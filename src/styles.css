@@ -52,8 +52,8 @@
   --color-emma-purple: var(--emma-purple);
   --color-emma-gold: var(--emma-gold);
   --color-emma-charcoal: var(--emma-charcoal);
-  --font-display: var(--font-syne);
-  --font-body: var(--font-dm-sans);
+  --font-display: var(--font-sora);
+  --font-body: var(--font-inter);
 }
 
 :root {
@@ -108,8 +108,8 @@
   --shadow-card-hover: 0 12px 40px oklch(0 0 0 / 0.12);
 
   /* Fonts */
-  --font-syne: 'Syne', sans-serif;
-  --font-dm-sans: 'DM Sans', sans-serif;
+  --font-sora: 'Sora', sans-serif;
+  --font-inter: 'Inter', sans-serif;
 
   /* Sidebar */
   --sidebar: oklch(0.98 0.003 280);
@@ -136,14 +136,17 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-syne);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    font-family: var(--font-sora);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
   }
 
+  h1 { font-weight: 800; }
+
   p, span, a, li, label, input, textarea, select, button {
-    font-family: var(--font-dm-sans);
+    font-family: var(--font-inter);
+    line-height: 1.5;
   }
 }
 

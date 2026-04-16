@@ -39,10 +39,10 @@ function AboutPage() {
         {/* Hero */}
         <section className="relative flex min-h-[60vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
           <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-medium text-white/70">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-body text-xs font-medium text-white/70">
               Our Story
             </span>
-            <h1 className="mt-6 font-display text-4xl font-extrabold text-white md:text-6xl">
+            <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight text-white md:text-6xl">
               One Vision. Three Continents.{" "}
               <span className="gradient-text-gold">Unlimited Growth.</span>
             </h1>
@@ -52,7 +52,7 @@ function AboutPage() {
         {/* Origin Story */}
         <section className="section-padding">
           <div className="mx-auto max-w-3xl">
-            <div className="space-y-5 text-base leading-relaxed text-muted-foreground">
+            <div className="space-y-5 font-body text-base font-normal leading-relaxed text-muted-foreground">
               <p>
                 Emmanuel Akinloye Oluwaseun didn't start with a team or an office. He started with a burning question: <em className="font-semibold text-foreground">"Why are Nigerian businesses being left behind in the digital age?"</em>
               </p>
@@ -69,7 +69,7 @@ function AboutPage() {
                 <p className="font-display text-lg font-bold italic text-white">
                   "I've seen what happens when a small business gets the right digital system. They don't just survive — they dominate."
                 </p>
-                <cite className="mt-3 block text-sm font-medium text-white/60 not-italic">
+                <cite className="mt-3 block font-body text-sm font-medium text-white/60 not-italic">
                   — Emmanuel Akinloye Oluwaseun, Founder
                 </cite>
               </blockquote>
@@ -80,12 +80,17 @@ function AboutPage() {
         {/* Founder Card */}
         <section className="section-padding bg-muted/30">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mx-auto inline-flex h-32 w-32 items-center justify-center rounded-full bg-muted font-display text-4xl font-extrabold text-muted-foreground/30">
-              EO
+            <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
+              <img
+                src="/images/emmanuel.png"
+                alt="Emmanuel Akinloye Oluwaseun"
+                className="h-full w-full object-cover object-top"
+                loading="lazy"
+              />
             </div>
-            <h3 className="mt-5 font-display text-2xl font-bold text-foreground">Emmanuel Akinloye Oluwaseun</h3>
-            <p className="text-muted-foreground">Founder & CEO, EmmaForYou</p>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            <h3 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h3>
+            <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
+            <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
               Digital strategist, automation expert, and passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
             </p>
           </div>
@@ -94,15 +99,15 @@ function AboutPage() {
         {/* Values */}
         <section className="section-padding">
           <div className="mx-auto max-w-6xl">
-            <h2 className="text-center font-display text-3xl font-extrabold text-foreground md:text-4xl">
+            <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
               Our Core <span className="gradient-text">Values</span>
             </h2>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {VALUES.map((v, i) => (
                 <div key={i} className="gradient-border rounded-2xl p-6 text-center">
                   <span className="text-3xl">{v.icon}</span>
-                  <h3 className="mt-3 font-display text-lg font-bold text-foreground">{v.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
+                  <h3 className="mt-3 font-display text-lg font-bold tracking-tight text-foreground">{v.title}</h3>
+                  <p className="mt-2 font-body text-sm font-normal text-muted-foreground">{v.desc}</p>
                 </div>
               ))}
             </div>
@@ -112,7 +117,7 @@ function AboutPage() {
         {/* Global Presence */}
         <section className="section-padding bg-muted/30">
           <div className="mx-auto max-w-4xl text-center">
-            <h2 className="font-display text-3xl font-extrabold text-foreground md:text-4xl">
+            <h2 className="font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
               Global <span className="gradient-text">Presence</span>
             </h2>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
@@ -121,7 +126,7 @@ function AboutPage() {
                   <span className="text-2xl">{loc.flag}</span>
                   <div className="text-left">
                     <p className="font-display text-sm font-bold text-foreground">{loc.city}</p>
-                    <p className="text-xs text-muted-foreground">{loc.country}</p>
+                    <p className="font-body text-xs font-normal text-muted-foreground">{loc.country}</p>
                   </div>
                 </div>
               ))}
@@ -131,13 +136,13 @@ function AboutPage() {
 
         {/* CTA */}
         <section className="section-padding text-center" style={{ background: "var(--gradient-gold)" }}>
-          <h2 className="font-display text-3xl font-extrabold text-emma-charcoal md:text-4xl">Ready to Grow?</h2>
-          <p className="mx-auto mt-3 max-w-lg text-base text-emma-charcoal/70">Let's build something incredible for your business.</p>
+          <h2 className="font-display text-3xl font-extrabold tracking-tight text-emma-charcoal md:text-4xl">Ready to Grow?</h2>
+          <p className="mx-auto mt-3 max-w-lg font-body text-base font-normal text-emma-charcoal/70">Let's build something incredible for your business.</p>
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white"
+            className="mt-6 inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-body text-sm font-semibold text-white"
             style={{ background: "var(--gradient-dark)" }}
           >
             Work With Us →

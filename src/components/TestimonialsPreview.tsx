@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const TESTIMONIALS = [
   { name: "Chioma Okafor", biz: "Fashion Store", loc: "Lagos, Nigeria", text: "EmmaForYou transformed our Instagram from 200 to 3,000 followers in 6 weeks. Sales doubled.", rating: 5 },
   { name: "David Mensah", biz: "Auto Dealer", loc: "Accra, Ghana", text: "Our website now generates 15+ leads per week. Before EmmaForYou, we had zero online presence.", rating: 5 },
@@ -68,7 +70,13 @@ function MarqueeRow({ items, reverse }: { items: typeof TESTIMONIALS; reverse?: 
 export default function TestimonialsPreview() {
   return (
     <section className="section-padding overflow-hidden bg-muted/50">
-      <div className="mx-auto max-w-7xl text-center">
+      <motion.div
+        className="mx-auto max-w-7xl text-center"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      >
         <span className="inline-block rounded-full bg-background px-4 py-1.5 text-xs font-medium text-muted-foreground">
           Testimonials
         </span>
@@ -78,18 +86,30 @@ export default function TestimonialsPreview() {
         <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
           Don't take our word for it — hear from businesses we've helped transform.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="mt-12 flex flex-col gap-5">
+      <motion.div
+        className="mt-12 flex flex-col gap-5"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
         <MarqueeRow items={ROW1} />
         <MarqueeRow items={ROW2} reverse />
-      </div>
+      </motion.div>
 
-      <div className="mt-10 text-center">
+      <motion.div
+        className="mt-10 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
         <a href="/testimonials" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
           See All 500+ Testimonials →
         </a>
-      </div>
+      </motion.div>
     </section>
   );
 }

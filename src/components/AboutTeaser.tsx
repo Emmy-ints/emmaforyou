@@ -1,11 +1,23 @@
-const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
+import { motion } from "framer-motion";
 
 export default function AboutTeaser() {
   return (
     <section className="section-padding bg-background">
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
-        <div className="flex items-center justify-center">
-          <div className="relative h-80 w-80 overflow-hidden rounded-3xl md:h-96 md:w-96">
+        <motion.div
+          className="flex items-center justify-center"
+          initial={{ opacity: 0, x: -60, rotateY: 15 }}
+          whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{ perspective: 1000 }}
+        >
+          <motion.div
+            className="relative h-80 w-80 overflow-hidden rounded-3xl md:h-96 md:w-96"
+            whileHover={{ scale: 1.04, rotateY: -6, rotateX: 4 }}
+            transition={{ duration: 0.4 }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
             <img
               src="/images/emmanuel.png"
               alt="Emmanuel Akinloye Oluwaseun — Founder & CEO, EmmaForYou"
@@ -17,10 +29,15 @@ export default function AboutTeaser() {
               <p className="font-display text-lg font-bold text-white">Emmanuel Akinloye Oluwaseun</p>
               <p className="font-body text-sm font-normal text-white/60">Founder & CEO, EmmaForYou</p>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div>
+        <motion.div
+          initial={{ opacity: 0, x: 60 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        >
           <span className="inline-block rounded-full bg-muted px-4 py-1.5 font-body text-xs font-medium text-muted-foreground">
             Our Story
           </span>
@@ -34,13 +51,15 @@ export default function AboutTeaser() {
           <p className="mt-3 font-body text-base font-normal leading-relaxed text-muted-foreground">
             Today, we serve clients across Nigeria, Columbia, United States, Germany, France and Spain. From freelancer to agency, this is just the beginning.
           </p>
-          <a
+          <motion.a
             href="/about"
             className="btn-primary-gradient mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 font-body text-sm font-medium"
+            whileHover={{ scale: 1.06, y: -3 }}
+            whileTap={{ scale: 0.97 }}
           >
             Our Full Story →
-          </a>
-        </div>
+          </motion.a>
+        </motion.div>
       </div>
     </section>
   );

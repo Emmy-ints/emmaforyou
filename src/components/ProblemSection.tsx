@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 const PAIN_POINTS = [
@@ -10,28 +12,52 @@ export default function ProblemSection() {
   return (
     <section className="section-padding">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl p-8 md:p-14" style={{ background: "var(--gradient-dark)" }}>
-          <p className="text-center font-display text-2xl font-extrabold leading-tight text-white md:text-4xl">
+        <motion.div
+          className="rounded-3xl p-8 md:p-14"
+          style={{ background: "var(--gradient-dark)", transformStyle: "preserve-3d", perspective: 1000 }}
+          initial={{ opacity: 0, rotateX: 8, y: 60 }}
+          whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <motion.p
+            className="text-center font-display text-2xl font-extrabold leading-tight text-white md:text-4xl"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             "Every day you don't have a system —{" "}
             <span style={{ color: "oklch(0.7 0.2 25)" }}>you're losing customers</span>{" "}
             to businesses that do."
-          </p>
+          </motion.p>
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {PAIN_POINTS.map((p, i) => (
-              <div
+              <motion.div
                 key={i}
                 className="rounded-2xl border border-white/10 p-6"
                 style={{ background: "oklch(0.18 0.03 280 / 0.8)" }}
+                initial={{ opacity: 0, y: 40, rotateY: -10 }}
+                whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ scale: 1.04, rotateY: 5, z: 20 }}
               >
                 <span className="text-2xl">{p.emoji}</span>
                 <h3 className="mt-3 font-display text-lg font-bold text-white">{p.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/60">{p.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
 
-          <div className="mt-10 text-center">
+          <motion.div
+            className="mt-10 text-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
             <a
               href={WHATSAPP_URL}
               target="_blank"
@@ -40,8 +66,8 @@ export default function ProblemSection() {
             >
               Fix This Now →
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

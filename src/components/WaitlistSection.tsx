@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { motion } from "framer-motion";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -27,7 +28,13 @@ export default function WaitlistSection() {
 
   return (
     <section className="section-padding" style={{ background: "var(--gradient-gold)" }}>
-      <div className="mx-auto max-w-3xl text-center">
+      <motion.div
+        className="mx-auto max-w-3xl text-center"
+        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
         <h2 className="font-display text-3xl font-extrabold text-emma-charcoal md:text-5xl">
           Be First. Get Early Access. Grow Faster.
         </h2>
@@ -35,12 +42,25 @@ export default function WaitlistSection() {
           Join the EmmaForYou waitlist and be among the first businesses to access our full suite of AI-powered growth services. Limited spots. Serious results.
         </p>
 
-        <p className="mt-6 text-sm font-semibold text-emma-charcoal/80">
+        <motion.p
+          className="mt-6 text-sm font-semibold text-emma-charcoal/80"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+        >
           🔥 {count} businesses already on the waitlist
-        </p>
+        </motion.p>
 
         {!submitted ? (
-          <form onSubmit={handleSubmit} className="mx-auto mt-6 flex max-w-md gap-3">
+          <motion.form
+            onSubmit={handleSubmit}
+            className="mx-auto mt-6 flex max-w-md gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
             <input
               type="email"
               required
@@ -49,16 +69,23 @@ export default function WaitlistSection() {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 rounded-full border-2 border-emma-charcoal/20 bg-white/80 px-5 py-3 text-sm text-emma-charcoal placeholder:text-emma-charcoal/40 focus:border-emma-charcoal/50 focus:outline-none"
             />
-            <button
+            <motion.button
               type="submit"
-              className="rounded-full px-6 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5"
+              className="rounded-full px-6 py-3 text-sm font-semibold text-white"
               style={{ background: "var(--gradient-dark)" }}
+              whileHover={{ scale: 1.06, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
               Join Waitlist
-            </button>
-          </form>
+            </motion.button>
+          </motion.form>
         ) : (
-          <div className="mt-6 rounded-2xl bg-white/60 p-6">
+          <motion.div
+            className="mt-6 rounded-2xl bg-white/60 p-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <p className="font-display text-lg font-bold text-emma-charcoal">
               🎉 You're in!
             </p>
@@ -74,7 +101,7 @@ export default function WaitlistSection() {
             >
               Chat With Us Now →
             </a>
-          </div>
+          </motion.div>
         )}
 
         <a
@@ -85,7 +112,7 @@ export default function WaitlistSection() {
         >
           Or chat with us directly on WhatsApp →
         </a>
-      </div>
+      </motion.div>
     </section>
   );
 }

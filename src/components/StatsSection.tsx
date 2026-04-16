@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 const STATS = [
   { value: 500, suffix: "+", label: "Testimonials" },
@@ -50,12 +51,20 @@ export default function StatsSection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           {STATS.map((stat, i) => (
-            <div key={i} className="text-center">
+            <motion.div
+              key={i}
+              className="text-center"
+              initial={{ opacity: 0, y: 40, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ scale: 1.1, y: -8 }}
+            >
               <div className="font-display text-4xl font-extrabold text-white md:text-5xl">
                 <CountUp target={stat.value} suffix={stat.suffix} />
               </div>
               <p className="mt-2 text-sm font-medium text-white/60">{stat.label}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 const SERVICES = [
@@ -10,11 +12,31 @@ const SERVICES = [
   { icon: "📲", name: "App Development", desc: "Custom mobile and web applications that streamline operations and delight your customers." },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 60, rotateX: 15 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: {
+      duration: 0.7,
+      delay: i * 0.1,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  }),
+};
+
 export default function ServicesSection() {
   return (
     <section id="services" className="section-padding bg-background">
       <div className="mx-auto max-w-7xl">
-        <div className="text-center">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
           <span className="inline-block rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground">
             What We Do
           </span>
@@ -25,27 +47,43 @@ export default function ServicesSection() {
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
             From AI automation to full-stack web development — we deliver the digital infrastructure your business needs to grow.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" style={{ perspective: 1200 }}>
           {SERVICES.map((s, i) => (
-            <a
+            <motion.a
               key={i}
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="gradient-border group flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
-              style={{ animationDelay: `${i * 0.1}s` }}
+              className="gradient-border group flex flex-col rounded-2xl p-6"
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              whileHover={{
+                y: -12,
+                rotateY: 8,
+                rotateX: -4,
+                scale: 1.03,
+                transition: { duration: 0.3 },
+              }}
+              style={{ transformStyle: "preserve-3d" }}
             >
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-2xl transition-transform duration-500 group-hover:rotate-[360deg]">
+              <motion.span
+                className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-2xl"
+                whileHover={{ rotate: 360, scale: 1.15 }}
+                transition={{ duration: 0.6 }}
+              >
                 {s.icon}
-              </span>
+              </motion.span>
               <h3 className="mt-4 font-display text-lg font-bold text-foreground">{s.name}</h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-emma-blue transition-colors group-hover:text-emma-pink">
                 Learn More <span aria-hidden>→</span>
               </span>
-            </a>
+            </motion.a>
           ))}
         </div>
       </div>

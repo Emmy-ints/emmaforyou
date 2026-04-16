@@ -29,10 +29,10 @@ export default function AboutTeaser() {
             <span className="gradient-text">3 Continents</span>
           </h2>
           <p className="mt-5 font-body text-base font-normal leading-relaxed text-muted-foreground">
-            EmmaForYou started as one person's dream in Nigeria — Emmanuel Akinloye Oluwaseun — with a laptop, a vision, and an unshakeable belief that African businesses deserve world-class digital tools.
+            EmmaForYou started as one person's dream in Nigeria, Emmanuel Akinloye Oluwaseun, with a laptop, a vision, and an unshakeable belief that African businesses deserve world-class digital tools.
           </p>
           <p className="mt-3 font-body text-base font-normal leading-relaxed text-muted-foreground">
-            Today, we serve clients across Lagos, Hanover, Toulon, Halle, and Cookhouse. From freelancer to agency — this is just the beginning.
+            Today, we serve clients across Nigeria, Columbia, United States, Germany, France and Spain. From freelancer to agency, this is just the beginning.
           </p>
           <a
             href="/about"

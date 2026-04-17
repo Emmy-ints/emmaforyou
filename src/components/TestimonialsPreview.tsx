@@ -102,12 +102,6 @@ function TestimonialCard({ t }: { t: typeof TESTIMONIALS[0] }) {
     </div>
   );
 }
-      </div>
-      <StarRating rating={t.rating} />
-      <p className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
-    </div>
-  );
-}
 
 function MarqueeRow({ items, reverse }: { items: typeof TESTIMONIALS; reverse?: boolean }) {
   const doubled = [...items, ...items];

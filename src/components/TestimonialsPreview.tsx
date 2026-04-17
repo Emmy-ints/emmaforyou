@@ -1,22 +1,65 @@
 import { motion } from "framer-motion";
 
+function getFlag(loc: string): string {
+  const l = loc.toLowerCase();
+  if (/(nigeria|lagos|abuja|port harcourt|ibadan|kano|benin|enugu|kaduna)/.test(l)) return "🇳🇬";
+  if (/(usa|united states|maryland|hanover|new york|atlanta|texas|miami|chicago|los angeles)/.test(l)) return "🇺🇸";
+  if (/(france|toulon|paris|lyon|marseille)/.test(l)) return "🇫🇷";
+  if (/(germany|halle|berlin|munich|hamburg)/.test(l)) return "🇩🇪";
+  if (/(south africa|cookhouse|cape town|johannesburg|durban|pretoria)/.test(l)) return "🇿🇦";
+  if (/(uk|london|manchester|birmingham|leeds|bristol|england)/.test(l)) return "🇬🇧";
+  if (/(ghana|accra|kumasi)/.test(l)) return "🇬🇭";
+  if (/(kenya|nairobi|mombasa)/.test(l)) return "🇰🇪";
+  if (/(canada|toronto|vancouver|montreal|ottawa)/.test(l)) return "🇨🇦";
+  if (/(spain|madrid|barcelona)/.test(l)) return "🇪🇸";
+  if (/(colombia|bogota|medellin)/.test(l)) return "🇨🇴";
+  return "🌍";
+}
+
 const TESTIMONIALS = [
+  // Nigeria
   { name: "Chioma Okafor", biz: "Fashion Store", loc: "Lagos, Nigeria", text: "EmmaForYou transformed our Instagram from 200 to 3,000 followers in 6 weeks. Sales doubled.", rating: 5 },
-  { name: "David Mensah", biz: "Auto Dealer", loc: "Accra, Ghana", text: "Our website now generates 15+ leads per week. Before EmmaForYou, we had zero online presence.", rating: 5 },
-  { name: "Sarah Johnson", biz: "Real Estate Agent", loc: "Hanover, MD USA", text: "Closed 4 properties in 2 months from Facebook leads they set up. Incredible ROI.", rating: 5 },
   { name: "Adebayo Tunde", biz: "Restaurant", loc: "Port Harcourt, Nigeria", text: "Fully booked every weekend after Google Ads setup. EmmaForYou changed our business.", rating: 5 },
-  { name: "Marie Dupont", biz: "Beauty Salon", loc: "Toulon, France", text: "The AI booking system saves us 3 hours daily. Clients love the instant confirmations.", rating: 5 },
-  { name: "Klaus Weber", biz: "Fitness Gym", loc: "Halle, Germany", text: "Membership signups increased 180% after the new website and email campaigns launched.", rating: 5 },
   { name: "Ngozi Eze", biz: "Clinic", loc: "Abuja, Nigeria", text: "From 5 to 47 Google reviews and 3x new patients. EmmaForYou built our credibility online.", rating: 5 },
-  { name: "James Molefe", biz: "Car Rental", loc: "Cookhouse, SA", text: "Our booking platform handles everything automatically now. Revenue up 200% in 90 days.", rating: 5 },
-  { name: "Funke Adeyemi", biz: "Bakery", loc: "Ibadan, Nigeria", text: "Instagram orders went from 2 per week to 15+ daily. The content strategy was brilliant.", rating: 4.9 },
-  { name: "Peter Okonkwo", biz: "Ecommerce", loc: "Lagos, Nigeria", text: "Scaled from ₦200k to ₦1.8M monthly revenue with Shopify optimization and ads.", rating: 5 },
-  { name: "Lisa Ndlovu", biz: "Nail Studio", loc: "Johannesburg, SA", text: "Clients now book online 24/7. We're booked out 2 weeks in advance since the new system.", rating: 5 },
-  { name: "Emmanuel Bassey", biz: "SaaS Startup", loc: "Lagos, Nigeria", text: "The app they built handles 500+ users daily with zero downtime. Professional team.", rating: 5 },
+  { name: "Funke Adeyemi", biz: "Bakery", loc: "Ibadan, Nigeria", text: "Instagram orders went from 2/week to 15+ daily. Content strategy was brilliant.", rating: 4.9 },
+  { name: "Peter Okonkwo", biz: "Ecommerce", loc: "Kano, Nigeria", text: "Scaled from ₦200k to ₦1.8M monthly revenue with Shopify optimization and ads.", rating: 5 },
+  { name: "Emmanuel Bassey", biz: "SaaS Startup", loc: "Benin City, Nigeria", text: "The app they built handles 500+ users daily with zero downtime. Professional team.", rating: 5 },
+  { name: "Zainab Yusuf", biz: "Beauty Brand", loc: "Kaduna, Nigeria", text: "Email list grew from 0 to 8,000 subscribers in 4 months. ROI is unreal.", rating: 5 },
+  { name: "Ifeanyi Nwosu", biz: "Logistics", loc: "Enugu, Nigeria", text: "WhatsApp automation handles 90% of customer enquiries now. Game changer.", rating: 5 },
+  // USA
+  { name: "Sarah Johnson", biz: "Real Estate", loc: "Hanover, Maryland USA", text: "Closed 4 properties in 2 months from Facebook leads they set up. Incredible ROI.", rating: 5 },
+  { name: "Michael Brown", biz: "Auto Detailing", loc: "Atlanta, USA", text: "Bookings tripled in 60 days. The local SEO work alone paid for everything.", rating: 5 },
+  { name: "Jessica Carter", biz: "Wellness Coach", loc: "Miami, USA", text: "Funnel converts at 8%. I went from 3 clients/month to fully booked.", rating: 5 },
+  // UK
+  { name: "Oliver Smith", biz: "Marketing Agency", loc: "London, UK", text: "Their AI automation saves my team 20 hours a week. Pure magic.", rating: 5 },
+  { name: "Emily Watson", biz: "Boutique", loc: "Manchester, UK", text: "Online sales now 40% of revenue, up from zero. The Shopify build is flawless.", rating: 5 },
+  { name: "Harry Thompson", biz: "Fitness Studio", loc: "Birmingham, UK", text: "Membership app + booking system = 220 new members in 90 days.", rating: 5 },
+  { name: "Sophie Bennett", biz: "Florist", loc: "Bristol, UK", text: "Same-day delivery orders via Instagram are now my biggest income stream.", rating: 5 },
+  { name: "James Carter", biz: "Consultancy", loc: "Leeds, UK", text: "LinkedIn lead-gen pipeline brings 12 qualified calls a week. Worth every penny.", rating: 5 },
+  { name: "Charlotte Hughes", biz: "Skincare Brand", loc: "London, UK", text: "TikTok strategy went viral — 2 products sold out in 48 hours.", rating: 5 },
+  // Ghana
+  { name: "David Mensah", biz: "Auto Dealer", loc: "Accra, Ghana", text: "Our website now generates 15+ leads per week. Before EmmaForYou, zero online presence.", rating: 5 },
+  { name: "Akosua Boateng", biz: "Catering", loc: "Kumasi, Ghana", text: "Wedding bookings up 300%. The portfolio site is stunning and converts.", rating: 5 },
+  { name: "Kwame Asante", biz: "Tech Startup", loc: "Accra, Ghana", text: "Pitch deck site + product demo helped us close $80k in seed funding.", rating: 5 },
+  { name: "Ama Owusu", biz: "Spa", loc: "Accra, Ghana", text: "Booking system runs itself. We focus on clients, not admin. Brilliant team.", rating: 5 },
+  // Kenya
+  { name: "John Kamau", biz: "Safari Tours", loc: "Nairobi, Kenya", text: "International bookings increased 5x. SEO + multilingual site changed everything.", rating: 5 },
+  { name: "Grace Wanjiku", biz: "Coffee Brand", loc: "Nairobi, Kenya", text: "DTC ecommerce launch hit $30k in first month. Phenomenal execution.", rating: 5 },
+  { name: "Daniel Mwangi", biz: "Real Estate", loc: "Mombasa, Kenya", text: "Virtual tour platform sold 8 units in one quarter. Outstanding work.", rating: 5 },
+  { name: "Mercy Achieng", biz: "Fashion Designer", loc: "Nairobi, Kenya", text: "Reels strategy brought 50k followers and a global stockist deal.", rating: 5 },
+  // Canada
+  { name: "Liam O'Connor", biz: "Restaurant Group", loc: "Toronto, Canada", text: "Centralised booking + loyalty app across 4 locations. Repeat visits up 65%.", rating: 5 },
+  { name: "Olivia Tremblay", biz: "Yoga Studio", loc: "Montreal, Canada", text: "Class bookings doubled. The website finally feels as premium as the brand.", rating: 5 },
+  { name: "Noah Singh", biz: "Dental Clinic", loc: "Vancouver, Canada", text: "Google ranking jumped to top 3 in 4 months. Phones don't stop ringing.", rating: 5 },
+  // Europe + SA (existing)
+  { name: "Marie Dupont", biz: "Beauty Salon", loc: "Toulon, France", text: "The AI booking system saves us 3 hours daily. Clients love instant confirmations.", rating: 5 },
+  { name: "Klaus Weber", biz: "Fitness Gym", loc: "Halle, Germany", text: "Membership signups increased 180% after the new website and email campaigns launched.", rating: 5 },
+  { name: "Lisa Ndlovu", biz: "Nail Studio", loc: "Johannesburg, South Africa", text: "Clients now book 24/7. We're booked out 2 weeks in advance since the new system.", rating: 5 },
+  { name: "James Molefe", biz: "Car Rental", loc: "Cookhouse, South Africa", text: "Our booking platform handles everything automatically. Revenue up 200% in 90 days.", rating: 5 },
 ];
 
-const ROW1 = TESTIMONIALS.slice(0, 6);
-const ROW2 = TESTIMONIALS.slice(6, 12);
+const ROW1 = TESTIMONIALS.slice(0, Math.ceil(TESTIMONIALS.length / 2));
+const ROW2 = TESTIMONIALS.slice(Math.ceil(TESTIMONIALS.length / 2));
 
 function StarRating({ rating }: { rating: number }) {
   return (

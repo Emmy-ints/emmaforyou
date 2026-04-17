@@ -133,7 +133,7 @@ export default function TestimonialsPreview() {
           <span className="gradient-text">500+ Businesses.</span> Real Results.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
-          Don't take our word for it — hear from businesses we've helped transform.
+          From 🇳🇬 Nigeria to 🇬🇧 UK, 🇺🇸 USA, 🇨🇦 Canada, 🇩🇪 Germany, 🇫🇷 France, 🇬🇭 Ghana, 🇰🇪 Kenya & 🇿🇦 South Africa — real businesses, real results.
         </p>
       </motion.div>
 
@@ -155,7 +155,7 @@ export default function TestimonialsPreview() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <a href="/testimonials" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
+        <a href="/testimonials" className="btn-green inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
           See All 500+ Testimonials →
         </a>
       </motion.div>

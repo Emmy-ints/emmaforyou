@@ -29,7 +29,7 @@ export default function WaitlistSection() {
   return (
     <section className="section-padding" style={{ background: "var(--gradient-gold)" }}>
       <motion.div
-        className="mx-auto max-w-3xl text-center"
+        className="mx-auto max-w-3xl rounded-3xl bg-white/30 p-8 text-center backdrop-blur-sm md:p-12 animate-glow-pulse"
         initial={{ opacity: 0, y: 60, scale: 0.95 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, amount: 0.3 }}

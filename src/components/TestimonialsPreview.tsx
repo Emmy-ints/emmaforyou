@@ -76,20 +76,32 @@ function StarRating({ rating }: { rating: number }) {
 function TestimonialCard({ t }: { t: typeof TESTIMONIALS[0] }) {
   const initial = t.name[0];
   const hue = t.name.charCodeAt(0) * 15 % 360;
+  const flag = getFlag(t.loc);
 
   return (
     <div className="gradient-border flex min-w-[280px] flex-col gap-3 rounded-2xl p-5 md:min-w-[320px]">
       <div className="flex items-center gap-3">
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-          style={{ background: `oklch(0.6 0.15 ${hue})` }}
-        >
-          {initial}
+        <div className="relative">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
+            style={{ background: `oklch(0.6 0.15 ${hue})` }}
+          >
+            {initial}
+          </div>
+          <span className="absolute -bottom-1 -right-1 text-base leading-none drop-shadow-sm">{flag}</span>
         </div>
         <div>
           <p className="text-sm font-semibold text-foreground">{t.name}</p>
-          <p className="text-xs text-muted-foreground">{t.biz} · {t.loc}</p>
+          <p className="text-xs text-muted-foreground">
+            {t.biz} · <span aria-hidden>{flag}</span> {t.loc}
+          </p>
         </div>
+      </div>
+      <StarRating rating={t.rating} />
+      <p className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
+    </div>
+  );
+}
       </div>
       <StarRating rating={t.rating} />
       <p className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>

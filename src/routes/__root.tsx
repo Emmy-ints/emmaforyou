@@ -1,5 +1,4 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import ParticleBackground from "../components/ParticleBackground";
 
 import appCss from "../styles.css?url";
 
@@ -69,10 +68,5 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  return (
-    <>
-      <ParticleBackground />
-      <Outlet />
-    </>
-  );
+  return <Outlet />;
 }

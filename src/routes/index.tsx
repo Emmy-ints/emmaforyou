@@ -7,12 +7,14 @@ import PageLoader from "../components/PageLoader";
 import SocialProofBar from "../components/SocialProofBar";
 import ProblemSection from "../components/ProblemSection";
 import ServicesSection from "../components/ServicesSection";
+import AnalyserTeaser from "../components/AnalyserTeaser";
 import NicheShowcase from "../components/NicheShowcase";
 import StatsSection from "../components/StatsSection";
 import TestimonialsPreview from "../components/TestimonialsPreview";
 import AboutTeaser from "../components/AboutTeaser";
 import MissionSection from "../components/MissionSection";
 import WaitlistSection from "../components/WaitlistSection";
+import { useI18n } from "../lib/i18n";
 
 const HeroScene = lazy(() => import("../components/HeroScene"));
 
@@ -40,6 +42,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+  const { t } = useI18n();
   const [loaded, setLoaded] = useState(false);
   const onLoaderComplete = useCallback(() => setLoaded(true), []);
 
@@ -60,7 +63,7 @@ function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              🌍 Trusted by businesses across 3 continents
+              {t("hero_badge")}
             </motion.span>
             <motion.h1
               className="mt-8 font-display text-4xl font-extrabold leading-[1.1] text-foreground sm:text-5xl md:text-7xl"
@@ -69,12 +72,12 @@ function HomePage() {
               transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
               style={{ perspective: 1000 }}
             >
-              Your Business Deserves
+              {t("hero_title_1")}
               <br />
-              To Be Found, Followed
+              {t("hero_title_2")}
               <br />
-              & <span className="relative inline-block">
-                <span className="gradient-text">Fully Automated</span>
+              {t("hero_title_3")}<span className="relative inline-block">
+                <span className="gradient-text">{t("hero_title_4")}</span>
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full" style={{ background: "var(--gradient-gold)" }} />
               </span>.
             </motion.h1>
@@ -84,7 +87,7 @@ function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.7 }}
             >
-              We help fashion stores, clinics, restaurants, coaches, real estate agents and 50+ business types across Nigeria, USA, Europe and Africa grow faster with AI automation, stunning websites, and digital marketing that actually works.
+              {t("hero_sub")}
             </motion.p>
             <motion.div
               className="mt-8 flex flex-wrap items-center justify-center gap-4"
@@ -100,14 +103,14 @@ function HomePage() {
                 whileHover={{ scale: 1.06, y: -3 }}
                 whileTap={{ scale: 0.96 }}
               >
-                Start Growing My Business →
+                {t("cta_start")} →
               </motion.a>
               <motion.button
                 className="btn-ghost inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.96 }}
               >
-                ▶ Watch How It Works
+                ▶ {t("cta_watch")}
               </motion.button>
             </motion.div>
 
@@ -151,6 +154,7 @@ function HomePage() {
         <SocialProofBar />
         <ProblemSection />
         <ServicesSection />
+        <AnalyserTeaser />
         <NicheShowcase />
         <StatsSection />
         <TestimonialsPreview />

@@ -1,23 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
+import LanguageSelector from "./LanguageSelector";
+import { useI18n } from "@/lib/i18n";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
-const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "About", to: "/about" },
-  { label: "Services", to: "/#services" },
-  { label: "Testimonials", to: "/testimonials" },
-  { label: "Case Studies", to: "/cases" },
-  { label: "Business Analyser", to: "/analyser" },
-];
-
 export default function Navbar() {
+  const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [lastY, setLastY] = useState(0);
   const location = useLocation();
+
+  const NAV_LINKS = [
+    { label: t("nav_home"), to: "/" },
+    { label: t("nav_about"), to: "/about" },
+    { label: t("nav_testimonials"), to: "/testimonials" },
+    { label: t("nav_cases"), to: "/cases" },
+    { label: t("nav_analyser"), to: "/analyser" },
+  ];
 
   const handleScroll = useCallback(() => {
     const y = window.scrollY;
@@ -53,7 +55,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden items-center gap-7 lg:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
@@ -63,32 +65,30 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          <LanguageSelector />
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-gold inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm"
           >
-            Join Waitlist <span aria-hidden>→</span>
+            {t("cta_waitlist")} <span aria-hidden>→</span>
           </a>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5 lg:hidden"
-          aria-label="Toggle menu"
-        >
-          <span
-            className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "translate-y-2 rotate-45" : ""}`}
-          />
-          <span
-            className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "opacity-0" : ""}`}
-          />
-          <span
-            className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "-translate-y-2 -rotate-45" : ""}`}
-          />
-        </button>
+        {/* Mobile right cluster */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSelector />
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5"
+            aria-label="Toggle menu"
+          >
+            <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "translate-y-2 rotate-45" : ""}`} />
+            <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "opacity-0" : ""}`} />
+            <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "-translate-y-2 -rotate-45" : ""}`} />
+          </button>
+        </div>
 
         {/* Mobile menu */}
         <div
@@ -112,7 +112,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="btn-gold mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base"
             >
-              Join Waitlist <span aria-hidden>→</span>
+              {t("cta_waitlist")} <span aria-hidden>→</span>
             </a>
           </div>
         </div>

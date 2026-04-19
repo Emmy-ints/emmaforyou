@@ -1,9 +1,12 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
+import { submitLead } from "@/lib/leads";
+import { useI18n } from "@/lib/i18n";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 export default function WaitlistSection() {
+  const { t, lang } = useI18n();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [count] = useState(() => {
@@ -14,16 +17,21 @@ export default function WaitlistSection() {
   });
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       if (!email) return;
-      const stored = localStorage.getItem("emma_waitlist");
-      const entries = stored ? JSON.parse(stored) : [];
-      entries.push({ email, date: new Date().toISOString() });
-      localStorage.setItem("emma_waitlist", JSON.stringify(entries));
+      // Local backup for the counter
+      try {
+        const stored = localStorage.getItem("emma_waitlist");
+        const entries = stored ? JSON.parse(stored) : [];
+        entries.push({ email, date: new Date().toISOString() });
+        localStorage.setItem("emma_waitlist", JSON.stringify(entries));
+      } catch { /* ignore */ }
+      // Persist to Cloud
+      await submitLead({ source: "waitlist", email, language: lang });
       setSubmitted(true);
     },
-    [email]
+    [email, lang]
   );
 
   return (
@@ -36,7 +44,7 @@ export default function WaitlistSection() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
         <h2 className="font-display text-3xl font-extrabold text-emma-charcoal md:text-5xl">
-          Be First. Get Early Access. Grow Faster.
+          {t("waitlist_title")}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-base text-emma-charcoal/70">
           Join the EmmaForYou waitlist and be among the first businesses to access our full suite of AI-powered growth services. Limited spots. Serious results.
@@ -64,6 +72,7 @@ export default function WaitlistSection() {
             <input
               type="email"
               required
+              maxLength={255}
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +85,7 @@ export default function WaitlistSection() {
               whileHover={{ scale: 1.06, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              Join Waitlist
+              {t("cta_waitlist")}
             </motion.button>
           </motion.form>
         ) : (

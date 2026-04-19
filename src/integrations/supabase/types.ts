@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          budget: string | null
+          business_name: string | null
+          business_type: string | null
+          challenges: string[] | null
+          created_at: string
+          email: string | null
+          goal: string | null
+          id: string
+          language: string | null
+          location: string | null
+          name: string | null
+          presence: string[] | null
+          recommended_services: string[] | null
+          revenue: string | null
+          score: number | null
+          source: string
+          team_size: string | null
+          timeline: string | null
+          whatsapp: string | null
+          years_in_business: string | null
+        }
+        Insert: {
+          budget?: string | null
+          business_name?: string | null
+          business_type?: string | null
+          challenges?: string[] | null
+          created_at?: string
+          email?: string | null
+          goal?: string | null
+          id?: string
+          language?: string | null
+          location?: string | null
+          name?: string | null
+          presence?: string[] | null
+          recommended_services?: string[] | null
+          revenue?: string | null
+          score?: number | null
+          source: string
+          team_size?: string | null
+          timeline?: string | null
+          whatsapp?: string | null
+          years_in_business?: string | null
+        }
+        Update: {
+          budget?: string | null
+          business_name?: string | null
+          business_type?: string | null
+          challenges?: string[] | null
+          created_at?: string
+          email?: string | null
+          goal?: string | null
+          id?: string
+          language?: string | null
+          location?: string | null
+          name?: string | null
+          presence?: string[] | null
+          recommended_services?: string[] | null
+          revenue?: string | null
+          score?: number | null
+          source?: string
+          team_size?: string | null
+          timeline?: string | null
+          whatsapp?: string | null
+          years_in_business?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

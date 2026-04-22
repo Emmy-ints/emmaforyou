@@ -22,6 +22,7 @@ export interface LeadPayload {
 }
 
 const LOCAL_KEY = "emma_leads_backup";
+const INTAKE_KEY = "emma_intake_backup";
 
 export async function submitLead(payload: LeadPayload): Promise<{ ok: boolean; error?: string }> {
   // Always save a local backup first so we never lose a lead.
@@ -47,6 +48,82 @@ export async function submitLead(payload: LeadPayload): Promise<{ ok: boolean; e
 export function buildWhatsAppLink(score: number, businessName: string): string {
   const text = encodeURIComponent(
     `Hi EmmaForYou! I just completed the business analyser. My business is ${businessName} and my score is ${score}/100. I'd like my full report.`
+  );
+  return `https://wa.me/message/HHGMMWMRJFYUC1?text=${text}`;
+}
+
+// ===== Business Intake =====
+
+export interface IntakePayload {
+  full_name: string;
+  business_name: string;
+  business_type?: string;
+  business_description?: string;
+  years_in_business?: string;
+  business_stage?: string;
+  country?: string;
+  city?: string;
+  target_market?: string[];
+  customer_age_min?: number;
+  customer_age_max?: number;
+  customer_gender?: string;
+  has_website?: string;
+  website_url?: string;
+  website_rating?: number;
+  social_platforms?: Record<string, string | number>;
+  email_list_size?: string;
+  runs_ads?: string;
+  ad_platforms?: string[];
+  ad_spend?: string;
+  monthly_revenue?: string;
+  revenue_trend?: string;
+  revenue_source?: string;
+  growth_budget?: string;
+  has_marketing_budget?: string;
+  services_needed?: string[];
+  primary_goal?: string;
+  revenue_goal?: string;
+  desired_outcomes?: string;
+  success_metric?: string;
+  timeline?: string;
+  engagement_type?: string;
+  communication_preference?: string[];
+  start_timeline?: string;
+  worked_with_agency?: string;
+  agency_experience?: string;
+  biggest_fear?: string;
+  email: string;
+  whatsapp: string;
+  instagram_handle?: string;
+  how_found_us?: string;
+  referrer_name?: string;
+  uploaded_file_name?: string;
+  other_notes?: string;
+  consent: boolean;
+  language?: string;
+}
+
+export async function submitIntake(payload: IntakePayload): Promise<{ ok: boolean; error?: string }> {
+  try {
+    if (typeof window !== "undefined") {
+      const existing = JSON.parse(localStorage.getItem(INTAKE_KEY) || "[]");
+      existing.push({ ...payload, ts: new Date().toISOString() });
+      localStorage.setItem(INTAKE_KEY, JSON.stringify(existing.slice(-20)));
+    }
+  } catch { /* ignore */ }
+
+  try {
+    const { error } = await supabase.from("business_intakes").insert(payload);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+export function buildIntakeWhatsApp(businessName: string, location: string): string {
+  const text = encodeURIComponent(
+    `Hi EmmaForYou! I just submitted my business profile. Business: ${businessName} in ${location}. Looking forward to our conversation! 🚀`
   );
   return `https://wa.me/message/HHGMMWMRJFYUC1?text=${text}`;
 }

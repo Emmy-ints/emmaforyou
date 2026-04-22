@@ -14,6 +14,162 @@ export type Database = {
   }
   public: {
     Tables: {
+      business_intakes: {
+        Row: {
+          ad_platforms: string[] | null
+          ad_spend: string | null
+          agency_experience: string | null
+          biggest_fear: string | null
+          business_description: string | null
+          business_name: string
+          business_stage: string | null
+          business_type: string | null
+          city: string | null
+          communication_preference: string[] | null
+          consent: boolean
+          country: string | null
+          created_at: string
+          customer_age_max: number | null
+          customer_age_min: number | null
+          customer_gender: string | null
+          desired_outcomes: string | null
+          email: string
+          email_list_size: string | null
+          engagement_type: string | null
+          full_name: string
+          growth_budget: string | null
+          has_marketing_budget: string | null
+          has_website: string | null
+          how_found_us: string | null
+          id: string
+          instagram_handle: string | null
+          language: string | null
+          monthly_revenue: string | null
+          other_notes: string | null
+          primary_goal: string | null
+          referrer_name: string | null
+          revenue_goal: string | null
+          revenue_source: string | null
+          revenue_trend: string | null
+          runs_ads: string | null
+          services_needed: string[] | null
+          social_platforms: Json | null
+          source: string | null
+          start_timeline: string | null
+          success_metric: string | null
+          target_market: string[] | null
+          timeline: string | null
+          uploaded_file_name: string | null
+          website_rating: number | null
+          website_url: string | null
+          whatsapp: string
+          worked_with_agency: string | null
+          years_in_business: string | null
+        }
+        Insert: {
+          ad_platforms?: string[] | null
+          ad_spend?: string | null
+          agency_experience?: string | null
+          biggest_fear?: string | null
+          business_description?: string | null
+          business_name: string
+          business_stage?: string | null
+          business_type?: string | null
+          city?: string | null
+          communication_preference?: string[] | null
+          consent?: boolean
+          country?: string | null
+          created_at?: string
+          customer_age_max?: number | null
+          customer_age_min?: number | null
+          customer_gender?: string | null
+          desired_outcomes?: string | null
+          email: string
+          email_list_size?: string | null
+          engagement_type?: string | null
+          full_name: string
+          growth_budget?: string | null
+          has_marketing_budget?: string | null
+          has_website?: string | null
+          how_found_us?: string | null
+          id?: string
+          instagram_handle?: string | null
+          language?: string | null
+          monthly_revenue?: string | null
+          other_notes?: string | null
+          primary_goal?: string | null
+          referrer_name?: string | null
+          revenue_goal?: string | null
+          revenue_source?: string | null
+          revenue_trend?: string | null
+          runs_ads?: string | null
+          services_needed?: string[] | null
+          social_platforms?: Json | null
+          source?: string | null
+          start_timeline?: string | null
+          success_metric?: string | null
+          target_market?: string[] | null
+          timeline?: string | null
+          uploaded_file_name?: string | null
+          website_rating?: number | null
+          website_url?: string | null
+          whatsapp: string
+          worked_with_agency?: string | null
+          years_in_business?: string | null
+        }
+        Update: {
+          ad_platforms?: string[] | null
+          ad_spend?: string | null
+          agency_experience?: string | null
+          biggest_fear?: string | null
+          business_description?: string | null
+          business_name?: string
+          business_stage?: string | null
+          business_type?: string | null
+          city?: string | null
+          communication_preference?: string[] | null
+          consent?: boolean
+          country?: string | null
+          created_at?: string
+          customer_age_max?: number | null
+          customer_age_min?: number | null
+          customer_gender?: string | null
+          desired_outcomes?: string | null
+          email?: string
+          email_list_size?: string | null
+          engagement_type?: string | null
+          full_name?: string
+          growth_budget?: string | null
+          has_marketing_budget?: string | null
+          has_website?: string | null
+          how_found_us?: string | null
+          id?: string
+          instagram_handle?: string | null
+          language?: string | null
+          monthly_revenue?: string | null
+          other_notes?: string | null
+          primary_goal?: string | null
+          referrer_name?: string | null
+          revenue_goal?: string | null
+          revenue_source?: string | null
+          revenue_trend?: string | null
+          runs_ads?: string | null
+          services_needed?: string[] | null
+          social_platforms?: Json | null
+          source?: string | null
+          start_timeline?: string | null
+          success_metric?: string | null
+          target_market?: string[] | null
+          timeline?: string | null
+          uploaded_file_name?: string | null
+          website_rating?: number | null
+          website_url?: string | null
+          whatsapp?: string
+          worked_with_agency?: string | null
+          years_in_business?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           budget: string | null

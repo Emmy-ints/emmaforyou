@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as IntakeRouteImport } from './routes/intake'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as AnalyserRouteImport } from './routes/analyser'
 import { Route as AboutRouteImport } from './routes/about'
@@ -18,6 +20,16 @@ import { Route as IndexRouteImport } from './routes/index'
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
   path: '/testimonials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntakeRoute = IntakeRouteImport.update({
+  id: '/intake',
+  path: '/intake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasesRoute = CasesRouteImport.update({
@@ -46,6 +58,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/analyser': typeof AnalyserRoute
   '/cases': typeof CasesRoute
+  '/intake': typeof IntakeRoute
+  '/portfolio': typeof PortfolioRoute
   '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +67,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/analyser': typeof AnalyserRoute
   '/cases': typeof CasesRoute
+  '/intake': typeof IntakeRoute
+  '/portfolio': typeof PortfolioRoute
   '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +77,38 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/analyser': typeof AnalyserRoute
   '/cases': typeof CasesRoute
+  '/intake': typeof IntakeRoute
+  '/portfolio': typeof PortfolioRoute
   '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/analyser' | '/cases' | '/testimonials'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/analyser'
+    | '/cases'
+    | '/intake'
+    | '/portfolio'
+    | '/testimonials'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/analyser' | '/cases' | '/testimonials'
-  id: '__root__' | '/' | '/about' | '/analyser' | '/cases' | '/testimonials'
+  to:
+    | '/'
+    | '/about'
+    | '/analyser'
+    | '/cases'
+    | '/intake'
+    | '/portfolio'
+    | '/testimonials'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/analyser'
+    | '/cases'
+    | '/intake'
+    | '/portfolio'
+    | '/testimonials'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +116,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AnalyserRoute: typeof AnalyserRoute
   CasesRoute: typeof CasesRoute
+  IntakeRoute: typeof IntakeRoute
+  PortfolioRoute: typeof PortfolioRoute
   TestimonialsRoute: typeof TestimonialsRoute
 }
 
@@ -86,6 +128,20 @@ declare module '@tanstack/react-router' {
       path: '/testimonials'
       fullPath: '/testimonials'
       preLoaderRoute: typeof TestimonialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intake': {
+      id: '/intake'
+      path: '/intake'
+      fullPath: '/intake'
+      preLoaderRoute: typeof IntakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cases': {
@@ -124,6 +180,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AnalyserRoute: AnalyserRoute,
   CasesRoute: CasesRoute,
+  IntakeRoute: IntakeRoute,
+  PortfolioRoute: PortfolioRoute,
   TestimonialsRoute: TestimonialsRoute,
 }
 export const routeTree = rootRouteImport

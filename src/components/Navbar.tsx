@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import LanguageSelector from "./LanguageSelector";
+import DarkModeToggle from "./DarkModeToggle";
 import { useI18n } from "@/lib/i18n";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
@@ -18,6 +19,10 @@ export default function Navbar() {
     { label: "Portfolio", to: "/portfolio" },
     { label: "Pricing", to: "/pricing" },
     { label: t("nav_analyser"), to: "/analyser" },
+    { label: "ROI", to: "/roi-calculator" },
+    { label: "Resources", to: "/free-resources" },
+    { label: "Quiz", to: "/growth-quiz" },
+    { label: "Knowledge", to: "/knowledge-base" },
     { label: "FAQ", to: "/faq" },
     { label: t("nav_about"), to: "/about" },
   ];
@@ -66,6 +71,7 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          <DarkModeToggle />
           <LanguageSelector />
           <a
             href={WHATSAPP_URL}
@@ -79,6 +85,7 @@ export default function Navbar() {
 
         {/* Mobile right cluster */}
         <div className="flex items-center gap-2 lg:hidden">
+          <DarkModeToggle />
           <LanguageSelector />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

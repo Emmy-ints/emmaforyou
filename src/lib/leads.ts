@@ -127,3 +127,132 @@ export function buildIntakeWhatsApp(businessName: string, location: string): str
   );
   return `https://wa.me/message/HHGMMWMRJFYUC1?text=${text}`;
 }
+
+// ===== ROI Calculator =====
+export interface RoiPayload {
+  name?: string;
+  whatsapp?: string;
+  email?: string;
+  niche: string;
+  current_revenue: number;
+  current_ad_spend: number;
+  current_leads: number;
+  conversion_rate: number;
+  avg_order_value: number;
+  budget: string;
+  timeline: number;
+  projected_revenue: number;
+  additional_revenue: number;
+  projected_leads: number;
+  roi_multiplier: number;
+  break_even_days: number;
+  language?: string;
+}
+
+export async function submitRoi(p: RoiPayload) {
+  try {
+    const { error } = await supabase.from("roi_calculations").insert(p);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+// ===== Lead magnet downloads =====
+export interface MagnetPayload {
+  name: string;
+  whatsapp: string;
+  email?: string;
+  business_type?: string;
+  resource_slug: string;
+  resource_title: string;
+  opted_in_weekly?: boolean;
+  language?: string;
+}
+export async function submitMagnet(p: MagnetPayload) {
+  try {
+    const { error } = await supabase.from("lead_magnet_downloads").insert(p);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+// ===== Quiz =====
+export interface QuizPayload {
+  name?: string;
+  whatsapp?: string;
+  business_type?: string;
+  score: number;
+  result_bucket: string;
+  no_questions: number[];
+  language?: string;
+}
+export async function submitQuiz(p: QuizPayload) {
+  try {
+    const { error } = await supabase.from("quiz_results").insert(p);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+// ===== Email sequence leads =====
+export interface EmailGenPayload {
+  name?: string;
+  whatsapp?: string;
+  email?: string;
+  business_name?: string;
+  business_type?: string;
+  sequence_goal?: string;
+  tone?: string;
+  language?: string;
+}
+export async function submitEmailGen(p: EmailGenPayload) {
+  try {
+    const { error } = await supabase.from("email_sequence_leads").insert(p);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+// ===== Affiliates =====
+export interface AffiliatePayload {
+  full_name: string;
+  whatsapp: string;
+  email: string;
+  source?: string;
+}
+export function generateRefCode(name: string): string {
+  const clean = (name || "REF").trim().split(/\s+/)[0].toUpperCase().replace(/[^A-Z]/g, "").slice(0, 8) || "REF";
+  const num = Math.floor(1000 + Math.random() * 8999);
+  return `${clean}${num}`;
+}
+export async function submitAffiliate(p: AffiliatePayload & { referral_code: string }) {
+  try {
+    const { error } = await supabase.from("affiliates").insert(p);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
+
+export async function logReferralClick(referral_code: string) {
+  try {
+    await supabase.from("referral_clicks").insert({
+      referral_code,
+      page: typeof window !== "undefined" ? window.location.pathname : null,
+      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+    });
+  } catch { /* ignore */ }
+}
+
+export function buildWa(message: string): string {
+  return `https://wa.me/message/HHGMMWMRJFYUC1?text=${encodeURIComponent(message)}`;
+}

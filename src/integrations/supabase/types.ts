@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliates: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          opted_in_leaderboard: boolean | null
+          referral_code: string
+          source: string | null
+          user_id: string | null
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          opted_in_leaderboard?: boolean | null
+          referral_code: string
+          source?: string | null
+          user_id?: string | null
+          whatsapp: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          opted_in_leaderboard?: boolean | null
+          referral_code?: string
+          source?: string | null
+          user_id?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       business_intakes: {
         Row: {
           ad_platforms: string[] | null
@@ -170,6 +206,300 @@ export type Database = {
         }
         Relationships: []
       }
+      client_accounts: {
+        Row: {
+          avatar_initials: string | null
+          business_name: string
+          created_at: string
+          full_name: string
+          id: string
+          manager_name: string | null
+          plan: string
+          start_date: string
+          user_id: string
+        }
+        Insert: {
+          avatar_initials?: string | null
+          business_name: string
+          created_at?: string
+          full_name: string
+          id?: string
+          manager_name?: string | null
+          plan?: string
+          start_date?: string
+          user_id: string
+        }
+        Update: {
+          avatar_initials?: string | null
+          business_name?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          manager_name?: string | null
+          plan?: string
+          start_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      client_files: {
+        Row: {
+          category: string | null
+          client_user_id: string
+          created_at: string
+          file_name: string
+          id: string
+          size_kb: number | null
+          storage_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          client_user_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          size_kb?: number | null
+          storage_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          client_user_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          size_kb?: number | null
+          storage_url?: string | null
+        }
+        Relationships: []
+      }
+      client_messages: {
+        Row: {
+          body: string
+          client_user_id: string
+          created_at: string
+          id: string
+          sender: string
+        }
+        Insert: {
+          body: string
+          client_user_id: string
+          created_at?: string
+          id?: string
+          sender: string
+        }
+        Update: {
+          body?: string
+          client_user_id?: string
+          created_at?: string
+          id?: string
+          sender?: string
+        }
+        Relationships: []
+      }
+      client_projects: {
+        Row: {
+          client_user_id: string
+          created_at: string
+          id: string
+          metrics: Json | null
+          next_milestone: string | null
+          next_milestone_date: string | null
+          progress_pct: number
+          status: string
+          title: string
+        }
+        Insert: {
+          client_user_id: string
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          next_milestone?: string | null
+          next_milestone_date?: string | null
+          progress_pct?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          client_user_id?: string
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          next_milestone?: string | null
+          next_milestone_date?: string | null
+          progress_pct?: number
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      client_tasks: {
+        Row: {
+          client_user_id: string
+          created_at: string
+          done: boolean
+          id: string
+          label: string
+          week: number
+        }
+        Insert: {
+          client_user_id: string
+          created_at?: string
+          done?: boolean
+          id?: string
+          label: string
+          week?: number
+        }
+        Update: {
+          client_user_id?: string
+          created_at?: string
+          done?: boolean
+          id?: string
+          label?: string
+          week?: number
+        }
+        Relationships: []
+      }
+      email_sequence_leads: {
+        Row: {
+          business_name: string | null
+          business_type: string | null
+          created_at: string
+          email: string | null
+          id: string
+          language: string | null
+          name: string | null
+          sequence_goal: string | null
+          tone: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string | null
+          name?: string | null
+          sequence_goal?: string | null
+          tone?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          business_type?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string | null
+          name?: string | null
+          sequence_goal?: string | null
+          tone?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      knowledge_articles: {
+        Row: {
+          body_md: string
+          category: string
+          created_at: string
+          difficulty: string
+          excerpt: string | null
+          featured: boolean
+          id: string
+          published: boolean
+          read_time_minutes: number
+          slug: string
+          title: string
+        }
+        Insert: {
+          body_md: string
+          category: string
+          created_at?: string
+          difficulty?: string
+          excerpt?: string | null
+          featured?: boolean
+          id?: string
+          published?: boolean
+          read_time_minutes?: number
+          slug: string
+          title: string
+        }
+        Update: {
+          body_md?: string
+          category?: string
+          created_at?: string
+          difficulty?: string
+          excerpt?: string | null
+          featured?: boolean
+          id?: string
+          published?: boolean
+          read_time_minutes?: number
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      knowledge_feedback: {
+        Row: {
+          article_slug: string
+          created_at: string
+          helpful: boolean
+          id: string
+        }
+        Insert: {
+          article_slug: string
+          created_at?: string
+          helpful: boolean
+          id?: string
+        }
+        Update: {
+          article_slug?: string
+          created_at?: string
+          helpful?: boolean
+          id?: string
+        }
+        Relationships: []
+      }
+      lead_magnet_downloads: {
+        Row: {
+          business_type: string | null
+          created_at: string
+          email: string | null
+          id: string
+          language: string | null
+          name: string
+          opted_in_weekly: boolean | null
+          resource_slug: string
+          resource_title: string | null
+          whatsapp: string
+        }
+        Insert: {
+          business_type?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          opted_in_weekly?: boolean | null
+          resource_slug: string
+          resource_title?: string | null
+          whatsapp: string
+        }
+        Update: {
+          business_type?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          opted_in_weekly?: boolean | null
+          resource_slug?: string
+          resource_title?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           budget: string | null
@@ -239,15 +569,171 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_results: {
+        Row: {
+          business_type: string | null
+          created_at: string
+          id: string
+          language: string | null
+          name: string | null
+          no_questions: Json | null
+          result_bucket: string
+          score: number
+          whatsapp: string | null
+        }
+        Insert: {
+          business_type?: string | null
+          created_at?: string
+          id?: string
+          language?: string | null
+          name?: string | null
+          no_questions?: Json | null
+          result_bucket: string
+          score: number
+          whatsapp?: string | null
+        }
+        Update: {
+          business_type?: string | null
+          created_at?: string
+          id?: string
+          language?: string | null
+          name?: string | null
+          no_questions?: Json | null
+          result_bucket?: string
+          score?: number
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      referral_clicks: {
+        Row: {
+          country: string | null
+          created_at: string
+          id: string
+          page: string | null
+          referral_code: string
+          user_agent: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          page?: string | null
+          referral_code: string
+          user_agent?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          id?: string
+          page?: string | null
+          referral_code?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      roi_calculations: {
+        Row: {
+          additional_revenue: number | null
+          avg_order_value: number | null
+          break_even_days: number | null
+          budget: string | null
+          conversion_rate: number | null
+          created_at: string
+          current_ad_spend: number | null
+          current_leads: number | null
+          current_revenue: number | null
+          email: string | null
+          id: string
+          language: string | null
+          name: string | null
+          niche: string | null
+          projected_leads: number | null
+          projected_revenue: number | null
+          roi_multiplier: number | null
+          timeline: number | null
+          whatsapp: string | null
+        }
+        Insert: {
+          additional_revenue?: number | null
+          avg_order_value?: number | null
+          break_even_days?: number | null
+          budget?: string | null
+          conversion_rate?: number | null
+          created_at?: string
+          current_ad_spend?: number | null
+          current_leads?: number | null
+          current_revenue?: number | null
+          email?: string | null
+          id?: string
+          language?: string | null
+          name?: string | null
+          niche?: string | null
+          projected_leads?: number | null
+          projected_revenue?: number | null
+          roi_multiplier?: number | null
+          timeline?: number | null
+          whatsapp?: string | null
+        }
+        Update: {
+          additional_revenue?: number | null
+          avg_order_value?: number | null
+          break_even_days?: number | null
+          budget?: string | null
+          conversion_rate?: number | null
+          created_at?: string
+          current_ad_spend?: number | null
+          current_leads?: number | null
+          current_revenue?: number | null
+          email?: string | null
+          id?: string
+          language?: string | null
+          name?: string | null
+          niche?: string | null
+          projected_leads?: number | null
+          projected_revenue?: number | null
+          roi_multiplier?: number | null
+          timeline?: number | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "client" | "affiliate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -374,6 +860,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "client", "affiliate"],
+    },
   },
 } as const

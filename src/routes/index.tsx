@@ -14,6 +14,14 @@ import TestimonialsPreview from "../components/TestimonialsPreview";
 import AboutTeaser from "../components/AboutTeaser";
 import MissionSection from "../components/MissionSection";
 import WaitlistSection from "../components/WaitlistSection";
+import ResultsTicker from "../components/home/ResultsTicker";
+import TrustBadges from "../components/home/TrustBadges";
+import ComparisonTable from "../components/home/ComparisonTable";
+import CountdownUrgency from "../components/home/CountdownUrgency";
+import IntakeSection from "../components/home/IntakeSection";
+import StrategyCallSection from "../components/home/StrategyCallSection";
+import FaqAccordion from "../components/home/FaqAccordion";
+import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
 import { useI18n } from "../lib/i18n";
 
 const HeroScene = lazy(() => import("../components/HeroScene"));
@@ -152,17 +160,25 @@ function HomePage() {
         </section>
 
         <SocialProofBar />
+        <ResultsTicker />
         <ProblemSection />
         <ServicesSection />
         <AnalyserTeaser />
         <NicheShowcase />
+        <ComparisonTable />
         <StatsSection />
         <TestimonialsPreview />
+        <TrustBadges />
         <AboutTeaser />
         <MissionSection />
+        <CountdownUrgency />
+        <IntakeSection />
+        <StrategyCallSection />
+        <FaqAccordion />
         <WaitlistSection />
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </>
   );
 }

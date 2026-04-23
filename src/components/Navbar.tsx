@@ -15,10 +15,11 @@ export default function Navbar() {
 
   const NAV_LINKS = [
     { label: t("nav_home"), to: "/" },
-    { label: t("nav_about"), to: "/about" },
-    { label: t("nav_testimonials"), to: "/testimonials" },
-    { label: t("nav_cases"), to: "/cases" },
+    { label: "Portfolio", to: "/portfolio" },
+    { label: "Pricing", to: "/pricing" },
     { label: t("nav_analyser"), to: "/analyser" },
+    { label: "FAQ", to: "/faq" },
+    { label: t("nav_about"), to: "/about" },
   ];
 
   const handleScroll = useCallback(() => {

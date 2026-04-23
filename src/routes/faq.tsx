@@ -64,7 +64,7 @@ function FaqPage() {
   const all = useMemo(() => CATEGORIES.flatMap((c) => c.items.map((i) => ({ ...i, cat: c.id }))), []);
   const filtered = search
     ? all.filter((i) => i.q.toLowerCase().includes(search.toLowerCase()) || i.a.toLowerCase().includes(search.toLowerCase()))
-    : CATEGORIES.find((c) => c.id === activeCat)?.items || [];
+    : (CATEGORIES.find((c) => c.id === activeCat)?.items || []).map((i) => ({ ...i, cat: activeCat }));
 
   return (
     <>

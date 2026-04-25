@@ -14,6 +14,7 @@ import { Route as RoiCalculatorRouteImport } from './routes/roi-calculator'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as IntakeRouteImport } from './routes/intake'
+import { Route as FreeResourcesRouteImport } from './routes/free-resources'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -44,6 +45,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const IntakeRoute = IntakeRouteImport.update({
   id: '/intake',
   path: '/intake',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeResourcesRoute = FreeResourcesRouteImport.update({
+  id: '/free-resources',
+  path: '/free-resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
   '/intake': typeof IntakeRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
   '/intake': typeof IntakeRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
   '/intake': typeof IntakeRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/faq'
+    | '/free-resources'
     | '/intake'
     | '/portfolio'
     | '/pricing'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/faq'
+    | '/free-resources'
     | '/intake'
     | '/portfolio'
     | '/pricing'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/faq'
+    | '/free-resources'
     | '/intake'
     | '/portfolio'
     | '/pricing'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   CasesRoute: typeof CasesRoute
   FaqRoute: typeof FaqRoute
+  FreeResourcesRoute: typeof FreeResourcesRoute
   IntakeRoute: typeof IntakeRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/intake'
       fullPath: '/intake'
       preLoaderRoute: typeof IntakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-resources': {
+      id: '/free-resources'
+      path: '/free-resources'
+      fullPath: '/free-resources'
+      preLoaderRoute: typeof FreeResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   CasesRoute: CasesRoute,
   FaqRoute: FaqRoute,
+  FreeResourcesRoute: FreeResourcesRoute,
   IntakeRoute: IntakeRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,

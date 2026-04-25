@@ -18,6 +18,7 @@ import { Route as IntakeRouteImport } from './routes/intake'
 import { Route as GrowthQuizRouteImport } from './routes/growth-quiz'
 import { Route as FreeResourcesRouteImport } from './routes/free-resources'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AnalyserRouteImport } from './routes/analyser'
@@ -71,6 +72,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CasesRoute = CasesRouteImport.update({
   id: '/cases',
   path: '/cases',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   AnalyserRoute: typeof AnalyserRoute
   BlogRoute: typeof BlogRoute
   CasesRoute: typeof CasesRoute
+  DashboardRoute: typeof DashboardRoute
   FaqRoute: typeof FaqRoute
   FreeResourcesRoute: typeof FreeResourcesRoute
   GrowthQuizRoute: typeof GrowthQuizRoute
@@ -302,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cases': {
       id: '/cases'
       path: '/cases'
@@ -372,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyserRoute: AnalyserRoute,
   BlogRoute: BlogRoute,
   CasesRoute: CasesRoute,
+  DashboardRoute: DashboardRoute,
   FaqRoute: FaqRoute,
   FreeResourcesRoute: FreeResourcesRoute,
   GrowthQuizRoute: GrowthQuizRoute,

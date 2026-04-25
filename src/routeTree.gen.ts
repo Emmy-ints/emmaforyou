@@ -9,20 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatchRouteImport } from './routes/watch'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
+import { Route as RoiCalculatorRouteImport } from './routes/roi-calculator'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as KnowledgeBaseRouteImport } from './routes/knowledge-base'
 import { Route as IntakeRouteImport } from './routes/intake'
+import { Route as GrowthQuizRouteImport } from './routes/growth-quiz'
+import { Route as FreeResourcesRouteImport } from './routes/free-resources'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EmailGeneratorRouteImport } from './routes/email-generator'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AnalyserRouteImport } from './routes/analyser'
+import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
+import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
 
+const WatchRoute = WatchRouteImport.update({
+  id: '/watch',
+  path: '/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
   path: '/testimonials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoiCalculatorRoute = RoiCalculatorRouteImport.update({
+  id: '/roi-calculator',
+  path: '/roi-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -35,14 +56,44 @@ const PortfolioRoute = PortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeBaseRoute = KnowledgeBaseRouteImport.update({
+  id: '/knowledge-base',
+  path: '/knowledge-base',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntakeRoute = IntakeRouteImport.update({
   id: '/intake',
   path: '/intake',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GrowthQuizRoute = GrowthQuizRouteImport.update({
+  id: '/growth-quiz',
+  path: '/growth-quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeResourcesRoute = FreeResourcesRouteImport.update({
+  id: '/free-resources',
+  path: '/free-resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailGeneratorRoute = EmailGeneratorRouteImport.update({
+  id: '/email-generator',
+  path: '/email-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasesRoute = CasesRouteImport.update({
@@ -60,6 +111,11 @@ const AnalyserRoute = AnalyserRouteImport.update({
   path: '/analyser',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliateRoute = AffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -70,103 +126,203 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NicheSlugRoute = NicheSlugRouteImport.update({
+  id: '/niche/$slug',
+  path: '/niche/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KnowledgeBaseRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
+  '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
+  '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
+  '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
+  '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
+  '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
+  '/free-resources': typeof FreeResourcesRoute
+  '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
+  '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
+    | '/email-generator'
     | '/faq'
+    | '/free-resources'
+    | '/growth-quiz'
     | '/intake'
+    | '/knowledge-base'
+    | '/portal'
     | '/portfolio'
     | '/pricing'
+    | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
+    | '/email-generator'
     | '/faq'
+    | '/free-resources'
+    | '/growth-quiz'
     | '/intake'
+    | '/knowledge-base'
+    | '/portal'
     | '/portfolio'
     | '/pricing'
+    | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
+    | '/dashboard'
+    | '/email-generator'
     | '/faq'
+    | '/free-resources'
+    | '/growth-quiz'
     | '/intake'
+    | '/knowledge-base'
+    | '/portal'
     | '/portfolio'
     | '/pricing'
+    | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AffiliateRoute: typeof AffiliateRoute
   AnalyserRoute: typeof AnalyserRoute
   BlogRoute: typeof BlogRoute
   CasesRoute: typeof CasesRoute
+  DashboardRoute: typeof DashboardRoute
+  EmailGeneratorRoute: typeof EmailGeneratorRoute
   FaqRoute: typeof FaqRoute
+  FreeResourcesRoute: typeof FreeResourcesRoute
+  GrowthQuizRoute: typeof GrowthQuizRoute
   IntakeRoute: typeof IntakeRoute
+  KnowledgeBaseRoute: typeof KnowledgeBaseRouteWithChildren
+  PortalRoute: typeof PortalRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
+  RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
+  WatchRoute: typeof WatchRoute
+  NicheSlugRoute: typeof NicheSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watch': {
+      id: '/watch'
+      path: '/watch'
+      fullPath: '/watch'
+      preLoaderRoute: typeof WatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/testimonials': {
       id: '/testimonials'
       path: '/testimonials'
       fullPath: '/testimonials'
       preLoaderRoute: typeof TestimonialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roi-calculator': {
+      id: '/roi-calculator'
+      path: '/roi-calculator'
+      fullPath: '/roi-calculator'
+      preLoaderRoute: typeof RoiCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -183,6 +339,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge-base': {
+      id: '/knowledge-base'
+      path: '/knowledge-base'
+      fullPath: '/knowledge-base'
+      preLoaderRoute: typeof KnowledgeBaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/intake': {
       id: '/intake'
       path: '/intake'
@@ -190,11 +360,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntakeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/growth-quiz': {
+      id: '/growth-quiz'
+      path: '/growth-quiz'
+      fullPath: '/growth-quiz'
+      preLoaderRoute: typeof GrowthQuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-resources': {
+      id: '/free-resources'
+      path: '/free-resources'
+      fullPath: '/free-resources'
+      preLoaderRoute: typeof FreeResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faq': {
       id: '/faq'
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-generator': {
+      id: '/email-generator'
+      path: '/email-generator'
+      fullPath: '/email-generator'
+      preLoaderRoute: typeof EmailGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cases': {
@@ -218,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliate': {
+      id: '/affiliate'
+      path: '/affiliate'
+      fullPath: '/affiliate'
+      preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -232,20 +437,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/niche/$slug': {
+      id: '/niche/$slug'
+      path: '/niche/$slug'
+      fullPath: '/niche/$slug'
+      preLoaderRoute: typeof NicheSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge-base/$slug': {
+      id: '/knowledge-base/$slug'
+      path: '/$slug'
+      fullPath: '/knowledge-base/$slug'
+      preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
+      parentRoute: typeof KnowledgeBaseRoute
+    }
   }
 }
+
+interface KnowledgeBaseRouteChildren {
+  KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
+}
+
+const KnowledgeBaseRouteChildren: KnowledgeBaseRouteChildren = {
+  KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
+}
+
+const KnowledgeBaseRouteWithChildren = KnowledgeBaseRoute._addFileChildren(
+  KnowledgeBaseRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AffiliateRoute: AffiliateRoute,
   AnalyserRoute: AnalyserRoute,
   BlogRoute: BlogRoute,
   CasesRoute: CasesRoute,
+  DashboardRoute: DashboardRoute,
+  EmailGeneratorRoute: EmailGeneratorRoute,
   FaqRoute: FaqRoute,
+  FreeResourcesRoute: FreeResourcesRoute,
+  GrowthQuizRoute: GrowthQuizRoute,
   IntakeRoute: IntakeRoute,
+  KnowledgeBaseRoute: KnowledgeBaseRouteWithChildren,
+  PortalRoute: PortalRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
+  RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
+  WatchRoute: WatchRoute,
+  NicheSlugRoute: NicheSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

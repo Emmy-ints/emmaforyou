@@ -1,5 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { I18nProvider } from "../lib/i18n";
+import LiveNotifications from "../components/home/LiveNotifications";
 
 import appCss from "../styles.css?url";
 
@@ -72,6 +73,7 @@ function RootComponent() {
   return (
     <I18nProvider>
       <Outlet />
+      <LiveNotifications />
     </I18nProvider>
   );
 }

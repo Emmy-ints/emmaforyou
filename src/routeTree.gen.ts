@@ -23,6 +23,8 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AnalyserRouteImport } from './routes/analyser'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
+import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -94,6 +96,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NicheSlugRoute = NicheSlugRouteImport.update({
+  id: '/niche/$slug',
+  path: '/niche/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KnowledgeBaseRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,11 +117,13 @@ export interface FileRoutesByFullPath {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,11 +135,13 @@ export interface FileRoutesByTo {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,11 +154,13 @@ export interface FileRoutesById {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRoute
+  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
+  '/niche/$slug': typeof NicheSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +179,8 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +197,8 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   id:
     | '__root__'
     | '/'
@@ -193,6 +215,8 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/knowledge-base/$slug'
+    | '/niche/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -205,11 +229,12 @@ export interface RootRouteChildren {
   FreeResourcesRoute: typeof FreeResourcesRoute
   GrowthQuizRoute: typeof GrowthQuizRoute
   IntakeRoute: typeof IntakeRoute
-  KnowledgeBaseRoute: typeof KnowledgeBaseRoute
+  KnowledgeBaseRoute: typeof KnowledgeBaseRouteWithChildren
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
   RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
+  NicheSlugRoute: typeof NicheSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,8 +337,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/niche/$slug': {
+      id: '/niche/$slug'
+      path: '/niche/$slug'
+      fullPath: '/niche/$slug'
+      preLoaderRoute: typeof NicheSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge-base/$slug': {
+      id: '/knowledge-base/$slug'
+      path: '/$slug'
+      fullPath: '/knowledge-base/$slug'
+      preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
+      parentRoute: typeof KnowledgeBaseRoute
+    }
   }
 }
+
+interface KnowledgeBaseRouteChildren {
+  KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
+}
+
+const KnowledgeBaseRouteChildren: KnowledgeBaseRouteChildren = {
+  KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
+}
+
+const KnowledgeBaseRouteWithChildren = KnowledgeBaseRoute._addFileChildren(
+  KnowledgeBaseRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -325,11 +376,12 @@ const rootRouteChildren: RootRouteChildren = {
   FreeResourcesRoute: FreeResourcesRoute,
   GrowthQuizRoute: GrowthQuizRoute,
   IntakeRoute: IntakeRoute,
-  KnowledgeBaseRoute: KnowledgeBaseRoute,
+  KnowledgeBaseRoute: KnowledgeBaseRouteWithChildren,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
   RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
+  NicheSlugRoute: NicheSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

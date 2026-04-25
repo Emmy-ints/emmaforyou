@@ -83,10 +83,10 @@ function DashboardPage() {
               <h3 className="font-display text-base font-bold uppercase tracking-widest text-muted-foreground">Live activity feed</h3>
               <ul className="mt-4 space-y-2">
                 {feed.map((n, i) => (
-                  <motion.li key={`${n.text}-${i}`} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 rounded-xl bg-muted/40 px-3 py-2 text-sm">
-                    <span className="text-lg">{n.emoji}</span>
-                    <span className="flex-1">{n.text}</span>
-                    <span className="text-xs text-muted-foreground">{n.location}</span>
+                  <motion.li key={`${n.name}-${i}`} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3 rounded-xl bg-muted/40 px-3 py-2 text-sm">
+                    <span className="text-lg">{n.flag}</span>
+                    <span className="flex-1"><strong>{n.name}</strong> {n.action}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">{n.city}</span>
                   </motion.li>
                 ))}
               </ul>

@@ -18,6 +18,7 @@ import { Route as IntakeRouteImport } from './routes/intake'
 import { Route as GrowthQuizRouteImport } from './routes/growth-quiz'
 import { Route as FreeResourcesRouteImport } from './routes/free-resources'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EmailGeneratorRouteImport } from './routes/email-generator'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -71,6 +72,11 @@ const FreeResourcesRoute = FreeResourcesRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailGeneratorRoute = EmailGeneratorRouteImport.update({
+  id: '/email-generator',
+  path: '/email-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
+  '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/dashboard'
+    | '/email-generator'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/dashboard'
+    | '/email-generator'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/cases'
     | '/dashboard'
+    | '/email-generator'
     | '/faq'
     | '/free-resources'
     | '/growth-quiz'
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   CasesRoute: typeof CasesRoute
   DashboardRoute: typeof DashboardRoute
+  EmailGeneratorRoute: typeof EmailGeneratorRoute
   FaqRoute: typeof FaqRoute
   FreeResourcesRoute: typeof FreeResourcesRoute
   GrowthQuizRoute: typeof GrowthQuizRoute
@@ -326,6 +339,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-generator': {
+      id: '/email-generator'
+      path: '/email-generator'
+      fullPath: '/email-generator'
+      preLoaderRoute: typeof EmailGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -414,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   CasesRoute: CasesRoute,
   DashboardRoute: DashboardRoute,
+  EmailGeneratorRoute: EmailGeneratorRoute,
   FaqRoute: FaqRoute,
   FreeResourcesRoute: FreeResourcesRoute,
   GrowthQuizRoute: GrowthQuizRoute,

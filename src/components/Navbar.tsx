@@ -18,13 +18,13 @@ export default function Navbar() {
     { label: t("nav_home"), to: "/" },
     { label: "Portfolio", to: "/portfolio" },
     { label: "Pricing", to: "/pricing" },
-    { label: t("nav_analyser"), to: "/analyser" },
     { label: "ROI", to: "/roi-calculator" },
     { label: "Resources", to: "/free-resources" },
     { label: "Quiz", to: "/growth-quiz" },
     { label: "Knowledge", to: "/knowledge-base" },
-    { label: "FAQ", to: "/faq" },
-    { label: t("nav_about"), to: "/about" },
+    { label: "Dashboard", to: "/dashboard" },
+    { label: "Affiliate", to: "/affiliate" },
+    { label: "Portal", to: "/portal" },
   ];
 
   const handleScroll = useCallback(() => {

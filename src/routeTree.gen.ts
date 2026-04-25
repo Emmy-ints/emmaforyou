@@ -22,6 +22,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CasesRouteImport } from './routes/cases'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AnalyserRouteImport } from './routes/analyser'
+import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
@@ -92,6 +93,11 @@ const AnalyserRoute = AnalyserRouteImport.update({
   path: '/analyser',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliateRoute = AffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -116,6 +122,7 @@ const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
   '/blog': typeof BlogRoute
   '/cases': typeof CasesRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/affiliate'
     | '/analyser'
     | '/blog'
     | '/cases'
@@ -234,6 +246,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AffiliateRoute: typeof AffiliateRoute
   AnalyserRoute: typeof AnalyserRoute
   BlogRoute: typeof BlogRoute
   CasesRoute: typeof CasesRoute
@@ -343,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliate': {
+      id: '/affiliate'
+      path: '/affiliate'
+      fullPath: '/affiliate'
+      preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -389,6 +409,7 @@ const KnowledgeBaseRouteWithChildren = KnowledgeBaseRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AffiliateRoute: AffiliateRoute,
   AnalyserRoute: AnalyserRoute,
   BlogRoute: BlogRoute,
   CasesRoute: CasesRoute,

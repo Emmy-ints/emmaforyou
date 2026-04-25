@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WatchRouteImport } from './routes/watch'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
 import { Route as RoiCalculatorRouteImport } from './routes/roi-calculator'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -29,6 +30,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
 
+const WatchRoute = WatchRouteImport.update({
+  id: '/watch',
+  path: '/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
   path: '/testimonials',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
+  '/watch': typeof WatchRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   id:
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/roi-calculator'
     | '/testimonials'
+    | '/watch'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   fileRoutesById: FileRoutesById
@@ -273,11 +285,19 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
+  WatchRoute: typeof WatchRoute
   NicheSlugRoute: typeof NicheSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/watch': {
+      id: '/watch'
+      path: '/watch'
+      fullPath: '/watch'
+      preLoaderRoute: typeof WatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/testimonials': {
       id: '/testimonials'
       path: '/testimonials'
@@ -444,6 +464,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
+  WatchRoute: WatchRoute,
   NicheSlugRoute: NicheSlugRoute,
 }
 export const routeTree = rootRouteImport

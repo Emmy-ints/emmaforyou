@@ -29,18 +29,18 @@ const FEATURED = [
 ];
 
 const NICHES = [
-  { name: "Fashion Boutique", category: "Ecommerce", colors: ["#fde68a", "#f59e0b"], url: "lagoscouture.com" },
-  { name: "Real Estate Pro", category: "Websites", colors: ["#dbeafe", "#1e3a8a"], url: "marylandhomes.us" },
-  { name: "Restaurant Brand", category: "Websites", colors: ["#fee2e2", "#dc2626"], url: "spicerestaurant.com" },
-  { name: "Wellness Clinic", category: "Websites", colors: ["#cffafe", "#0891b2"], url: "wellnessclinic.de" },
-  { name: "Coach Landing", category: "Websites", colors: ["#fae8ff", "#a21caf"], url: "scaleupcoach.com" },
-  { name: "Auto Dealer", category: "Ecommerce", colors: ["#e2e8f0", "#0f172a"], url: "autohaus-halle.de" },
-  { name: "Beauty Salon", category: "Branding", colors: ["#fce7f3", "#db2777"], url: "glowsalon.ng" },
-  { name: "Fitness Studio", category: "Websites", colors: ["#dcfce7", "#16a34a"], url: "capefitness.za" },
-  { name: "School Brand", category: "Websites", colors: ["#fef3c7", "#d97706"], url: "brightschool.gh" },
-  { name: "Hotel Booking", category: "Ecommerce", colors: ["#e0e7ff", "#4338ca"], url: "boutiquehotel.fr" },
-  { name: "Restaurant Order", category: "Ecommerce", colors: ["#fed7aa", "#ea580c"], url: "kitchen.com.ng" },
-  { name: "Coach Course", category: "Websites", colors: ["#f3e8ff", "#7e22ce"], url: "courses.london" },
+  { name: "Lagos Couture", desc: "Bold ecommerce rebuild for a Lagos fashion house — Shopify, WhatsApp checkout, ad-ready product feed.", category: "Ecommerce", url: "lagoscouture.com", img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=70", stack: ["Shopify", "Klaviyo", "Meta Ads"], outcome: "+312% traffic" },
+  { name: "Maryland Premier Properties", desc: "Lead-gen funnel + automated WhatsApp follow-up for a US real estate team.", category: "Websites", url: "marylandhomes.us", img: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=70", stack: ["Webflow", "HubSpot", "Twilio"], outcome: "47 leads/mo" },
+  { name: "Spice Restaurant", desc: "Reservations, menu showcase and local SEO for a restaurant in Halle.", category: "Websites", url: "spicerestaurant.com", img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=70", stack: ["Next.js", "Stripe", "GBP"], outcome: "65% more bookings" },
+  { name: "Wellness Clinic Halle", desc: "Booking system + automated reminders + Google review automation for a Berlin clinic.", category: "Automation", url: "wellnessclinic.de", img: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=70", stack: ["Make.com", "Calendly", "WhatsApp API"], outcome: "60% less no-shows" },
+  { name: "Scale Up Coach", desc: "High-ticket coaching funnel with VSL, scheduler and email sequence.", category: "Websites", url: "scaleupcoach.com", img: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=70", stack: ["Framer", "Stripe", "ConvertKit"], outcome: "3.5x audience" },
+  { name: "Autohaus Halle", desc: "Inventory listing site + lead-capture campaign for a German auto dealer.", category: "Ecommerce", url: "autohaus-halle.de", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=70", stack: ["Astro", "Cloudinary", "Google Ads"], outcome: "3x test drives" },
+  { name: "Glow Salon", desc: "Brand refresh + booking system + Instagram content engine for a Lagos beauty salon.", category: "Branding", url: "glowsalon.ng", img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=70", stack: ["Canva", "Fresha", "Instagram"], outcome: "2x bookings" },
+  { name: "Cape Fitness", desc: "Member onboarding + retention sequences for a Cape Town gym chain.", category: "Social Media", url: "capefitness.za", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=70", stack: ["Mailchimp", "Glofox", "Reels"], outcome: "+38% retention" },
+  { name: "Bright Academy", desc: "Enrolment funnel + parent comms automation for a Ghanaian school.", category: "Automation", url: "brightschool.gh", img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=70", stack: ["Notion", "Make.com", "WhatsApp"], outcome: "+40% enrolments" },
+  { name: "Boutique Hotel Paris", desc: "Direct booking site that beats OTAs on conversion and brand feel.", category: "Ecommerce", url: "boutiquehotel.fr", img: "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=1200&q=70", stack: ["Sanity", "Stripe", "i18n"], outcome: "+45% direct" },
+  { name: "Kitchen.ng", desc: "WhatsApp-first ordering for a Lagos cloud kitchen.", category: "Ecommerce", url: "kitchen.com.ng", img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=70", stack: ["Paystack", "Twilio", "Vercel"], outcome: "+212% orders" },
+  { name: "Courses London", desc: "Course launch site for a London-based business coach.", category: "Websites", url: "courses.london", img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=70", stack: ["Teachable", "Stripe", "Webflow"], outcome: "5x launch revenue" },
 ];
 
 const VIDEOS = [

@@ -30,6 +30,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 
 const WatchRoute = WatchRouteImport.update({
   id: '/watch',
@@ -136,13 +137,18 @@ const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => KnowledgeBaseRoute,
 } as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -165,7 +172,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -189,7 +197,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
 }
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/blog/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/blog/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   id:
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/blog/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
   fileRoutesById: FileRoutesById
@@ -284,7 +296,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AffiliateRoute: typeof AffiliateRoute
   AnalyserRoute: typeof AnalyserRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   CasesRoute: typeof CasesRoute
   DashboardRoute: typeof DashboardRoute
   EmailGeneratorRoute: typeof EmailGeneratorRoute
@@ -451,8 +463,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
       parentRoute: typeof KnowledgeBaseRoute
     }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
+    }
   }
 }
+
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface KnowledgeBaseRouteChildren {
   KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
@@ -471,7 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AffiliateRoute: AffiliateRoute,
   AnalyserRoute: AnalyserRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   CasesRoute: CasesRoute,
   DashboardRoute: DashboardRoute,
   EmailGeneratorRoute: EmailGeneratorRoute,
@@ -491,3 +520,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

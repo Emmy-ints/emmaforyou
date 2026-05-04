@@ -173,19 +173,50 @@ function PortfolioPage() {
           <div className="mx-auto max-w-7xl">
             <h2 className="text-center font-display text-3xl font-extrabold md:text-5xl">Website Gallery</h2>
             <p className="mt-3 text-center text-base text-muted-foreground">12 recent builds across niches</p>
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((n, i) => (
-                <motion.div key={n.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: (i % 6) * 0.05, duration: 0.4 }}
-                  whileHover={{ y: -6 }} className="group cursor-pointer">
+                <motion.article
+                  key={n.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: (i % 6) * 0.05, duration: 0.4 }}
+                  whileHover={{ y: -6 }}
+                  className="group flex flex-col"
+                >
                   <BrowserFrame url={n.url}>
-                    <NicheMockup {...n} />
+                    <img
+                      src={n.img}
+                      alt={`${n.name} project preview`}
+                      loading="lazy"
+                      className="block h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </BrowserFrame>
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="font-display text-sm font-bold">{n.name}</p>
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{n.category}</span>
+                  <div className="mt-4 flex flex-1 flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-display text-base font-bold">{n.name}</p>
+                      <span className="rounded-full bg-emma-blue/10 px-2 py-0.5 text-[10px] font-bold text-emma-blue">
+                        {n.outcome}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{n.desc}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {n.stack.map((s) => (
+                        <span key={s} className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href={`https://${n.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emma-blue hover:underline"
+                    >
+                      View case study →
+                    </a>
                   </div>
-                </motion.div>
+                </motion.article>
               ))}
             </div>
           </div>

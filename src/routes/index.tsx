@@ -22,6 +22,7 @@ import IntakeSection from "../components/home/IntakeSection";
 import StrategyCallSection from "../components/home/StrategyCallSection";
 import FaqAccordion from "../components/home/FaqAccordion";
 import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
+import RoiSection from "../components/home/RoiSection";
 import { useI18n } from "../lib/i18n";
 
 const HeroScene = lazy(() => import("../components/HeroScene"));
@@ -166,6 +167,7 @@ function HomePage() {
         <AnalyserTeaser />
         <NicheShowcase />
         <ComparisonTable />
+        <RoiSection />
         <StatsSection />
         <TestimonialsPreview />
         <TrustBadges />

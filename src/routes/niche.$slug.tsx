@@ -52,7 +52,7 @@ function NichePage() {
         <section className="mx-auto mt-24 max-w-5xl px-5">
           <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Sound familiar?</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {niche.problems.map((p) => (
+            {niche.problems.map((p: string) => (
               <div key={p} className="rounded-2xl border border-border bg-card p-6 text-center">
                 <div className="text-3xl">😩</div>
                 <p className="mt-3 font-medium">{p}</p>
@@ -65,7 +65,7 @@ function NichePage() {
         <section className="mx-auto mt-24 max-w-5xl px-5">
           <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Here's what we do for <span className="gradient-text">{niche.name.toLowerCase()}</span></h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {niche.services.map((s, i) => (
+            {niche.services.map((s: string, i: number) => (
               <motion.div key={s} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="rounded-2xl border border-border bg-card p-5">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl text-white" style={{ background: "var(--gradient-hero-cta)" }}>✓</div>
                 <p className="mt-4 font-display font-bold">{s}</p>

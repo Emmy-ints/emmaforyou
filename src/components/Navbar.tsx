@@ -61,7 +61,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-5 xl:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}
@@ -84,13 +84,14 @@ export default function Navbar() {
         </div>
 
         {/* Mobile right cluster */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <DarkModeToggle />
           <LanguageSelector />
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5"
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "translate-y-2 rotate-45" : ""}`} />
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "opacity-0" : ""}`} />
@@ -100,7 +101,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         <div
-          className={`fixed inset-0 z-40 flex flex-col bg-background pt-24 transition-all duration-300 lg:hidden ${
+          className={`fixed inset-0 z-40 flex flex-col overflow-y-auto bg-background pt-24 pb-10 transition-all duration-300 xl:hidden ${
             mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
         >
@@ -109,7 +110,8 @@ export default function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
-                className="font-display text-2xl font-bold text-foreground py-3 border-b border-border"
+                onClick={() => setMobileOpen(false)}
+                className="font-display text-xl font-bold text-foreground py-3 border-b border-border"
               >
                 {link.label}
               </Link>
@@ -118,6 +120,7 @@ export default function Navbar() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
               className="btn-gold mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base"
             >
               {t("cta_waitlist")} <span aria-hidden>→</span>

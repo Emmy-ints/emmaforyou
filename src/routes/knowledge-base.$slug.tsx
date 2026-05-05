@@ -90,3 +90,81 @@ function ArticlePage() {
     </div>
   );
 }
+
+function renderBody(body: string) {
+  // Split into lines and group into blocks: heading | list | paragraph
+  const lines = body.split(/\n/);
+  const out: React.ReactNode[] = [];
+  let para: string[] = [];
+  let list: { type: "ul" | "ol"; items: string[] } | null = null;
+
+  const flushPara = () => {
+    if (para.length) {
+      out.push(
+        <p key={`p-${out.length}`} className="leading-relaxed">
+          {para.join(" ")}
+        </p>,
+      );
+      para = [];
+    }
+  };
+  const flushList = () => {
+    if (list) {
+      const Tag = list.type === "ul" ? "ul" : "ol";
+      out.push(
+        <Tag
+          key={`l-${out.length}`}
+          className={`ml-5 ${list.type === "ul" ? "list-disc" : "list-decimal"} space-y-1`}
+        >
+          {list.items.map((it, i) => (
+            <li key={i}>{it}</li>
+          ))}
+        </Tag>,
+      );
+      list = null;
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      flushPara();
+      flushList();
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      flushPara();
+      flushList();
+      out.push(
+        <h2 key={`h-${out.length}`} className="font-display text-2xl font-bold mt-8">
+          {line.replace(/^##\s+/, "")}
+        </h2>,
+      );
+      continue;
+    }
+    const ol = line.match(/^(\d+)\.\s+(.*)$/);
+    if (ol) {
+      flushPara();
+      if (!list || list.type !== "ol") {
+        flushList();
+        list = { type: "ol", items: [] };
+      }
+      list.items.push(ol[2]);
+      continue;
+    }
+    if (line.startsWith("- ")) {
+      flushPara();
+      if (!list || list.type !== "ul") {
+        flushList();
+        list = { type: "ul", items: [] };
+      }
+      list.items.push(line.replace(/^-\s+/, ""));
+      continue;
+    }
+    flushList();
+    para.push(line);
+  }
+  flushPara();
+  flushList();
+  return out;
+}

@@ -37,8 +37,6 @@ function ArticlePage() {
   }
 
   // very simple markdown -> html (h2, p, ul/ol)
-  const blocks = article.body.split(/\n\n+/);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

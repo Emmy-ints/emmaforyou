@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
@@ -13,6 +13,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [lastY, setLastY] = useState(0);
   const location = useLocation();
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const NAV_LINKS = [
     { label: t("nav_home"), to: "/" },
@@ -42,6 +44,60 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  // Focus trap + scroll lock + Escape close for the mobile drawer
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const getFocusable = () => {
+      const root = drawerRef.current;
+      if (!root) return [] as HTMLElement[];
+      return Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.hasAttribute("aria-hidden"));
+    };
+
+    // Move focus into the drawer
+    requestAnimationFrame(() => {
+      const focusables = getFocusable();
+      focusables[0]?.focus();
+    });
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusables = getFocusable();
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (active && drawerRef.current && !drawerRef.current.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = originalOverflow;
+      previouslyFocused?.focus?.();
+    };
+  }, [mobileOpen]);
 
   return (
     <header
@@ -88,6 +144,7 @@ export default function Navbar() {
           <DarkModeToggle />
           <LanguageSelector />
           <button
+            ref={triggerRef}
             onClick={() => setMobileOpen(!mobileOpen)}
             className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5"
             aria-label="Toggle menu"
@@ -110,12 +167,14 @@ export default function Navbar() {
 
         {/* Mobile slide-in drawer */}
         <aside
+          ref={drawerRef}
           className={`fixed top-0 right-0 z-40 h-screen w-[85vw] max-w-sm overflow-y-auto bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
             mobileOpen ? "translate-x-0" : "translate-x-full"
           }`}
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation"
+          aria-hidden={!mobileOpen}
         >
           <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">

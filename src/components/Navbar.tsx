@@ -99,19 +99,34 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile backdrop */}
         <div
-          className={`fixed inset-0 z-40 flex flex-col overflow-y-auto bg-background pt-24 pb-10 transition-all duration-300 xl:hidden ${
+          onClick={() => setMobileOpen(false)}
+          className={`fixed inset-0 z-30 bg-black/60 backdrop-blur-sm transition-opacity duration-300 xl:hidden ${
             mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
+          aria-hidden
+        />
+
+        {/* Mobile slide-in drawer */}
+        <aside
+          className={`fixed top-0 right-0 z-40 h-screen w-[85vw] max-w-sm overflow-y-auto bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
+            mobileOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
         >
-          <div className="flex flex-col gap-2 px-6">
+          <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
+            <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Menu
+            </p>
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={() => setMobileOpen(false)}
-                className="font-display text-xl font-bold text-foreground py-3 border-b border-border"
+                className="font-display text-lg font-bold text-foreground py-3 border-b border-border hover:text-primary transition-colors"
               >
                 {link.label}
               </Link>
@@ -121,12 +136,12 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileOpen(false)}
-              className="btn-gold mt-6 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base"
+              className="btn-gold mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base"
             >
               {t("cta_waitlist")} <span aria-hidden>→</span>
             </a>
           </div>
-        </div>
+        </aside>
       </nav>
     </header>
   );

@@ -52,17 +52,7 @@ function ArticlePage() {
           <p className="mt-4 text-lg text-muted-foreground">{article.excerpt}</p>
 
           <div className="prose-emma mt-10 space-y-5 text-foreground">
-            {blocks.map((b: string, i: number) => {
-              const trimmed = b.trim();
-              if (trimmed.startsWith("## ")) return <h2 key={i} className="font-display text-2xl font-bold mt-8">{trimmed.replace(/^##\s+/, "")}</h2>;
-              if (/^\d+\.\s/.test(trimmed)) {
-                return <ol key={i} className="ml-5 list-decimal space-y-1">{trimmed.split(/\n/).map((l: string, j: number) => <li key={j}>{l.replace(/^\d+\.\s+/, "")}</li>)}</ol>;
-              }
-              if (trimmed.startsWith("- ")) {
-                return <ul key={i} className="ml-5 list-disc space-y-1">{trimmed.split(/\n/).map((l: string, j: number) => <li key={j}>{l.replace(/^-\s+/, "")}</li>)}</ul>;
-              }
-              return <p key={i} className="leading-relaxed">{trimmed}</p>;
-            })}
+            {renderBody(article.body)}
           </div>
 
           <div className="mt-12 rounded-2xl border border-border bg-card p-6 text-center">

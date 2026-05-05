@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
@@ -37,8 +37,6 @@ function ArticlePage() {
   }
 
   // very simple markdown -> html (h2, p, ul/ol)
-  const blocks = article.body.split(/\n\n+/);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -52,17 +50,7 @@ function ArticlePage() {
           <p className="mt-4 text-lg text-muted-foreground">{article.excerpt}</p>
 
           <div className="prose-emma mt-10 space-y-5 text-foreground">
-            {blocks.map((b: string, i: number) => {
-              const trimmed = b.trim();
-              if (trimmed.startsWith("## ")) return <h2 key={i} className="font-display text-2xl font-bold mt-8">{trimmed.replace(/^##\s+/, "")}</h2>;
-              if (/^\d+\.\s/.test(trimmed)) {
-                return <ol key={i} className="ml-5 list-decimal space-y-1">{trimmed.split(/\n/).map((l: string, j: number) => <li key={j}>{l.replace(/^\d+\.\s+/, "")}</li>)}</ol>;
-              }
-              if (trimmed.startsWith("- ")) {
-                return <ul key={i} className="ml-5 list-disc space-y-1">{trimmed.split(/\n/).map((l: string, j: number) => <li key={j}>{l.replace(/^-\s+/, "")}</li>)}</ul>;
-              }
-              return <p key={i} className="leading-relaxed">{trimmed}</p>;
-            })}
+            {renderBody(article.body)}
           </div>
 
           <div className="mt-12 rounded-2xl border border-border bg-card p-6 text-center">
@@ -101,4 +89,82 @@ function ArticlePage() {
       <Footer />
     </div>
   );
+}
+
+function renderBody(body: string) {
+  // Split into lines and group into blocks: heading | list | paragraph
+  const lines = body.split(/\n/);
+  const out: React.ReactNode[] = [];
+  let para: string[] = [];
+  let list: { type: "ul" | "ol"; items: string[] } | null = null;
+
+  const flushPara = () => {
+    if (para.length) {
+      out.push(
+        <p key={`p-${out.length}`} className="leading-relaxed">
+          {para.join(" ")}
+        </p>,
+      );
+      para = [];
+    }
+  };
+  const flushList = () => {
+    if (list) {
+      const Tag = list.type === "ul" ? "ul" : "ol";
+      out.push(
+        <Tag
+          key={`l-${out.length}`}
+          className={`ml-5 ${list.type === "ul" ? "list-disc" : "list-decimal"} space-y-1`}
+        >
+          {list.items.map((it, i) => (
+            <li key={i}>{it}</li>
+          ))}
+        </Tag>,
+      );
+      list = null;
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      flushPara();
+      flushList();
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      flushPara();
+      flushList();
+      out.push(
+        <h2 key={`h-${out.length}`} className="font-display text-2xl font-bold mt-8">
+          {line.replace(/^##\s+/, "")}
+        </h2>,
+      );
+      continue;
+    }
+    const ol = line.match(/^(\d+)\.\s+(.*)$/);
+    if (ol) {
+      flushPara();
+      if (!list || list.type !== "ol") {
+        flushList();
+        list = { type: "ol", items: [] };
+      }
+      list.items.push(ol[2]);
+      continue;
+    }
+    if (line.startsWith("- ")) {
+      flushPara();
+      if (!list || list.type !== "ul") {
+        flushList();
+        list = { type: "ul", items: [] };
+      }
+      list.items.push(line.replace(/^-\s+/, ""));
+      continue;
+    }
+    flushList();
+    para.push(line);
+  }
+  flushPara();
+  flushList();
+  return out;
 }

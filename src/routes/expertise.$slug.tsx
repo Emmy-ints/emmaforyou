@@ -1,0 +1,46 @@
+import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ExpertiseTemplate from "@/components/ExpertiseTemplate";
+import { findExpertise, EXPERTISE } from "@/lib/services-data";
+
+export const Route = createFileRoute("/expertise/$slug")({
+  component: ExpertisePage,
+  loader: ({ params }) => {
+    const data = findExpertise(params.slug);
+    if (!data) throw notFound();
+    return { data };
+  },
+  head: ({ loaderData }) => ({
+    meta: loaderData ? [
+      { title: `${loaderData.data.name} — EmmaForYou` },
+      { name: "description", content: loaderData.data.hero.sub },
+      { property: "og:title", content: loaderData.data.hero.headline },
+      { property: "og:description", content: loaderData.data.hero.sub },
+    ] : [{ title: "Expertise — EmmaForYou" }],
+  }),
+  notFoundComponent: () => (
+    <>
+      <Navbar />
+      <main className="min-h-screen pt-32 px-5 max-w-3xl mx-auto text-center">
+        <h1 className="font-display text-3xl font-bold">Expertise area not found</h1>
+        <p className="mt-2 text-muted-foreground">Browse all our expertise areas:</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          {EXPERTISE.map(e => <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} className="rounded-full border border-border bg-card px-4 py-2 text-sm">{e.icon} {e.name}</Link>)}
+        </div>
+      </main>
+      <Footer />
+    </>
+  ),
+});
+
+function ExpertisePage() {
+  const { data } = Route.useLoaderData();
+  return (
+    <>
+      <Navbar />
+      <ExpertiseTemplate data={data} />
+      <Footer />
+    </>
+  );
+}

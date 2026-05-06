@@ -28,8 +28,10 @@ import { Route as AnalyserRouteImport } from './routes/analyser'
 import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
+import { Route as ExpertiseSlugRouteImport } from './routes/expertise.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 
 const WatchRoute = WatchRouteImport.update({
@@ -127,6 +129,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesSlugRoute = ServicesSlugRouteImport.update({
+  id: '/services/$slug',
+  path: '/services/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NicheSlugRoute = NicheSlugRouteImport.update({
   id: '/niche/$slug',
   path: '/niche/$slug',
@@ -136,6 +143,11 @@ const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => KnowledgeBaseRoute,
+} as any)
+const ExpertiseSlugRoute = ExpertiseSlugRouteImport.update({
+  id: '/expertise/$slug',
+  path: '/expertise/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
@@ -164,8 +176,10 @@ export interface FileRoutesByFullPath {
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/services/$slug': typeof ServicesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -188,8 +202,10 @@ export interface FileRoutesByTo {
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/services/$slug': typeof ServicesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,8 +229,10 @@ export interface FileRoutesById {
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/services/$slug': typeof ServicesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -239,8 +257,10 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/watch'
     | '/blog/$slug'
+    | '/expertise/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/services/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -263,8 +283,10 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/watch'
     | '/blog/$slug'
+    | '/expertise/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/services/$slug'
   id:
     | '__root__'
     | '/'
@@ -287,8 +309,10 @@ export interface FileRouteTypes {
     | '/testimonials'
     | '/watch'
     | '/blog/$slug'
+    | '/expertise/$slug'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/services/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -311,7 +335,9 @@ export interface RootRouteChildren {
   RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
   WatchRoute: typeof WatchRoute
+  ExpertiseSlugRoute: typeof ExpertiseSlugRoute
   NicheSlugRoute: typeof NicheSlugRoute
+  ServicesSlugRoute: typeof ServicesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -449,6 +475,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/services/$slug': {
+      id: '/services/$slug'
+      path: '/services/$slug'
+      fullPath: '/services/$slug'
+      preLoaderRoute: typeof ServicesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/niche/$slug': {
       id: '/niche/$slug'
       path: '/niche/$slug'
@@ -462,6 +495,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge-base/$slug'
       preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
       parentRoute: typeof KnowledgeBaseRoute
+    }
+    '/expertise/$slug': {
+      id: '/expertise/$slug'
+      path: '/expertise/$slug'
+      fullPath: '/expertise/$slug'
+      preLoaderRoute: typeof ExpertiseSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -515,8 +555,19 @@ const rootRouteChildren: RootRouteChildren = {
   RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
   WatchRoute: WatchRoute,
+  ExpertiseSlugRoute: ExpertiseSlugRoute,
   NicheSlugRoute: NicheSlugRoute,
+  ServicesSlugRoute: ServicesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

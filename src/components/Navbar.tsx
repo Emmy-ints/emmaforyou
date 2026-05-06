@@ -3,6 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
 import { useI18n } from "@/lib/i18n";
+import { SERVICES, EXPERTISE } from "@/lib/services-data";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -11,6 +12,9 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<null | "services" | "expertise">(null);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
+  const [mobileExpertiseOpen, setMobileExpertiseOpen] = useState(false);
   const [lastY, setLastY] = useState(0);
   const location = useLocation();
   const drawerRef = useRef<HTMLElement | null>(null);
@@ -19,14 +23,11 @@ export default function Navbar() {
   const NAV_LINKS = [
     { label: t("nav_home"), to: "/" },
     { label: "Portfolio", to: "/portfolio" },
-    { label: "Pricing", to: "/pricing" },
-    { label: "ROI", to: "/roi-calculator" },
-    { label: "Resources", to: "/free-resources" },
-    { label: "Quiz", to: "/growth-quiz" },
+    { label: "Blog", to: "/blog" },
     { label: "Knowledge", to: "/knowledge-base" },
-    { label: "Dashboard", to: "/dashboard" },
-    { label: "Affiliate", to: "/affiliate" },
-    { label: "Portal", to: "/portal" },
+    { label: "Pricing", to: "/pricing" },
+    { label: "About", to: "/about" },
+    { label: "Resources", to: "/free-resources" },
   ];
 
   const handleScroll = useCallback(() => {
@@ -118,12 +119,53 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="hidden items-center gap-5 xl:flex">
-          {NAV_LINKS.map((link) => (
+          {NAV_LINKS.slice(0, 2).map((link) => (
             <Link
               key={link.to}
               to={link.to}
               className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
+              {link.label}
+            </Link>
+          ))}
+          {/* Services Dropdown */}
+          <div className="relative" onMouseEnter={() => setOpenDropdown("services")} onMouseLeave={() => setOpenDropdown(null)}>
+            <button className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground inline-flex items-center gap-1">
+              Services <span className="text-xs">▾</span>
+            </button>
+            {openDropdown === "services" && (
+              <div className="absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
+                <div className="absolute left-0 top-3 bottom-3 w-1 rounded-full" style={{ background: "var(--gradient-brand)" }} />
+                {SERVICES.map((s) => (
+                  <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted">
+                    <span className="text-lg">{s.icon}</span>
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">{s.name}</div>
+                      <div className="text-xs text-muted-foreground">{s.short}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Expertise Dropdown */}
+          <div className="relative" onMouseEnter={() => setOpenDropdown("expertise")} onMouseLeave={() => setOpenDropdown(null)}>
+            <button className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground inline-flex items-center gap-1">
+              Our Expertise <span className="text-xs">▾</span>
+            </button>
+            {openDropdown === "expertise" && (
+              <div className="absolute left-1/2 top-full z-50 mt-2 grid w-[640px] -translate-x-1/2 grid-cols-2 gap-1 rounded-2xl border border-border bg-background p-2 shadow-xl">
+                {EXPERTISE.map((e) => (
+                  <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
+                    <span>{e.icon}</span>
+                    <span className="text-xs font-medium text-foreground">{e.name}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          {NAV_LINKS.slice(2).map((link) => (
+            <Link key={link.to} to={link.to} className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
               {link.label}
             </Link>
           ))}
@@ -190,6 +232,31 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {/* Mobile Services collapse */}
+            <button onClick={() => setMobileServicesOpen(o => !o)} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border">
+              Services <span className={`text-sm transition ${mobileServicesOpen ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            {mobileServicesOpen && (
+              <div className="border-b border-border pb-2">
+                {SERVICES.map(s => (
+                  <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2.5 pl-3 text-sm text-muted-foreground hover:text-foreground">
+                    <span>{s.icon}</span> {s.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setMobileExpertiseOpen(o => !o)} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border">
+              Our Expertise <span className={`text-sm transition ${mobileExpertiseOpen ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            {mobileExpertiseOpen && (
+              <div className="border-b border-border pb-2">
+                {EXPERTISE.map(e => (
+                  <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 pl-3 text-sm text-muted-foreground hover:text-foreground">
+                    <span>{e.icon}</span> {e.name}
+                  </Link>
+                ))}
+              </div>
+            )}
             <a
               href={WHATSAPP_URL}
               target="_blank"

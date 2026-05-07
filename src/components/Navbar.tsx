@@ -110,7 +110,19 @@ export default function Navbar() {
       </button>
       {openDropdown === key && (
         <>
-          {key === "services" && dropdownPanel(SERVICES.map(s => ({ to: `/services/${s.slug}`, name: s.name, icon: s.icon, short: s.short })))}
+          {key === "services" && (
+            <div className="absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
+              {SERVICES.map((s) => (
+                <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted">
+                  <span className="text-lg">{s.icon}</span>
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">{s.name}</div>
+                    <div className="text-xs text-muted-foreground">{s.short}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
           {key === "expertise" && (
             <div className="absolute left-1/2 top-full z-50 mt-2 grid w-[680px] -translate-x-1/2 grid-cols-2 gap-1 rounded-2xl border border-border bg-background p-2 shadow-xl">
               {EXPERTISE.map(e => (
@@ -184,8 +196,30 @@ export default function Navbar() {
           <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">Menu</p>
             <Link to="/" onClick={() => setMobileOpen(false)} className="font-display text-lg font-bold text-foreground py-3 border-b border-border">{t("nav_home")}</Link>
-            {mobileSection_("services", "Services", SERVICES.map(s => ({ to: `/services/${s.slug}`, name: s.name, icon: s.icon })))}
-            {mobileSection_("expertise", "Expertise", EXPERTISE.map(e => ({ to: `/expertise/${e.slug}`, name: e.name, icon: e.icon })))}
+            <button onClick={() => setMobileSection(mobileSection === "services" ? null : "services")} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
+              Services <span className={`text-sm transition ${mobileSection === "services" ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            {mobileSection === "services" && (
+              <div className="border-b border-border pb-2">
+                {SERVICES.map(s => (
+                  <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2.5 pl-3 text-sm text-muted-foreground hover:text-foreground">
+                    <span>{s.icon}</span> {s.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setMobileSection(mobileSection === "expertise" ? null : "expertise")} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
+              Expertise <span className={`text-sm transition ${mobileSection === "expertise" ? "rotate-180" : ""}`}>▾</span>
+            </button>
+            {mobileSection === "expertise" && (
+              <div className="border-b border-border pb-2">
+                {EXPERTISE.map(e => (
+                  <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 pl-3 text-sm text-muted-foreground hover:text-foreground">
+                    <span>{e.icon}</span> {e.name}
+                  </Link>
+                ))}
+              </div>
+            )}
             {mobileSection_("company", "Company", COMPANY)}
             {mobileSection_("resources", "Resources", RESOURCES)}
             {mobileSection_("tools", "Tools", TOOLS)}

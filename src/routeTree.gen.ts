@@ -140,9 +140,9 @@ const NicheSlugRoute = NicheSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => KnowledgeBaseRoute,
+  id: '/knowledge-base/$slug',
+  path: '/knowledge-base/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ExpertiseSlugRoute = ExpertiseSlugRouteImport.update({
   id: '/expertise/$slug',
@@ -150,9 +150,9 @@ const ExpertiseSlugRoute = ExpertiseSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -333,7 +333,9 @@ export interface RootRouteChildren {
   RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
   WatchRoute: typeof WatchRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   ExpertiseSlugRoute: typeof ExpertiseSlugRoute
+  KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
   NicheSlugRoute: typeof NicheSlugRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -491,10 +493,10 @@ declare module '@tanstack/react-router' {
     }
     '/knowledge-base/$slug': {
       id: '/knowledge-base/$slug'
-      path: '/$slug'
+      path: '/knowledge-base/$slug'
       fullPath: '/knowledge-base/$slug'
       preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
-      parentRoute: typeof KnowledgeBaseRoute
+      parentRoute: typeof rootRouteImport
     }
     '/expertise/$slug': {
       id: '/expertise/$slug'
@@ -505,10 +507,10 @@ declare module '@tanstack/react-router' {
     }
     '/blog/$slug': {
       id: '/blog/$slug'
-      path: '/$slug'
+      path: '/blog/$slug'
       fullPath: '/blog/$slug'
       preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -531,7 +533,9 @@ const rootRouteChildren: RootRouteChildren = {
   RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
   WatchRoute: WatchRoute,
+  BlogSlugRoute: BlogSlugRoute,
   ExpertiseSlugRoute: ExpertiseSlugRoute,
+  KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
   NicheSlugRoute: NicheSlugRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   BlogIndexRoute: BlogIndexRoute,

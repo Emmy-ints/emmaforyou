@@ -15,7 +15,6 @@ import { Route as RoiCalculatorRouteImport } from './routes/roi-calculator'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PortalRouteImport } from './routes/portal'
-import { Route as KnowledgeBaseRouteImport } from './routes/knowledge-base'
 import { Route as IntakeRouteImport } from './routes/intake'
 import { Route as GrowthQuizRouteImport } from './routes/growth-quiz'
 import { Route as FreeResourcesRouteImport } from './routes/free-resources'
@@ -23,11 +22,12 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EmailGeneratorRouteImport } from './routes/email-generator'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CasesRouteImport } from './routes/cases'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AnalyserRouteImport } from './routes/analyser'
 import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KnowledgeBaseIndexRouteImport } from './routes/knowledge-base.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
@@ -62,11 +62,6 @@ const PortfolioRoute = PortfolioRouteImport.update({
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeBaseRoute = KnowledgeBaseRouteImport.update({
-  id: '/knowledge-base',
-  path: '/knowledge-base',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntakeRoute = IntakeRouteImport.update({
@@ -104,11 +99,6 @@ const CasesRoute = CasesRouteImport.update({
   path: '/cases',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AnalyserRoute = AnalyserRouteImport.update({
   id: '/analyser',
   path: '/analyser',
@@ -127,6 +117,16 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KnowledgeBaseIndexRoute = KnowledgeBaseIndexRouteImport.update({
+  id: '/knowledge-base/',
+  path: '/knowledge-base/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
@@ -160,7 +160,6 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -168,7 +167,6 @@ export interface FileRoutesByFullPath {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -180,13 +178,14 @@ export interface FileRoutesByFullPath {
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/knowledge-base/': typeof KnowledgeBaseIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -194,7 +193,6 @@ export interface FileRoutesByTo {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -206,6 +204,8 @@ export interface FileRoutesByTo {
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/blog': typeof BlogIndexRoute
+  '/knowledge-base': typeof KnowledgeBaseIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,7 +213,6 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/affiliate': typeof AffiliateRoute
   '/analyser': typeof AnalyserRoute
-  '/blog': typeof BlogRouteWithChildren
   '/cases': typeof CasesRoute
   '/dashboard': typeof DashboardRoute
   '/email-generator': typeof EmailGeneratorRoute
@@ -221,7 +220,6 @@ export interface FileRoutesById {
   '/free-resources': typeof FreeResourcesRoute
   '/growth-quiz': typeof GrowthQuizRoute
   '/intake': typeof IntakeRoute
-  '/knowledge-base': typeof KnowledgeBaseRouteWithChildren
   '/portal': typeof PortalRoute
   '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
@@ -233,6 +231,8 @@ export interface FileRoutesById {
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/blog/': typeof BlogIndexRoute
+  '/knowledge-base/': typeof KnowledgeBaseIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,7 +241,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/affiliate'
     | '/analyser'
-    | '/blog'
     | '/cases'
     | '/dashboard'
     | '/email-generator'
@@ -249,7 +248,6 @@ export interface FileRouteTypes {
     | '/free-resources'
     | '/growth-quiz'
     | '/intake'
-    | '/knowledge-base'
     | '/portal'
     | '/portfolio'
     | '/pricing'
@@ -261,13 +259,14 @@ export interface FileRouteTypes {
     | '/knowledge-base/$slug'
     | '/niche/$slug'
     | '/services/$slug'
+    | '/blog/'
+    | '/knowledge-base/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/affiliate'
     | '/analyser'
-    | '/blog'
     | '/cases'
     | '/dashboard'
     | '/email-generator'
@@ -275,7 +274,6 @@ export interface FileRouteTypes {
     | '/free-resources'
     | '/growth-quiz'
     | '/intake'
-    | '/knowledge-base'
     | '/portal'
     | '/portfolio'
     | '/pricing'
@@ -287,13 +285,14 @@ export interface FileRouteTypes {
     | '/knowledge-base/$slug'
     | '/niche/$slug'
     | '/services/$slug'
+    | '/blog'
+    | '/knowledge-base'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/affiliate'
     | '/analyser'
-    | '/blog'
     | '/cases'
     | '/dashboard'
     | '/email-generator'
@@ -301,7 +300,6 @@ export interface FileRouteTypes {
     | '/free-resources'
     | '/growth-quiz'
     | '/intake'
-    | '/knowledge-base'
     | '/portal'
     | '/portfolio'
     | '/pricing'
@@ -313,6 +311,8 @@ export interface FileRouteTypes {
     | '/knowledge-base/$slug'
     | '/niche/$slug'
     | '/services/$slug'
+    | '/blog/'
+    | '/knowledge-base/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -320,7 +320,6 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AffiliateRoute: typeof AffiliateRoute
   AnalyserRoute: typeof AnalyserRoute
-  BlogRoute: typeof BlogRouteWithChildren
   CasesRoute: typeof CasesRoute
   DashboardRoute: typeof DashboardRoute
   EmailGeneratorRoute: typeof EmailGeneratorRoute
@@ -328,7 +327,6 @@ export interface RootRouteChildren {
   FreeResourcesRoute: typeof FreeResourcesRoute
   GrowthQuizRoute: typeof GrowthQuizRoute
   IntakeRoute: typeof IntakeRoute
-  KnowledgeBaseRoute: typeof KnowledgeBaseRouteWithChildren
   PortalRoute: typeof PortalRoute
   PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
@@ -338,6 +336,8 @@ export interface RootRouteChildren {
   ExpertiseSlugRoute: typeof ExpertiseSlugRoute
   NicheSlugRoute: typeof NicheSlugRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+  KnowledgeBaseIndexRoute: typeof KnowledgeBaseIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -382,13 +382,6 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge-base': {
-      id: '/knowledge-base'
-      path: '/knowledge-base'
-      fullPath: '/knowledge-base'
-      preLoaderRoute: typeof KnowledgeBaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/intake': {
@@ -440,13 +433,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CasesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/analyser': {
       id: '/analyser'
       path: '/analyser'
@@ -473,6 +459,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge-base/': {
+      id: '/knowledge-base/'
+      path: '/knowledge-base'
+      fullPath: '/knowledge-base/'
+      preLoaderRoute: typeof KnowledgeBaseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/$slug': {
@@ -513,34 +513,11 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
-interface KnowledgeBaseRouteChildren {
-  KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
-}
-
-const KnowledgeBaseRouteChildren: KnowledgeBaseRouteChildren = {
-  KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
-}
-
-const KnowledgeBaseRouteWithChildren = KnowledgeBaseRoute._addFileChildren(
-  KnowledgeBaseRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AffiliateRoute: AffiliateRoute,
   AnalyserRoute: AnalyserRoute,
-  BlogRoute: BlogRouteWithChildren,
   CasesRoute: CasesRoute,
   DashboardRoute: DashboardRoute,
   EmailGeneratorRoute: EmailGeneratorRoute,
@@ -548,7 +525,6 @@ const rootRouteChildren: RootRouteChildren = {
   FreeResourcesRoute: FreeResourcesRoute,
   GrowthQuizRoute: GrowthQuizRoute,
   IntakeRoute: IntakeRoute,
-  KnowledgeBaseRoute: KnowledgeBaseRouteWithChildren,
   PortalRoute: PortalRoute,
   PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
@@ -558,7 +534,18 @@ const rootRouteChildren: RootRouteChildren = {
   ExpertiseSlugRoute: ExpertiseSlugRoute,
   NicheSlugRoute: NicheSlugRoute,
   ServicesSlugRoute: ServicesSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+  KnowledgeBaseIndexRoute: KnowledgeBaseIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

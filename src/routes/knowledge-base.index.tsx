@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
 
-export const Route = createFileRoute("/knowledge-base")({
+export const Route = createFileRoute("/knowledge-base/")({
   component: KbIndex,
   head: () => ({
     meta: [

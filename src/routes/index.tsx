@@ -77,7 +77,7 @@ function HomePage() {
               {t("hero_badge")}
             </motion.span>
             <motion.h1
-              className="mt-8 font-display text-4xl font-extrabold leading-[1.1] text-foreground sm:text-5xl md:text-7xl"
+              className="mt-8 font-display text-[clamp(2.1rem,5.2vw,4.5rem)] font-extrabold leading-[1.06] text-foreground"
               initial={{ opacity: 0, y: 40, rotateX: 15 }}
               animate={{ opacity: 1, y: 0, rotateX: 0 }}
               transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}

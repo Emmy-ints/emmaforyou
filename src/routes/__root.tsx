@@ -1,6 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { I18nProvider } from "../lib/i18n";
-import LiveNotifications from "../components/home/LiveNotifications";
+
 
 import appCss from "../styles.css?url";
 
@@ -38,8 +38,6 @@ export const Route = createRootRoute({
       { name: "twitter:title", content: "EmmaForYou | AI Automation & Digital Growth Agency" },
       { property: "og:description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
       { name: "twitter:description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/gVBUQ568wCezkaRHakh9kKy9yXn1/social-images/social-1776299046090-11af4dcf-31fc-4b22-ae72-beea4dc6f015.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/gVBUQ568wCezkaRHakh9kKy9yXn1/social-images/social-1776299046090-11af4dcf-31fc-4b22-ae72-beea4dc6f015.webp" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
@@ -73,7 +71,7 @@ function RootComponent() {
   return (
     <I18nProvider>
       <Outlet />
-      <LiveNotifications />
+
     </I18nProvider>
   );
 }

@@ -66,10 +66,11 @@ interface FormData extends Partial<IntakePayload> {
 
 const STEPS = 8;
 
-export default function BusinessIntakeForm({ onClose }: { onClose?: () => void }) {
+export default function BusinessIntakeForm({ onClose, initialDescription }: { onClose?: () => void; initialDescription?: string }) {
   const { lang } = useI18n();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<FormData>({
+    business_description: initialDescription,
     target_market: [], services_needed: [], communication_preference: [],
     ad_platforms: [], customer_age_min: 25, customer_age_max: 45,
     customer_gender: "Mixed", consent: false, social_platforms_followers: {},
@@ -102,7 +103,7 @@ export default function BusinessIntakeForm({ onClose }: { onClose?: () => void }
   const restore = () => {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      if (saved.data) setData(saved.data);
+      if (saved.data) setData({ ...saved.data, ...(initialDescription ? { business_description: initialDescription } : {}) });
       if (saved.step) setStep(saved.step);
     } catch { /* ignore */ }
     setShowRestore(false);

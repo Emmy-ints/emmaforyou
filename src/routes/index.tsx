@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
 import { useState, useCallback, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -23,16 +23,14 @@ import StrategyCallSection from "../components/home/StrategyCallSection";
 import FaqAccordion from "../components/home/FaqAccordion";
 import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
 import RoiSection from "../components/home/RoiSection";
+import PrototypeBuilder from "../components/home/PrototypeBuilder";
+import { Button } from "../components/ui/button";
 import { useI18n } from "../lib/i18n";
 
 const HeroScene = lazy(() => import("../components/HeroScene"));
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
-const FLOATING_PILLS = [
-  "AI Automation", "Web Design", "Email Marketing", "Social Media",
-  "Ecommerce", "App Dev", "Ad Marketing",
-];
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -42,6 +40,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "EmmaForYou helps fashion stores, clinics, restaurants, coaches, real estate agents and 50+ business types grow with AI automation, website design, social media management, email marketing and ecommerce solutions." },
       { property: "og:title", content: "EmmaForYou — Grow Your Business With AI" },
       { property: "og:description", content: "500+ businesses transformed. Join the waitlist." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "keywords", content: "AI automation Nigeria, digital marketing agency Lagos, website design Nigeria, social media management Nigeria, ecommerce growth Nigeria" },
     ],
     links: [
@@ -61,11 +61,8 @@ function HomePage() {
       <Navbar />
       <main>
         {/* Hero */}
-        <section className="relative flex min-h-screen items-center overflow-hidden pt-20">
-          <Suspense fallback={null}>
-            <HeroScene />
-          </Suspense>
-          <div className="relative mx-auto max-w-7xl px-5 py-20 text-center">
+        <section className="interactive-hero relative overflow-hidden pt-24">
+          <div className="hero-copy relative z-30 mx-auto max-w-7xl px-5 pt-8 text-center">
             <motion.span
               className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground"
               initial={{ opacity: 0, y: 20 }}
@@ -114,51 +111,13 @@ function HomePage() {
               >
                 {t("cta_start")} →
               </motion.a>
-              <motion.button
-                className="btn-ghost inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.96 }}
-              >
-                ▶ {t("cta_watch")}
-              </motion.button>
+              <Button asChild variant="outline" className="h-auto rounded-full px-7 py-3.5"><Link to="/watch">▶ {t("cta_watch")}</Link></Button>
             </motion.div>
 
-            {/* Floating pills */}
-            <motion.div
-              className="mt-14 flex flex-wrap justify-center gap-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.3 }}
-            >
-              {FLOATING_PILLS.map((pill, i) => (
-                <motion.span
-                  key={pill}
-                  className="rounded-full bg-background/80 px-4 py-2 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm border border-border"
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 1.4 + i * 0.1 }}
-                  whileHover={{ y: -8, scale: 1.1, rotate: 3 }}
-                  style={{ animation: `float-slow 6s ease-in-out infinite ${i * 0.5}s` }}
-                >
-                  {pill}
-                </motion.span>
-              ))}
-            </motion.div>
-
-            {/* Scroll indicator */}
-            <motion.div
-              className="mt-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
-              style={{ animation: "bounce-down 2s ease-in-out infinite" }}
-            >
-              <svg className="mx-auto h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </motion.div>
           </div>
+          <ClientOnly fallback={<div className="hero-scene" />}><Suspense fallback={<div className="hero-scene" />}><HeroScene /></Suspense></ClientOnly>
         </section>
+        <PrototypeBuilder />
 
         <SocialProofBar />
         <ResultsTicker />

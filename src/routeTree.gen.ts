@@ -33,6 +33,7 @@ import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
 import { Route as ExpertiseSlugRouteImport } from './routes/expertise.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ApiPrototypeRouteImport } from './routes/api/prototype'
 
 const WatchRoute = WatchRouteImport.update({
   id: '/watch',
@@ -154,6 +155,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPrototypeRoute = ApiPrototypeRouteImport.update({
+  id: '/api/prototype',
+  path: '/api/prototype',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/api/prototype': typeof ApiPrototypeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/api/prototype': typeof ApiPrototypeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/roi-calculator': typeof RoiCalculatorRoute
   '/testimonials': typeof TestimonialsRoute
   '/watch': typeof WatchRoute
+  '/api/prototype': typeof ApiPrototypeRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/api/prototype'
     | '/blog/$slug'
     | '/expertise/$slug'
     | '/knowledge-base/$slug'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/api/prototype'
     | '/blog/$slug'
     | '/expertise/$slug'
     | '/knowledge-base/$slug'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/roi-calculator'
     | '/testimonials'
     | '/watch'
+    | '/api/prototype'
     | '/blog/$slug'
     | '/expertise/$slug'
     | '/knowledge-base/$slug'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   RoiCalculatorRoute: typeof RoiCalculatorRoute
   TestimonialsRoute: typeof TestimonialsRoute
   WatchRoute: typeof WatchRoute
+  ApiPrototypeRoute: typeof ApiPrototypeRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ExpertiseSlugRoute: typeof ExpertiseSlugRoute
   KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/prototype': {
+      id: '/api/prototype'
+      path: '/api/prototype'
+      fullPath: '/api/prototype'
+      preLoaderRoute: typeof ApiPrototypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoiCalculatorRoute: RoiCalculatorRoute,
   TestimonialsRoute: TestimonialsRoute,
   WatchRoute: WatchRoute,
+  ApiPrototypeRoute: ApiPrototypeRoute,
   BlogSlugRoute: BlogSlugRoute,
   ExpertiseSlugRoute: ExpertiseSlugRoute,
   KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
@@ -544,3 +565,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

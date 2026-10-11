@@ -53,6 +53,7 @@ export default function ServicesSection() {
           {SERVICES.map((s, i) => (
             <motion.a
               key={i}
+              id={["service-ai", "service-web", "service-email", "service-social", "service-ads", "service-ecommerce", "service-app"][i]}
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"

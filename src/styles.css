@@ -108,9 +108,9 @@
   --shadow-card-hover: 0 12px 40px oklch(0 0 0 / 0.12);
 
   /* Fonts */
-  --font-sora: 'Syne', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-inter: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-dm-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sora: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-inter: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-dm-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Sidebar */
   --sidebar: oklch(0.98 0.003 280);
@@ -165,12 +165,14 @@
     font-family: var(--font-dm-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv11", "ss01", "ss03";
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-sora);
     font-weight: 700;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
     line-height: 1.15;
   }
 
@@ -427,7 +429,7 @@ html { scroll-behavior: smooth; }
   content: ''; position: absolute; inset: -40px -12% -24px; z-index: -1;
   background: radial-gradient(ellipse at center, var(--background) 55%, transparent 75%);
 }
-.hero-copy h1 { letter-spacing: -0.03em; text-wrap: balance; }
+.hero-copy h1 { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.035em; line-height: 1.04; text-wrap: balance; }
 .hero-copy p { text-wrap: pretty; }
 .hero-backdrop {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -519,7 +521,7 @@ html { scroll-behavior: smooth; }
 
 @media (max-width: 767px) {
   .interactive-hero { min-height: auto; }
-  .hero-copy h1 { font-size: clamp(1.55rem, 7.4vw, 2rem); letter-spacing: -0.02em; }
+  .hero-copy h1 { font-size: clamp(2rem, 9vw, 2.6rem); letter-spacing: -0.03em; }
   .hero-copy p { font-size: 0.95rem; }
   .hero-scene { height: 280px; }
   .hero-service-tile { font-size: 10px; padding: 0 9px; height: 30px; }

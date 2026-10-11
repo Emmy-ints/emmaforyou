@@ -533,3 +533,19 @@ html { scroll-behavior: smooth; }
   html { scroll-behavior: auto; }
   .interactive-hero *, .prototype-section * { animation: none !important; transition: none !important; }
 }
+
+/* Before → After transformation slider */
+.ts-frame { cursor: ew-resize; }
+.ts-label {
+  position: absolute; top: 12px; z-index: 5; pointer-events: none;
+  padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: rgba(20, 20, 20, 0.72); color: #fff; backdrop-filter: blur(6px);
+}
+.ts-label-after { background: var(--gradient-gold); color: var(--emma-charcoal); }
+.ts-knob {
+  position: absolute; top: 50%; left: 0; transform: translate(-50%, -50%);
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px;
+  background: #fff; color: #111; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.35);
+}
+.ts-frame:hover .ts-knob { transform: translate(-50%, -50%) scale(1.06); transition: transform 0.2s; }

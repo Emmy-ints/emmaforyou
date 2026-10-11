@@ -24,6 +24,7 @@ import FaqAccordion from "../components/home/FaqAccordion";
 import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
 import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
+import TransformationSlider from "../components/home/TransformationSlider";
 import { Button } from "../components/ui/button";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
@@ -135,6 +136,7 @@ function HomePage() {
           <p className="relative z-10 mt-1 text-center text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70" aria-hidden="true">{hx.dragHint}</p>
         </section>
         <PrototypeBuilder />
+        <TransformationSlider />
 
         <SocialProofBar />
         <ResultsTicker />

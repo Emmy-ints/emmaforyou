@@ -87,10 +87,10 @@ function HomePage() {
               <br />
               {t("hero_title_2")}
               <br />
-              {t("hero_title_3")}<span className="relative inline-block">
+              {t("hero_title_3")}<span className="whitespace-nowrap"><span className="relative inline-block">
                 <span className="gradient-text">{t("hero_title_4")}</span>
                 <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full" style={{ background: "var(--gradient-gold)" }} />
-              </span>.
+              </span>.</span>
             </motion.h1>
             <motion.p
               className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"

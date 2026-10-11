@@ -159,9 +159,9 @@ export default function Navbar() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass shadow-sm" : "bg-transparent"}`}>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-        <Link to="/" className="flex items-baseline gap-0.5">
-          <span className="font-display text-xl font-extrabold tracking-tight text-foreground">EmmaForYou</span>
+      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-5">
+        <Link to="/" className="flex min-w-0 items-baseline gap-0.5">
+          <span className="truncate font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />
         </Link>
 
@@ -180,10 +180,10 @@ export default function Navbar() {
           </a>
         </div>
 
-        <div className="flex items-center gap-2 xl:hidden">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2 xl:hidden">
           <DarkModeToggle />
           <LanguageSelector />
-          <button ref={triggerRef} onClick={() => setMobileOpen(!mobileOpen)} className="relative z-50 flex h-10 w-10 flex-col items-center justify-center gap-1.5" aria-label="Toggle menu" aria-expanded={mobileOpen}>
+          <button ref={triggerRef} onClick={() => setMobileOpen(!mobileOpen)} className="relative z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5" aria-label="Toggle menu" aria-expanded={mobileOpen}>
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "translate-y-2 rotate-45" : ""}`} />
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "opacity-0" : ""}`} />
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "-translate-y-2 -rotate-45" : ""}`} />

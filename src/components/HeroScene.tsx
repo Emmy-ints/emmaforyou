@@ -83,7 +83,8 @@ function OrbitTiles({ input, reduced, mobile, active }: { input: RefObject<Input
   let raf = 0; let last = performance.now(); let spin = 0;
   const place = () => {
    const w = el.clientWidth, h = el.clientHeight;
-   const rx = Math.min(w * (mobile ? 0.41 : 0.4), 430);
+   // Keep every tile fully on screen: on phones the orbit is bounded by half the width minus a tile's half-width.
+   const rx = mobile ? Math.max(90, w / 2 - 74) : Math.min(w * 0.4, 430);
    const ry = Math.min(h * 0.3, 120);
    const n = tiles.current.length;
    const p = input.current;

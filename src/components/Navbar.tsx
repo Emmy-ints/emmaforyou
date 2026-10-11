@@ -35,7 +35,8 @@ const COMPANY = [
 export default function Navbar() {
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
-  const onInkHero = useRouterState({ select: (st) => st.location.pathname }) === "/";
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const onInkHero = pathname === "/" || pathname.startsWith("/services/") || pathname.startsWith("/expertise/");
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<null | DropdownKey>(null);

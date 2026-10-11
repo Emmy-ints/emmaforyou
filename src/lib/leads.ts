@@ -103,6 +103,8 @@ export interface IntakePayload {
   other_notes?: string;
   consent: boolean;
   language?: string;
+  /** Where the intake came from, e.g. "service:seo". */
+  source?: string;
 }
 
 export async function submitIntake(payload: IntakePayload): Promise<{ ok: boolean; error?: string }> {

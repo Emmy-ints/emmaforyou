@@ -24,9 +24,34 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   if (!key) return Response.json({ message: "AI generation is not configured yet." }, { status: 401 });
   // Only trusted same-origin generation requests can reach private circuit-breaker state.
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: blocked, error: stateError } = await supabaseAdmin.from("prototype_ai_access_state").select("status,message").eq("id", "prototype").maybeSingle();
+  const { data: blocked, error: stateError } = await supabaseAdmin.from("prototype_ai_access_state").select("status,message,updated_at").eq("id", "prototype").maybeSingle();
   if (stateError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
-  if (blocked) return Response.json({ message: blocked.message }, { status: blocked.status });
+  // A credit/access failure pauses generation for a while, then retries on its own (e.g. after credits are topped up).
+  if (blocked && Date.now() - new Date(blocked.updated_at).getTime() < BLOCK_COOLDOWN_MS) {
+    return Response.json({ message: "The prototype builder is taking a short break. Please try again later, or chat with us on WhatsApp." }, { status: 503 });
+  }
+
+  // Visitor limit: a few generations per visitor per hour, plus an overall hourly cap to protect the AI budget.
+  const visitorHash = await hashVisitor(request, key);
+  const since = new Date(Date.now() - HOUR_MS).toISOString();
+  const [{ data: mine, error: mineError }, { count: everyone, error: allError }] = await Promise.all([
+    supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).gte("created_at", since).order("created_at", { ascending: true }),
+    supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).gte("created_at", since),
+  ]);
+  if (mineError || allError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
+  if ((mine?.length ?? 0) >= PER_VISITOR_PER_HOUR) {
+    const oldest = new Date(mine![0].created_at).getTime();
+    const minutes = Math.max(1, Math.ceil((oldest + HOUR_MS - Date.now()) / 60000));
+    return Response.json(
+      { message: `You've used your ${PER_VISITOR_PER_HOUR} free prototypes for this hour. You can create more in about ${minutes} minute${minutes === 1 ? "" : "s"} — or chat with us on WhatsApp and we'll build the real thing.`, retryAfterMinutes: minutes },
+      { status: 429, headers: { "Retry-After": String(minutes * 60) } },
+    );
+  }
+  if ((everyone ?? 0) >= GLOBAL_PER_HOUR) {
+    return Response.json({ message: "The prototype builder is very busy right now. Please try again in a little while." }, { status: 429, headers: { "Retry-After": "900" } });
+  }
+  await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.refinement ? "refine" : "new" });
+  const remaining = PER_VISITOR_PER_HOUR - (mine?.length ?? 0) - 1;
 
   let notifyReady: (response: Response | null) => void = () => {};
   const ready = new Promise<Response | null>((resolve) => { notifyReady = resolve; });
@@ -42,7 +67,7 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
         } catch { /* Keep safe fallback for non-JSON failures. */ }
         upstreamFailure = message;
         if (response.status === 402 || response.status === 403) {
-          await supabaseAdmin.from("prototype_ai_access_state").upsert({ id: "prototype", status: response.status, message });
+          await supabaseAdmin.from("prototype_ai_access_state").upsert({ id: "prototype", status: response.status, message, updated_at: new Date().toISOString() });
         }
       }
       notifyReady(response);
@@ -79,6 +104,24 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   const upstream = await ready;
   if (upstream && !upstream.ok) return Response.json({ message: upstreamFailure }, { status: upstream.status });
   if (request.signal.aborted) return new Response(null, { status: 499 });
-  const headers = getLovableAiGatewayResponseHeaders(upstream?.headers, { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform" });
+  const headers = getLovableAiGatewayResponseHeaders(upstream?.headers, { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) });
   return new Response(stream, { headers });
 });
+
+const HOUR_MS = 60 * 60 * 1000;
+const PER_VISITOR_PER_HOUR = 3;
+const GLOBAL_PER_HOUR = 60;
+const BLOCK_COOLDOWN_MS = 30 * 60 * 1000;
+
+/** One-way hash of the visitor's network address and browser, salted with a server secret. Raw IPs are never stored. */
+async function hashVisitor(request: Request, secret: string): Promise<string> {
+  const ip =
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
+  const agent = (request.headers.get("user-agent") || "").slice(0, 200);
+  const data = new TextEncoder().encode(`${secret.slice(0, 16)}|${ip}|${agent}`);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}

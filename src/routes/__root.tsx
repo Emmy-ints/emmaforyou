@@ -1,5 +1,7 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { I18nProvider } from "../lib/i18n";
+import { installClickTracking, track } from "../lib/analytics";
 
 
 import appCss from "../styles.css?url";
@@ -70,8 +72,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <I18nProvider>
+      <AnalyticsTracker />
       <Outlet />
-
     </I18nProvider>
   );
+}
+
+/** Records a page view on every route change and counts WhatsApp/phone/email clicks site-wide. */
+function AnalyticsTracker() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  useEffect(() => installClickTracking(), []);
+  useEffect(() => {
+    track("page_view");
+  }, [pathname]);
+  return null;
 }

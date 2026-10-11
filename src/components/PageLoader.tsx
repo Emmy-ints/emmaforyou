@@ -6,6 +6,18 @@ export default function PageLoader({ onComplete }: { onComplete: () => void }) {
   const letters = "EmmaForYou".split("");
 
   useEffect(() => {
+    // Returning visitors and reduced-motion users skip the intro animation.
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("efy_intro_seen") === "1";
+      sessionStorage.setItem("efy_intro_seen", "1");
+    } catch {
+      /* storage blocked */
+    }
+    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onComplete();
+      return;
+    }
     const timer = setInterval(() => {
       setProgress((p) => {
         if (p >= 100) {
@@ -14,7 +26,7 @@ export default function PageLoader({ onComplete }: { onComplete: () => void }) {
           setTimeout(onComplete, 500);
           return 100;
         }
-        return p + 5;
+        return p + 7;
       });
     }, 30);
     return () => clearInterval(timer);
@@ -33,7 +45,7 @@ export default function PageLoader({ onComplete }: { onComplete: () => void }) {
               opacity: progress > i * 10 ? 1 : 0,
               transform: progress > i * 10 ? "translateY(0)" : "translateY(20px)",
               transition: `all 0.3s ease ${i * 0.05}s`,
-              color: "var(--emma-charcoal)",
+              color: "var(--foreground)",
             }}
           >
             {letter}

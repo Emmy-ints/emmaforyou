@@ -1,9 +1,9 @@
 # Homepage upgrade
 
-- [ ] Replace hero rings with interactive 3D growth object and service tiles.
-- [ ] Add live AI prototype generation, refinement, device previews, and fullscreen.
-- [ ] Connect prototype prompt to business intake form.
-- [ ] Remove fabricated activity notifications.
-- [ ] Preserve languages, dark mode, sections, and existing pages.
-- [ ] Confirm stored visitor-limit tradeoff before implementing generation limits.
-- [ ] Test live generation, interactions, and mobile layout.
+- [x] Replace hero rings with interactive 3D growth object and service tiles.
+- [x] Add live AI prototype generation, refinement, device previews, and fullscreen.
+- [x] Connect prototype prompt to business intake form.
+- [x] Remove fabricated activity notifications.
+- [x] Per-visitor (3/hour) and global (60/hour) prototype limits.
+- [x] First-party analytics and private /dashboard with leads inbox.
+- [ ] Email/WhatsApp alert to the owner for each new lead (needs an email provider key).

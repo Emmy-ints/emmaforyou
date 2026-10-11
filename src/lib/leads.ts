@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { track } from "@/lib/analytics";
 
 export interface LeadPayload {
   source: "analyser_full" | "analyser_teaser" | "waitlist";
@@ -39,6 +40,7 @@ export async function submitLead(payload: LeadPayload): Promise<{ ok: boolean; e
   try {
     const { error } = await supabase.from("leads").insert(payload);
     if (error) return { ok: false, error: error.message };
+    track("lead_submitted", { source: payload.source, business_type: payload.business_type });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
@@ -115,6 +117,7 @@ export async function submitIntake(payload: IntakePayload): Promise<{ ok: boolea
   try {
     const { error } = await supabase.from("business_intakes").insert(payload);
     if (error) return { ok: false, error: error.message };
+    track("intake_submitted", { business_type: payload.business_type, country: payload.country });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
@@ -153,6 +156,7 @@ export async function submitRoi(p: RoiPayload) {
   try {
     const { error } = await supabase.from("roi_calculations").insert(p);
     if (error) return { ok: false, error: error.message };
+    track("roi_calculated", { niche: p.niche });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
@@ -174,6 +178,7 @@ export async function submitMagnet(p: MagnetPayload) {
   try {
     const { error } = await supabase.from("lead_magnet_downloads").insert(p);
     if (error) return { ok: false, error: error.message };
+    track("magnet_downloaded", { resource: p.resource_slug });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
@@ -194,6 +199,7 @@ export async function submitQuiz(p: QuizPayload) {
   try {
     const { error } = await supabase.from("quiz_results").insert(p);
     if (error) return { ok: false, error: error.message };
+    track("quiz_completed", { bucket: p.result_bucket, score: p.score });
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };
@@ -237,6 +243,7 @@ export async function submitAffiliate(p: AffiliatePayload & { referral_code: str
   try {
     const { error } = await supabase.from("affiliates").insert(p);
     if (error) return { ok: false, error: error.message };
+    track("affiliate_signup");
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" };

@@ -590,6 +590,72 @@ export type Database = {
         }
         Relationships: []
       }
+      prototype_generations: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          visitor_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          visitor_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
+      site_events: {
+        Row: {
+          created_at: string
+          device: string | null
+          event: string
+          id: string
+          language: string | null
+          path: string | null
+          props: Json
+          referrer: string | null
+          session_id: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          event: string
+          id?: string
+          language?: string | null
+          path?: string | null
+          props?: Json
+          referrer?: string | null
+          session_id: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          event?: string
+          id?: string
+          language?: string | null
+          path?: string | null
+          props?: Json
+          referrer?: string | null
+          session_id?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       quiz_results: {
         Row: {
           business_type: string | null

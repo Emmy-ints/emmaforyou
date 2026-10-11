@@ -8,6 +8,7 @@ import { Bot, Globe, Mail, Megaphone, ShoppingBag, Smartphone, Users } from 'luc
 import { Button } from './ui/button';
 import { useI18n } from '@/lib/i18n';
 import { homeExperienceCopy, serviceAnchors } from '@/lib/home-experience-copy';
+import { track } from '@/lib/analytics';
 
 const icons = [Bot, Globe, Mail, Users, ShoppingBag, Smartphone, Megaphone];
 type ScenePalette = { blue: string; purple: string; gold: string; card: string };
@@ -87,7 +88,7 @@ function ServiceTile({ index, reduced, palette }: { index: number; reduced: bool
   </RoundedBox>
   <Html center position={[0, 0, .1]} distanceFactor={8} zIndexRange={[20, 10]}>
    <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-    <Button variant="outline" className="hero-service-tile" title={copy.descriptions[index]} onFocus={() => setHovered(true)} onBlur={() => setHovered(false)} onClick={() => document.getElementById(serviceAnchors[index])?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'center' })}>
+    <Button variant="outline" className="hero-service-tile" title={copy.descriptions[index]} onFocus={() => setHovered(true)} onBlur={() => setHovered(false)} onClick={() => { track('service_tile_click', { service: serviceAnchors[index] }); document.getElementById(serviceAnchors[index])?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'center' }); }}>
      <Icon className="text-emma-blue" /><span>{copy.services[index]}</span>
     </Button>
     {hovered && <div role="tooltip" className="hero-service-description">{copy.descriptions[index]}</div>}

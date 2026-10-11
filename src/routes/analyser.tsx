@@ -1,17 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import AnalyserFull from "../components/AnalyserFull";
+import GrowthAssessment from "../components/assessment/GrowthAssessment";
 
 export const Route = createFileRoute("/analyser")({
   component: AnalyserPage,
   head: () => ({
     meta: [
-      { title: "Free 10-Step Business Analyser — EmmaForYou" },
-      { name: "description", content: "Get a free 10-step deep-dive analysis of your business. Digital health score, revenue projection, recommended services and a 90-day roadmap — delivered to WhatsApp." },
-      { property: "og:title", content: "Free Business Analyser — EmmaForYou" },
-      { property: "og:description", content: "Discover your digital health score, revenue projection and 90-day growth roadmap in 10 quick steps." },
-      { name: "keywords", content: "business analyser, business growth, digital health score, marketing audit, EmmaForYou" },
+      { title: "Free Business Growth Assessment — EmmaForYou" },
+      { name: "description", content: "Answer 8 quick questions about your online presence, marketing, website and follow-up. Get an explained growth score, three prioritised recommendations, and the option of a free personal audit." },
+      { property: "og:title", content: "Free Business Growth Assessment — EmmaForYou" },
+      { property: "og:description", content: "An explained growth score and a prioritised plan in about two minutes." },
     ],
     links: [{ rel: "canonical", href: "https://emmaforyou.com/analyser" }],
   }),
@@ -19,12 +18,18 @@ export const Route = createFileRoute("/analyser")({
 
 function AnalyserPage() {
   return (
-    <>
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main>
-        <AnalyserFull />
+      <main className="mx-auto max-w-4xl px-5 pb-24 pt-32">
+        <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">Business growth assessment</h1>
+        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+          Eight short questions about how customers find you, buy from you and hear back from you. You'll get an explained score and a prioritised plan straight away.
+        </p>
+        <div className="mt-10 rounded-[24px] border border-border bg-card p-5 shadow-[var(--shadow-card)] md:p-8">
+          <GrowthAssessment />
+        </div>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

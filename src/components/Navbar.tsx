@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useRouterState } from "@tanstack/react-router";
 import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
 import { useI18n } from "@/lib/i18n";
@@ -35,6 +35,7 @@ const COMPANY = [
 export default function Navbar() {
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
+  const onInkHero = useRouterState({ select: (st) => st.location.pathname }) === "/";
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<null | DropdownKey>(null);
@@ -158,7 +159,7 @@ export default function Navbar() {
   );
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass shadow-sm" : "bg-transparent"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-5">
         <Link to="/" className="flex min-w-0 items-baseline gap-0.5">
           <span className="truncate font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>

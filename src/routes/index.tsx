@@ -1,23 +1,14 @@
-import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
-import { useState, useCallback, lazy, Suspense } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import PageLoader from "../components/PageLoader";
 import SocialProofBar from "../components/SocialProofBar";
 import ProblemSection from "../components/ProblemSection";
 import ServicesSection from "../components/ServicesSection";
 import AnalyserTeaser from "../components/AnalyserTeaser";
-import NicheShowcase from "../components/NicheShowcase";
-import StatsSection from "../components/StatsSection";
 import TestimonialsPreview from "../components/TestimonialsPreview";
 import AboutTeaser from "../components/AboutTeaser";
-import MissionSection from "../components/MissionSection";
-import WaitlistSection from "../components/WaitlistSection";
-import ResultsTicker from "../components/home/ResultsTicker";
-import TrustBadges from "../components/home/TrustBadges";
 import ComparisonTable from "../components/home/ComparisonTable";
-import CountdownUrgency from "../components/home/CountdownUrgency";
 import IntakeSection from "../components/home/IntakeSection";
 import StrategyCallSection from "../components/home/StrategyCallSection";
 import FaqAccordion from "../components/home/FaqAccordion";
@@ -25,12 +16,11 @@ import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
 import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
-import { Button } from "../components/ui/button";
+import GrowthOS from "../components/home/GrowthOS";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
 import { CheckCircle2 } from "lucide-react";
 
-const HeroScene = lazy(() => import("../components/HeroScene"));
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -56,106 +46,89 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { t, lang } = useI18n();
   const hx = homeExperienceCopy[lang];
-  const [loaded, setLoaded] = useState(false);
-  const onLoaderComplete = useCallback(() => setLoaded(true), []);
 
   return (
     <>
-      {!loaded && <PageLoader onComplete={onLoaderComplete} />}
       <Navbar />
       <main>
-        {/* Hero */}
-        <section className="interactive-hero relative overflow-hidden pt-24">
-          <div className="hero-backdrop" aria-hidden="true" />
-          <div className="hero-grid" aria-hidden="true" />
-          <div className="hero-copy relative z-30 mx-auto max-w-7xl px-5 pt-8 text-center">
-            <motion.span
-              className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-xs font-medium text-muted-foreground"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              {t("hero_badge")}
-            </motion.span>
-            <motion.h1
-              className="mt-8 font-display text-[clamp(2.3rem,5.6vw,4.9rem)] font-extrabold leading-[1.04] text-foreground"
-              initial={{ opacity: 0, y: 40, rotateX: 15 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{ perspective: 1000 }}
-            >
-              {t("hero_title_1")}
-              <br />
-              {t("hero_title_2")}
-              <br />
-              {t("hero_title_3")}<span className="whitespace-nowrap"><span className="relative inline-block">
-                <span className="gradient-text">{t("hero_title_4")}</span>
-                <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full" style={{ background: "var(--gradient-gold)" }} />
-              </span>.</span>
-            </motion.h1>
-            <motion.p
-              className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.7 }}
-            >
-              {t("hero_sub")}
-            </motion.p>
-            <motion.div
-              className="mt-8 flex flex-wrap items-center justify-center gap-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-            >
-              <motion.a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-gold inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold"
-                whileHover={{ scale: 1.06, y: -3 }}
-                whileTap={{ scale: 0.96 }}
+        {/* Hero: midnight band with a working demo of the product */}
+        <section className="hero-ink relative overflow-hidden">
+          <div className="hero-ink-grid" aria-hidden="true" />
+          <div className="hero-ink-glow" aria-hidden="true" />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-32 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:pb-28 lg:pt-40">
+            <div className="hero-ink-copy">
+              <motion.p
+                className="hero-kicker"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
-                {t("cta_start")} →
-              </motion.a>
-              <Button asChild variant="outline" className="h-auto rounded-full bg-card/80 px-7 py-3.5 backdrop-blur"><a href="#prototype" data-track="hero_try_prototype">✦ {hx.heroTry}</a></Button>
-            </motion.div>
+                <span className="hero-kicker-dot" aria-hidden="true" />
+                AI-native growth studio for ambitious businesses
+              </motion.p>
+              <motion.h1
+                className="hero-ink-title"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {t("hero_title_1")} {t("hero_title_2")} {t("hero_title_3")}<span className="whitespace-nowrap">{t("hero_title_4")}.</span>
+              </motion.h1>
+              <motion.p
+                className="hero-ink-sub"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {t("hero_sub")}
+              </motion.p>
+              <motion.div
+                className="mt-9 flex flex-wrap items-center gap-3"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.28 }}
+              >
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px]">
+                  {t("cta_start")}
+                </a>
+                <a href="#prototype" data-track="hero_try_prototype" className="hero-ghost-btn">
+                  {hx.heroTry}
+                </a>
+              </motion.div>
+              <motion.ul
+                className="hero-ink-proof"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                {hx.proof.map((item) => (
+                  <li key={item}><CheckCircle2 aria-hidden="true" />{item}</li>
+                ))}
+              </motion.ul>
+            </div>
             <motion.div
-              className="hero-proof mt-7"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
+              initial={{ opacity: 0, y: 30, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
-              {hx.proof.map((item) => (
-                <span key={item}><CheckCircle2 aria-hidden="true" />{item}</span>
-              ))}
-              <Link to="/watch" className="underline-offset-4 hover:text-foreground hover:underline">▶ {t("cta_watch")}</Link>
+              <GrowthOS />
             </motion.div>
-
           </div>
-          <ClientOnly fallback={<div className="hero-scene" />}><Suspense fallback={<div className="hero-scene" />}><HeroScene /></Suspense></ClientOnly>
-          <p className="relative z-10 mt-1 text-center text-[11px] uppercase tracking-[0.18em] text-muted-foreground/70" aria-hidden="true">{hx.dragHint}</p>
         </section>
-        <PrototypeBuilder />
-        <TransformationSlider />
 
         <SocialProofBar />
-        <ResultsTicker />
+        <PrototypeBuilder />
+        <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
         <AnalyserTeaser />
-        <NicheShowcase />
-        <ComparisonTable />
         <RoiSection />
-        <StatsSection />
+        <ComparisonTable />
         <TestimonialsPreview />
-        <TrustBadges />
         <AboutTeaser />
-        <MissionSection />
-        <CountdownUrgency />
         <IntakeSection />
         <StrategyCallSection />
         <FaqAccordion />
-        <WaitlistSection />
       </main>
       <Footer />
       <FloatingWhatsApp />

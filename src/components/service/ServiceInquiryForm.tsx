@@ -61,7 +61,7 @@ export default function ServiceInquiryForm({ serviceName, serviceSlug, questions
         <CheckCircle2 className="h-6 w-6 shrink-0 text-[#3dd6f5]" />
         <div>
           <p className="font-display text-lg font-semibold text-white">Enquiry sent</p>
-          <p className="mt-1 text-sm text-[#a6abd0]">Thanks, {name.split(" ")[0]}. Emmanuel will look at your answers and reply within one working day with next steps for {serviceName.toLowerCase()}.</p>
+          <p className="mt-1 text-sm text-[#a6abd0]">Thanks, {name.split(" ")[0]}. Emmanuel will look at your answers and reply within one working day with next steps for {serviceName}.</p>
           <a href={buildWa(`Hi! I just sent an enquiry about ${serviceName} for ${business}.`)} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-sm font-semibold text-[#3dd6f5] underline underline-offset-4">Need it sooner? Message on WhatsApp</a>
         </div>
       </div>

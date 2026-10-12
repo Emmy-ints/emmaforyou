@@ -54,13 +54,13 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
           <motion.dl initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="svc-facts">
             <Fact icon={<Clock />} label="Typical timeline" value={x.timeline} />
             <Fact icon={<Layers />} label="How we work together" value={x.engagement} />
-            <Fact icon={<Target />} label="Best for" value={x.audience} />
+            <Fact icon={<Target />} label="Next step" value="A free call, then a clear plan and fixed quote" />
           </motion.dl>
         </div>
       </section>
 
       {/* Problem */}
-      <Block title="The problem this solves" lead={`What usually goes wrong before businesses come to us for ${data.name.toLowerCase()}.`}>
+      <Block title="The problem this solves" lead={`What usually goes wrong before businesses come to us for ${data.name}.`}>
         <div className="grid gap-4 md:grid-cols-2">
           {data.pains.map((p) => (
             <motion.div key={p.title} {...reveal} className="svc-pain">
@@ -175,7 +175,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
           <div>
             <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">You work directly with Emmanuel</h2>
             <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-              No account managers or hand-offs. Emmanuel plans your {data.name.toLowerCase()} system with you, builds it with the team, and stays reachable on WhatsApp after launch. Every setup is built around how your customers actually buy — not copied from a template.
+              No account managers or hand-offs. Emmanuel plans your {data.name} system with you, builds it with the team, and stays reachable on WhatsApp after launch. Every setup is built around how your customers actually buy — not copied from a template.
             </p>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         <div className="hero-ink-glow" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-6xl gap-12 px-5 py-24 md:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
-            <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">Tell us about your {data.name.toLowerCase()} project</h2>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">Tell us about your {data.name} project</h2>
             <p className="mt-4 text-[#b3b8dc]">A few quick answers help us come back with a useful plan, not a generic pitch. Free, and no obligation.</p>
             <ul className="mt-8 space-y-3 text-sm text-[#c9ccec]">
               <li className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-[#3dd6f5]" /> Reply within one working day</li>

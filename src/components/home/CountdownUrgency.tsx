@@ -21,6 +21,10 @@ function useCountdown() {
   return t;
 }
 
+/** Update these each month: how many onboarding spots you offer and how many are filled. */
+const MONTHLY_SPOTS = 20;
+const SPOTS_TAKEN = 12;
+
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1?text=" + encodeURIComponent("Hi EmmaForYou! I'd like to book a spot for this month's onboarding.");
 
 export default function CountdownUrgency() {
@@ -31,11 +35,11 @@ export default function CountdownUrgency() {
       <div className="mx-auto max-w-5xl text-center text-white">
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <span className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider"
-            style={{ background: "var(--gradient-gold)", color: "var(--emma-charcoal)" }}>
-            ⚡ Limited onboarding each month
+            style={{ background: "var(--gradient-gold)", color: "#fff" }}>
+            ⚡ Limited Onboarding Spots
           </span>
           <h2 className="mt-6 font-display text-3xl font-extrabold md:text-5xl">
-            We take on a <span className="gradient-text-gold">small number</span> of new clients each month
+            Only <span className="gradient-text-gold">{MONTHLY_SPOTS - SPOTS_TAKEN} Spots Left</span> This Month
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/70">
             Every project gets hands-on attention from Emmanuel, so we keep our monthly intake small. This month's onboarding closes in:
@@ -55,6 +59,18 @@ export default function CountdownUrgency() {
               <div className="mt-1 text-xs uppercase tracking-wider text-white/60">{it.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Progress bar */}
+        <div className="mx-auto mt-10 max-w-xl">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="font-semibold">{SPOTS_TAKEN} of {MONTHLY_SPOTS} spots taken</span>
+            <span className="text-white/60">{Math.round((SPOTS_TAKEN / MONTHLY_SPOTS) * 100)}%</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-white/10">
+            <motion.div className="h-full rounded-full" style={{ background: "var(--gradient-gold)" }}
+              initial={{ width: 0 }} whileInView={{ width: `${(SPOTS_TAKEN / MONTHLY_SPOTS) * 100}%` }} viewport={{ once: true }} transition={{ duration: 1.4, ease: "easeOut" }} />
+          </div>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">

@@ -22,6 +22,9 @@ import ResultsTicker from "../components/home/ResultsTicker";
 import NicheShowcase from "../components/NicheShowcase";
 import MissionSection from "../components/MissionSection";
 import WaitlistSection from "../components/WaitlistSection";
+import StatsSection from "../components/StatsSection";
+import TrustBadges from "../components/home/TrustBadges";
+import CountdownUrgency from "../components/home/CountdownUrgency";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
 import { CheckCircle2 } from "lucide-react";
@@ -37,7 +40,7 @@ export const Route = createFileRoute("/")({
       { title: "EmmaForYou | AI Automation & Digital Growth Agency — Nigeria, USA, Europe, Africa" },
       { name: "description", content: "EmmaForYou helps fashion stores, clinics, restaurants, coaches, real estate agents and 50+ business types grow with AI automation, website design, social media management, email marketing and ecommerce solutions." },
       { property: "og:title", content: "EmmaForYou — Grow Your Business With AI" },
-      { property: "og:description", content: "AI automation, websites and digital marketing for growing businesses. Describe your idea and get a free working prototype in under a minute." },
+      { property: "og:description", content: "500+ businesses transformed. Join the waitlist." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "keywords", content: "AI automation Nigeria, digital marketing agency Lagos, website design Nigeria, social media management Nigeria, ecommerce growth Nigeria" },
@@ -132,9 +135,12 @@ function HomePage() {
         <AnalyserTeaser />
         <RoiSection />
         <ComparisonTable />
+        <StatsSection />
         <TestimonialsPreview />
+        <TrustBadges />
         <AboutTeaser />
         <MissionSection />
+        <CountdownUrgency />
         <IntakeSection />
         <StrategyCallSection />
         <FaqAccordion />

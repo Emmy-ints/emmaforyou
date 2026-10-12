@@ -22,6 +22,12 @@ export const Route = createFileRoute("/portfolio/")({
   }),
 });
 
+const enter = (delay = 0) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+});
+
 const reveal = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -44,9 +50,9 @@ function PortfolioPage() {
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
           <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-32 md:px-8 lg:pt-40">
-            <motion.p {...reveal} className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />Selected client work</motion.p>
-            <motion.h1 {...reveal} className="hero-ink-title max-w-[18ch]">Real businesses. Real projects. Built and grown by EmmaForYou.</motion.h1>
-            <motion.p {...reveal} className="hero-ink-sub">
+            <motion.p {...enter(0)} className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />Selected client work</motion.p>
+            <motion.h1 {...enter(0.06)} className="hero-ink-title max-w-[18ch]">Real businesses. Real projects. Built and grown by EmmaForYou.</motion.h1>
+            <motion.p {...enter(0.12)} className="hero-ink-sub">
               Websites, online stores, automation, social media and ads for {PROJECTS.length} businesses across fashion, real estate, hospitality, health, education and coaching.
             </motion.p>
             <div className="mt-12">

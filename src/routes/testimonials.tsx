@@ -142,6 +142,7 @@ function TestimonialsPage() {
 
         <section className="sticky top-16 z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
           <div className="mx-auto max-w-7xl px-5">
+            <h2 className="sr-only">Search and filter testimonials</h2>
             <input
               type="text"
               placeholder="Search testimonials..."
@@ -166,6 +167,7 @@ function TestimonialsPage() {
         </section>
 
         <section className="section-padding">
+          <h2 className="sr-only">Client testimonials</h2>
           <div className="mx-auto max-w-7xl columns-1 gap-5 sm:columns-2 lg:columns-3">
             {visible.map((t, i) => {
               const hue = t.name.charCodeAt(0) * 15 % 360;

@@ -33,6 +33,7 @@ function IntakePage() {
               Takes 5 minutes. No commitment. Our team reviews every submission personally and sends your plan to WhatsApp within 24 hours.
             </p>
           </div>
+          <h2 className="sr-only">Your project brief</h2>
           <BusinessIntakeForm />
         </div>
       </main>

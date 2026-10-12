@@ -47,7 +47,7 @@ function FreeResources() {
                 className="group flex flex-col rounded-3xl border border-border bg-card p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl text-white" style={{ background: m.gradient }}>{m.icon}</div>
-                <h3 className="mt-5 font-display text-xl font-bold">{m.title}</h3>
+                <h2 className="mt-5 font-display text-xl font-bold">{m.title}</h2>
                 <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{m.description}</p>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{m.pages} pages</span>
@@ -96,10 +96,10 @@ function DownloadModal({ magnet, onClose }: { magnet: LeadMagnet; onClose: () =>
         <div className="flex items-center gap-4 p-6 text-white" style={{ background: magnet.gradient }}>
           <div className="text-4xl">{magnet.icon}</div>
           <div className="flex-1">
-            <h3 className="font-display text-lg font-bold">{magnet.title}</h3>
+            <h2 className="font-display text-lg font-bold">{magnet.title}</h2>
             <p className="text-xs text-white/80">{magnet.pages} pages · Free PDF</p>
           </div>
-          <button onClick={onClose} className="rounded-full bg-white/20 px-3 py-1 text-sm">✕</button>
+          <button onClick={onClose} aria-label="Close" className="rounded-full bg-white/20 px-3 py-1 text-sm"><span aria-hidden="true">✕</span></button>
         </div>
 
         {!done ? (

@@ -51,6 +51,7 @@ function AffiliatePage() {
           </motion.div>
 
           {/* How it works */}
+          <h2 className="sr-only">How the affiliate programme works</h2>
           <div className="mt-14 grid gap-5 md:grid-cols-3">
             {[
               { n: 1, t: "Get your link", d: "Sign up in 60 seconds. We give you a unique referral link instantly." },
@@ -79,7 +80,7 @@ function AffiliatePage() {
           <div className="mt-10 rounded-3xl border border-border bg-card p-8">
             {!code ? (
               <form onSubmit={submit} className="grid gap-3">
-                <h3 className="font-display text-2xl font-bold">Get your unique referral link</h3>
+                <h2 className="font-display text-2xl font-bold">Get your unique referral link</h2>
                 <input className="input" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
                 <input className="input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 <input className="input" placeholder="WhatsApp number" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} required />

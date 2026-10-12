@@ -25,6 +25,7 @@ function AnalyserPage() {
           Eight short questions about how customers find you, buy from you and hear back from you. You'll get an explained score and a prioritised plan straight away.
         </p>
         <div className="mt-10 rounded-[24px] border border-border bg-card p-5 shadow-[var(--shadow-card)] md:p-8">
+          <h2 className="sr-only">Assessment questions</h2>
           <GrowthAssessment />
         </div>
       </main>

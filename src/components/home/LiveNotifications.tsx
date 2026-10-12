@@ -70,7 +70,7 @@ export default function LiveNotifications() {
               <p className="text-xs text-muted-foreground">{current.action}</p>
               <p className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground/70">{current.time}</p>
             </div>
-            <button onClick={dismiss} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss">×</button>
+            <button onClick={dismiss} className="text-muted-foreground hover:text-foreground" aria-label="Dismiss"><span aria-hidden="true">×</span></button>
           </motion.div>
         )}
       </AnimatePresence>

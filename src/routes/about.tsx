@@ -88,7 +88,7 @@ function AboutPage() {
                 loading="lazy"
               />
             </div>
-            <h3 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h3>
+            <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h2>
             <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
             <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
               Digital strategist, automation expert, and passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.

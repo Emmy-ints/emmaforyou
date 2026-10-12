@@ -146,6 +146,7 @@ function CasesPage() {
         </section>
 
         <section className="section-padding">
+          <h2 className="sr-only">Case studies</h2>
           <div className="mx-auto max-w-7xl grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
               <div key={c.id} className="gradient-border rounded-2xl p-6">

@@ -64,7 +64,7 @@ export default function Footer() {
           </div>
 
           <nav aria-label="Services">
-            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Services</h4>
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Services</h2>
             <div className="mt-4 flex flex-col gap-2.5">
               {SERVICE_LINKS.map((l) => (
                 <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -75,7 +75,7 @@ export default function Footer() {
           </nav>
 
           <nav aria-label="Free tools and resources">
-            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Free Tools</h4>
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Free Tools</h2>
             <div className="mt-4 flex flex-col gap-2.5">
               {TOOL_LINKS.map((l) => (
                 <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -86,7 +86,7 @@ export default function Footer() {
           </nav>
 
           <div>
-            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Company</h4>
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Company</h2>
             <div className="mt-4 flex flex-col gap-2.5">
               {LINKS.map((l) => (
                 <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -97,7 +97,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Locations</h4>
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Locations</h2>
             <div className="mt-4 flex flex-col gap-2.5">
               {LOCATIONS.map((loc) => (
                 <span key={loc} className="text-sm text-muted-foreground">{loc}</span>

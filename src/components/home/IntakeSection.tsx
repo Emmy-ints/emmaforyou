@@ -46,7 +46,7 @@ export default function IntakeSection() {
             onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
             <div className="my-12 w-full max-w-3xl">
               <button onClick={() => setOpen(false)}
-                className="mb-4 ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground shadow-lg">✕</button>
+                className="mb-4 ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-foreground shadow-lg" aria-label="Close the brief form"><span aria-hidden="true">✕</span></button>
               <BusinessIntakeForm onClose={() => setOpen(false)} />
             </div>
           </motion.div>

@@ -68,7 +68,7 @@ function PricingPage() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
                     style={{ background: "var(--gradient-brand)" }}>Most Popular</div>
                 )}
-                <h3 className="font-display text-xl font-extrabold">{t.name}</h3>
+                <h2 className="font-display text-xl font-extrabold">{t.name}</h2>
                 <p className="mt-1 text-xs text-muted-foreground">{t.audience}</p>
                 <div className="mt-5">
                   {t.custom ? (

@@ -40,7 +40,7 @@ export default function FloatingWhatsApp() {
             exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.4 }}
             className="relative max-w-[15rem] rounded-2xl border border-border bg-card p-3.5 pr-9 shadow-2xl sm:max-w-xs sm:p-4 sm:pr-9">
             <button onClick={dismiss} aria-label="Dismiss"
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">✕</button>
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"><span aria-hidden="true">✕</span></button>
             <p className="text-[13px] font-semibold text-foreground sm:text-sm">👋 Hi! Need help growing your business?</p>
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-emma-blue">

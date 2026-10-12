@@ -75,7 +75,7 @@ function FaqPage() {
           </div>
 
           <div className="mx-auto mt-14 max-w-2xl rounded-3xl border border-border bg-card p-8 text-center shadow-lg">
-            <h3 className="font-display text-xl font-bold">Still have questions?</h3>
+            <h2 className="font-display text-xl font-bold">Still have questions?</h2>
             <p className="mt-2 text-sm text-muted-foreground">Chat with us directly on WhatsApp — we usually respond within minutes.</p>
             <a href="https://wa.me/message/HHGMMWMRJFYUC1" target="_blank" rel="noopener noreferrer"
               className="btn-gold mt-5 inline-flex rounded-full px-6 py-3 text-sm font-semibold">Chat With Us →</a>

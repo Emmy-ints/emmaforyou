@@ -27,6 +27,7 @@ function RoiPage() {
           </p>
         </div>
         <div className="mt-10">
+          <h2 className="sr-only">Calculate your return</h2>
           <RoiCalculator />
         </div>
       </main>

@@ -78,7 +78,7 @@ export default function ServiceInquiryForm({ serviceName, serviceSlug, questions
               {q.options.map((opt) => {
                 const on = (answers[q.id] ?? []).includes(opt);
                 return (
-                  <button key={opt} type="button" role={q.multi ? "checkbox" : "radio"} aria-checked={on} onClick={() => toggle(q, opt)} className={`sif-chip ${on ? "is-on" : ""}`}>
+                  <button key={opt} type="button" role={q.multi ? "checkbox" : "radio"} aria-checked={on} aria-label={opt === "X" ? "X (formerly Twitter)" : undefined} onClick={() => toggle(q, opt)} className={`sif-chip ${on ? "is-on" : ""}`}>
                     {on && <Check className="h-3.5 w-3.5" />}{opt}
                   </button>
                 );

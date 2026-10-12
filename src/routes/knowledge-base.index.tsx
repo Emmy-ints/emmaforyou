@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
-import { KNOWLEDGE } from "@/lib/knowledge-data";
 
 export const Route = createFileRoute("/knowledge-base/")({
   component: KbIndex,

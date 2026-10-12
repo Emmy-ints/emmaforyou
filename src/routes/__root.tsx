@@ -2,6 +2,16 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } f
 import { useEffect } from "react";
 import { I18nProvider } from "../lib/i18n";
 import { installClickTracking, track } from "../lib/analytics";
+import { ORG_DESCRIPTION, founderLd, organizationLd, websiteLd } from "../lib/seo";
+
+/**
+ * Search Console / Bing Webmaster verification. Paste the token from each tool into the
+ * environment variables VITE_GOOGLE_SITE_VERIFICATION and VITE_BING_SITE_VERIFICATION.
+ */
+const VERIFICATION_META = [
+  import.meta.env.VITE_GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION) } : null,
+  import.meta.env.VITE_BING_SITE_VERIFICATION ? { name: "msvalidate.01", content: String(import.meta.env.VITE_BING_SITE_VERIFICATION) } : null,
+].filter((x): x is { name: string; content: string } => Boolean(x));
 
 
 import appCss from "../styles.css?url";
@@ -32,22 +42,22 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EmmaForYou | AI Automation & Digital Growth Agency" },
-      { name: "description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: "EmmaForYou — AI Automation, Websites & Digital Growth Agency" },
+      { name: "description", content: ORG_DESCRIPTION },
       { name: "author", content: "EmmaForYou" },
-      { property: "og:title", content: "EmmaForYou | AI Automation & Digital Growth Agency" },
-      { name: "twitter:title", content: "EmmaForYou | AI Automation & Digital Growth Agency" },
-      { property: "og:description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
-      { name: "twitter:description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
-      { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:type", content: "website" },
+      { name: "theme-color", content: "#0b0d24" },
+      { name: "format-detection", content: "telephone=no" },
+      ...VERIFICATION_META,
     ],
+    scripts: [organizationLd(), websiteLd(), founderLd()].map((x) => ({ type: "application/ld+json", children: JSON.stringify(x) })),
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "apple-touch-icon", href: "/icons/icon-512.png" },
     ],
   }),
   shellComponent: RootShell,

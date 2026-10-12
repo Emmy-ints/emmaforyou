@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
+import { pageHead, breadcrumbLd, articleLd, clip } from "@/lib/seo";
 
 export const Route = createFileRoute("/knowledge-base/$slug")({
   component: ArticlePage,
@@ -16,14 +17,24 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
   notFoundComponent: () => (
     <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Article not found</h1><Link to="/knowledge-base" className="mt-4 inline-block text-sm underline">Back to knowledge base</Link></div></div>
   ),
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.article.title} — EmmaForYou` },
-      { name: "description", content: loaderData.article.excerpt },
-      { property: "og:title", content: loaderData.article.title },
-      { property: "og:description", content: loaderData.article.excerpt },
-    ] : [],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: `${loaderData.article.title} | EmmaForYou Guides`,
+          description: clip(loaderData.article.excerpt),
+          path: `/knowledge-base/${loaderData.article.slug}`,
+          type: "article",
+          jsonLd: [
+            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Knowledge base", path: "/knowledge-base" }, { name: loaderData.article.title, path: `/knowledge-base/${loaderData.article.slug}` }]),
+            articleLd({
+              headline: loaderData.article.title,
+              description: loaderData.article.excerpt,
+              path: `/knowledge-base/${loaderData.article.slug}`,
+              section: loaderData.article.category,
+            }),
+          ],
+        })
+      : { meta: [{ title: "Guide not found — EmmaForYou" }, { name: "robots", content: "noindex" }] },
 });
 
 function ArticlePage() {

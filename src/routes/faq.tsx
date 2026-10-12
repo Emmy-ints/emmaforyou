@@ -2,17 +2,24 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/faq")({
   component: FaqPage,
-  head: () => ({
-    meta: [
-      { title: "FAQs — Everything You Need to Know | EmmaForYou" },
-      { name: "description", content: "Answers to common questions about pricing, services, timelines, AI automation, and working with EmmaForYou across Nigeria, USA, Europe and Africa." },
-      { property: "og:title", content: "EmmaForYou — Frequently Asked Questions" },
-      { property: "og:description", content: "Pricing, services, timelines and more — answered." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "FAQ — Pricing, Timelines & How EmmaForYou Works",
+      description: "Answers about pricing, payment, timelines, services, AI automation and working with EmmaForYou from Nigeria, the USA, Europe or Africa.",
+      path: "/faq",
+      jsonLd: [
+        breadcrumbLd([{ name: "Home", path: "/" }, { name: "FAQ", path: "/faq" }]),
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: CATEGORIES.flatMap((c) => c.items).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+        },
+      ],
+    }),
 });
 
 const CATEGORIES = [

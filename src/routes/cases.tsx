@@ -2,17 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/cases")({
   component: CasesPage,
-  head: () => ({
-    meta: [
-      { title: "100 Case Studies — EmmaForYou Before & After Results" },
-      { name: "description", content: "See 100 real before & after case studies of businesses EmmaForYou has transformed across Nigeria, USA, Europe, and Africa." },
-      { property: "og:title", content: "100 Case Studies — EmmaForYou" },
-      { property: "og:description", content: "Real before & after proof from businesses across 3 continents." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Case Studies — Before & After Results by Industry | EmmaForYou",
+      description: "Before-and-after case studies across fashion, clinics, real estate, restaurants, salons and more — filter by industry and result type.",
+      path: "/cases",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Case studies", path: "/cases" }])],
+    }),
 });
 
 const NICHES = ["All","Fashion","Ecommerce","Real Estate","Clinics","Restaurants","Salons","Gyms","SaaS","Coaches","Barbershops","Bakeries","Car Dealers","Hotels","Logistics"];

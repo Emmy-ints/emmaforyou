@@ -177,7 +177,14 @@ export function serviceLd(s: { name: string; description: string; path: string; 
   };
 }
 
-export function articleLd(a: { headline: string; description: string; path: string; datePublished?: string; authorName?: string; section?: string; type?: "Article" | "BlogPosting" }): JsonLd {
+/** Convert dates like "Apr 18, 2026" to ISO (YYYY-MM-DD). Returns undefined if unparseable. */
+export function isoDate(input: string): string | undefined {
+  const d = new Date(input);
+  if (Number.isNaN(d.getTime())) return undefined;
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString().slice(0, 10);
+}
+
+export function articleLd(a: { headline: string; description: string; path: string; datePublished?: string; authorName?: string; authorRole?: string; section?: string; type?: "Article" | "BlogPosting" }): JsonLd {
   const isFounder = a.authorName === FOUNDER.name;
   return {
     "@context": "https://schema.org",
@@ -189,7 +196,11 @@ export function articleLd(a: { headline: string; description: string; path: stri
     image: absoluteUrl(DEFAULT_OG_IMAGE),
     ...(a.datePublished ? { datePublished: a.datePublished } : {}),
     ...(a.section ? { articleSection: a.section } : {}),
-    author: isFounder ? { "@id": FOUNDER_ID } : { "@id": ORG_ID },
+    author: isFounder
+      ? { "@id": FOUNDER_ID }
+      : a.authorName
+        ? { "@type": "Person", name: a.authorName, ...(a.authorRole ? { jobTitle: a.authorRole } : {}), worksFor: { "@id": ORG_ID } }
+        : { "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
     inLanguage: "en",
   };

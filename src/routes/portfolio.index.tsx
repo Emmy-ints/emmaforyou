@@ -8,18 +8,22 @@ import ProjectCard from "../components/portfolio/ProjectCard";
 import ClientWall from "../components/portfolio/ClientWall";
 import { ADS, AUTOMATIONS, FEATURED, PROJECTS, SOCIAL_BEFORE_AFTER, VIDEOS, findProject, projectSlug } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
+import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/")({
   component: PortfolioPage,
-  head: () => ({
-    meta: [
-      { title: "Portfolio — Client Work | EmmaForYou" },
-      { name: "description", content: "Websites, ecommerce stores, automation systems, social media and ad campaigns EmmaForYou has delivered for fashion brands, clinics, restaurants, real estate teams, coaches and more." },
-      { property: "og:title", content: "EmmaForYou — Client Work" },
-      { property: "og:description", content: "Real businesses, real projects: websites, automation, social and ads." },
-      { property: "og:image", content: FEATURED[0].img },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Portfolio — Client Websites, Stores & Automation | EmmaForYou",
+      description: "Websites, ecommerce stores, automation systems, social media and ad campaigns EmmaForYou has delivered for fashion brands, clinics, restaurants, real estate teams, coaches and more.",
+      path: "/portfolio",
+      image: FEATURED[0].img,
+      imageAlt: `${FEATURED[0].client} project by EmmaForYou`,
+      jsonLd: [
+        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Portfolio", path: "/portfolio" }]),
+        itemListLd("EmmaForYou client projects", PROJECTS.map((p) => ({ name: p.name, path: `/portfolio/${projectSlug(p.name)}` }))),
+      ],
+    }),
 });
 
 const enter = (delay = 0) => ({

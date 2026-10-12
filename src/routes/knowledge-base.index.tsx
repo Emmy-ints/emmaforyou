@@ -3,17 +3,21 @@ import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
+import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
+import { KNOWLEDGE } from "@/lib/knowledge-data";
 
 export const Route = createFileRoute("/knowledge-base/")({
   component: KbIndex,
-  head: () => ({
-    meta: [
-      { title: "Knowledge Base — 48 Free Growth Articles | EmmaForYou" },
-      { name: "description", content: "48 in-depth articles covering websites, SEO, AI automation, social media, paid ads, email marketing and ecommerce. 100% free." },
-      { property: "og:title", content: "EmmaForYou Knowledge Base" },
-      { property: "og:description", content: "Free in-depth articles to grow your business." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: `Knowledge Base — ${KNOWLEDGE.length} Free Guides on Websites, SEO & Automation`,
+      description: `${KNOWLEDGE.length} in-depth guides for business owners on websites, SEO, AI automation, social media, paid ads, email marketing and ecommerce. Free to read.`,
+      path: "/knowledge-base",
+      jsonLd: [
+        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Knowledge base", path: "/knowledge-base" }]),
+        itemListLd("EmmaForYou knowledge base", KNOWLEDGE.map((a) => ({ name: a.title, path: `/knowledge-base/${a.slug}` }))),
+      ],
+    }),
 });
 
 const CATS = ["All", "Business Growth", "Website & SEO", "AI Automation", "Social Media", "Paid Advertising", "Email Marketing", "Ecommerce"];

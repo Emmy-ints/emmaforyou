@@ -3,17 +3,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
-  head: () => ({
-    meta: [
-      { title: "Pricing — Transparent Plans for Every Stage | EmmaForYou" },
-      { name: "description", content: "Simple, transparent pricing for AI automation, web design, social media, ads and ecommerce. From $99/mo Starter to custom Enterprise." },
-      { property: "og:title", content: "EmmaForYou Pricing — Transparent. Real Results." },
-      { property: "og:description", content: "4 plans built for every business stage. Annual discount available." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Pricing — Plans from $99/month | EmmaForYou",
+      description: "Transparent monthly plans for AI automation, websites, social media, ads and ecommerce: Starter $99, Growth $299, Pro $799 and custom Enterprise. Ad spend is billed separately.",
+      path: "/pricing",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])],
+    }),
 });
 
 const TIERS = [

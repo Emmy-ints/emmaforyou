@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ExpertiseTemplate from "@/components/ExpertiseTemplate";
 import { findExpertise, SERVICE_TO_EXPERTISE, SERVICES } from "@/lib/services-data";
+import { pageHead, breadcrumbLd, serviceLd, clip } from "@/lib/seo";
 
 export const Route = createFileRoute("/services/$slug")({
   component: ServicePage,
@@ -10,14 +11,22 @@ export const Route = createFileRoute("/services/$slug")({
     const target = SERVICE_TO_EXPERTISE[params.slug];
     const data = target ? findExpertise(target) : undefined;
     if (!data) throw notFound();
-    return { data };
+    const name = SERVICES.find((s) => s.slug === params.slug)?.name ?? data.name;
+    return { data, slug: params.slug, name };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.data.name} — EmmaForYou Services` },
-      { name: "description", content: loaderData.data.hero.sub },
-    ] : [{ title: "Services — EmmaForYou" }],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: `${loaderData.name} Services | EmmaForYou`,
+          description: clip(`${loaderData.data.hero.sub}`),
+          ogDescription: loaderData.data.hero.headline,
+          path: `/services/${loaderData.slug}`,
+          jsonLd: [
+            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Services", path: "/#services" }, { name: loaderData.name, path: `/services/${loaderData.slug}` }]),
+            serviceLd({ name: loaderData.name, description: loaderData.data.hero.sub, path: `/services/${loaderData.slug}`, serviceType: loaderData.data.name }),
+          ],
+        })
+      : { meta: [{ title: "Service not found — EmmaForYou" }, { name: "robots", content: "noindex" }] },
   notFoundComponent: () => (
     <>
       <Navbar />

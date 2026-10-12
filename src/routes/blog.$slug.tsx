@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { POSTS, getPost } from "@/lib/blog-data";
+import { pageHead, breadcrumbLd, articleLd, clip, isoDate } from "@/lib/seo";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -21,18 +22,29 @@ export const Route = createFileRoute("/blog/$slug")({
       </div>
     </div>
   ),
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.post.title} — EmmaForYou` },
-          { name: "description", content: loaderData.post.excerpt },
-          { property: "og:title", content: loaderData.post.title },
-          { property: "og:description", content: loaderData.post.excerpt },
-          { property: "article:published_time", content: loaderData.post.date },
-          { property: "article:author", content: loaderData.post.author.name },
-        ]
-      : [],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: `${loaderData.post.title} | EmmaForYou Blog`,
+          description: clip(loaderData.post.excerpt),
+          path: `/blog/${loaderData.post.slug}`,
+          type: "article",
+          publishedTime: isoDate(loaderData.post.date),
+          jsonLd: [
+            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: loaderData.post.title, path: `/blog/${loaderData.post.slug}` }]),
+            articleLd({
+              type: "BlogPosting",
+              headline: loaderData.post.title,
+              description: loaderData.post.excerpt,
+              path: `/blog/${loaderData.post.slug}`,
+              datePublished: isoDate(loaderData.post.date),
+              authorName: loaderData.post.author.name,
+              authorRole: loaderData.post.author.role,
+              section: loaderData.post.category,
+            }),
+          ],
+        })
+      : { meta: [{ title: "Post not found — EmmaForYou" }, { name: "robots", content: "noindex" }] },
 });
 
 function BlogArticle() {

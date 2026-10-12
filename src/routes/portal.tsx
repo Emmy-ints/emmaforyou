@@ -4,15 +4,17 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portal")({
   component: Portal,
-  head: () => ({
-    meta: [
-      { title: "Client Portal — EmmaForYou" },
-      { name: "description", content: "Login to your EmmaForYou client portal — track projects, tasks, files and chat with your team." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Client Portal — EmmaForYou",
+      description: "Sign in to the EmmaForYou client portal.",
+      path: "/portal",
+      noindex: true,
+    }),
 });
 
 interface Project { id: string; title: string; progress_pct: number; status: string; next_milestone: string | null; next_milestone_date: string | null; metrics: Record<string, unknown> }

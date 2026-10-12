@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LegalPage from "../components/legal/LegalPage";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
   component: TermsPage,
-  head: () => ({
-    meta: [
-      { title: "Terms of Use — EmmaForYou" },
-      { name: "description", content: "The terms for using the EmmaForYou website and its free tools." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Terms of Use — EmmaForYou",
+      description: "The terms for using the EmmaForYou website, its free tools and AI prototype builder.",
+      path: "/terms",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Terms of use", path: "/terms" }])],
+    }),
 });
 
 function TermsPage() {

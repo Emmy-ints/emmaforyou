@@ -3,6 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ExpertiseTemplate from "@/components/ExpertiseTemplate";
 import { findExpertise, EXPERTISE } from "@/lib/services-data";
+import { pageHead, breadcrumbLd, serviceLd, clip } from "@/lib/seo";
+import { canonicalForExpertise } from "@/lib/seo-routes";
 
 export const Route = createFileRoute("/expertise/$slug")({
   component: ExpertisePage,
@@ -11,14 +13,25 @@ export const Route = createFileRoute("/expertise/$slug")({
     if (!data) throw notFound();
     return { data };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.data.name} — EmmaForYou` },
-      { name: "description", content: loaderData.data.hero.sub },
-      { property: "og:title", content: loaderData.data.hero.headline },
-      { property: "og:description", content: loaderData.data.hero.sub },
-    ] : [{ title: "Expertise — EmmaForYou" }],
-  }),
+  head: ({ loaderData }) => {
+    if (!loaderData) return { meta: [{ title: "Expertise not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
+    const d = loaderData.data;
+    const own = `/expertise/${d.slug}`;
+    const canonical = canonicalForExpertise(d.slug);
+    const head = pageHead({
+      title: `${d.name} | EmmaForYou`,
+      description: clip(d.hero.sub),
+      ogDescription: d.hero.headline,
+      path: canonical,
+      jsonLd: canonical === own
+        ? [
+            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Expertise", path: "/#services" }, { name: d.name, path: own }]),
+            serviceLd({ name: d.name, description: d.hero.sub, path: own }),
+          ]
+        : [],
+    });
+    return head;
+  },
   notFoundComponent: () => (
     <>
       <Navbar />

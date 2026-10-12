@@ -824,3 +824,10 @@ select.roi-input { appearance: auto; }
 .sif-chip:hover { border-color: rgba(139, 123, 255, 0.6); }
 .sif-chip.is-on { background: rgba(109, 91, 255, 0.3); border-color: #8b7bff; color: #fff; }
 .sif-chip:focus-visible { outline: 2px solid var(--emma-cyan); outline-offset: 2px; }
+
+/* Legal pages */
+.legal { font-size: 1rem; line-height: 1.75; color: var(--foreground); }
+.legal > * + * { margin-top: 1rem; }
+.legal h2 { margin-top: 2.5rem; font-size: 1.35rem; font-weight: 600; }
+.legal ul { list-style: disc; padding-left: 1.25rem; display: grid; gap: 0.6rem; }
+.legal p, .legal li { color: color-mix(in srgb, var(--foreground) 82%, transparent); }

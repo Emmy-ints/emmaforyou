@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { NICHES, getNiche } from "@/lib/niches";
 import { buildWa } from "@/lib/leads";
-import { pageHead, breadcrumbLd, serviceLd, clip } from "@/lib/seo";
 
 export const Route = createFileRoute("/niche/$slug")({
   component: NichePage,
@@ -16,18 +15,14 @@ export const Route = createFileRoute("/niche/$slug")({
   notFoundComponent: () => (
     <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Niche not found</h1><Link to="/" className="mt-4 inline-block text-sm underline">Go home</Link></div></div>
   ),
-  head: ({ loaderData }) =>
-    loaderData
-      ? pageHead({
-          title: `${loaderData.niche.name}: Websites, Automation & Marketing | EmmaForYou`,
-          description: clip(`${loaderData.niche.hero} ${loaderData.niche.sub}`),
-          path: `/niche/${loaderData.niche.slug}`,
-          jsonLd: [
-            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Industries", path: "/#tools" }, { name: loaderData.niche.name, path: `/niche/${loaderData.niche.slug}` }]),
-            serviceLd({ name: `Digital growth services for ${loaderData.niche.name.toLowerCase()}`, description: loaderData.niche.sub, path: `/niche/${loaderData.niche.slug}`, serviceType: loaderData.niche.services.join(", ") }),
-          ],
-        })
-      : { meta: [{ title: "Industry not found — EmmaForYou" }, { name: "robots", content: "noindex" }] },
+  head: ({ loaderData }) => ({
+    meta: loaderData ? [
+      { title: `${loaderData.niche.name} Growth — ${loaderData.niche.hero} | EmmaForYou` },
+      { name: "description", content: loaderData.niche.sub },
+      { property: "og:title", content: `${loaderData.niche.name} — ${loaderData.niche.hero}` },
+      { property: "og:description", content: loaderData.niche.sub },
+    ] : [],
+  }),
 });
 
 function NichePage() {

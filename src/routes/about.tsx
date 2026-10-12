@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { pageHead, breadcrumbLd, founderLd } from "@/lib/seo";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -22,13 +21,14 @@ const LOCATIONS = [
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
-  head: () =>
-    pageHead({
-      title: "About EmmaForYou — Founder Emmanuel Akinloye Oluwaseun",
-      description: "From a laptop in Nigeria to 3 continents. The story of founder Emmanuel Akinloye Oluwaseun and how EmmaForYou builds automation, websites and marketing for growing businesses.",
-      path: "/about",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "About", path: "/about" }]), founderLd()],
-    }),
+  head: () => ({
+    meta: [
+      { title: "About EmmaForYou — Our Story | Digital Growth Agency" },
+      { name: "description", content: "From a laptop in Nigeria to 3 continents. Learn about Emmanuel Akinloye Oluwaseun and the EmmaForYou mission." },
+      { property: "og:title", content: "About EmmaForYou — One Vision. Three Continents." },
+      { property: "og:description", content: "The story behind Africa's fastest-growing digital agency." },
+    ],
+  }),
 });
 
 function AboutPage() {

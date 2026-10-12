@@ -2,17 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import GrowthAssessment from "../components/assessment/GrowthAssessment";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/analyser")({
   component: AnalyserPage,
-  head: () =>
-    pageHead({
-      title: "Free Business Growth Assessment — Score Your Online Presence",
-      description: "Answer 8 quick questions about your online presence, marketing, website and follow-up. Get an explained growth score, three prioritised fixes and an optional free expert audit.",
-      path: "/analyser",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Growth assessment", path: "/analyser" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "Free Business Growth Assessment — EmmaForYou" },
+      { name: "description", content: "Answer 8 quick questions about your online presence, marketing, website and follow-up. Get an explained growth score, three prioritised recommendations, and the option of a free personal audit." },
+      { property: "og:title", content: "Free Business Growth Assessment — EmmaForYou" },
+      { property: "og:description", content: "An explained growth score and a prioritised plan in about two minutes." },
+    ],
+    links: [{ rel: "canonical", href: "https://emmaforyou.com/analyser" }],
+  }),
 });
 
 function AnalyserPage() {

@@ -3,17 +3,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/pricing")({
   component: PricingPage,
-  head: () =>
-    pageHead({
-      title: "Pricing — Plans from $99/month | EmmaForYou",
-      description: "Transparent monthly plans for AI automation, websites, social media, ads and ecommerce: Starter $99, Growth $299, Pro $799 and custom Enterprise. Ad spend is billed separately.",
-      path: "/pricing",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "Pricing — Transparent Plans for Every Stage | EmmaForYou" },
+      { name: "description", content: "Simple, transparent pricing for AI automation, web design, social media, ads and ecommerce. From $99/mo Starter to custom Enterprise." },
+      { property: "og:title", content: "EmmaForYou Pricing — Transparent. Real Results." },
+      { property: "og:description", content: "4 plans built for every business stage. Annual discount available." },
+    ],
+  }),
 });
 
 const TIERS = [
@@ -109,12 +109,12 @@ function PricingPage() {
             <div className="mt-10 space-y-3">
               {FAQS.map((f, i) => (
                 <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
-                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
                     className="flex w-full items-center justify-between gap-4 p-5 text-left">
                     <span className="font-display text-base font-bold">{f.q}</span>
                     <span className={`flex h-7 w-7 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
                   </button>
-                  <div className="acc-panel" data-open={openFaq === i} inert={openFaq !== i}><div><p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p></div></div>
+                  {openFaq === i && <p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p>}
                 </div>
               ))}
             </div>

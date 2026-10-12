@@ -4,17 +4,15 @@ import type { Session } from "@supabase/supabase-js";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Download, LogOut, MessageCircle, RefreshCw, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
-  head: () =>
-    pageHead({
-      title: "Dashboard — EmmaForYou",
-      description: "Private dashboard.",
-      path: "/dashboard",
-      noindex: true,
-    }),
+  head: () => ({
+    meta: [
+      { title: "Dashboard — EmmaForYou" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
 });
 
 /* ------------------------------------------------------------------ */

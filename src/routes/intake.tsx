@@ -2,17 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BusinessIntakeForm from "../components/intake/BusinessIntakeForm";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/intake")({
   component: IntakePage,
-  head: () =>
-    pageHead({
-      title: "Get a Custom 90-Day Growth Plan — Business Profile | EmmaForYou",
-      description: "Tell us about your business, customers, goals and budget in one guided form. Emmanuel reviews every profile personally and replies with a 90-day plan.",
-      path: "/intake",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Business profile", path: "/intake" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "Business Intake — Get Your Custom Growth Plan | EmmaForYou" },
+      { name: "description", content: "Tell us about your business and we'll build a custom 90-day growth plan. Takes 5 minutes. Personal review by Emmanuel and the EmmaForYou team." },
+      { property: "og:title", content: "Business Intake — Custom Growth Plan | EmmaForYou" },
+      { property: "og:description", content: "Submit your business profile and get a custom plan within 24 hours." },
+    ],
+  }),
 });
 
 function IntakePage() {

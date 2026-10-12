@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import ProjectCard, { projectImage } from "../components/portfolio/ProjectCard";
 import { PROJECTS, featuredFor, findProject, projectSlug, socialFor } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
-import { pageHead, breadcrumbLd, creativeWorkLd, clip } from "@/lib/seo";
 
 const SERVICE_FOR_CATEGORY: Record<string, { slug: string; name: string }> = {
   Ecommerce: { slug: "ecommerce", name: "Ecommerce Growth" },
@@ -24,25 +23,16 @@ export const Route = createFileRoute("/portfolio/$slug")({
     if (!project) throw notFound();
     return { project };
   },
-  head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "Project not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
-    const p = loaderData.project;
-    const f = featuredFor(p.name);
-    const path = `/portfolio/${projectSlug(p.name)}`;
-    const image = f?.img ?? p.img;
-    return pageHead({
-      title: `${p.name} — ${p.category} Case Study | EmmaForYou`,
-      description: clip(`${p.desc} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.`),
-      path,
-      image,
-      imageAlt: `${p.name} project`,
-      type: "article",
-      jsonLd: [
-        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Portfolio", path: "/portfolio" }, { name: p.name, path }]),
-        creativeWorkLd({ name: p.name, description: f?.desc ?? p.desc, path, image, about: p.category }),
-      ],
-    });
-  },
+  head: ({ loaderData }) => ({
+    meta: loaderData
+      ? [
+          { title: `${loaderData.project.name} — Case Study | EmmaForYou` },
+          { name: "description", content: loaderData.project.desc },
+          { property: "og:title", content: `${loaderData.project.name} — EmmaForYou case study` },
+          { property: "og:description", content: loaderData.project.desc },
+        ]
+      : [{ title: "Case study — EmmaForYou" }],
+  }),
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">
       <Navbar />

@@ -1,16 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import LegalPage from "../components/legal/LegalPage";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
-  head: () =>
-    pageHead({
-      title: "Privacy Policy — EmmaForYou",
-      description: "What information EmmaForYou collects through this website, why, where it is stored, how long it is kept and how to have it deleted.",
-      path: "/privacy",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Privacy policy", path: "/privacy" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "Privacy Policy — EmmaForYou" },
+      { name: "description", content: "What information EmmaForYou collects through this website, why, where it's stored and how to have it deleted." },
+    ],
+  }),
 });
 
 function PrivacyPage() {

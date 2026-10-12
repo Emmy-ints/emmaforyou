@@ -3,17 +3,17 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { POSTS } from "@/lib/blog-data";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogPage,
-  head: () =>
-    pageHead({
-      title: "Blog — Practical Growth Tips for Small Businesses | EmmaForYou",
-      description: "Practical tips on Instagram growth, WhatsApp automation, ads, SEO, email and websites from the EmmaForYou team.",
-      path: "/blog",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "Free Resources & Guides | EmmaForYou Blog" },
+      { name: "description", content: "Free tips, guides, and strategies to grow your business — from Instagram growth to WhatsApp automation, ads, SEO and more." },
+      { property: "og:title", content: "EmmaForYou Blog — Free Growth Resources" },
+      { property: "og:description", content: "Tips and strategies from the EmmaForYou team. 100% free." },
+    ],
+  }),
 });
 
 function BlogPage() {

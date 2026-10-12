@@ -2,17 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RoiCalculator from "../components/roi/RoiCalculator";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/roi-calculator")({
   component: RoiPage,
-  head: () =>
-    pageHead({
-      title: "ROI Calculator — Estimate Revenue from Faster Replies & Marketing",
-      description: "Estimate the extra revenue from answering enquiries faster, automated follow-up and better marketing, using your own numbers, editable assumptions and visible maths.",
-      path: "/roi-calculator",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "ROI calculator", path: "/roi-calculator" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "ROI Calculator — Transparent Growth Estimate | EmmaForYou" },
+      { name: "description", content: "Estimate the extra revenue from faster replies, automated follow-up and better marketing — using your own numbers and editable assumptions." },
+      { property: "og:title", content: "ROI Calculator — EmmaForYou" },
+      { property: "og:description", content: "See exactly how much additional revenue you can generate." },
+    ],
+  }),
 });
 
 function RoiPage() {

@@ -5,17 +5,17 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { SEQUENCES, pickSequence, GOAL_TO_SEQ } from "@/lib/email-templates";
 import { submitEmailGen, buildWa } from "@/lib/leads";
-import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/email-generator")({
   component: EmailGen,
-  head: () =>
-    pageHead({
-      title: "Free Email Sequence Generator — 5 Emails in 60 Seconds",
-      description: "Generate a ready-to-use 5-email sequence for your business: welcome, abandoned cart, re-engagement or product launch. Free, no sign-up.",
-      path: "/email-generator",
-      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Email sequence generator", path: "/email-generator" }])],
-    }),
+  head: () => ({
+    meta: [
+      { title: "AI Email Sequence Generator — Free | EmmaForYou" },
+      { name: "description", content: "Generate a 5-email sequence for your business in 60 seconds. Welcome, abandoned cart, re-engage, product launch — all free." },
+      { property: "og:title", content: "Free AI Email Sequence Generator" },
+      { property: "og:description", content: "5 ready-to-send emails tailored to your business." },
+    ],
+  }),
 });
 
 const GOALS = Object.keys(GOAL_TO_SEQ);

@@ -36,7 +36,7 @@ export default function Navbar() {
   const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (st) => st.location.pathname });
-  const onInkHero = pathname === "/" || pathname.startsWith("/services/") || pathname.startsWith("/expertise/");
+  const onInkHero = pathname === "/" || pathname.startsWith("/services/") || pathname.startsWith("/expertise/") || pathname.startsWith("/portfolio");
   const [hidden, setHidden] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<null | DropdownKey>(null);

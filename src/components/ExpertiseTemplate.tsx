@@ -126,14 +126,14 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         </ol>
       </Block>
 
-      {/* Scenarios */}
+      {/* Client results */}
       {data.results.length > 0 && (
-        <Block title="What this can look like" lead="Typical before-and-after scenarios for businesses like yours.">
+        <Block title="What happens after we set this up" lead="Results from businesses we've built this for.">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {data.results.map((r) => (
               <motion.div key={r.business} {...reveal} className="svc-scenario">
-                <p className="text-xs text-muted-foreground">{r.business}</p>
-                <p className="mt-3 text-sm"><span className="text-muted-foreground">Before · </span>{r.before}</p>
+                <p className="flex items-center gap-2 text-sm font-semibold"><span className="text-xl" aria-hidden="true">{r.flag}</span>{r.business}</p>
+                <p className="mt-4 text-sm"><span className="text-muted-foreground">Before · </span>{r.before}</p>
                 <p className="mt-2 text-sm font-medium"><span className="text-[color:var(--emma-violet)]">After · </span>{r.after}</p>
               </motion.div>
             ))}
@@ -168,15 +168,20 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         </div>
       </Block>
 
-      {/* Who you work with */}
+      {/* About Emmanuel (original bio) */}
       <Block tone="alt">
-        <div className="grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-center">
-          <img src={emmanuelImg} alt="Emmanuel Akinloye Oluwaseun, founder of EmmaForYou" className="aspect-[4/5] w-full max-w-[280px] rounded-[22px] object-cover shadow-[var(--shadow-card-hover)]" loading="lazy" />
+        <div className="grid gap-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
+          <img src={emmanuelImg} alt="Emmanuel Akinloye Oluwaseun, founder of EmmaForYou" className="aspect-[4/5] w-full max-w-[300px] rounded-[22px] object-cover shadow-[var(--shadow-card-hover)]" loading="lazy" />
           <div>
-            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">You work directly with Emmanuel</h2>
-            <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-              No account managers or hand-offs. Emmanuel plans your {data.name} system with you, builds it with the team, and stays reachable on WhatsApp after launch. Every setup is built around how your customers actually buy — not copied from a template.
-            </p>
+            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">Why Emmanuel Akinloye Oluwaseun?</h2>
+            <div className="mt-5 max-w-2xl space-y-4 leading-relaxed text-muted-foreground">
+              <p>Emmanuel started building digital systems for businesses in Lagos before scaling his work across Europe and the United States. After 6+ years and 500+ projects, he's learnt one thing — businesses don't need more tools, they need the RIGHT system, configured for THEIR customer.</p>
+              <p>He's worked with fashion brands, clinics, restaurants, real-estate teams, coaches, ecommerce stores and over 50 niches in total. Every implementation is hands-on, customised, and outcome-focused.</p>
+              <p>His philosophy on {data.name}: "Tools are commodities. Strategy is rare. We sell the strategy and use the right tool for your specific reality."</p>
+              <p>What makes his approach different is access — clients chat with Emmanuel directly on WhatsApp. No account managers. No layers. Just real conversations and real results.</p>
+              <blockquote className="border-l-2 border-[color:var(--emma-violet)] pl-4 italic text-foreground">"Every business is one well-built system away from doubling. We just build that system."</blockquote>
+            </div>
+            <p className="mt-6 text-sm text-muted-foreground">500+ Businesses Helped · 3 Continents · 6+ Years Experience · Nigeria · USA · Europe · Africa</p>
           </div>
         </div>
       </Block>

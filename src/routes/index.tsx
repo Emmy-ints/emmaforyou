@@ -17,6 +17,11 @@ import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
+import SelectedWork from "../components/home/SelectedWork";
+import ResultsTicker from "../components/home/ResultsTicker";
+import NicheShowcase from "../components/NicheShowcase";
+import MissionSection from "../components/MissionSection";
+import WaitlistSection from "../components/WaitlistSection";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
 import { CheckCircle2 } from "lucide-react";
@@ -116,19 +121,24 @@ function HomePage() {
           </div>
         </section>
 
+        <ResultsTicker />
+        <SelectedWork />
         <SocialProofBar />
         <PrototypeBuilder />
         <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
+        <NicheShowcase />
         <AnalyserTeaser />
         <RoiSection />
         <ComparisonTable />
         <TestimonialsPreview />
         <AboutTeaser />
+        <MissionSection />
         <IntakeSection />
         <StrategyCallSection />
         <FaqAccordion />
+        <WaitlistSection />
       </main>
       <Footer />
       <FloatingWhatsApp />

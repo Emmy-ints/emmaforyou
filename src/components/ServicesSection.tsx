@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 
-const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
+const SLUGS = ["ai-automation", "website-design", "email-marketing", "social-media", "ad-marketing", "ecommerce", "app-development"];
 
 const SERVICES = [
   { icon: "🤖", name: "AI Automation", desc: "Automate follow-ups, bookings, and lead nurturing with intelligent AI systems that work 24/7." },
@@ -51,13 +52,10 @@ export default function ServicesSection() {
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" style={{ perspective: 1200 }}>
           {SERVICES.map((s, i) => (
-            <motion.a
+            <motion.div
               key={i}
               id={["service-ai", "service-web", "service-email", "service-social", "service-ads", "service-ecommerce", "service-app"][i]}
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="gradient-border group flex flex-col rounded-2xl p-6"
+              className="gradient-border group relative flex flex-col rounded-2xl p-6"
               custom={i}
               variants={cardVariants}
               initial="hidden"
@@ -79,12 +77,16 @@ export default function ServicesSection() {
               >
                 {s.icon}
               </motion.span>
-              <h3 className="mt-4 font-display text-lg font-bold text-foreground">{s.name}</h3>
+              <h3 className="mt-4 font-display text-lg font-bold text-foreground">
+                <Link to="/services/$slug" params={{ slug: SLUGS[i] }} className="after:absolute after:inset-0 after:rounded-2xl after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--emma-violet)]">
+                  {s.name}
+                </Link>
+              </h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-emma-blue transition-colors group-hover:text-emma-pink">
-                Learn More <span aria-hidden>→</span>
+                Learn more about {s.name} <span aria-hidden>→</span>
               </span>
-            </motion.a>
+            </motion.div>
           ))}
         </div>
       </div>

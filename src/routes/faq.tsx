@@ -102,12 +102,12 @@ function FaqPage() {
               const key = `${f.cat}-${i}`;
               return (
                 <div key={key} className="overflow-hidden rounded-2xl border border-border bg-card">
-                  <button onClick={() => setOpen(open === key ? null : key)}
+                  <button onClick={() => setOpen(open === key ? null : key)} aria-expanded={open === key}
                     className="flex w-full items-center justify-between gap-4 p-5 text-left hover:bg-muted/30">
                     <span className="font-display text-base font-bold">{f.q}</span>
                     <span className={`flex h-7 w-7 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${open === key ? "rotate-45" : ""}`}>+</span>
                   </button>
-                  {open === key && <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>}
+                  <div className="acc-panel" data-open={open === key} inert={open !== key}><div><p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p></div></div>
                 </div>
               );
             })}

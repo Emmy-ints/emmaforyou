@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { POSTS, getPost } from "@/lib/blog-data";
+import { serviceForTopic } from "@/lib/topic-service";
 import { pageHead, breadcrumbLd, articleLd, clip, isoDate } from "@/lib/seo";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
@@ -147,14 +148,17 @@ function BlogArticle() {
               <p className="mt-2 text-sm text-muted-foreground">
                 We help businesses across 3 continents implement everything you just read — and a lot more.
               </p>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary-gradient mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white"
-              >
-                Talk to a strategist on WhatsApp →
-              </a>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Link to={serviceForTopic(post.category).to} className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:border-[color:var(--emma-violet)]">How our {serviceForTopic(post.category).label} service works</Link>
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white"
+                >
+                  Talk to a strategist on WhatsApp →
+                </a>
+              </div>
             </div>
           </div>
 

@@ -109,12 +109,12 @@ function PricingPage() {
             <div className="mt-10 space-y-3">
               {FAQS.map((f, i) => (
                 <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
-                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}
                     className="flex w-full items-center justify-between gap-4 p-5 text-left">
                     <span className="font-display text-base font-bold">{f.q}</span>
                     <span className={`flex h-7 w-7 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
                   </button>
-                  {openFaq === i && <p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p>}
+                  <div className="acc-panel" data-open={openFaq === i} inert={openFaq !== i}><div><p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p></div></div>
                 </div>
               ))}
             </div>

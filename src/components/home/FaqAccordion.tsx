@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 
 const FAQS = [
@@ -29,19 +29,14 @@ export default function FaqAccordion() {
         <div className="mt-10 space-y-3">
           {FAQS.map((f, i) => (
             <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
-              <button onClick={() => setOpen(open === i ? null : i)}
+              <button onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i} aria-controls={`home-faq-${i}`}
                 className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-muted/30">
                 <span className="font-display text-base font-bold">{f.q}</span>
                 <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${open === i ? "rotate-45" : ""}`}>+</span>
               </button>
-              <AnimatePresence>
-                {open === i && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
-                    <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div id={`home-faq-${i}`} className="acc-panel" data-open={open === i} inert={open !== i}>
+                <div><p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p></div>
+              </div>
             </div>
           ))}
         </div>

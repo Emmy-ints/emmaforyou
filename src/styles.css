@@ -924,3 +924,9 @@ select.roi-input { appearance: auto; }
 .th-industry { display: inline-flex; font-size: 0.85rem; padding: 0.45rem 0.9rem; border-radius: 999px; color: #d6d8f5; border: 1px solid rgba(255, 255, 255, 0.14); transition: border-color 0.2s, background 0.2s; }
 .th-industry:hover { border-color: #8b7bff; background: rgba(109, 91, 255, 0.18); color: #fff; }
 html { scroll-padding-top: 88px; }
+
+/* Accordions: answers stay in the HTML (crawlable, find-in-page) and animate open/closed. */
+.acc-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s; }
+.acc-panel[data-open="true"] { grid-template-rows: 1fr; opacity: 1; }
+.acc-panel > * { overflow: hidden; min-height: 0; }
+@media (prefers-reduced-motion: reduce) { .acc-panel { transition: none; } }

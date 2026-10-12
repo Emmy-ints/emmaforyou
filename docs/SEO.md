@@ -1,7 +1,7 @@
 # EmmaForYou — SEO, AEO and GEO
 
 Living reference for how the site is optimised for search engines, answer engines and AI search.
-Last updated: 12 October 2026. Canonical domain: `https://emmaforyou.lovable.app` (set `VITE_SITE_URL` when a custom domain goes live).
+Last updated: 12 October 2026 (validated on the latest build: 115/115 pages clean). Canonical domain: `https://emmaforyou.lovable.app` (set `VITE_SITE_URL` when a custom domain goes live).
 
 ## 1. Audit findings (before → after)
 
@@ -20,6 +20,9 @@ Last updated: 12 October 2026. Canonical domain: `https://emmaforyou.lovable.app
 | 11 | Inconsistent numbers in metadata (500+, 1,200+, 5,000+) | Medium | Metadata avoids unverified figures; on-page claims are owner-confirmed |
 | 12 | `/dashboard` and `/portal` indexable | Medium | `noindex`; disallowed in robots (access control remains login-based) |
 | 13 | Unknown slugs returned generic titles | Low | `noindex` + specific "not found" titles; 404 status |
+| 14 | Skipped heading levels on every page (footer `h4` after `h2`; `h1`→`h3` on pricing, about, tools, FAQ, affiliate, intake, testimonials, cases); testimonials page had no `h2` | Medium | Footer titles are `h2`; section headings promoted; visually hidden `h2` where a section had no visible title |
+| 15 | Icon-only "✕" close buttons without accessible names | Low | `aria-label` on every close button; glyph hidden from screen readers |
+| 16 | Knowledge-base guide and blog post shared the title "AI Automation Explained…" | Low | Guide title made distinct |
 
 Open items needing the owner: real client screenshots/logos, the real founder video, a verified email/phone for `contactPoint`, official social profile URLs for `sameAs`, and whether to opt out of AI training crawlers.
 

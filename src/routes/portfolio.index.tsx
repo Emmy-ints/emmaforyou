@@ -15,7 +15,7 @@ export const Route = createFileRoute("/portfolio/")({
   head: () =>
     pageHead({
       title: "Portfolio — Client Websites, Stores & Automation | EmmaForYou",
-      description: "Websites, online stores, automation, social media and ad campaigns EmmaForYou has delivered for fashion brands, clinics, restaurants, real estate teams and coaches.",
+      description: "Websites, online stores, automation, social media and ad campaigns EmmaForYou has delivered for fashion brands, clinics, restaurants, estate agents and coaches.",
       path: "/portfolio",
       image: FEATURED[0].img,
       imageAlt: `${FEATURED[0].client} project by EmmaForYou`,

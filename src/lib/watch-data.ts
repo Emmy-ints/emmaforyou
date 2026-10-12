@@ -6,5 +6,5 @@
 export const FOUNDER_VIDEO: { youtubeId: string; uploadDate: string; durationIso: string } = { youtubeId: "", uploadDate: "", durationIso: "" };
 
 export const TITLE = "How the EmmaForYou Growth System Works: Audit to Scale";
-export const DESCRIPTION = "The four-step system EmmaForYou uses with clients: audit every channel, build the foundation (website, brand, automation), launch traffic, then scale what works.";
+export const DESCRIPTION = "The four-step system EmmaForYou uses with clients: audit every channel, build the foundation (website, brand, automation), launch traffic, then scale.";
 

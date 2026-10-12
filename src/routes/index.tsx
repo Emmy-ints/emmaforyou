@@ -41,7 +41,7 @@ export const Route = createFileRoute("/")({
   head: () =>
     pageHead({
       title: "EmmaForYou — AI Automation, Websites & Digital Growth Agency",
-      description: "EmmaForYou builds AI chat and booking automation, websites, online stores, email, social media and ads for growing businesses in Nigeria, the USA, Europe and Africa.",
+      description: "EmmaForYou builds AI chat and booking automation, websites, online stores, email, social and ads for growing businesses in Nigeria, the USA, Europe and Africa.",
       ogDescription: "500+ businesses transformed. Join the waitlist.",
       path: "/",
       jsonLd: [

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
+import { POSTS } from "@/lib/blog-data";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
 import { serviceForTopic } from "@/lib/topic-service";
@@ -21,7 +22,9 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: withBrand(loaderData.article.title),
+          title: POSTS.some((p) => p.title === loaderData.article.title)
+            ? withBrand(`${loaderData.article.title.split(":")[0]} — Small Business Guide`)
+            : withBrand(loaderData.article.title),
           description: describe(loaderData.article.excerpt, loaderData.article.body),
           path: `/knowledge-base/${loaderData.article.slug}`,
           type: "article",

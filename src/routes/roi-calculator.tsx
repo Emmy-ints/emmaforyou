@@ -9,7 +9,7 @@ export const Route = createFileRoute("/roi-calculator")({
   head: () =>
     pageHead({
       title: "ROI Calculator — Estimate Revenue from Faster Replies & Marketing",
-      description: "Estimate the extra revenue from answering enquiries faster, automated follow-up and better marketing, using your own numbers, editable assumptions and visible maths.",
+      description: "Estimate the extra revenue from answering enquiries faster, automated follow-up and better marketing, with your own numbers and visible maths.",
       path: "/roi-calculator",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "ROI calculator", path: "/roi-calculator" }])],
     }),

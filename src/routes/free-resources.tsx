@@ -11,7 +11,7 @@ export const Route = createFileRoute("/free-resources")({
   component: FreeResources,
   head: () =>
     pageHead({
-      title: "Free Growth Toolkits — Checklists, Playbooks & Planners | EmmaForYou",
+      title: "Free Growth Toolkits — Checklists, Playbooks & Planners",
       description: "Download six free toolkits: digital checklist, Instagram captions, AI automation starter, ad swipe file, WhatsApp playbook and a 90-day growth planner.",
       path: "/free-resources",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Free resources", path: "/free-resources" }])],

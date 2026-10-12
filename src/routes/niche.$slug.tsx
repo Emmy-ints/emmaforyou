@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { NICHES, getNiche } from "@/lib/niches";
 import { buildWa } from "@/lib/leads";
-import { pageHead, breadcrumbLd, serviceLd, clip } from "@/lib/seo";
+import { pageHead, breadcrumbLd, serviceLd, clip, withBrand } from "@/lib/seo";
 
 export const Route = createFileRoute("/niche/$slug")({
   component: NichePage,
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/niche/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: `${loaderData.niche.name}: Websites, Automation & Marketing | EmmaForYou`,
+          title: withBrand(`${loaderData.niche.name}: Websites, Automation & Marketing`),
           description: clip(`${loaderData.niche.hero} ${loaderData.niche.sub}`),
           path: `/niche/${loaderData.niche.slug}`,
           jsonLd: [

@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { generateRefCode, submitAffiliate, buildWa } from "@/lib/leads";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/affiliate")({
   component: AffiliatePage,
-  head: () => ({
-    meta: [
-      { title: "Affiliate Program — Earn 25% Recurring | EmmaForYou" },
-      { name: "description", content: "Refer clients, earn 25% recurring commission. No experience needed. Get your unique link in 60 seconds." },
-      { property: "og:title", content: "EmmaForYou Affiliate Program" },
-      { property: "og:description", content: "Earn 25% recurring on every client you refer." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Affiliate Program — Earn 25% Recurring Commission | EmmaForYou",
+      description: "Refer businesses to EmmaForYou and earn 25% recurring commission on every client you send. Get your own referral link in about a minute.",
+      path: "/affiliate",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Affiliate program", path: "/affiliate" }])],
+    }),
 });
 
 function AffiliatePage() {

@@ -29,6 +29,8 @@ import CountdownUrgency from "../components/home/CountdownUrgency";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
 import { CheckCircle2 } from "lucide-react";
+import { pageHead, itemListLd } from "@/lib/seo";
+import { SERVICES } from "@/lib/services-data";
 
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
@@ -36,20 +38,16 @@ const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
-  head: () => ({
-    meta: [
-      { title: "EmmaForYou | AI Automation & Digital Growth Agency — Nigeria, USA, Europe, Africa" },
-      { name: "description", content: "EmmaForYou helps fashion stores, clinics, restaurants, coaches, real estate agents and 50+ business types grow with AI automation, website design, social media management, email marketing and ecommerce solutions." },
-      { property: "og:title", content: "EmmaForYou — Grow Your Business With AI" },
-      { property: "og:description", content: "500+ businesses transformed. Join the waitlist." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "keywords", content: "AI automation Nigeria, digital marketing agency Lagos, website design Nigeria, social media management Nigeria, ecommerce growth Nigeria" },
-    ],
-    links: [
-      { rel: "canonical", href: "https://emmaforyou.com" },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "EmmaForYou — AI Automation, Websites & Digital Growth Agency",
+      description: "EmmaForYou builds AI chat and booking automation, websites, online stores, email marketing, social media and ads for growing businesses in Nigeria, the USA, Europe and Africa.",
+      ogDescription: "500+ businesses transformed. Join the waitlist.",
+      path: "/",
+      jsonLd: [
+        itemListLd("EmmaForYou services", SERVICES.map((s) => ({ name: s.name, path: `/services/${s.slug}` }))),
+      ],
+    }),
 });
 
 function HomePage() {

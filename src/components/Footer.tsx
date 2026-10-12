@@ -2,12 +2,34 @@ import { Link } from "@tanstack/react-router";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
+const SERVICE_LINKS = [
+  { label: "AI Automation", slug: "ai-automation" },
+  { label: "Website Design & Development", slug: "website-design" },
+  { label: "Ecommerce & Shopify", slug: "ecommerce" },
+  { label: "Email Marketing", slug: "email-marketing" },
+  { label: "Social Media Management", slug: "social-media" },
+  { label: "Paid Advertising", slug: "ad-marketing" },
+  { label: "App Development", slug: "app-development" },
+];
+
 const LINKS = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
-  { label: "Testimonials", to: "/testimonials" },
+  { label: "Portfolio", to: "/portfolio" },
   { label: "Case Studies", to: "/cases" },
-  { label: "Business Analyser", to: "/analyser" },
+  { label: "Testimonials", to: "/testimonials" },
+  { label: "Pricing", to: "/pricing" },
+  { label: "FAQ", to: "/faq" },
+];
+
+const TOOL_LINKS = [
+  { label: "Growth Assessment", to: "/analyser" },
+  { label: "ROI Calculator", to: "/roi-calculator" },
+  { label: "Growth Quiz", to: "/growth-quiz" },
+  { label: "Email Sequence Generator", to: "/email-generator" },
+  { label: "Free Toolkits", to: "/free-resources" },
+  { label: "Knowledge Base", to: "/knowledge-base" },
+  { label: "Blog", to: "/blog" },
 ];
 
 const LOCATIONS = [
@@ -22,7 +44,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16">
-        <div className="grid gap-10 md:grid-cols-3">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <div className="flex items-baseline gap-0.5">
               <span className="font-display text-xl font-extrabold text-foreground">EmmaForYou</span>
@@ -41,8 +63,30 @@ export default function Footer() {
             </a>
           </div>
 
+          <nav aria-label="Services">
+            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Services</h4>
+            <div className="mt-4 flex flex-col gap-2.5">
+              {SERVICE_LINKS.map((l) => (
+                <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
+          <nav aria-label="Free tools and resources">
+            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Free Tools</h4>
+            <div className="mt-4 flex flex-col gap-2.5">
+              {TOOL_LINKS.map((l) => (
+                <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          </nav>
+
           <div>
-            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Quick Links</h4>
+            <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Company</h4>
             <div className="mt-4 flex flex-col gap-2.5">
               {LINKS.map((l) => (
                 <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">

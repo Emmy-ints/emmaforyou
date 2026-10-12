@@ -209,3 +209,109 @@ export const SERVICE_EXTRAS: Record<string, ServiceExtra> = {
 export function extraFor(slug: string): ServiceExtra {
   return SERVICE_EXTRAS[slug] ?? SERVICE_EXTRAS["ai-automation"];
 }
+
+/* ------------------------------------------------------------------ */
+/* Service-specific questions (answer first, then detail)              */
+/* ------------------------------------------------------------------ */
+
+export interface ServiceQA {
+  q: string;
+  a: string;
+}
+
+const PRICING_NOTE = "Monthly plans start at $99 (Starter), $299 (Growth) and $799 (Pro), with custom Enterprise pricing; one-off builds get a fixed quote after a free call.";
+
+export const SERVICE_QA: Record<string, ServiceQA[]> = {
+  "ai-automation": [
+    { q: "What is AI business automation?", a: "AI business automation uses software that understands messages and data to handle repetitive work without a person — for example answering customer questions on WhatsApp, booking appointments and sending follow-ups. A person stays in charge: the system hands over anything unusual." },
+    { q: "What does an AI automation agency do?", a: "It finds the repetitive work slowing your business down, then designs, builds and maintains systems that handle it — such as AI assistants on WhatsApp and your website, booking flows, follow-up sequences and CRM updates — connected to the tools you already use." },
+    { q: "Which business processes can be automated first?", a: "The best first candidates are frequent, rule-based tasks: replying to common enquiries (prices, opening hours, availability), taking bookings, sending reminders, collecting reviews and moving new leads into a CRM. Tasks needing judgement or negotiation should stay with your team." },
+    { q: "How much does AI automation cost?", a: `It depends on the number of channels and how complex the conversations are. ${PRICING_NOTE}` },
+  ],
+  "lead-generation": [
+    { q: "What does a lead generation service include?", a: "Defining your ideal customer and offer, building a page or form that captures their details, running targeted campaigns, and sending every new lead straight to WhatsApp or your CRM so it's answered quickly." },
+    { q: "How quickly do leads start coming in?", a: "Paid campaigns usually produce the first enquiries within a few weeks of launch. Lead quality improves over the following weeks as targeting and messaging are refined with real data." },
+  ],
+  "sales-conversion": [
+    { q: "Why do enquiries not turn into sales?", a: "The most common reasons are slow replies, unclear pricing or offers, no follow-up for people who aren't ready yet, and too many steps to pay. Fixing response time and follow-up usually has the biggest effect." },
+    { q: "How can a business improve its conversion rate?", a: "Answer enquiries within minutes, present clear options with prices, make paying or booking possible in a few taps, and follow up automatically with people who don't buy straight away." },
+  ],
+  copywriting: [
+    { q: "What makes website copy convert?", a: "It names the customer's problem in their own words, explains the outcome you deliver, shows proof, and gives one clear next step. Benefits come before features, and every section answers 'why should I care?'." },
+  ],
+  "funnel-building": [
+    { q: "What is a sales funnel?", a: "A sales funnel is the path from first contact to purchase: an ad or post, a focused landing page, a way to capture interest (such as a free guide or call booking), follow-up messages, and checkout." },
+    { q: "Who needs a funnel rather than a website?", a: "Businesses selling one clear offer online — such as coaching, courses or events — often convert better with a focused funnel than a general website with many pages." },
+  ],
+  "crm-systems": [
+    { q: "What is a CRM and does a small business need one?", a: "A CRM (customer relationship management system) keeps every lead and customer, their history and the next follow-up in one place. If enquiries are tracked across WhatsApp chats and spreadsheets and some get forgotten, a simple CRM pays off quickly." },
+  ],
+  "social-media-automation": [
+    { q: "What does social media management include?", a: "A monthly content plan, designed posts and short videos, scheduling across platforms, replies to comments and messages, and a monthly report on what's working." },
+    { q: "How often should a business post on social media?", a: "Consistency matters more than volume. For most small businesses, three to five quality posts a week on one or two platforms where their customers spend time is a realistic, effective starting point." },
+  ],
+  "email-marketing": [
+    { q: "How can email automation improve follow-up?", a: "Automated emails go out at the right moment without anyone remembering to send them — a welcome after sign-up, a reminder before an appointment, a review request after a visit, or a nudge when a cart is abandoned." },
+    { q: "Which automated emails should a business set up first?", a: "Start with a welcome sequence, an abandoned-cart or abandoned-enquiry reminder, and a post-purchase review request. These run continuously and cover the moments customers are most likely to act." },
+  ],
+  "website-landing-pages": [
+    { q: "How much does website development cost?", a: `Cost depends on the number of pages, features such as booking, payments or a store, and whether content and photography are included. ${PRICING_NOTE}` },
+    { q: "What should a business prepare before hiring a web development agency?", a: "Your goals for the site, examples of sites you like, your logo and photos, the services and prices you want shown, and how customers should contact or buy from you. Clear inputs make the project faster and cheaper." },
+    { q: "How long does it take to build a website?", a: "A focused business website typically takes two to four weeks, depending on content readiness and features such as booking or payments." },
+  ],
+  "shopify-ecommerce": [
+    { q: "How can an ecommerce business improve conversion rates?", a: "Speed up the store on mobile, write product pages that answer buyer questions, show clear delivery costs and times early, offer familiar payment options, and recover abandoned carts with automated reminders." },
+    { q: "Is Shopify right for my store?", a: "Shopify suits most product businesses that want a reliable store without managing servers. Very custom marketplaces or complex B2B pricing may need a different setup — we'll advise on the call." },
+  ],
+  "paid-ads": [
+    { q: "What is the difference between SEO and paid advertising?", a: "Paid advertising buys visibility immediately and stops when spending stops. SEO earns visibility in unpaid search results over months and keeps working without paying per click. Many businesses use ads for quick results while SEO builds." },
+    { q: "Is ad spend included in your price?", a: "No. Our fee covers strategy, creative and management; you pay Meta, Google or TikTok directly for ad spend, so every amount is transparent." },
+  ],
+  seo: [
+    { q: "What is the difference between SEO and paid advertising?", a: "SEO earns visibility in unpaid search results and keeps working without paying per click, but takes months to build. Paid ads deliver visibility straight away and stop when spending stops." },
+    { q: "How long does SEO take to work?", a: "Technical fixes and Google Business Profile improvements can help within weeks. Ranking for competitive searches usually takes several months of consistent work, and no one can guarantee specific rankings." },
+  ],
+  analytics: [
+    { q: "What should a small business measure?", a: "Where enquiries come from, how many become customers, cost per customer for each channel, and revenue per customer. These four numbers show what to spend more or less on." },
+  ],
+  wordpress: [
+    { q: "Should I rebuild or improve my WordPress site?", a: "If the site is slow, hard to edit or looks dated, a rebuild on a lean theme is often faster and cheaper long-term. If the structure works, targeted speed, security and design improvements may be enough." },
+  ],
+  "app-development": [
+    { q: "When does a business need a custom app?", a: "When spreadsheets and chat threads can't keep up, off-the-shelf tools don't fit how you work, or customers keep asking for updates they could see themselves — a focused custom app can remove that manual work." },
+    { q: "How long does it take to build an app?", a: "A focused first version usually takes four to eight weeks after a short discovery phase. Starting small and improving with real usage keeps cost and risk down." },
+  ],
+  "digital-strategy": [
+    { q: "How do I choose the right digital growth services for my business?", a: "Start with where you lose the most customers today. If people can't find you, fix visibility (website, Google profile, SEO). If they find you but don't buy, fix replies, offers and follow-up. If you're ready to grow, add ads and content. Our free growth assessment shows which applies to you." },
+  ],
+};
+
+/** Portfolio projects relevant to a service, matched by category or stack. */
+export const SERVICE_WORK_MATCH: Record<string, { categories?: string[]; stack?: string[] }> = {
+  "ai-automation": { categories: ["Automation"], stack: ["Make.com", "WhatsApp", "Twilio"] },
+  "lead-generation": { stack: ["HubSpot", "Google Ads", "Meta Ads"] },
+  "sales-conversion": { stack: ["Stripe", "Paystack", "HubSpot"] },
+  copywriting: { categories: ["Websites"] },
+  "funnel-building": { stack: ["ConvertKit", "Teachable", "Stripe"] },
+  "crm-systems": { stack: ["HubSpot", "Notion"] },
+  "social-media-automation": { categories: ["Social Media", "Branding"], stack: ["Instagram", "Reels"] },
+  "email-marketing": { stack: ["Klaviyo", "Mailchimp", "ConvertKit"] },
+  "website-landing-pages": { categories: ["Websites"] },
+  "shopify-ecommerce": { categories: ["Ecommerce"] },
+  "paid-ads": { stack: ["Meta Ads", "Google Ads"] },
+  seo: { stack: ["GBP"] },
+  analytics: { stack: ["HubSpot"] },
+  wordpress: { categories: ["Websites"] },
+  "app-development": { stack: ["Paystack", "Notion", "Next.js"] },
+  "digital-strategy": { categories: ["Ecommerce", "Websites"] },
+};
+
+/** Related services shown at the bottom of a service page (by /services or /expertise slug). */
+export const RELATED_SERVICES: Record<string, { label: string; to: string }[]> = {
+  default: [
+    { label: "AI Automation", to: "/services/ai-automation" },
+    { label: "Website Design & Development", to: "/services/website-design" },
+    { label: "Email Marketing", to: "/services/email-marketing" },
+    { label: "Paid Advertising", to: "/services/ad-marketing" },
+  ],
+};

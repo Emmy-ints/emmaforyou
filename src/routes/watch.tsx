@@ -3,17 +3,38 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { buildWa } from "@/lib/leads";
+import GrowthOS from "../components/home/GrowthOS";
+import { pageHead, breadcrumbLd, absoluteUrl, ORG_ID } from "@/lib/seo";
+import { FOUNDER_VIDEO, TITLE, DESCRIPTION } from "@/lib/watch-data";
 
 export const Route = createFileRoute("/watch")({
   component: WatchPage,
-  head: () => ({
-    meta: [
-      { title: "Watch: How We 3x Businesses in 90 Days | EmmaForYou" },
-      { name: "description", content: "Watch our founder break down the exact 4-step system used to triple revenue for 1,200+ businesses worldwide." },
-      { property: "og:title", content: "Watch the EmmaForYou Growth System" },
-      { property: "og:description", content: "Free 12-minute breakdown of our proven 4-step system." },
-    ],
-  }),
+  head: () => {
+    const base = pageHead({
+      title: TITLE,
+      description: DESCRIPTION,
+      path: "/watch",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "How it works", path: "/watch" }])],
+    });
+    if (FOUNDER_VIDEO.youtubeId && FOUNDER_VIDEO.uploadDate) {
+      base.scripts.push({
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          name: TITLE,
+          description: DESCRIPTION,
+          thumbnailUrl: `https://i.ytimg.com/vi/${FOUNDER_VIDEO.youtubeId}/hqdefault.jpg`,
+          uploadDate: FOUNDER_VIDEO.uploadDate,
+          ...(FOUNDER_VIDEO.durationIso ? { duration: FOUNDER_VIDEO.durationIso } : {}),
+          embedUrl: `https://www.youtube.com/embed/${FOUNDER_VIDEO.youtubeId}`,
+          url: absoluteUrl("/watch"),
+          publisher: { "@id": ORG_ID },
+        }),
+      });
+    }
+    return base;
+  },
 });
 
 function WatchPage() {
@@ -23,21 +44,27 @@ function WatchPage() {
       <main className="pt-32 pb-24">
         <section className="mx-auto max-w-4xl px-5 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <span className="inline-block rounded-full glass px-4 py-1.5 text-xs font-medium text-muted-foreground">12-minute breakdown · Free</span>
-            <h1 className="mt-4 font-display text-4xl font-extrabold leading-tight md:text-6xl">How we <span className="gradient-text">3x businesses</span> in 90 days</h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">The exact 4-step system used by 1,200+ businesses worldwide — broken down by our founder Emmanuel in 12 minutes.</p>
+            <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-6xl">How the EmmaForYou growth system works</h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">Four steps we follow with every client: audit, foundation, traffic and scale. Below is a live demo of the kind of automation we build in step two.</p>
           </motion.div>
 
-          <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
-            <div className="aspect-video w-full bg-black">
-              <iframe
-                title="EmmaForYou Growth System"
-                src="https://www.youtube.com/embed/Tn6-PIqc4UM?rel=0"
-                className="h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+          <div className="mt-10 text-left">
+            {FOUNDER_VIDEO.youtubeId ? (
+              <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+                <div className="aspect-video w-full bg-black">
+                  <iframe
+                    title="Emmanuel explains the EmmaForYou growth system"
+                    src={`https://www.youtube-nocookie.com/embed/${FOUNDER_VIDEO.youtubeId}?rel=0`}
+                    className="h-full w-full"
+                    loading="lazy"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            ) : (
+              <GrowthOS />
+            )}
           </div>
 
           <div className="mt-10 grid gap-4 md:grid-cols-4">
@@ -56,7 +83,7 @@ function WatchPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <a href={buildWa("Hi! I just watched the 12-min video. I want to apply this to my business.")} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white">Apply to my business →</a>
+            <a href={buildWa("Hi! I just read how the EmmaForYou growth system works. I want to apply it to my business.")} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white">Apply to my business →</a>
             <Link to="/intake" className="btn-ghost inline-flex items-center gap-2 rounded-full border border-border px-7 py-3.5 text-base font-semibold">Free strategy session</Link>
           </div>
         </section>

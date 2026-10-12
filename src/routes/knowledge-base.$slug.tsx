@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import { KNOWLEDGE } from "@/lib/knowledge-data";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
+import { serviceForTopic } from "@/lib/topic-service";
+import { pageHead, breadcrumbLd, articleLd, clip } from "@/lib/seo";
 
 export const Route = createFileRoute("/knowledge-base/$slug")({
   component: ArticlePage,
@@ -16,14 +18,24 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
   notFoundComponent: () => (
     <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Article not found</h1><Link to="/knowledge-base" className="mt-4 inline-block text-sm underline">Back to knowledge base</Link></div></div>
   ),
-  head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `${loaderData.article.title} — EmmaForYou` },
-      { name: "description", content: loaderData.article.excerpt },
-      { property: "og:title", content: loaderData.article.title },
-      { property: "og:description", content: loaderData.article.excerpt },
-    ] : [],
-  }),
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: `${loaderData.article.title} | EmmaForYou Guides`,
+          description: clip(loaderData.article.excerpt),
+          path: `/knowledge-base/${loaderData.article.slug}`,
+          type: "article",
+          jsonLd: [
+            breadcrumbLd([{ name: "Home", path: "/" }, { name: "Knowledge base", path: "/knowledge-base" }, { name: loaderData.article.title, path: `/knowledge-base/${loaderData.article.slug}` }]),
+            articleLd({
+              headline: loaderData.article.title,
+              description: loaderData.article.excerpt,
+              path: `/knowledge-base/${loaderData.article.slug}`,
+              section: loaderData.article.category,
+            }),
+          ],
+        })
+      : { meta: [{ title: "Guide not found — EmmaForYou" }, { name: "robots", content: "noindex" }] },
 });
 
 function ArticlePage() {
@@ -67,7 +79,10 @@ function ArticlePage() {
             <div className="rounded-[22px] bg-card p-6 md:p-8 text-center">
               <h3 className="font-display text-xl font-bold">Want us to do this for you?</h3>
               <p className="mt-2 text-sm text-muted-foreground">We implement everything in this article — and a lot more — for businesses worldwide.</p>
-              <a href={buildWa(`Hi! I read "${article.title}" — I'd love help implementing this.`)} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient mt-4 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white">Talk to a strategist →</a>
+              <div className="mt-4 flex flex-wrap justify-center gap-3">
+                <Link to={serviceForTopic(article.category).to} className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold hover:border-[color:var(--emma-violet)]">How our {serviceForTopic(article.category).label} service works</Link>
+                <a href={buildWa(`Hi! I read "${article.title}" — I'd love help implementing this.`)} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white">Talk to a strategist →</a>
+              </div>
             </div>
           </div>
 

@@ -2,17 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/testimonials")({
   component: TestimonialsPage,
-  head: () => ({
-    meta: [
-      { title: "500+ Testimonials — EmmaForYou Client Results" },
-      { name: "description", content: "Read real testimonials from 500+ businesses EmmaForYou has helped grow across Nigeria, USA, Europe, and Africa." },
-      { property: "og:title", content: "500+ Real Testimonials — EmmaForYou" },
-      { property: "og:description", content: "Businesses across 3 continents share their results with EmmaForYou." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Client Testimonials by Industry and Location | EmmaForYou",
+      description: "What business owners across Nigeria, the USA, Europe and Africa say about working with EmmaForYou, filterable by industry and location.",
+      path: "/testimonials",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Testimonials", path: "/testimonials" }])],
+    }),
 });
 
 const NICHES = [

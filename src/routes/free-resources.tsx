@@ -5,17 +5,17 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { LEAD_MAGNETS, type LeadMagnet } from "@/lib/lead-magnets";
 import { submitMagnet, buildWa } from "@/lib/leads";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/free-resources")({
   component: FreeResources,
-  head: () => ({
-    meta: [
-      { title: "Free Resources — 6 Growth Toolkits | EmmaForYou" },
-      { name: "description", content: "Download our 6 free growth toolkits — Digital Checklist, Instagram Captions, AI Automation Starter, Ad Swipe File, WhatsApp Playbook and 90-Day Growth Planner." },
-      { property: "og:title", content: "Free Business Growth Resources" },
-      { property: "og:description", content: "6 toolkits used by 5,000+ business owners worldwide. 100% free." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Free Growth Toolkits — Checklists, Playbooks & Planners | EmmaForYou",
+      description: "Download six free toolkits: digital checklist, Instagram captions, AI automation starter, ad swipe file, WhatsApp playbook and a 90-day growth planner.",
+      path: "/free-resources",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Free resources", path: "/free-resources" }])],
+    }),
 });
 
 function FreeResources() {

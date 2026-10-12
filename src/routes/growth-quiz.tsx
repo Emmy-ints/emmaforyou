@@ -5,17 +5,17 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { QUIZ_QUESTIONS, bucketFor } from "@/lib/quiz-data";
 import { submitQuiz, buildWa } from "@/lib/leads";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/growth-quiz")({
   component: QuizPage,
-  head: () => ({
-    meta: [
-      { title: "Growth Quiz — Score Your Digital Maturity | EmmaForYou" },
-      { name: "description", content: "10 yes/no questions reveal exactly where your business stands digitally — and the 3 fastest fixes to grow." },
-      { property: "og:title", content: "Free 2-Minute Growth Quiz" },
-      { property: "og:description", content: "Score your digital maturity in 10 questions." },
-    ],
-  }),
+  head: () =>
+    pageHead({
+      title: "Digital Growth Quiz — 10 Questions, 3 Fixes | EmmaForYou",
+      description: "Answer 10 yes/no questions to see where your business stands online, and get the three fastest fixes to grow.",
+      path: "/growth-quiz",
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Growth quiz", path: "/growth-quiz" }])],
+    }),
 });
 
 function QuizPage() {

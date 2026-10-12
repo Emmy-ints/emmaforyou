@@ -1,10 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { ArrowRight, Check, ChevronDown, Clock, Layers, MessageCircle, Target, Wrench } from "lucide-react";
 import emmanuelImg from "@/assets/emmanuel-portrait.webp";
 import type { ServiceItem } from "@/lib/services-data";
-import { extraFor } from "@/lib/service-extras";
+import { extraFor, SERVICE_QA, SERVICE_WORK_MATCH } from "@/lib/service-extras";
+import { PROJECTS } from "@/lib/portfolio-data";
+import ProjectCard from "./portfolio/ProjectCard";
+import { SERVICES, SERVICE_TO_EXPERTISE, EXPERTISE } from "@/lib/services-data";
 import { WorkflowViz, DashboardDemo } from "./service/ServiceDemos";
 import ServiceInquiryForm from "./service/ServiceInquiryForm";
 import TransformationSlider from "./home/TransformationSlider";
@@ -17,8 +20,24 @@ const reveal = {
   transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
 };
 
+function relatedWork(slug: string) {
+  const m = SERVICE_WORK_MATCH[slug] ?? {};
+  const hits = PROJECTS.filter((p) => (m.categories ?? []).includes(p.category) || p.stack.some((t) => (m.stack ?? []).some((k) => t.includes(k))));
+  return (hits.length ? hits : PROJECTS).slice(0, 3);
+}
+
+function relatedServices(slug: string) {
+  const own = Object.entries(SERVICE_TO_EXPERTISE).find(([, e]) => e === slug)?.[0];
+  const svc = SERVICES.filter((s) => s.slug !== own).slice(0, 4).map((s) => ({ label: s.name, to: `/services/${s.slug}`, short: s.short }));
+  const more = EXPERTISE.filter((e) => e.slug !== slug && !Object.values(SERVICE_TO_EXPERTISE).includes(e.slug)).slice(0, 4).map((e) => ({ label: e.name, to: `/expertise/${e.slug}`, short: e.short }));
+  return [...svc, ...more];
+}
+
 export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
   const x = extraFor(data.slug);
+  const qa = SERVICE_QA[data.slug] ?? [];
+  const work = relatedWork(data.slug);
+  const related = relatedServices(data.slug);
   const wa = buildWa(`Hi Emmanuel! I'm interested in ${data.name}.`);
 
   return (
@@ -141,6 +160,30 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         </Block>
       )}
 
+      {/* Direct answers */}
+      {qa.length > 0 && (
+        <Block title={`Questions about ${data.name}`} lead="Straight answers to what business owners ask us most.">
+          <div className="grid gap-4 lg:grid-cols-2">
+            {qa.map((item) => (
+              <motion.article key={item.q} {...reveal} className="svc-panel">
+                <h3 className="font-display text-lg font-semibold">{item.q}</h3>
+                <p className="mt-3 leading-relaxed text-muted-foreground">{item.a}</p>
+              </motion.article>
+            ))}
+          </div>
+        </Block>
+      )}
+
+      {/* Related client work */}
+      <Block tone="alt" title="Related client work" lead="Projects where we delivered this kind of work.">
+        <div className="grid gap-5 md:grid-cols-3">
+          {work.map((p, i) => <ProjectCard key={p.name} p={p} index={i} />)}
+        </div>
+        <Link to="/portfolio" className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--emma-violet)] hover:underline underline-offset-4">
+          See all client work <ArrowRight className="h-4 w-4" />
+        </Link>
+      </Block>
+
       {/* Integrations + scope */}
       <Block tone="alt" title="Tools, scope and pricing">
         <div className="grid gap-5 lg:grid-cols-3">
@@ -184,6 +227,20 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
             <p className="mt-6 text-sm text-muted-foreground">500+ Businesses Helped · 3 Continents · 6+ Years Experience · Nigeria · USA · Europe · Africa</p>
           </div>
         </div>
+      </Block>
+
+      {/* Related services */}
+      <Block title="Related services">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {related.map((r) => (
+            <li key={r.to}>
+              <Link to={r.to} className="flex h-full flex-col rounded-[18px] border border-border bg-card p-5 transition-colors hover:border-[color:var(--emma-violet)]">
+                <span className="font-display font-semibold">{r.label}</span>
+                <span className="mt-1 text-sm text-muted-foreground">{r.short}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Block>
 
       {/* Inquiry */}
@@ -242,13 +299,9 @@ function FaqItem({ q, a }: { q: string; a: string }) {
         <span className="font-medium">{q}</span>
         <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-            <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="acc-panel" data-open={open} inert={!open}>
+        <div><p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p></div>
+      </div>
     </div>
   );
 }

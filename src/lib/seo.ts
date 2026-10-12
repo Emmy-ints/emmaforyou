@@ -227,3 +227,12 @@ export function itemListLd(name: string, items: { name: string; path: string }[]
     itemListElement: items.map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, url: absoluteUrl(it.path) })),
   };
 }
+
+/**
+ * Search Console / Bing Webmaster verification. Paste the token from each tool into the
+ * environment variables VITE_GOOGLE_SITE_VERIFICATION and VITE_BING_SITE_VERIFICATION.
+ */
+export const VERIFICATION_META = [
+  import.meta.env.VITE_GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION) } : null,
+  import.meta.env.VITE_BING_SITE_VERIFICATION ? { name: "msvalidate.01", content: String(import.meta.env.VITE_BING_SITE_VERIFICATION) } : null,
+].filter((x): x is { name: string; content: string } => Boolean(x));

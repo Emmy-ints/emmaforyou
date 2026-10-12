@@ -2,16 +2,9 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } f
 import { useEffect } from "react";
 import { I18nProvider } from "../lib/i18n";
 import { installClickTracking, track } from "../lib/analytics";
-import { ORG_DESCRIPTION, founderLd, organizationLd, websiteLd } from "../lib/seo";
+import { ORG_DESCRIPTION, VERIFICATION_META, founderLd, organizationLd, websiteLd } from "../lib/seo";
 
-/**
- * Search Console / Bing Webmaster verification. Paste the token from each tool into the
- * environment variables VITE_GOOGLE_SITE_VERIFICATION and VITE_BING_SITE_VERIFICATION.
- */
-const VERIFICATION_META = [
-  import.meta.env.VITE_GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION) } : null,
-  import.meta.env.VITE_BING_SITE_VERIFICATION ? { name: "msvalidate.01", content: String(import.meta.env.VITE_BING_SITE_VERIFICATION) } : null,
-].filter((x): x is { name: string; content: string } => Boolean(x));
+
 
 
 import appCss from "../styles.css?url";

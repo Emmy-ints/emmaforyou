@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Megaphone, PlayCircle, Sparkles, Zap } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -110,11 +110,9 @@ function PortfolioPage() {
                 </div>
               </LayoutGroup>
             </div>
-            <motion.div layout className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              <AnimatePresence mode="popLayout">
-                {shown.map((p, i) => <ProjectCard key={p.name} p={p} index={i} />)}
-              </AnimatePresence>
-            </motion.div>
+            <div key={filter} className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="tabpanel" aria-label={`${filter} projects`}>
+              {shown.map((p, i) => <ProjectCard key={p.name} p={p} index={i} />)}
+            </div>
           </div>
         </section>
 

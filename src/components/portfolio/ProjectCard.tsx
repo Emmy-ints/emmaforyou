@@ -11,10 +11,8 @@ export function projectImage(p: Project): string {
 export default function ProjectCard({ p, index = 0, size = "md" }: { p: Project; index?: number; size?: "md" | "lg" }) {
   return (
     <motion.article
-      layout
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.5, delay: Math.min(index, 6) * 0.05, ease: [0.16, 1, 0.3, 1] }}
       className={`pc group ${size === "lg" ? "pc-lg" : ""}`}
     >

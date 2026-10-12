@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { LayoutGroup, motion } from "framer-motion";
 import {
   ArrowRight, ArrowLeftRight, BookOpen, Briefcase, Calculator, CalendarCheck, ClipboardList, Download, Gauge,
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
@@ -96,21 +96,18 @@ export default function ToolsHub() {
         </LayoutGroup>
         <p className="mt-4 text-sm text-[#a6abd0]">{active.intro}</p>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {tools.map((t, i) => (
-              <motion.div
-                key={t.name}
-                layout
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.4, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <ToolCard t={t} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+        {/* Keyed by tab: switching swaps cards instantly, then animates the new ones in. */}
+        <div key={group} className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="tabpanel" aria-label={active.label}>
+          {tools.map((t, i) => (
+            <motion.div
+              key={t.name}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <ToolCard t={t} />
+            </motion.div>
+          ))}
         </div>
 
         <div className="mt-14 border-t border-white/10 pt-8">

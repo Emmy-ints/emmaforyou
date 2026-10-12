@@ -181,6 +181,21 @@ export const SERVICE_EXTRAS: Record<string, ServiceExtra> = {
     demo: "site",
     questions: [SITE_NOW, START],
   },
+  "app-development": {
+    audience: "Businesses whose operations run on spreadsheets and chat threads, or founders with an app idea to test.",
+    deliverables: ["Discovery workshop and clickable prototype", "Mobile-first web app or customer portal", "User accounts, roles and permissions", "Payments, notifications and integrations", "Admin dashboard and reporting", "Launch support and improvements"],
+    timeline: "First version in 4–8 weeks",
+    engagement: "Project, then optional ongoing development",
+    demo: "workflow",
+    workflow: [
+      { label: "Discover", detail: "Map the process and the people using it" },
+      { label: "Prototype", detail: "Clickable screens to test the idea" },
+      { label: "Build", detail: "A focused first version" },
+      { label: "Launch", detail: "Real users, real data" },
+      { label: "Improve", detail: "Add features based on usage" },
+    ],
+    questions: [{ id: "kind", label: "What kind of app?", options: ["Customer portal", "Booking or ordering app", "Internal dashboard", "Marketplace", "Something else"] }, { id: "users", label: "Who will use it?", options: ["Customers", "My team", "Both"] }, START],
+  },
   "digital-strategy": {
     audience: "Businesses that want a clear plan before spending on marketing.",
     deliverables: ["Business and competitor review", "Channel and budget plan", "90-day roadmap with priorities", "Measurement plan", "Monthly strategy call"],

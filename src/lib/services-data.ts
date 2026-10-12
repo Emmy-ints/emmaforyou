@@ -466,6 +466,39 @@ export const EXPERTISE: ServiceItem[] = [
     faqs: baseFaqs,
   },
   {
+    slug: "app-development",
+    name: "App Development",
+    short: "Custom web and mobile apps that run your operations.",
+    icon: "📲",
+    gradient: "from-violet-600 to-indigo-600",
+    hero: {
+      headline: "Custom Apps That Take the Busywork Out of Running Your Business.",
+      sub: "Booking apps, customer portals, internal dashboards and mobile-first web apps — designed around how your team and customers actually work.",
+    },
+    pains: [
+      { icon: "❌", title: "Spreadsheets and WhatsApp threads are running your operations", body: "Orders, bookings and customer details live in too many places, so things get missed and nobody has the full picture." },
+      { icon: "❌", title: "Off-the-shelf software doesn't fit how you work", body: "You pay for features you don't use and still work around the gaps with manual steps." },
+      { icon: "❌", title: "Customers can't help themselves", body: "Every booking change, order update or payment question needs a person to answer it." },
+      { icon: "❌", title: "You can't see what's happening in your business", body: "Without one system, reporting means hours of copying numbers between tools." },
+    ],
+    criteria: [
+      { title: "Start small, then grow", body: "A focused first version that solves the biggest problem, released quickly, then improved with real usage." },
+      { title: "Built for phones first", body: "Most of your customers and staff will use it on a phone, so it has to be fast and simple there." },
+      { title: "Connects to what you already use", body: "Payments, WhatsApp, email, calendars and your existing website should plug in rather than be replaced." },
+      { title: "You own your data", body: "Your customer records and business data stay yours, with exports available." },
+    ],
+    process: baseProcess("app"),
+    results: [],
+    forYou: [
+      "Your team re-types the same information into several places",
+      "Customers keep asking for updates you could show them in an app",
+      "You've outgrown spreadsheets but enterprise software is overkill",
+      "You have an app idea and want a working first version, not a 6-month project",
+    ],
+    tools: ["React", "TanStack", "Supabase", "Stripe", "Paystack", "WhatsApp API"],
+    faqs: baseFaqs,
+  },
+  {
     slug: "digital-strategy",
     name: "Digital Marketing Strategy",
     short: "A complete plan, not random tactics.",
@@ -513,7 +546,7 @@ export const SERVICE_TO_EXPERTISE: Record<string, string> = {
   "social-media": "social-media-automation",
   "ad-marketing": "paid-ads",
   "ecommerce": "shopify-ecommerce",
-  "app-development": "website-landing-pages",
+  "app-development": "app-development",
 };
 
 export function findExpertise(slug: string) {

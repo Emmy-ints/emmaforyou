@@ -19,7 +19,7 @@ export default function AboutTeaser() {
             style={{ transformStyle: "preserve-3d" }}
           >
             <img
-              src="/images/emmanuel.png"
+              src="/images/emmanuel.webp" width={900} height={1350} decoding="async"
               alt="Emmanuel Akinloye Oluwaseun — Founder & CEO, EmmaForYou"
               className="h-full w-full object-cover object-top"
               loading="lazy"

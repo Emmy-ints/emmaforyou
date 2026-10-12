@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { ArrowRight, Check, ChevronDown, Clock, Layers, MessageCircle, Target, Wrench } from "lucide-react";
-import emmanuelImg from "@/assets/emmanuel-portrait.jpg";
+import emmanuelImg from "@/assets/emmanuel-portrait.webp";
 import type { ServiceItem } from "@/lib/services-data";
 import { extraFor } from "@/lib/service-extras";
 import { WorkflowViz, DashboardDemo } from "./service/ServiceDemos";

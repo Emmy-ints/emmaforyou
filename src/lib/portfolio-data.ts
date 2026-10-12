@@ -5,9 +5,9 @@
  * Imagery: the three FEATURED images are local assets; PROJECTS images are stock photos
  * standing in until real project screenshots are supplied (see MISSING_ASSETS).
  */
-import fashionImg from "../assets/portfolio-fashion.jpg";
-import realestateImg from "../assets/portfolio-realestate.jpg";
-import clinicImg from "../assets/portfolio-clinic.jpg";
+import fashionImg from "../assets/portfolio-fashion.webp";
+import realestateImg from "../assets/portfolio-realestate.webp";
+import clinicImg from "../assets/portfolio-clinic.webp";
 
 export const PORTFOLIO_FILTERS = ["All", "Websites", "Ecommerce", "Social Media", "Ads", "Automation", "Branding"];
 

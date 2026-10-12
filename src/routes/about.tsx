@@ -82,7 +82,7 @@ function AboutPage() {
           <div className="mx-auto max-w-4xl text-center">
             <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
               <img
-                src="/images/emmanuel.png"
+                src="/images/emmanuel.webp" width={900} height={1350} decoding="async"
                 alt="Emmanuel Akinloye Oluwaseun"
                 className="h-full w-full object-cover object-top"
                 loading="lazy"

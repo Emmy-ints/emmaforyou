@@ -18,6 +18,7 @@ import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
 import SelectedWork from "../components/home/SelectedWork";
+import ToolsHub from "../components/home/ToolsHub";
 import ResultsTicker from "../components/home/ResultsTicker";
 import NicheShowcase from "../components/NicheShowcase";
 import MissionSection from "../components/MissionSection";
@@ -112,6 +113,7 @@ function HomePage() {
                 {hx.proof.map((item) => (
                   <li key={item}><CheckCircle2 aria-hidden="true" />{item}</li>
                 ))}
+                <li><a href="#tools" className="underline-offset-4 hover:text-white hover:underline">Explore all free tools ↓</a></li>
               </motion.ul>
             </div>
             <motion.div
@@ -126,6 +128,7 @@ function HomePage() {
 
         <ResultsTicker />
         <SelectedWork />
+        <ToolsHub />
         <SocialProofBar />
         <PrototypeBuilder />
         <TransformationSlider />

@@ -10,7 +10,7 @@ export default function StrategyCallSection() {
     "Honest advice — no pressure to buy",
   ];
   return (
-    <section className="section-padding">
+    <section id="strategy-call" className="section-padding">
       <motion.div className="mx-auto max-w-4xl rounded-3xl border border-border bg-card p-8 md:p-14 shadow-xl"
         initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}>
         <div className="grid items-center gap-10 md:grid-cols-2">

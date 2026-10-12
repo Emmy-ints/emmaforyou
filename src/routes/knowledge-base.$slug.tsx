@@ -6,7 +6,7 @@ import { KNOWLEDGE } from "@/lib/knowledge-data";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
 import { serviceForTopic } from "@/lib/topic-service";
-import { pageHead, breadcrumbLd, articleLd, clip } from "@/lib/seo";
+import { pageHead, breadcrumbLd, articleLd, describe, withBrand } from "@/lib/seo";
 
 export const Route = createFileRoute("/knowledge-base/$slug")({
   component: ArticlePage,
@@ -21,15 +21,15 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: `${loaderData.article.title} | EmmaForYou Guides`,
-          description: clip(loaderData.article.excerpt),
+          title: withBrand(loaderData.article.title),
+          description: describe(loaderData.article.excerpt, loaderData.article.body),
           path: `/knowledge-base/${loaderData.article.slug}`,
           type: "article",
           jsonLd: [
             breadcrumbLd([{ name: "Home", path: "/" }, { name: "Knowledge base", path: "/knowledge-base" }, { name: loaderData.article.title, path: `/knowledge-base/${loaderData.article.slug}` }]),
             articleLd({
               headline: loaderData.article.title,
-              description: loaderData.article.excerpt,
+              description: describe(loaderData.article.excerpt, loaderData.article.body),
               path: `/knowledge-base/${loaderData.article.slug}`,
               section: loaderData.article.category,
             }),

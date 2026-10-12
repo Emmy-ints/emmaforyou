@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { POSTS, getPost } from "@/lib/blog-data";
 import { serviceForTopic } from "@/lib/topic-service";
-import { pageHead, breadcrumbLd, articleLd, clip, isoDate } from "@/lib/seo";
+import { pageHead, breadcrumbLd, articleLd, describe, withBrand, isoDate } from "@/lib/seo";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -26,8 +26,8 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: `${loaderData.post.title} | EmmaForYou Blog`,
-          description: clip(loaderData.post.excerpt),
+          title: withBrand(loaderData.post.title),
+          description: describe(loaderData.post.excerpt, loaderData.post.body),
           path: `/blog/${loaderData.post.slug}`,
           type: "article",
           publishedTime: isoDate(loaderData.post.date),

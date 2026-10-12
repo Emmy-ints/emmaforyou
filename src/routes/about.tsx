@@ -25,7 +25,7 @@ export const Route = createFileRoute("/about")({
   head: () =>
     pageHead({
       title: "About EmmaForYou — Founder Emmanuel Akinloye Oluwaseun",
-      description: "From a laptop in Nigeria to 3 continents. The story of founder Emmanuel Akinloye Oluwaseun and how EmmaForYou builds automation, websites and marketing for growing businesses.",
+      description: "From a laptop in Nigeria to 3 continents: the story of founder Emmanuel Akinloye Oluwaseun and how EmmaForYou helps businesses grow.",
       path: "/about",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "About", path: "/about" }]), founderLd()],
     }),

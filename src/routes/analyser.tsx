@@ -9,7 +9,7 @@ export const Route = createFileRoute("/analyser")({
   head: () =>
     pageHead({
       title: "Free Business Growth Assessment — Score Your Online Presence",
-      description: "Answer 8 quick questions about your online presence, marketing, website and follow-up. Get an explained growth score, three prioritised fixes and an optional free expert audit.",
+      description: "Answer 8 quick questions about your online presence, marketing, website and follow-up. Get an explained score, three priority fixes and a free expert audit.",
       path: "/analyser",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Growth assessment", path: "/analyser" }])],
     }),

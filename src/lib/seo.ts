@@ -75,6 +75,25 @@ export interface PageHeadInput {
   publishedTime?: string;
 }
 
+/** Add the brand to a title only when it still fits in a search result (~60 characters). */
+export function withBrand(title: string, suffix = " | EmmaForYou"): string {
+  return title.length + suffix.length <= 62 ? `${title}${suffix}` : title;
+}
+
+/**
+ * A meta description from an excerpt, topped up with the opening paragraph of a markdown body
+ * when the excerpt alone is too thin to describe the page.
+ */
+export function describe(excerpt: string, markdownBody = ""): string {
+  const clean = (t: string) => t.replace(/[#*_`>\[\]]/g, "").replace(/\(https?:[^)]*\)/g, "").replace(/\\n/g, " ").replace(/\s+/g, " ").trim();
+  let text = clean(excerpt);
+  if (text.length < 110 && markdownBody) {
+    const paras = markdownBody.replace(/\\n/g, "\n").split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p && !p.startsWith("#") && !/^[-*\d]/.test(p));
+    if (paras[0]) text = `${text.replace(/[.!?]?$/, ".")} ${clean(paras[0])}`;
+  }
+  return clip(text, 158);
+}
+
 /** Build a TanStack Router head object for a page. */
 export function pageHead(p: PageHeadInput) {
   const url = absoluteUrl(p.path);

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/pricing")({
   head: () =>
     pageHead({
       title: "Pricing — Plans from $99/month | EmmaForYou",
-      description: "Transparent monthly plans for AI automation, websites, social media, ads and ecommerce: Starter $99, Growth $299, Pro $799 and custom Enterprise. Ad spend is billed separately.",
+      description: "Monthly plans for AI automation, websites, social, ads and ecommerce: Starter $99, Growth $299, Pro $799, or custom Enterprise. Ad spend billed separately.",
       path: "/pricing",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])],
     }),

@@ -36,6 +36,7 @@ export const Route = createRootRoute({
       { title: "EmmaForYou | AI Automation & Digital Growth Agency" },
       { name: "description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },
       { name: "author", content: "EmmaForYou" },
+      { name: "build-marker", content: "1791793791" },
       { property: "og:title", content: "EmmaForYou | AI Automation & Digital Growth Agency" },
       { name: "twitter:title", content: "EmmaForYou | AI Automation & Digital Growth Agency" },
       { property: "og:description", content: "EmmaForYou helps 50+ business types grow with AI automation, website design, social media management and more." },

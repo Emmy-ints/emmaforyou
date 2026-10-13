@@ -3,6 +3,7 @@ import { FOUNDER, ORG_DESCRIPTION, SITE_URL, WHATSAPP_URL } from "@/lib/seo";
 import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE, findExpertise } from "@/lib/services-data";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
 import { canonicalForExpertise } from "@/lib/seo-routes";
+import { POSTS } from "@/lib/blog-data";
 
 /**
  * llms.txt (https://llmstxt.org) — an optional, experimental summary for AI assistants.
@@ -55,6 +56,13 @@ function body(): string {
     `- [ROI calculator](${u("/roi-calculator")}): estimates extra revenue from faster replies and better marketing, with editable assumptions.`,
     `- [Email sequence generator](${u("/email-generator")}): drafts a 5-email sequence.`,
     `- [Growth quiz](${u("/growth-quiz")}): 10 yes/no questions on digital maturity.`,
+    "",
+    "## Start here",
+    `- [Why EmmaForYou](${u("/why-emmaforyou")}): how EmmaForYou works, who it's a good fit for (and who it isn't), and the process.`,
+    `- [All services](${u("/services")}) · [Industries](${u("/industries")}) · [All free tools](${u("/tools")}) · [Contact](${u("/contact")})`,
+    "",
+    "## Articles",
+    ...POSTS.slice(0, 16).map((p) => `- [${p.title}](${u(`/blog/${p.slug}`)}): ${p.excerpt}`),
     "",
     "## Learn",
     `- [Knowledge base](${u("/knowledge-base")}): in-depth guides on websites, SEO, automation, social media, ads, email and ecommerce.`,

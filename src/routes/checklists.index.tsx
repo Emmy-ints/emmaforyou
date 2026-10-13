@@ -8,7 +8,7 @@ export const Route = createFileRoute("/checklists/")({
   head: () =>
     pageHead({
       title: "Free Business Checklists — Website, Conversion, Web3 & Launch",
-      description: "Free checklists to launch a website, improve conversions, prepare for AI automation, launch a Web3 project or promote a product. Tick them off and download as PDF.",
+      description: "Free checklists to launch a website, lift conversions, prepare for AI automation, launch a Web3 project or promote a product. Tick them off, download a PDF.",
       path: "/checklists",
       jsonLd: [
         breadcrumbLd([{ name: "Home", path: "/" }, { name: "Checklists", path: "/checklists" }]),

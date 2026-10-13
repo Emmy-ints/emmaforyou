@@ -5,6 +5,7 @@ const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou",
 export const POSTS_A: BlogPost[] = [
   {
     slug: "ai-receptionist-small-business",
+    seoTitle: "AI Receptionist for Small Business: Reply and Book 24/7",
     title: "Missed Messages Are Missed Money: How an AI Receptionist Books Customers While You Sleep",
     category: "AI Automation",
     excerpt: "Customers message at 11pm, on Sundays and while you're with a client. Here's how an AI receptionist answers in seconds, books appointments and hands the tricky ones to you.",
@@ -70,6 +71,7 @@ You don't need to answer every message yourself to give every customer a fast, h
   },
   {
     slug: "website-mistakes-costing-customers",
+    seoTitle: "11 Website Mistakes That Cost Small Businesses Customers",
     title: "11 Website Mistakes That Quietly Cost Small Businesses Customers (and How to Fix Each)",
     category: "Website & SEO",
     excerpt: "Your website can look fine and still lose customers every day. These are the eleven problems we find most often in audits, with a fix for each.",
@@ -160,6 +162,7 @@ If you'd rather not fix it yourself, our [website design and development](/servi
   },
   {
     slug: "how-much-does-a-business-website-cost",
+    seoTitle: "How Much Does a Business Website Cost? 8 Price Factors",
     title: "How Much Does a Business Website Cost? The 8 Things That Change the Price",
     category: "Web Design",
     excerpt: "Two websites can look similar and cost very different amounts. Here's what actually drives the price, what you can skip, and how to get a fair quote.",
@@ -235,6 +238,7 @@ See what's included in our [website design and development service](/services/we
   },
   {
     slug: "conversion-rate-optimisation-small-business",
+    seoTitle: "Conversion Rate Optimisation for Small Business: A Guide",
     title: "Get More Customers From the Traffic You Already Have: A Practical CRO Guide",
     category: "Conversion",
     excerpt: "Before you spend more on ads, fix the leaks. A step-by-step conversion rate optimisation process any small business can follow.",

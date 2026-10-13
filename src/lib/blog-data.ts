@@ -1,6 +1,8 @@
 export interface BlogPost {
   slug: string;
   title: string;
+  /** Shorter title for search results when the headline is long. */
+  seoTitle?: string;
   category: string;
   excerpt: string;
   read: string;

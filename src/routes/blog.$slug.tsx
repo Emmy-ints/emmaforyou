@@ -26,7 +26,7 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: withBrand(loaderData.post.title),
+          title: withBrand(loaderData.post.seoTitle || loaderData.post.title),
           description: describe(loaderData.post.excerpt, loaderData.post.body),
           path: `/blog/${loaderData.post.slug}`,
           type: "article",

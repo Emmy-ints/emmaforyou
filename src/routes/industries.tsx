@@ -7,7 +7,7 @@ export const Route = createFileRoute("/industries")({
   component: Page,
   head: () =>
     pageHead({
-      title: "Industries We Help — Salons, Clinics, Restaurants, Real Estate & More",
+      title: "Industries We Help — Salons, Clinics, Real Estate & More",
       description: "How EmmaForYou helps salons, clinics, restaurants, real estate agents, fashion and ecommerce brands, coaches, gyms, schools, hotels, auto dealers and SaaS grow.",
       path: "/industries",
       jsonLd: [

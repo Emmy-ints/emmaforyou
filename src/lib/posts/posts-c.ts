@@ -5,6 +5,7 @@ const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou",
 export const POSTS_C: BlogPost[] = [
   {
     slug: "signs-you-need-a-business-consultant",
+    seoTitle: "7 Signs Your Business Needs a Consultant",
     title: "7 Signs Your Business Needs an Outside View (and What a Consultant Actually Does)",
     category: "Consulting",
     excerpt: "Busy but not growing? Everything depends on you? These are the signals that an outside view would pay for itself, and what good consulting looks like.",
@@ -64,6 +65,7 @@ Emmanuel's [business consulting](/expertise/business-consulting) is hands-on and
   },
   {
     slug: "launch-promotion-playbook",
+    seoTitle: "Launch Playbook: Promote a Product or Event in 4 Weeks",
     title: "The Launch Playbook: How to Promote a Product, Event or Offer in 4 Weeks",
     category: "Marketing & Promotion",
     excerpt: "Launches that work are campaigns, not posts. A week-by-week plan to build anticipation, launch across the right channels and follow up with everyone who showed interest.",
@@ -125,6 +127,7 @@ Our [marketing and promotion](/expertise/marketing-promotion) service plans and 
   },
   {
     slug: "how-to-choose-a-digital-agency",
+    seoTitle: "How to Choose a Digital Agency: 12 Questions to Ask",
     title: "How to Choose a Digital Agency: 12 Questions to Ask Before You Pay Anyone",
     category: "Choosing an Agency",
     excerpt: "The right agency can transform your business; the wrong one wastes months. Twelve questions that separate the two, and how we answer each one.",
@@ -201,6 +204,7 @@ Shortlist two or three agencies, ask each these questions, and compare the answe
   },
   {
     slug: "small-business-growth-system",
+    seoTitle: "The Small Business Growth System: Found, Reply, Follow Up",
     title: "The Small Business Growth System: Get Found, Reply Fast, Follow Up, Repeat",
     category: "Business Growth",
     excerpt: "Growth isn't one tactic. It's four connected stages, and most businesses are leaking customers at one of them. Here's how to find yours and fix it.",

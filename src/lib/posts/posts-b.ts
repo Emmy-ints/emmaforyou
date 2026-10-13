@@ -5,6 +5,7 @@ const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou",
 export const POSTS_B: BlogPost[] = [
   {
     slug: "ui-ux-design-that-sells",
+    seoTitle: "Why Good UI/UX Design Sells: 7 Principles of Trust",
     title: "Why Good UI/UX Design Sells: 7 Principles Behind Websites People Trust",
     category: "UI/UX Design",
     excerpt: "Design isn't decoration. It's how quickly a stranger understands you, trusts you and takes action. Seven principles we apply to every interface we design.",
@@ -57,6 +58,7 @@ Our [UI/UX design service](/expertise/ui-ux-design) starts with research (who yo
   },
   {
     slug: "smart-contract-security-checklist",
+    seoTitle: "Smart Contract Security Checklist: 15 Pre-Launch Checks",
     title: "Smart Contract Security Checklist: 15 Checks Before You Deploy to Mainnet",
     category: "Smart Contracts",
     excerpt: "Deployed contracts are hard to fix and easy to drain. A practical checklist covering access control, reentrancy, testing, upgrades and launch-day operations.",
@@ -145,6 +147,7 @@ Our [smart contracts and Solidity service](/expertise/smart-contract-development
   },
   {
     slug: "launch-web3-crypto-project",
+    seoTitle: "How to Launch a Web3 or Crypto Project People Trust",
     title: "How to Launch a Web3 or Crypto Project People Actually Trust",
     category: "Web3 & Blockchain",
     excerpt: "Most crypto launches fail on trust, not technology. A step-by-step path from idea and tokenomics to contracts, community and a launch that lasts.",
@@ -209,6 +212,7 @@ We handle the full journey in our [blockchain and crypto projects](/expertise/bl
   },
   {
     slug: "why-plans-fail-accountability",
+    seoTitle: "Why 90-Day Plans Fail in Week 3 (and How to Fix It)",
     title: "Why Most 90-Day Plans Fail in Week 3, and How Accountability Fixes It",
     category: "Coaching",
     excerpt: "Motivation fades, urgent work takes over, and the important plan quietly dies. Here's why that happens and the simple structure that keeps you going.",

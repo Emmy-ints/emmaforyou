@@ -251,7 +251,10 @@ export function itemListLd(name: string, items: { name: string; path: string }[]
  * Search Console / Bing Webmaster verification. Paste the token from each tool into the
  * environment variables VITE_GOOGLE_SITE_VERIFICATION and VITE_BING_SITE_VERIFICATION.
  */
+/** Google Search Console token for https://emmaforyou.lovable.app (public by design; it only proves ownership). */
+const GOOGLE_SITE_VERIFICATION = String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION || "j6roLB7t3mG0xjG29kUy-hB6o5zNN4ZtBlyJ1YKgNhw");
+
 export const VERIFICATION_META = [
-  import.meta.env.VITE_GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION) } : null,
+  GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: GOOGLE_SITE_VERIFICATION } : null,
   import.meta.env.VITE_BING_SITE_VERIFICATION ? { name: "msvalidate.01", content: String(import.meta.env.VITE_BING_SITE_VERIFICATION) } : null,
 ].filter((x): x is { name: string; content: string } => Boolean(x));

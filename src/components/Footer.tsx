@@ -48,6 +48,7 @@ const TOOL_LINKS = [
   { label: "Book a Strategy Call", to: "/book" },
   { label: "Smart Contract Check", to: "/smart-contract-check" },
   { label: "90-Day Goal Planner", to: "/goal-planner" },
+  { label: "Free Checklists", to: "/checklists" },
   { label: "Growth Assessment", to: "/analyser" },
   { label: "ROI Calculator", to: "/roi-calculator" },
   { label: "Growth Quiz", to: "/growth-quiz" },

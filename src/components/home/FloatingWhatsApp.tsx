@@ -33,7 +33,7 @@ export default function FloatingWhatsApp() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-[150] flex flex-col items-end gap-3 sm:bottom-5 sm:right-5">
+    <div className="fixed bottom-4 right-4 z-[150] hidden flex-col items-end gap-3 sm:bottom-5 sm:right-5 md:flex">
       <AnimatePresence>
         {showBubble && (
           <motion.div initial={{ opacity: 0, y: 20, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}

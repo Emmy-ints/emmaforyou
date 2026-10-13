@@ -10,6 +10,7 @@ import { ORG_DESCRIPTION, VERIFICATION_META, founderLd, organizationLd, websiteL
 import appCss from "../styles.css?url";
 import PageTranslator from "../components/tools/PageTranslator";
 import VoiceAsk from "../components/tools/VoiceAsk";
+import ConversionLayer from "../components/tools/ConversionLayer";
 
 function NotFoundComponent() {
   return (
@@ -81,6 +82,7 @@ function RootComponent() {
       <Outlet />
       <PageTranslator />
       <VoiceAsk />
+      <ConversionLayer />
     </I18nProvider>
   );
 }

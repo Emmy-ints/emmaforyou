@@ -140,7 +140,7 @@ export default function PageTranslator() {
   if (!lang) return null;
   const name = AI_LANGUAGES.find((l) => l.code === lang)?.name;
   return (
-    <div data-no-translate className="fixed bottom-20 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/95 px-4 py-2 text-xs text-foreground shadow-[var(--shadow-card-hover)] backdrop-blur" role="status">
+    <div data-no-translate className="fixed bottom-24 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/95 px-4 py-2 text-xs text-foreground shadow-[var(--shadow-card-hover)] backdrop-blur" role="status">
       {progress !== null ? <Loader2 className="h-4 w-4 animate-spin text-[var(--emma-violet)]" /> : <Globe className="h-4 w-4 text-[var(--emma-violet)]" />}
       <span>{error ? error : progress !== null ? `Translating to ${name}… ${progress}%` : `Translated to ${name} by AI`}</span>
       <button onClick={() => requestTranslation(null)} className="font-semibold text-[var(--emma-violet)]">Show original</button>

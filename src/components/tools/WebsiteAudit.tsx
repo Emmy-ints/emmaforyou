@@ -186,7 +186,7 @@ function Report({ r }: { r: AuditResult }) {
               </dl>
             </div>
           ) : (
-            <p className="rounded-[24px] border border-border bg-card p-5 text-sm text-muted-foreground">Google Lighthouse didn't respond in time, so speed is estimated from server response and page weight. Run the audit again for full Core Web Vitals.</p>
+            <p className="rounded-[24px] border border-border bg-card p-5 text-sm text-muted-foreground">Google Lighthouse speed data wasn't available for this audit, so the speed score is based on server response time, page weight, compression and scripts.</p>
           )}
         </div>
       </div>

@@ -4,6 +4,7 @@ import { POSTS } from "./blog-data";
 import { KNOWLEDGE } from "./knowledge-data";
 import { NICHES } from "./niches";
 import { CHECKLISTS } from "./checklists";
+import { COMPARISONS } from "./comparisons";
 
 /**
  * The seven /services/* pages are the primary commercial pages. Expertise pages that show the
@@ -24,6 +25,7 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/tools", priority: 0.8, changefreq: "monthly" },
   { path: "/contact", priority: 0.7, changefreq: "yearly" },
   { path: "/checklists", priority: 0.7, changefreq: "monthly" },
+  { path: "/compare", priority: 0.7, changefreq: "monthly" },
   { path: "/pricing", priority: 0.9, changefreq: "monthly" },
   { path: "/about", priority: 0.7, changefreq: "monthly" },
   { path: "/website-audit", priority: 0.8, changefreq: "monthly" },
@@ -55,8 +57,9 @@ export function sitemapPaths(): { path: string; priority: number; changefreq: st
   const niches = NICHES.map((n) => ({ path: `/niche/${n.slug}`, priority: 0.6, changefreq: "monthly" }));
   const posts = POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.5, changefreq: "yearly" }));
   const checklists = CHECKLISTS.map((c) => ({ path: `/checklists/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
+  const compares = COMPARISONS.map((c) => ({ path: `/compare/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
   const articles = KNOWLEDGE.map((a) => ({ path: `/knowledge-base/${a.slug}`, priority: 0.6, changefreq: "yearly" }));
-  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...articles];
+  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...compares, ...articles];
 }
 
 /** Paths that must never be indexed or listed. */

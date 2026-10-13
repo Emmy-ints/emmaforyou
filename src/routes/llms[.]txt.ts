@@ -4,6 +4,8 @@ import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE, findExpertise } from "@/lib/
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
 import { canonicalForExpertise } from "@/lib/seo-routes";
 import { POSTS } from "@/lib/blog-data";
+import { COMPARISONS } from "@/lib/comparisons";
+import { CHECKLISTS } from "@/lib/checklists";
 
 /**
  * llms.txt (https://llmstxt.org) — an optional, experimental summary for AI assistants.
@@ -63,6 +65,12 @@ function body(): string {
     "",
     "## Articles",
     ...POSTS.slice(0, 16).map((p) => `- [${p.title}](${u(`/blog/${p.slug}`)}): ${p.excerpt}`),
+    "",
+    "## Comparisons",
+    ...COMPARISONS.map((c) => `- [${c.title}](${u(`/compare/${c.slug}`)}): ${c.answer}`),
+    "",
+    "## Checklists",
+    ...CHECKLISTS.map((c) => `- [${c.title}](${u(`/checklists/${c.slug}`)}): ${c.description}`),
     "",
     "## Learn",
     `- [Knowledge base](${u("/knowledge-base")}): in-depth guides on websites, SEO, automation, social media, ads, email and ecommerce.`,

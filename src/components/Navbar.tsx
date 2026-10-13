@@ -13,6 +13,7 @@ const RESOURCES = [
   { to: "/blog", name: "Blog", icon: "📝", short: "Growth insights & guides" },
   { to: "/knowledge-base", name: "Knowledge Base", icon: "📚", short: "Deep playbooks" },
   { to: "/checklists", name: "Free Checklists", icon: "✅", short: "Website, CRO, Web3, launch" },
+  { to: "/compare", name: "Comparisons", icon: "⚖️", short: "Shopify vs Woo, SEO vs ads…" },
   { to: "/free-resources", name: "Free Resources", icon: "🎁", short: "Templates & lead magnets" },
   { to: "/faq", name: "FAQ", icon: "❓", short: "Common questions" },
 ];

@@ -91,7 +91,7 @@ export default function BookingCalendar() {
           <>
             <div className="mt-4 flex items-center gap-2">
               <button onClick={() => setDayIdx((i) => Math.max(0, i - 1))} disabled={dayIdx === 0} aria-label="Earlier days" className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border disabled:opacity-30"><ChevronLeft className="h-4 w-4" /></button>
-              <div className="flex flex-1 gap-2 overflow-x-auto pb-1" role="listbox" aria-label="Day">
+              <div className="flex flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="listbox" aria-label="Day">
                 {days.map((d, i) => {
                   const openCount = d.slots.filter((s) => !taken.has(s.getTime())).length;
                   return (

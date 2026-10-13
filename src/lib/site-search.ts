@@ -22,6 +22,8 @@ const TOOLS: SearchDoc[] = [
   { kind: "Tool", title: "AI receptionist demo", answer: "Chat or talk to an AI receptionist that answers questions and books appointments 24/7, the same assistant we set up for businesses.", href: "/ai-receptionist" },
   { kind: "Tool", title: "Instant proposal and quote", answer: "Answer a few questions and get a written proposal with scope, timeline and the plan that fits your budget.", href: "/proposal" },
   { kind: "Tool", title: "AI website makeover redesign", answer: "Upload a screenshot of your website and see it redesigned by AI in about a minute.", href: "/makeover" },
+  { kind: "Tool", title: "Free smart contract check (Solidity security review)", answer: "Paste Solidity code and get a free security and gas review ranked by severity, with fixes. Not a substitute for a full audit.", href: "/smart-contract-check" },
+  { kind: "Tool", title: "90-day goal planner and accountability", answer: "Turn a goal into monthly milestones and 12 weeks of concrete actions, with habits and a plan for your biggest obstacle.", href: "/goal-planner" },
   { kind: "Tool", title: "Book a free strategy call", answer: "Pick a time for a free 30-minute strategy call with Emmanuel; the call link arrives on WhatsApp.", href: "/book" },
   { kind: "Tool", title: "ROI calculator", answer: "Estimate the extra revenue from faster replies, automated follow-up and better marketing using your own numbers.", href: "/roi-calculator" },
   { kind: "Tool", title: "Business growth assessment", answer: "Eight questions that score how customers find you, buy from you and hear back from you, with a prioritised plan.", href: "/analyser" },

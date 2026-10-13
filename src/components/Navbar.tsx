@@ -22,6 +22,8 @@ const TOOLS = [
   { to: "/makeover", name: "AI Website Makeover", icon: "🎨", short: "See your site redesigned" },
   { to: "/proposal", name: "Instant Proposal", icon: "📝", short: "Your plan & quote in 20s" },
   { to: "/book", name: "Book a Call", icon: "📅", short: "Free 30-min strategy call" },
+  { to: "/smart-contract-check", name: "Smart Contract Check", icon: "🛡️", short: "Free Solidity security review" },
+  { to: "/goal-planner", name: "90-Day Goal Planner", icon: "🎯", short: "Goals into weekly actions" },
   { to: "/roi-calculator", name: "ROI Calculator", icon: "🧮", short: "Estimate your return" },
   { to: "/growth-quiz", name: "Growth Quiz", icon: "🎯", short: "Find your next step" },
   { to: "/email-generator", name: "Email Generator", icon: "✉️", short: "AI-written emails" },

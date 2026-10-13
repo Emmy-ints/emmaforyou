@@ -4,7 +4,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import {
   ArrowRight, ArrowLeftRight, BookOpen, Briefcase, Calculator, CalendarCheck, ClipboardList, Download, Gauge,
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
-  Bot, Globe, Languages, Mic, Palette, FileSignature,
+  Bot, Globe, Languages, Mic, Palette, FileSignature, ShieldCheck, Target,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
 
@@ -28,6 +28,8 @@ const TOOLS: Tool[] = [
   { group: "try", icon: Globe, name: "AI website audit", does: "Enter your website address. We check speed on a phone (Google Lighthouse), SEO, contact buttons, trust and more.", get: "A score out of 100, a phone screenshot, the top 5 fixes and a downloadable PDF report.", meta: "Free · ~1 minute", cta: "Audit my website", href: { to: "/website-audit" } },
   { group: "try", icon: Palette, name: "AI website makeover", does: "Upload a screenshot of your website and watch AI redesign it live, keeping your business details.", get: "A before-and-after comparison and a redesign concept you can download.", meta: "Free · ~1 minute", cta: "Redesign my site", href: { to: "/makeover" } },
   { group: "try", icon: FileSignature, name: "Instant proposal & quote", does: "Answer a few questions about your business, goals and budget.", get: "A written proposal with scope, timeline and the right plan, priced from our published plans. Download it or accept online.", meta: "Free · 20 seconds", cta: "Build my proposal", href: { to: "/proposal" } },
+  { group: "try", icon: ShieldCheck, name: "Smart contract check", does: "Paste a Solidity contract. A pattern scan and AI reviewer look for reentrancy, access-control, randomness and gas issues.", get: "Findings ranked from critical to info, each with a fix, plus a PDF and an optional manual review.", meta: "Web3 · free", cta: "Check my contract", href: { to: "/smart-contract-check" } },
+  { group: "try", icon: Target, name: "90-day goal planner", does: "Describe a goal and how much time you have.", get: "Monthly milestones, 12 weeks of small concrete actions, habits and an if-then plan for your biggest obstacle.", meta: "Coaching · free", cta: "Plan my 90 days", href: { to: "/goal-planner" } },
   { group: "try", icon: Mic, name: "Ask anything (voice)", does: "Tap the mic and ask a question out loud, like 'how much is a website?', or type it.", get: "The best answer from our FAQs, service pages and guides, read aloud, with a link to read more.", meta: "Voice · instant", cta: "Ask a question", href: { event: "efy-open-ask" } },
   { group: "try", icon: Languages, name: "Read this site in your language", does: "Translate any page with AI into Yorùbá, Hausa, Igbo, Pidgin, Swahili, Zulu, Portuguese, Arabic, French, Spanish or German.", get: "The whole page in your language, in seconds.", meta: "11 languages", cta: "Choose a language", href: { event: "efy-open-lang" } },
   { group: "try", icon: WandSparkles, name: "AI prototype builder", does: "Describe the website or app you want in plain words and AI builds a working, clickable prototype.", get: "A live preview you can test on desktop, tablet and mobile, then refine.", meta: "Free · under a minute", cta: "Build my prototype", href: { hash: "prototype" } },

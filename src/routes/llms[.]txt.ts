@@ -37,6 +37,8 @@ function body(): string {
     `- [AI receptionist demo](${u("/ai-receptionist")}): chat or talk to an AI receptionist for sample businesses that answers questions and books appointments.`,
     `- [AI website makeover](${u("/makeover")}): upload a screenshot and get an AI redesign concept of the same page.`,
     `- [Instant proposal](${u("/proposal")}): a tailored proposal with scope, timeline and a plan priced from the published pricing.`,
+    `- [Free smart contract check](${u("/smart-contract-check")}): pattern scan plus AI review of Solidity code, findings ranked by severity with fixes (not an audit).`,
+    `- [90-day goal planner](${u("/goal-planner")}): turns a goal into milestones and weekly actions; linked to accountability coaching.`,
     `- [Book a strategy call](${u("/book")}): free 30-minute call with the founder; times shown in the visitor's timezone.`,
     `- [Business growth assessment](${u("/analyser")}): 8 questions, an explained score across five areas, and prioritised recommendations.`,
     `- [ROI calculator](${u("/roi-calculator")}): estimates extra revenue from faster replies and better marketing, with editable assumptions.`,

@@ -24,6 +24,8 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/makeover", priority: 0.7, changefreq: "monthly" },
   { path: "/proposal", priority: 0.7, changefreq: "monthly" },
   { path: "/book", priority: 0.7, changefreq: "monthly" },
+  { path: "/smart-contract-check", priority: 0.7, changefreq: "monthly" },
+  { path: "/goal-planner", priority: 0.7, changefreq: "monthly" },
   { path: "/analyser", priority: 0.8, changefreq: "monthly" },
   { path: "/roi-calculator", priority: 0.8, changefreq: "monthly" },
   { path: "/growth-quiz", priority: 0.6, changefreq: "monthly" },

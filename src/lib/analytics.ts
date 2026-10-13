@@ -34,7 +34,14 @@ export type AnalyticsEvent =
   | "makeover_generated"
   | "call_booked"
   | "voice_search"
-  | "page_translated";
+  | "page_translated"
+  | "contract_checked"
+  | "plan_generated"
+  | "assistant_message"
+  | "assistant_lead"
+  | "exit_offer_shown"
+  | "exit_offer_clicked"
+  | "sticky_cta_click";
 
 type Props = Record<string, string | number | boolean | null | undefined>;
 

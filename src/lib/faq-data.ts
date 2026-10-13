@@ -33,6 +33,12 @@ export const CATEGORIES = [
     { q: "Can I edit what the AI says?", a: "Yes — you have full control via a simple dashboard. Update messages anytime." },
     { q: "What platforms does your AI work on?", a: "WhatsApp Business, Instagram DMs, Facebook Messenger, your website chat, and email." },
   ]},
+  { id: "tools", label: "Tools & Client Portal", items: [
+    { q: "What is the client portal?", a: "A private area at /portal where clients track project progress, approve designs and campaigns, see and pay invoices, share files securely and message the team. You get access when you start working with us; log in from the Login menu." },
+    { q: "Are the free tools really free?", a: "Yes. The website audit, AI receptionist demo, instant proposal, AI website makeover, ROI calculator and growth assessment are free with fair-use limits per hour. No sign-up is needed." },
+    { q: "Can I book a call online?", a: "Yes. Pick a time at /book; times are shown in your own timezone and the call link arrives on WhatsApp." },
+    { q: "Do you offer business consulting and accountability coaching?", a: "Yes. Emmanuel offers one-to-one business consulting (offers, pricing, systems, numbers) and accountability coaching (weekly goals and check-ins). Both are quoted after a free call." },
+  ]},
   { id: "starting", label: "Getting Started", items: [
     { q: "What's the first step?", a: "Either take the free analyser, fill the business intake form, or message us on WhatsApp. We'll respond within hours." },
     { q: "What information do you need from me?", a: "Just complete the 8-step intake form — it covers everything we need to build your custom plan." },

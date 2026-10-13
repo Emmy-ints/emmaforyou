@@ -89,7 +89,10 @@ function PricingPage() {
           </div>
 
           <p className="mt-12 text-sm text-muted-foreground">
-            Not sure which plan? <Link to="/analyser" className="font-bold text-emma-blue underline">Take the free analyser →</Link>
+            Not sure which plan? <Link to="/proposal" className="font-bold text-emma-blue underline">Get an instant proposal</Link>, <Link to="/analyser" className="font-bold text-emma-blue underline">take the growth assessment</Link> or <Link to="/book" className="font-bold text-emma-blue underline">book a free call</Link>.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Consulting, accountability coaching, UI/UX design, conversion optimisation and promotion campaigns are quoted separately after a free call.
           </p>
         </section>
 

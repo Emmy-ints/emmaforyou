@@ -211,6 +211,12 @@ function Results({ answers, result, onRestart }: { answers: AssessmentAnswers; r
         </ol>
       </div>
 
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Link to="/proposal" className="ga-rec block hover:border-[color:var(--emma-violet)]"><p className="font-display font-semibold">Get a written proposal →</p><p className="mt-1 text-sm text-muted-foreground">Scope, timeline and the right plan in 20 seconds.</p></Link>
+        <Link to="/website-audit" className="ga-rec block hover:border-[color:var(--emma-violet)]"><p className="font-display font-semibold">Audit your website →</p><p className="mt-1 text-sm text-muted-foreground">Speed, SEO and contact checks with a fix list.</p></Link>
+        <Link to="/book" className="ga-rec block hover:border-[color:var(--emma-violet)]"><p className="font-display font-semibold">Book a free call →</p><p className="mt-1 text-sm text-muted-foreground">Talk it through with Emmanuel.</p></Link>
+      </div>
+
       <ExpertAuditForm answers={answers} result={result} />
 
       <button type="button" onClick={onRestart} className="ga-back"><RotateCcw className="h-4 w-4" /> Start again</button>

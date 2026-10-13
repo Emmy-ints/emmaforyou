@@ -26,7 +26,7 @@ Respond with ONLY JSON: {"headline": "<max 10 words>", "northStar": "<the 90-day
   if (!j || !Array.isArray(j.weeks) || !j.weeks.length) return Response.json({ message: "The plan couldn't be created. Please try again." }, { status: 502 });
   const plan: GoalPlan = {
     headline: str(j.headline, 100),
-    northStar: str(j.northStar, 300),
+    northStar: str(j.northStar, 600),
     milestones: (Array.isArray(j.milestones) ? j.milestones : []).slice(0, 3).map((m: Record<string, unknown>, i: number) => ({ month: i + 1, outcome: str(m.outcome, 200), measure: str(m.measure, 200) })),
     weeks: j.weeks.slice(0, 12).map((w: Record<string, unknown>, i: number) => ({ week: i + 1, focus: str(w.focus, 80), actions: (Array.isArray(w.actions) ? w.actions : []).slice(0, 4).map((a: unknown) => str(a, 180)).filter(Boolean) })),
     habits: (Array.isArray(j.habits) ? j.habits : []).slice(0, 5).map((h: unknown) => str(h, 160)).filter(Boolean),

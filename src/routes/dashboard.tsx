@@ -5,6 +5,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { Download, LogOut, MessageCircle, RefreshCw, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
+import { ClientManager, UpcomingCalls } from "../components/dashboard/ClientManager";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -34,7 +35,7 @@ interface SiteEvent {
 
 interface Lead {
   id: string;
-  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator";
+  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked";
   name: string;
   business: string;
   email: string;
@@ -205,6 +206,13 @@ async function loadEvents(sinceIso: string): Promise<SiteEvent[]> {
 }
 
 async function loadLeads(sinceIso: string): Promise<Lead[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tdb = supabase as unknown as { from: (t: string) => any };
+  const [audits, proposals, calls] = await Promise.all([
+    tdb.from("site_audits").select("id,created_at,name,whatsapp,email,url,score").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
+    tdb.from("proposal_acceptances").select("id,signed_at,full_name,business_name,whatsapp,email,plan").gte("signed_at", sinceIso).order("signed_at", { ascending: false }).limit(500),
+    tdb.from("strategy_bookings").select("id,created_at,name,business,whatsapp,email,slot_start,topic").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
+  ]);
   const [leads, intakes, quiz, magnets, roi] = await Promise.all([
     supabase.from("leads").select("id,created_at,source,name,email,whatsapp,business_name,business_type,location,score,goal").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
     supabase.from("business_intakes").select("id,created_at,full_name,business_name,business_type,email,whatsapp,city,country,primary_goal,services_needed,growth_budget").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
@@ -253,6 +261,15 @@ async function loadLeads(sinceIso: string): Promise<Lead[]> {
       detail: [r.budget ? `budget ${r.budget}` : "", r.additional_revenue ? `projected +${Math.round(Number(r.additional_revenue)).toLocaleString()}` : ""].filter(Boolean).join(" · "),
       created_at: r.created_at,
     });
+  }
+  for (const r of (audits.data ?? []) as Record<string, unknown>[]) {
+    out.push({ id: `a-${r.id}`, kind: "Website audit", name: s(r.name), business: s(r.url), email: s(r.email), whatsapp: s(r.whatsapp), detail: r.score != null ? `score ${r.score}/100 · wants an expert review` : "wants an expert review", created_at: s(r.created_at) });
+  }
+  for (const r of (proposals.data ?? []) as Record<string, unknown>[]) {
+    out.push({ id: `p-${r.id}`, kind: "Proposal signed", name: s(r.full_name), business: s(r.business_name), email: s(r.email), whatsapp: s(r.whatsapp), detail: `accepted the ${s(r.plan)} plan`, created_at: s(r.signed_at) });
+  }
+  for (const r of (calls.data ?? []) as Record<string, unknown>[]) {
+    out.push({ id: `c-${r.id}`, kind: "Call booked", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`call ${new Date(s(r.slot_start)).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`, s(r.topic)].filter(Boolean).join(" · "), created_at: s(r.created_at) });
   }
   return out.sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
@@ -382,7 +399,9 @@ function Dashboard({ email }: { email: string }) {
                 { label: "Made a prototype", value: stats.sessionsWith("prototype_generated") },
                 { label: "Asked for the real build", value: stats.sessionsWith("prototype_build_real_click") },
                 { label: "Clicked WhatsApp", value: stats.sessionsWith("whatsapp_click") },
-                { label: "Submitted a form", value: stats.sessionsWithAny(["lead_submitted", "intake_submitted", "quiz_completed", "magnet_downloaded", "roi_calculated"]) },
+                { label: "Used an AI tool", value: stats.sessionsWithAny(["receptionist_message", "audit_run", "proposal_generated", "makeover_generated", "voice_search"]) },
+                { label: "Submitted a form", value: stats.sessionsWithAny(["lead_submitted", "intake_submitted", "quiz_completed", "magnet_downloaded", "roi_calculated", "audit_requested"]) },
+                { label: "Booked a call or signed", value: stats.sessionsWithAny(["call_booked", "proposal_accepted"]) },
               ]}
               keepOrder
             />
@@ -408,6 +427,8 @@ function Dashboard({ email }: { email: string }) {
             <BarList rows={stats.actions} />
           </div>
         </section>
+
+        <UpcomingCalls />
 
         {/* Leads inbox */}
         <section className="dash-card mt-4">
@@ -465,6 +486,7 @@ function Dashboard({ email }: { email: string }) {
             </div>
           )}
         </section>
+        <ClientManager />
       </main>
       <DashStyles />
     </div>

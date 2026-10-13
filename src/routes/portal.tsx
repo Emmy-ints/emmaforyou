@@ -20,6 +20,12 @@ export const Route = createFileRoute("/portal")({
 interface Project { id: string; title: string; progress_pct: number; status: string; next_milestone: string | null; next_milestone_date: string | null; metrics: Record<string, unknown> }
 interface Task { id: string; label: string; week: number; done: boolean }
 interface Message { id: string; sender: string; body: string; created_at: string }
+interface Approval { id: string; title: string; details: string | null; preview_url: string | null; status: "pending" | "approved" | "changes_requested"; client_note: string | null; decided_at: string | null; created_at: string }
+interface Invoice { id: string; number: string; description: string; amount: number; currency: string; status: "unpaid" | "paid" | "void"; due_date: string | null; pay_url: string | null; created_at: string }
+interface FileRow { id: string; file_name: string; category: string | null; size_kb: number | null; storage_url: string | null; created_at: string }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const pdb = supabase as unknown as { from: (t: string) => any; rpc: (fn: string, args: Record<string, unknown>) => any };
+const money = (n: number, c: string) => { try { return new Intl.NumberFormat(undefined, { style: "currency", currency: c }).format(n); } catch { return `${c} ${n}`; } };
 interface ClientAcc { id: string; full_name: string; business_name: string; avatar_initials: string | null; manager_name: string | null; plan: string; start_date: string }
 
 function Portal() {
@@ -128,8 +134,11 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [files, setFiles] = useState<FileRow[]>([]);
   const [reply, setReply] = useState("");
-  const [tab, setTab] = useState<"overview" | "tasks" | "messages" | "files">("overview");
+  const [tab, setTab] = useState<"overview" | "approvals" | "invoices" | "tasks" | "messages" | "files">("overview");
 
   useEffect(() => {
     (async () => {
@@ -143,8 +152,38 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
       setProjects((proj as Project[]) || []);
       setTasks((tk as Task[]) || []);
       setMessages((msg as Message[]) || []);
+      const [{ data: ap }, { data: inv }, { data: fl }] = await Promise.all([
+        pdb.from("client_approvals").select("*").eq("client_user_id", userId).order("created_at", { ascending: false }),
+        pdb.from("client_invoices").select("*").eq("client_user_id", userId).neq("status", "void").order("created_at", { ascending: false }),
+        pdb.from("client_files").select("*").eq("client_user_id", userId).order("created_at", { ascending: false }),
+      ]);
+      setApprovals((ap as Approval[]) || []);
+      setInvoices((inv as Invoice[]) || []);
+      setFiles((fl as FileRow[]) || []);
     })();
   }, [userId]);
+
+  // Keep the conversation fresh while it's open.
+  useEffect(() => {
+    if (tab !== "messages") return;
+    const id = window.setInterval(async () => {
+      const { data } = await supabase.from("client_messages").select("*").eq("client_user_id", userId).order("created_at");
+      if (data) setMessages(data as Message[]);
+    }, 15000);
+    return () => window.clearInterval(id);
+  }, [tab, userId]);
+
+  async function decide(a: Approval, status: "approved" | "changes_requested", note: string) {
+    const { error } = await pdb.rpc("decide_approval", { p_id: a.id, p_status: status, p_note: note });
+    if (error) return false;
+    setApprovals((prev) => prev.map((x) => (x.id === a.id ? { ...x, status, client_note: note || null, decided_at: new Date().toISOString() } : x)));
+    const { data } = await supabase.from("client_messages").select("*").eq("client_user_id", userId).order("created_at");
+    if (data) setMessages(data as Message[]);
+    return true;
+  }
+
+  const pendingApprovals = approvals.filter((a) => a.status === "pending").length;
+  const unpaid = invoices.filter((i) => i.status === "unpaid");
 
   async function logout() { await supabase.auth.signOut(); }
 
@@ -187,14 +226,32 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
 
           {/* Tabs */}
           <div className="mt-8 flex gap-2 overflow-x-auto">
-            {(["overview", "tasks", "messages", "files"] as const).map((t) => (
-              <button key={t} onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition ${tab === t ? "bg-foreground text-background" : "border border-border bg-card text-muted-foreground hover:text-foreground"}`}>{t}</button>
-            ))}
+            {(["overview", "approvals", "invoices", "tasks", "messages", "files"] as const).map((t) => {
+              const badge = t === "approvals" ? pendingApprovals : t === "invoices" ? unpaid.length : 0;
+              return (
+                <button key={t} onClick={() => setTab(t)} className={`relative shrink-0 rounded-full px-4 py-2 text-sm font-medium capitalize transition ${tab === t ? "bg-foreground text-background" : "border border-border bg-card text-muted-foreground hover:text-foreground"}`}>
+                  {t}{badge > 0 && <span className="ml-1.5 rounded-full bg-[var(--emma-violet)] px-1.5 py-0.5 text-[10px] font-bold text-white">{badge}</span>}
+                </button>
+              );
+            })}
           </div>
 
           <div className="mt-6">
             {tab === "overview" && (
               <div className="grid gap-4 md:grid-cols-2">
+                <div className="col-span-full grid gap-3 sm:grid-cols-4">
+                  {[
+                    { label: "Projects", value: projects.length, to: "overview" as const },
+                    { label: "Awaiting your approval", value: pendingApprovals, to: "approvals" as const },
+                    { label: "Unpaid invoices", value: unpaid.length, to: "invoices" as const },
+                    { label: "Tasks done", value: `${tasks.filter((t) => t.done).length}/${tasks.length}`, to: "tasks" as const },
+                  ].map((k) => (
+                    <button key={k.label} onClick={() => setTab(k.to)} className="rounded-2xl border border-border bg-card p-4 text-left hover:border-[var(--emma-violet)]">
+                      <p className="text-xs text-muted-foreground">{k.label}</p>
+                      <p className="mt-1 font-display text-2xl font-semibold">{k.value}</p>
+                    </button>
+                  ))}
+                </div>
                 {projects.length === 0 && (
                   <div className="col-span-full rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
                     No projects yet. Your manager will set one up after kickoff.
@@ -249,15 +306,94 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
               </div>
             )}
 
-            {tab === "files" && (
-              <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-                Files shared by your manager will appear here.
+            {tab === "approvals" && (
+              <div className="space-y-4">
+                {approvals.length === 0 && <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nothing to review yet. Designs, copy and campaigns for your sign-off will appear here.</div>}
+                {approvals.map((a) => <ApprovalCard key={a.id} a={a} onDecide={decide} />)}
               </div>
+            )}
+
+            {tab === "invoices" && (
+              <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                {invoices.length === 0 ? <p className="p-8 text-center text-sm text-muted-foreground">No invoices yet.</p> : (
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-left text-xs text-muted-foreground"><tr><th className="px-4 py-3 font-medium">Invoice</th><th className="px-4 py-3 font-medium">Amount</th><th className="hidden px-4 py-3 font-medium sm:table-cell">Due</th><th className="px-4 py-3 font-medium">Status</th></tr></thead>
+                    <tbody>
+                      {invoices.map((i) => (
+                        <tr key={i.id} className="border-t border-border">
+                          <td className="px-4 py-3"><p className="font-medium">{i.number}</p><p className="text-xs text-muted-foreground">{i.description}</p></td>
+                          <td className="px-4 py-3 font-semibold">{money(Number(i.amount), i.currency)}</td>
+                          <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{i.due_date ? new Date(i.due_date).toLocaleDateString() : "—"}</td>
+                          <td className="px-4 py-3">
+                            {i.status === "paid" ? <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600">Paid</span>
+                              : i.pay_url ? <a href={i.pay_url} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient inline-block rounded-full px-4 py-1.5 text-xs font-semibold text-white">Pay now</a>
+                              : <span className="rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600">Unpaid</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
+            {tab === "files" && (
+              files.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">Files shared by your manager will appear here.</div>
+              ) : (
+                <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+                  {files.map((f) => (
+                    <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                      <div><p className="font-medium">{f.file_name}</p><p className="text-xs text-muted-foreground">{[f.category, f.size_kb ? `${f.size_kb} KB` : null, new Date(f.created_at).toLocaleDateString()].filter(Boolean).join(" · ")}</p></div>
+                      {f.storage_url && /^https:\/\//.test(f.storage_url) && <a href={f.storage_url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:border-[var(--emma-violet)]">Open</a>}
+                    </li>
+                  ))}
+                </ul>
+              )
             )}
           </div>
         </section>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function ApprovalCard({ a, onDecide }: { a: Approval; onDecide: (a: Approval, s: "approved" | "changes_requested", note: string) => Promise<boolean> }) {
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  async function go(status: "approved" | "changes_requested") {
+    if (status === "changes_requested" && !note.trim()) { setErr("Tell us what to change."); return; }
+    setBusy(true); setErr("");
+    const ok = await onDecide(a, status, note);
+    if (!ok) setErr("That didn't save. Please try again.");
+    setBusy(false);
+  }
+  const tone = a.status === "approved" ? "bg-emerald-500/10 text-emerald-600" : a.status === "changes_requested" ? "bg-amber-500/10 text-amber-600" : "bg-[var(--emma-violet)]/10 text-[var(--emma-violet)]";
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="font-display text-lg font-semibold">{a.title}</h3>
+          <p className="text-xs text-muted-foreground">Shared {new Date(a.created_at).toLocaleDateString()}</p>
+        </div>
+        <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${tone}`}>{a.status === "pending" ? "Awaiting you" : a.status === "approved" ? "Approved" : "Changes requested"}</span>
+      </div>
+      {a.details && <p className="mt-3 whitespace-pre-wrap text-sm text-muted-foreground">{a.details}</p>}
+      {a.preview_url && <a href={a.preview_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-semibold text-[var(--emma-violet)] underline-offset-4 hover:underline">Open preview ↗</a>}
+      {a.status === "pending" ? (
+        <div className="mt-4">
+          <label className="text-xs text-muted-foreground">Comments (required if you want changes)
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} maxLength={1000} className="mt-1 block w-full rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+          </label>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button disabled={busy} onClick={() => go("approved")} className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white disabled:opacity-50">Approve</button>
+            <button disabled={busy} onClick={() => go("changes_requested")} className="rounded-full border border-border px-5 py-2 text-sm font-semibold hover:border-[var(--emma-violet)] disabled:opacity-50">Request changes</button>
+          </div>
+          {err && <p role="alert" className="mt-2 text-sm text-red-600">{err}</p>}
+        </div>
+      ) : a.client_note ? <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm">Your note: {a.client_note}</p> : null}
     </div>
   );
 }

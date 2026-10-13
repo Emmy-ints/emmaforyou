@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 
 const WA = "https://wa.me/message/HHGMMWMRJFYUC1?text=Hi%20EmmaForYou!%20I%27d%20like%20to%20book%20my%20free%2030-minute%20strategy%20call.";
 
@@ -24,12 +25,16 @@ export default function StrategyCallSection() {
             <p className="mt-4 text-base text-muted-foreground">
               Get on a call with Emmanuel or a senior strategist. We'll review your business, identify your top 3 growth opportunities, and outline a custom plan — for free.
             </p>
-            <a href={WA} target="_blank" rel="noopener noreferrer"
-              className="btn-gold mt-6 inline-flex rounded-full px-6 py-3 text-sm font-semibold">
-              Book My Free Strategy Call →
-            </a>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/book" className="btn-gold inline-flex rounded-full px-6 py-3 text-sm font-semibold">
+                Pick a time →
+              </Link>
+              <a href={WA} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-muted">
+                Or ask on WhatsApp
+              </a>
+            </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              <span className="inline-block h-2 w-2 rounded-full bg-green-500 align-middle" /> Slots available this week — Lagos · UK · USA time zones
+              <span className="inline-block h-2 w-2 rounded-full bg-green-500 align-middle" /> Times shown in your own timezone — Lagos · UK · USA and beyond
             </p>
           </div>
           <div className="rounded-2xl bg-muted/40 p-6">

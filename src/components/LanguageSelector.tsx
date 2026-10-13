@@ -13,7 +13,10 @@ export default function LanguageSelector() {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    // The homepage tools hub can open this menu (only the visible copy reacts).
+    const onOpen = () => { if (ref.current && ref.current.offsetParent !== null) { window.scrollTo({ top: 0, behavior: "smooth" }); window.setTimeout(() => setOpen(true), 350); } };
+    window.addEventListener("efy-open-lang", onOpen);
+    return () => { document.removeEventListener("click", onClick); window.removeEventListener("efy-open-lang", onOpen); };
   }, []);
 
   return (

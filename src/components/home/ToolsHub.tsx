@@ -4,6 +4,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import {
   ArrowRight, ArrowLeftRight, BookOpen, Briefcase, Calculator, CalendarCheck, ClipboardList, Download, Gauge,
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
+  Bot, Globe2, Languages, Mic, Palette, FileSignature,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
 
@@ -18,11 +19,17 @@ interface Tool {
   meta: string;
   cta: string;
   /** In-page anchor on the homepage, an app route, or an external link. */
-  href: { hash: string } | { to: string } | { external: string };
+  href: { hash: string } | { to: string } | { external: string } | { event: string };
 }
 
 const TOOLS: Tool[] = [
   // Try it now
+  { group: "try", icon: Bot, name: "AI receptionist demo", does: "Chat with, or talk out loud to, an AI receptionist for a sample salon, clinic or restaurant. Ask prices, then book an appointment.", get: "A feel for how your customers would get instant replies and bookings 24/7.", meta: "Live demo · voice", cta: "Talk to it", href: { to: "/ai-receptionist" } },
+  { group: "try", icon: Globe2, name: "AI website audit", does: "Enter your website address. We check speed on a phone (Google Lighthouse), SEO, contact buttons, trust and more.", get: "A score out of 100, a phone screenshot, the top 5 fixes and a downloadable PDF report.", meta: "Free · ~1 minute", cta: "Audit my website", href: { to: "/website-audit" } },
+  { group: "try", icon: Palette, name: "AI website makeover", does: "Upload a screenshot of your website and watch AI redesign it live, keeping your business details.", get: "A before-and-after comparison and a redesign concept you can download.", meta: "Free · ~1 minute", cta: "Redesign my site", href: { to: "/makeover" } },
+  { group: "try", icon: FileSignature, name: "Instant proposal & quote", does: "Answer a few questions about your business, goals and budget.", get: "A written proposal with scope, timeline and the right plan, priced from our published plans. Download it or accept online.", meta: "Free · 20 seconds", cta: "Build my proposal", href: { to: "/proposal" } },
+  { group: "try", icon: Mic, name: "Ask anything (voice)", does: "Tap the mic and ask a question out loud, like 'how much is a website?', or type it.", get: "The best answer from our FAQs, service pages and guides, read aloud, with a link to read more.", meta: "Voice · instant", cta: "Ask a question", href: { event: "efy-open-ask" } },
+  { group: "try", icon: Languages, name: "Read this site in your language", does: "Translate any page with AI into Yorùbá, Hausa, Igbo, Pidgin, Swahili, Zulu, Portuguese, Arabic, French, Spanish or German.", get: "The whole page in your language, in seconds.", meta: "11 languages", cta: "Choose a language", href: { event: "efy-open-lang" } },
   { group: "try", icon: WandSparkles, name: "AI prototype builder", does: "Describe the website or app you want in plain words and AI builds a working, clickable prototype.", get: "A live preview you can test on desktop, tablet and mobile, then refine.", meta: "Free · under a minute", cta: "Build my prototype", href: { hash: "prototype" } },
   { group: "try", icon: Gauge, name: "Business growth assessment", does: "Eight quick questions about how customers find you, buy from you and hear back from you.", get: "A score across five areas, how it's calculated, and three things to fix first.", meta: "Free · 2 minutes", cta: "Take the assessment", href: { hash: "analyser-teaser" } },
   { group: "try", icon: Calculator, name: "ROI calculator", does: "Enter your enquiries, close rate and customer value to see what faster replies and better marketing could earn.", get: "Monthly and yearly extra revenue, costs, payback month — with the maths shown.", meta: "Free · 1 minute", cta: "Calculate my ROI", href: { hash: "roi" } },
@@ -38,7 +45,7 @@ const TOOLS: Tool[] = [
 
   // Work with us
   { group: "work", icon: ClipboardList, name: "Business profile & growth plan", does: "Tell us about your business, customers, goals and budget in one guided form.", get: "A custom 90-day growth plan, reviewed personally by Emmanuel.", meta: "5 minutes", cta: "Get my growth plan", href: { hash: "get-started" } },
-  { group: "work", icon: CalendarCheck, name: "Free strategy call", does: "Book a 30-minute call to talk through your goals and what to build first.", get: "Clear next steps and honest advice — no pressure.", meta: "30 minutes · free", cta: "Book a call", href: { hash: "strategy-call" } },
+  { group: "work", icon: CalendarCheck, name: "Free strategy call", does: "Book a 30-minute call to talk through your goals and what to build first.", get: "Clear next steps and honest advice — no pressure.", meta: "30 minutes · free", cta: "Pick a time", href: { to: "/book" } },
   { group: "work", icon: MessageCircle, name: "Chat on WhatsApp", does: "Message Emmanuel directly with a question or a project idea.", get: "A personal reply from Emmanuel.", meta: "Instant", cta: "Open WhatsApp", href: { external: buildWa("Hi Emmanuel! I found you on the website and I'd like to talk about my business.") } },
   { group: "work", icon: Tag, name: "Pricing", does: "Compare plans from Starter to Enterprise for automation, websites, social, ads and ecommerce.", get: "Transparent monthly prices and what each plan includes.", meta: "From $99/mo", cta: "See pricing", href: { to: "/pricing" } },
   { group: "work", icon: LayoutDashboard, name: "Client portal", does: "For existing clients: track projects, tasks and files, and message the team.", get: "Everything about your project in one place.", meta: "Clients", cta: "Log in", href: { to: "/portal" } },
@@ -140,6 +147,10 @@ function ToolCard({ t }: { t: Tool }) {
     </>
   );
   if ("hash" in t.href) return <a href={`#${t.href.hash}`} className="th-card" data-track={`tool_${t.href.hash}`}>{body}</a>;
+  if ("event" in t.href) {
+    const name = t.href.event;
+    return <button type="button" onClick={() => window.dispatchEvent(new Event(name))} className="th-card w-full text-left">{body}</button>;
+  }
   if ("external" in t.href) return <a href={t.href.external} target="_blank" rel="noopener noreferrer" className="th-card">{body}</a>;
   return <Link to={t.href.to} className="th-card" data-track={`tool_${t.href.to.slice(1)}`}>{body}</Link>;
 }

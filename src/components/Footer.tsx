@@ -23,6 +23,11 @@ const LINKS = [
 ];
 
 const TOOL_LINKS = [
+  { label: "Website Audit", to: "/website-audit" },
+  { label: "AI Receptionist Demo", to: "/ai-receptionist" },
+  { label: "AI Website Makeover", to: "/makeover" },
+  { label: "Instant Proposal", to: "/proposal" },
+  { label: "Book a Strategy Call", to: "/book" },
   { label: "Growth Assessment", to: "/analyser" },
   { label: "ROI Calculator", to: "/roi-calculator" },
   { label: "Growth Quiz", to: "/growth-quiz" },

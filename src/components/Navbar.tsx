@@ -17,10 +17,15 @@ const RESOURCES = [
 ];
 
 const TOOLS = [
+  { to: "/website-audit", name: "Website Audit", icon: "🩺", short: "Speed, SEO & lead score" },
+  { to: "/ai-receptionist", name: "AI Receptionist Demo", icon: "🤖", short: "Chat or talk to it" },
+  { to: "/makeover", name: "AI Website Makeover", icon: "🎨", short: "See your site redesigned" },
+  { to: "/proposal", name: "Instant Proposal", icon: "📝", short: "Your plan & quote in 20s" },
+  { to: "/book", name: "Book a Call", icon: "📅", short: "Free 30-min strategy call" },
   { to: "/roi-calculator", name: "ROI Calculator", icon: "🧮", short: "Estimate your return" },
   { to: "/growth-quiz", name: "Growth Quiz", icon: "🎯", short: "Find your next step" },
   { to: "/email-generator", name: "Email Generator", icon: "✉️", short: "AI-written emails" },
-  { to: "/analyser", name: "Site Analyser", icon: "🔬", short: "Audit your funnel" },
+  { to: "/analyser", name: "Growth Assessment", icon: "🔬", short: "Score your business" },
 ];
 
 const COMPANY = [

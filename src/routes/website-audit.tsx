@@ -15,7 +15,7 @@ export const Route = createFileRoute("/website-audit")({
   head: () =>
     pageHead({
       title: "Free AI Website Audit — Speed, SEO & Lead Score in 60 Seconds",
-      description: "Enter your website and get a free scored audit: Google Lighthouse speed, SEO tags, mobile, contact and conversion checks, a phone screenshot and a prioritised fix list.",
+      description: "Get a free scored audit of your website: speed, SEO tags, mobile, contact and conversion checks, and a prioritised list of fixes, in about a minute.",
       path: "/website-audit",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Website audit", path: "/website-audit" }])],
     }),

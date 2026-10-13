@@ -14,7 +14,7 @@ export const Route = createFileRoute("/proposal")({
   head: () =>
     pageHead({
       title: "Instant Proposal & Quote — Your Custom Growth Plan in 20 Seconds",
-      description: "Answer a few questions and get a tailored proposal: scope, phases, deliverables and the plan that fits your budget, priced from our published plans. Download or accept online.",
+      description: "Answer a few questions and get a tailored proposal: scope, timeline, deliverables and the plan that fits your budget. Download it or accept online.",
       path: "/proposal",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Instant proposal", path: "/proposal" }])],
     }),

@@ -8,6 +8,8 @@ import { ORG_DESCRIPTION, VERIFICATION_META, founderLd, organizationLd, websiteL
 
 
 import appCss from "../styles.css?url";
+import PageTranslator from "../components/tools/PageTranslator";
+import VoiceAsk from "../components/tools/VoiceAsk";
 
 function NotFoundComponent() {
   return (
@@ -77,6 +79,8 @@ function RootComponent() {
     <I18nProvider>
       <AnalyticsTracker />
       <Outlet />
+      <PageTranslator />
+      <VoiceAsk />
     </I18nProvider>
   );
 }

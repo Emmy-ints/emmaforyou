@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const RESULTS = [
-  "🇳🇬 Fashion store in Lagos: +312% website traffic this month",
+  "🇳🇬 Fashion store in Lagos: +312% website traffic",
   "🇺🇸 Real estate agent in Maryland: 47 new leads generated",
   "🇬🇧 Course creator in London: £18,000 course launch",
   "🇩🇪 Auto dealer in Halle: 3x more test drive bookings",
@@ -25,6 +25,7 @@ export default function ResultsTicker() {
           <motion.span key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }}
             className="text-sm font-medium text-white/90 md:text-base">
+            <span className="mr-2 text-xs uppercase tracking-wider text-white/50">Client results</span>
             <span className="gradient-text-gold font-bold">{RESULTS[i].split(":")[1]?.trim()}</span>
             <span className="ml-2 text-white/60">— {RESULTS[i].split(":")[0]}</span>
           </motion.span>

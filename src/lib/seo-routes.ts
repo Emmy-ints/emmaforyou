@@ -21,6 +21,7 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/why-emmaforyou", priority: 0.8, changefreq: "monthly" },
   { path: "/industries", priority: 0.7, changefreq: "monthly" },
   { path: "/tools", priority: 0.8, changefreq: "monthly" },
+  { path: "/contact", priority: 0.7, changefreq: "yearly" },
   { path: "/pricing", priority: 0.9, changefreq: "monthly" },
   { path: "/about", priority: 0.7, changefreq: "monthly" },
   { path: "/website-audit", priority: 0.8, changefreq: "monthly" },

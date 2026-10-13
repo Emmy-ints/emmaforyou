@@ -35,7 +35,7 @@ interface SiteEvent {
 
 interface Lead {
   id: string;
-  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer";
+  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form";
   name: string;
   business: string;
   email: string;

@@ -33,3 +33,7 @@ BEGIN
 END $$;
 DROP TRIGGER IF EXISTS notify_new_lead ON public.tool_requests;
 CREATE TRIGGER notify_new_lead AFTER INSERT ON public.tool_requests FOR EACH ROW EXECUTE FUNCTION public.notify_new_lead();
+
+-- Contact page messages share the same inbox.
+ALTER TABLE public.tool_requests DROP CONSTRAINT IF EXISTS tool_requests_tool_ok;
+ALTER TABLE public.tool_requests ADD CONSTRAINT tool_requests_tool_ok CHECK (tool IN ('Smart contract review', 'Goal planner', 'AI assistant chat', 'Exit offer', 'Contact form'));

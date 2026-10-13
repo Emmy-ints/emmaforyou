@@ -46,6 +46,7 @@ const COMPANY = [
   { to: "/testimonials", name: "Testimonials", icon: "⭐", short: "What clients say" },
   { to: "/affiliate", name: "Affiliate Program", icon: "🤝", short: "Earn with us" },
   { to: "/intake", name: "Get Started", icon: "🚀", short: "Project intake" },
+  { to: "/contact", name: "Contact", icon: "✉️", short: "WhatsApp, call or message" },
 ];
 
 export default function Navbar() {

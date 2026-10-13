@@ -154,6 +154,12 @@ export function organizationLd(): JsonLd {
     founder: { "@id": FOUNDER_ID },
     areaServed: AREAS_SERVED.map((name) => ({ "@type": "Country", name })),
     knowsAbout: SERVICES_OFFERED,
+    slogan: "AI automation, websites and growth systems for ambitious businesses",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "EmmaForYou services",
+      itemListElement: SERVICES_OFFERED.map((name) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name } })),
+    },
     contactPoint: [{ "@type": "ContactPoint", contactType: "sales", url: WHATSAPP_URL, availableLanguage: ["English", "French", "Spanish", "German"] }],
   };
 }

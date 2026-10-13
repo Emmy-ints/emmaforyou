@@ -5,7 +5,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { Download, LogOut, MessageCircle, RefreshCw, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
-import { ClientManager, UpcomingCalls } from "../components/dashboard/ClientManager";
+import { ClientManager, SearchVisibility, UpcomingCalls } from "../components/dashboard/ClientManager";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -515,6 +515,7 @@ function Dashboard({ email }: { email: string }) {
           )}
         </section>
         <ClientManager />
+        <SearchVisibility />
       </main>
       <DashStyles />
     </div>

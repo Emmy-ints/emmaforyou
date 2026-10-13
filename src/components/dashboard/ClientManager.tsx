@@ -20,6 +20,37 @@ const waHref = (n: string) => {
   return d.length >= 8 ? `https://wa.me/${d}` : null;
 };
 
+/* ------------------------------ Search visibility ------------------------------ */
+
+export function SearchVisibility() {
+  const [state, setState] = useState<"idle" | "busy">("idle");
+  const [msg, setMsg] = useState("");
+  async function ping() {
+    setState("busy"); setMsg("");
+    const { data } = await supabase.auth.getSession();
+    const res = await fetch("/api/indexnow", { method: "POST", headers: { Authorization: `Bearer ${data.session?.access_token || ""}` } });
+    const j = await res.json().catch(() => ({}));
+    setMsg(j.message || (res.ok ? "Submitted." : "Something went wrong."));
+    setState("idle");
+  }
+  return (
+    <section className="dash-card mt-4">
+      <h2 className="dash-h2">Search & AI visibility</h2>
+      <p className="mt-1 text-xs text-muted-foreground">After you publish changes, notify Bing and IndexNow partners (Bing also powers Copilot and ChatGPT search). Google reads your sitemap via Search Console.</p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button onClick={ping} disabled={state === "busy"} className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-medium hover:bg-muted disabled:opacity-50">
+          {state === "busy" && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Notify search engines of all pages
+        </button>
+        <a href="/llms.txt" target="_blank" rel="noopener" className="text-xs text-muted-foreground underline">llms.txt</a>
+        <a href="/llms-full.txt" target="_blank" rel="noopener" className="text-xs text-muted-foreground underline">llms-full.txt</a>
+        <a href="/sitemap.xml" target="_blank" rel="noopener" className="text-xs text-muted-foreground underline">sitemap.xml</a>
+        <a href="/robots.txt" target="_blank" rel="noopener" className="text-xs text-muted-foreground underline">robots.txt</a>
+      </div>
+      {msg && <p className="mt-2 text-sm">{msg}</p>}
+    </section>
+  );
+}
+
 /* ------------------------------ Upcoming calls ------------------------------ */
 
 export function UpcomingCalls() {

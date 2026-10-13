@@ -17,6 +17,7 @@ const RESOURCES = [
 ];
 
 const TOOLS = [
+  { to: "/tools", name: "All Free Tools", icon: "🧰", short: "Every tool in one place" },
   { to: "/website-audit", name: "Website Audit", icon: "🩺", short: "Speed, SEO & lead score" },
   { to: "/ai-receptionist", name: "AI Receptionist Demo", icon: "🤖", short: "Chat or talk to it" },
   { to: "/makeover", name: "AI Website Makeover", icon: "🎨", short: "See your site redesigned" },
@@ -38,6 +39,8 @@ const ACCOUNT = [
 
 const COMPANY = [
   { to: "/about", name: "About Us", icon: "👋", short: "Our story & mission" },
+  { to: "/why-emmaforyou", name: "Why EmmaForYou", icon: "⭐", short: "How we work differently" },
+  { to: "/industries", name: "Industries", icon: "🏢", short: "Solutions for your sector" },
   { to: "/portfolio", name: "Portfolio", icon: "💼", short: "Featured client work" },
   { to: "/cases", name: "Case Studies", icon: "📈", short: "Real results" },
   { to: "/testimonials", name: "Testimonials", icon: "⭐", short: "What clients say" },
@@ -127,6 +130,7 @@ export default function Navbar() {
         <>
           {key === "services" && (
             <div className="absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
+              <Link to="/services" className="mb-1 flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-foreground">All services <span aria-hidden="true">→</span></Link>
               {SERVICES.map((s) => (
                 <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted">
                   <span className="text-lg">{s.icon}</span>
@@ -218,6 +222,7 @@ export default function Navbar() {
             </button>
             {mobileSection === "services" && (
               <div className="border-b border-border pb-2">
+                <Link to="/services" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2.5 pl-3 text-sm font-semibold text-foreground">All services →</Link>
                 {SERVICES.map(s => (
                   <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2.5 pl-3 text-sm text-muted-foreground hover:text-foreground">
                     <span>{s.icon}</span> {s.name}

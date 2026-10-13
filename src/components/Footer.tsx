@@ -24,6 +24,10 @@ const EXPERTISE_LINKS = [
 ];
 
 const LINKS = [
+  { label: "All Services", to: "/services" },
+  { label: "Why EmmaForYou", to: "/why-emmaforyou" },
+  { label: "Industries", to: "/industries" },
+  { label: "All Free Tools", to: "/tools" },
   { label: "Client Portal", to: "/portal" },
   { label: "Dashboard", to: "/dashboard" },
   { label: "Home", to: "/" },

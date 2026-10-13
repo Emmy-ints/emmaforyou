@@ -930,3 +930,18 @@ html { scroll-padding-top: 88px; }
 .acc-panel[data-open="true"] { grid-template-rows: 1fr; opacity: 1; }
 .acc-panel > * { overflow: hidden; min-height: 0; }
 @media (prefers-reduced-motion: reduce) { .acc-panel { transition: none; } }
+
+/* Printable reports (website audit, proposals): print only the report, as a clean light document. */
+@media print {
+  @page { margin: 14mm; }
+  html, body { background: #fff !important; color: #111 !important; }
+  :root, .dark, [data-theme] { --foreground: #111; --card: #fff; --background: #fff; --muted: #f3f4f6; --muted-foreground: #4b5563; --border: #e5e7eb; }
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; left: 0; top: 0; width: 100%; margin: 0 !important; }
+  .print-area .no-print, .no-print { display: none !important; }
+  .print-area [class*="shadow"] { box-shadow: none !important; }
+  .print-area .hero-ink { background: #fff !important; border-bottom: 2px solid #6d5bff; }
+  .print-area .hero-ink * { color: #111 !important; }
+  .print-area section, .print-area > div { break-inside: avoid; }
+}

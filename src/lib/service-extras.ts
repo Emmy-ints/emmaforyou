@@ -243,6 +243,44 @@ export const SERVICE_EXTRAS: Record<string, ServiceExtra> = {
     demo: "dashboard",
     questions: [{ id: "what", label: "What are you promoting?", options: ["A product launch", "An event", "A brand or business", "An offer or sale"] }, CHANNELS, START],
   },
+  "web3-development": {
+    audience: "Founders and teams building dApps, NFT or DeFi products, token-gated communities or crypto payments.",
+    deliverables: ["Architecture and prototype", "Smart contracts with tests", "Wallet-connected web app", "On-chain data indexing", "Testnet and mainnet deployment", "Launch support"],
+    timeline: "MVP in 4–10 weeks",
+    engagement: "Project, then ongoing development",
+    demo: "workflow",
+    workflow: [
+      { label: "Spec", detail: "Flows, contracts, chain" },
+      { label: "Contracts", detail: "Solidity + tests" },
+      { label: "App", detail: "Wallet-connected UI" },
+      { label: "Testnet", detail: "Real users, no real money" },
+      { label: "Launch", detail: "Mainnet + monitoring" },
+    ],
+    questions: [{ id: "kind", label: "What are you building?", options: ["dApp", "NFT project", "DeFi / staking", "Crypto payments", "Token-gated community"] }, { id: "stage", label: "Where are you?", options: ["Idea", "Contracts exist, need an app", "Live, need improvements"] }, START],
+  },
+  "smart-contract-development": {
+    audience: "Projects launching tokens, NFTs, staking or DAOs, and teams with contracts that need review, upgrades or gas savings.",
+    deliverables: ["Written contract specification", "Solidity implementation (OpenZeppelin-based)", "Unit, fuzz and invariant tests", "Static analysis and manual review", "Deployment with multisig ownership", "Verified source on the explorer"],
+    timeline: "1–6 weeks depending on scope",
+    engagement: "Project or review",
+    demo: "workflow",
+    workflow: [
+      { label: "Spec", detail: "Every function and role" },
+      { label: "Build", detail: "Solidity + OpenZeppelin" },
+      { label: "Test", detail: "Unit, fuzz, invariants" },
+      { label: "Review", detail: "Manual + static analysis" },
+      { label: "Deploy", detail: "Multisig + verification" },
+    ],
+    questions: [{ id: "need", label: "What do you need?", options: ["New contract", "Review of existing code", "Upgrade or gas optimisation", "Audit preparation"] }, { id: "type", label: "Contract type", options: ["Token (ERC-20)", "NFT (ERC-721/1155)", "Staking / vesting", "Marketplace / DAO", "Other"] }, START],
+  },
+  "blockchain-crypto": {
+    audience: "Crypto founders and businesses exploring blockchain payments, loyalty, traceability or digital ownership.",
+    deliverables: ["Strategy and token decision", "Tokenomics and vesting design", "Contracts and dApp", "Website, docs and whitepaper", "Community and launch campaign", "Post-launch support"],
+    timeline: "Strategy in 2 weeks, launch in 6–12 weeks",
+    engagement: "Project",
+    demo: "dashboard",
+    questions: [{ id: "who", label: "Which describes you?", options: ["Crypto / Web3 founder", "Business exploring blockchain", "Community or DAO", "Investor-backed startup"] }, START],
+  },
   "digital-strategy": {
     audience: "Businesses that want a clear plan before spending on marketing.",
     deliverables: ["Business and competitor review", "Channel and budget plan", "90-day roadmap with priorities", "Measurement plan", "Monthly strategy call"],
@@ -344,6 +382,16 @@ export const SERVICE_QA: Record<string, ServiceQA[]> = {
   ],
   "marketing-promotion": [
     { q: "How do I promote a new business or product launch?", a: "Pick one clear message and offer, build anticipation for 2–4 weeks with teasers and a waitlist, launch across the channels your audience uses (social, WhatsApp, email, partners or influencers), then follow up with people who showed interest. Track each channel with links or codes." },
+  ],
+  "web3-development": [
+    { q: "What does a Web3 developer do?", a: "A Web3 developer builds applications that use blockchains: writing smart contracts, building the website or app users connect their wallets to, reading and indexing on-chain data, and deploying everything safely to testnets and mainnet." },
+  ],
+  "smart-contract-development": [
+    { q: "How do I make a smart contract secure?", a: "Use well-tested libraries such as OpenZeppelin, keep logic simple, restrict admin functions and put them behind a multisig, write unit and fuzz tests, run static analysis, have it reviewed by someone who didn't write it, and get an independent audit before holding significant value." },
+    { q: "What are the most common smart contract vulnerabilities?", a: "Reentrancy, missing or weak access control, unchecked external calls, price-oracle manipulation, using tx.origin for authorisation, unsafe upgrade patterns and rounding errors in token maths. Our free smart contract check flags many of these." },
+  ],
+  "blockchain-crypto": [
+    { q: "How do I launch a crypto project?", a: "Define the problem and whether a token is genuinely needed, design and document tokenomics and vesting, build and test the contracts, publish a clear website and docs, verify contracts publicly, build the community before launch, and get legal advice for your jurisdiction." },
   ],
   "digital-strategy": [
     { q: "How do I choose the right digital growth services for my business?", a: "Start with where you lose the most customers today. If people can't find you, fix visibility (website, Google profile, SEO). If they find you but don't buy, fix replies, offers and follow-up. If you're ready to grow, add ads and content. Our free growth assessment shows which applies to you." },

@@ -23,7 +23,7 @@ export const handleProposal = createServerOnlyFn(async (request: Request) => {
 
 Published monthly plans (the ONLY prices that exist; never state any other price, discount or figure):
 ${plans}
-Consulting, accountability coaching, UI/UX design, conversion optimisation and promotion campaigns are not part of the monthly plans: list them in "extras".
+Consulting, accountability coaching, UI/UX design, conversion optimisation, promotion campaigns and Web3/smart contract/blockchain work are not part of the monthly plans: list them in "extras".
 Facts you may use: standard websites take 2–3 weeks, complex ecommerce or custom builds 4–8 weeks; onboarding starts within 1 week of signing; plans are month-to-month; ad spend is paid directly to the ad platforms; larger projects can be split into 2–3 payments.
 
 Rules:

@@ -18,6 +18,9 @@ const EXPERTISE_LINKS = [
   { label: "Marketing & Promotion", slug: "marketing-promotion" },
   { label: "Business Consulting", slug: "business-consulting" },
   { label: "Accountability Coaching", slug: "accountability-coaching" },
+  { label: "Web3 & dApps", slug: "web3-development" },
+  { label: "Smart Contracts (Solidity)", slug: "smart-contract-development" },
+  { label: "Blockchain & Crypto", slug: "blockchain-crypto" },
 ];
 
 const LINKS = [

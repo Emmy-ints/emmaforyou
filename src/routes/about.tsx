@@ -38,6 +38,9 @@ const ROLES = [
   { icon: "📈", title: "Conversion optimisation", desc: "More customers from your traffic", to: "/expertise/conversion-rate-optimisation" },
   { icon: "💼", title: "Business consultant", desc: "Offers, pricing, systems, numbers", to: "/expertise/business-consulting" },
   { icon: "🎯", title: "Accountability coach", desc: "Follow-through, week after week", to: "/expertise/accountability-coaching" },
+  { icon: "🌐", title: "Web3 developer", desc: "dApps, wallets and crypto payments", to: "/expertise/web3-development" },
+  { icon: "📜", title: "Solidity & smart contracts", desc: "Secure, tested contracts", to: "/expertise/smart-contract-development" },
+  { icon: "⛓️", title: "Crypto & blockchain", desc: "Projects from tokenomics to launch", to: "/expertise/blockchain-crypto" },
 ];
 
 function AboutPage() {
@@ -100,7 +103,7 @@ function AboutPage() {
             <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h2>
             <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
             <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
-              Developer, marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach, and a passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
+              Developer (web, apps, Web3, Solidity and smart contracts), marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach, and a passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
             </p>
             <ul className="mx-auto mt-8 grid max-w-3xl gap-3 text-left sm:grid-cols-2 lg:grid-cols-3">
               {ROLES.map((r) => (

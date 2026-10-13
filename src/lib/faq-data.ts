@@ -37,6 +37,7 @@ export const CATEGORIES = [
     { q: "What is the client portal?", a: "A private area at /portal where clients track project progress, approve designs and campaigns, see and pay invoices, share files securely and message the team. You get access when you start working with us; log in from the Login menu." },
     { q: "Are the free tools really free?", a: "Yes. The website audit, AI receptionist demo, instant proposal, AI website makeover, ROI calculator and growth assessment are free with fair-use limits per hour. No sign-up is needed." },
     { q: "Can I book a call online?", a: "Yes. Pick a time at /book; times are shown in your own timezone and the call link arrives on WhatsApp." },
+    { q: "Do you build Web3 apps and smart contracts?", a: "Yes. Emmanuel is a Web3 and Solidity developer: dApps, tokens, NFTs, staking, crypto payments and smart contract reviews on Ethereum and EVM chains. Try the free smart contract check, then book a call for a quote." },
     { q: "Do you offer business consulting and accountability coaching?", a: "Yes. Emmanuel offers one-to-one business consulting (offers, pricing, systems, numbers) and accountability coaching (weekly goals and check-ins). Both are quoted after a free call." },
   ]},
   { id: "starting", label: "Getting Started", items: [

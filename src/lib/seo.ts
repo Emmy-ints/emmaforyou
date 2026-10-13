@@ -83,6 +83,10 @@ export interface PageHeadInput {
   noindex?: boolean;
   jsonLd?: JsonLd | JsonLd[];
   publishedTime?: string;
+  /** Language versions of this page, e.g. [{ hreflang: "fr", path: "/fr" }]. Include the page itself. */
+  alternates?: { hreflang: string; path: string }[];
+  /** Open Graph locale, e.g. "fr_FR". Defaults to en_US. */
+  locale?: string;
 }
 
 /** Add the brand to a title only when it still fits in a search result (~60 characters). */
@@ -114,6 +118,7 @@ export function pageHead(p: PageHeadInput) {
     { name: "robots", content: p.noindex ? "noindex, follow" : "index, follow, max-image-preview:large" },
     { property: "og:type", content: p.type || "website" },
     { property: "og:site_name", content: SITE_NAME },
+    { property: "og:locale", content: p.locale || "en_US" },
     { property: "og:title", content: p.title },
     { property: "og:description", content: p.ogDescription || p.description },
     { property: "og:url", content: url },
@@ -128,7 +133,9 @@ export function pageHead(p: PageHeadInput) {
   const ld = p.jsonLd ? (Array.isArray(p.jsonLd) ? p.jsonLd : [p.jsonLd]) : [];
   return {
     meta,
-    links: p.noindex ? [] : [{ rel: "canonical", href: url }],
+    links: p.noindex
+      ? []
+      : [{ rel: "canonical", href: url }, ...(p.alternates ?? []).map((x) => ({ rel: "alternate", hrefLang: x.hreflang, href: absoluteUrl(x.path) }))],
     scripts: ld.map((x) => ({ type: "application/ld+json", children: JSON.stringify(x) })),
   };
 }
@@ -276,3 +283,11 @@ export const VERIFICATION_META = [
   GOOGLE_SITE_VERIFICATION ? { name: "google-site-verification", content: GOOGLE_SITE_VERIFICATION } : null,
   import.meta.env.VITE_BING_SITE_VERIFICATION ? { name: "msvalidate.01", content: String(import.meta.env.VITE_BING_SITE_VERIFICATION) } : null,
 ].filter((x): x is { name: string; content: string } => Boolean(x));
+
+/** hreflang set shared by the homepage and its French and German versions. */
+export const HOME_ALTERNATES = [
+  { hreflang: "en", path: "/" },
+  { hreflang: "fr", path: "/fr" },
+  { hreflang: "de", path: "/de" },
+  { hreflang: "x-default", path: "/" },
+];

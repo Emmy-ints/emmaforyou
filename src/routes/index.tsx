@@ -29,7 +29,7 @@ import CountdownUrgency from "../components/home/CountdownUrgency";
 import { useI18n } from "../lib/i18n";
 import { homeExperienceCopy } from "../lib/home-experience-copy";
 import { CheckCircle2 } from "lucide-react";
-import { pageHead, itemListLd } from "@/lib/seo";
+import { pageHead, itemListLd, HOME_ALTERNATES } from "@/lib/seo";
 import { SERVICES } from "@/lib/services-data";
 
 
@@ -44,6 +44,7 @@ export const Route = createFileRoute("/")({
       description: "EmmaForYou builds AI chat and booking automation, websites, online stores, email, social and ads for growing businesses in Nigeria, the USA, Europe and Africa.",
       ogDescription: "500+ businesses transformed. Join the waitlist.",
       path: "/",
+      alternates: HOME_ALTERNATES,
       jsonLd: [
         itemListLd("EmmaForYou services", SERVICES.map((s) => ({ name: s.name, path: `/services/${s.slug}` }))),
       ],

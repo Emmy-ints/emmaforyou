@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const TESTIMONIALS = [
+export const TESTIMONIALS = [
   { name: "Chioma Okafor", biz: "Fashion Store", loc: "Lagos, Nigeria", text: "EmmaForYou transformed our Instagram from 200 to 3,000 followers in 6 weeks. Sales doubled.", rating: 5 },
   { name: "David Mensah", biz: "Auto Dealer", loc: "Accra, Ghana", text: "Our website now generates 15+ leads per week. Before EmmaForYou, we had zero online presence.", rating: 5 },
   { name: "Sarah Johnson", biz: "Real Estate Agent", loc: "Hanover, MD USA", text: "Closed 4 properties in 2 months from Facebook leads they set up. Incredible ROI.", rating: 5 },

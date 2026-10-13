@@ -71,7 +71,7 @@ const LOCATIONS = [
 
 export default function Footer() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !pathname.startsWith("/fr") && !pathname.startsWith("/de");
+  const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !/^\/(fr|de)(\/|$)/.test(pathname);
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16">
@@ -137,7 +137,9 @@ export default function Footer() {
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Locations</h2>
             <div className="mt-4 flex flex-col gap-2.5">
               {LOCATIONS.map((loc) => (
-                <span key={loc} className="text-sm text-muted-foreground">{loc}</span>
+                loc === "Toulon, France" ? <Link key={loc} to="/fr" hrefLang="fr" className="text-sm text-muted-foreground hover:text-foreground">{loc} · FR</Link>
+                : loc === "Halle, Germany" ? <Link key={loc} to="/de" hrefLang="de" className="text-sm text-muted-foreground hover:text-foreground">{loc} · DE</Link>
+                : <span key={loc} className="text-sm text-muted-foreground">{loc}</span>
               ))}
             </div>
           </div>

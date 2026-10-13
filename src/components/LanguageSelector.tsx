@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "@tanstack/react-router";
 import { useI18n, LANGUAGES, type Lang } from "@/lib/i18n";
 import { AI_LANGUAGES } from "@/lib/translate";
 import { requestTranslation } from "./tools/PageTranslator";
@@ -46,6 +47,9 @@ export default function LanguageSelector() {
               <span>{LANGUAGES[code].name}</span>
             </button>
           ))}
+          <div className="my-1 border-t border-border" />
+          <Link to="/fr" hrefLang="fr" onClick={() => setOpen(false)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"><span>🇫🇷</span><span>EmmaForYou en français</span></Link>
+          <Link to="/de" hrefLang="de" onClick={() => setOpen(false)} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"><span>🇩🇪</span><span>EmmaForYou auf Deutsch</span></Link>
           <div className="my-1 border-t border-border" />
           <p className="px-3 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Translate whole page with AI</p>
           <div className="max-h-56 overflow-y-auto">

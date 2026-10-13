@@ -62,8 +62,10 @@ export const Route = createRootRoute({
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const docLang = /^\/fr(\/|$)/.test(pathname) ? "fr" : /^\/de(\/|$)/.test(pathname) ? "de" : "en";
   return (
-    <html lang="en">
+    <html lang={docLang}>
       <head>
         <HeadContent />
       </head>

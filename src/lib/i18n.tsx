@@ -147,7 +147,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof document !== "undefined") {
-      document.documentElement.lang = lang;
+      // The /fr and /de pages are real translations; keep their language attribute.
+      const fixed = /^\/(fr|de)(\/|$)/.exec(window.location.pathname);
+      document.documentElement.lang = fixed ? fixed[1] : lang;
     }
   }, [lang]);
 

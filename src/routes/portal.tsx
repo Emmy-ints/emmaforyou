@@ -5,6 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { pageHead } from "@/lib/seo";
+import { track } from "@/lib/analytics";
+
+/** Optional: the owner's Google review link (Google Business Profile → "Ask for reviews"). Leave empty to hide. */
+const GOOGLE_REVIEW_URL = "";
 
 export const Route = createFileRoute("/portal")({
   component: Portal,
@@ -144,6 +148,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [approvals, setApprovals] = useState<Approval[]>([]);
+  const [reviewed, setReviewed] = useState<Set<string>>(new Set());
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [files, setFiles] = useState<FileRow[]>([]);
   const [reply, setReply] = useState("");
@@ -196,11 +201,13 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
       setProjects((proj as Project[]) || []);
       setTasks((tk as Task[]) || []);
       setMessages((msg as Message[]) || []);
-      const [{ data: ap }, { data: inv }, { data: fl }] = await Promise.all([
+      const [{ data: ap }, { data: inv }, { data: fl }, { data: rv }] = await Promise.all([
         pdb.from("client_approvals").select("*").eq("client_user_id", userId).order("created_at", { ascending: false }),
         pdb.from("client_invoices").select("*").eq("client_user_id", userId).neq("status", "void").order("created_at", { ascending: false }),
         pdb.from("client_files").select("*").eq("client_user_id", userId).order("created_at", { ascending: false }),
+        pdb.from("client_testimonials").select("approval_id").eq("client_user_id", userId),
       ]);
+      setReviewed(new Set(((rv as { approval_id: string | null }[]) || []).map((r) => r.approval_id).filter(Boolean) as string[]));
       setApprovals((ap as Approval[]) || []);
       setInvoices((inv as Invoice[]) || []);
       setFiles((fl as FileRow[]) || []);
@@ -371,7 +378,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
             {tab === "approvals" && (
               <div className="space-y-4">
                 {approvals.length === 0 && <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nothing to review yet. Designs, copy and campaigns for your sign-off will appear here.</div>}
-                {approvals.map((a) => <ApprovalCard key={a.id} a={a} onDecide={decide} />)}
+                {approvals.map((a) => <ApprovalCard key={a.id} a={a} onDecide={decide} review={a.status === "approved" && !reviewed.has(a.id) ? <ReviewRequest approval={a} userId={userId} account={account} onDone={() => setReviewed((s) => new Set(s).add(a.id))} /> : null} />)}
               </div>
             )}
 
@@ -431,7 +438,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   );
 }
 
-function ApprovalCard({ a, onDecide }: { a: Approval; onDecide: (a: Approval, s: "approved" | "changes_requested", note: string) => Promise<boolean> }) {
+function ApprovalCard({ a, onDecide, review }: { a: Approval; onDecide: (a: Approval, s: "approved" | "changes_requested", note: string) => Promise<boolean>; review?: React.ReactNode }) {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -466,7 +473,75 @@ function ApprovalCard({ a, onDecide }: { a: Approval; onDecide: (a: Approval, s:
           {err && <p role="alert" className="mt-2 text-sm text-red-600">{err}</p>}
         </div>
       ) : a.client_note ? <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm">Your note: {a.client_note}</p> : null}
+      {review}
     </div>
+  );
+}
+
+/** Shown after a client approves a delivery: a short, optional review. Nothing is published until the client allows it and the owner approves it. */
+function ReviewRequest({ approval, userId, account, onDone }: { approval: Approval; userId: string; account: ClientAcc | null; onDone: () => void }) {
+  const [rating, setRating] = useState(0);
+  const [body, setBody] = useState("");
+  const [name, setName] = useState(account?.full_name || "");
+  const [biz, setBiz] = useState(account?.business_name || "");
+  const [mayPublish, setMayPublish] = useState(true);
+  const [state, setState] = useState<"idle" | "busy" | "done" | "later">("idle");
+  const [err, setErr] = useState("");
+  const laterKey = `efy_review_later_${approval.id}`;
+  useEffect(() => { try { if (localStorage.getItem(laterKey)) setState("later"); } catch { /* storage blocked */ } }, [laterKey]);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!rating) { setErr("Choose a star rating."); return; }
+    if (body.trim().length < 10) { setErr("Write at least a sentence (10+ characters)."); return; }
+    if (name.trim().length < 2) { setErr("Add the name to show with your review."); return; }
+    setState("busy"); setErr("");
+    const { error } = await pdb.from("client_testimonials").insert({
+      client_user_id: userId, approval_id: approval.id, rating, body: body.trim().slice(0, 1200),
+      display_name: name.trim().slice(0, 120), business: biz.trim().slice(0, 160) || null, may_publish: mayPublish,
+    });
+    if (error) { setState("idle"); setErr("That didn't save. Please try again."); return; }
+    track("review_submitted", { rating, may_publish: mayPublish });
+    setState("done");
+  }
+
+  if (state === "later") return null;
+  if (state === "done") {
+    return (
+      <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm" role="status">
+        <p className="font-semibold">Thank you for your review!</p>
+        {GOOGLE_REVIEW_URL && rating >= 4 && <p className="mt-1 text-muted-foreground">It would help us a lot if you also shared it on Google: <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--emma-violet)] underline">leave a Google review ↗</a></p>}
+        <button onClick={onDone} className="mt-2 text-xs text-muted-foreground underline">Close</button>
+      </div>
+    );
+  }
+  return (
+    <form onSubmit={submit} className="mt-4 rounded-xl border border-[var(--emma-violet)]/30 bg-[var(--emma-violet)]/5 p-4">
+      <p className="font-semibold">Happy with this delivery? Tell us how we did.</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">Takes 30 seconds. Your feedback goes to Emmanuel; it's only shown publicly if you allow it.</p>
+      <fieldset className="mt-3">
+        <legend className="text-xs text-muted-foreground">Your rating</legend>
+        <div className="mt-1 flex gap-1" role="radiogroup">
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={`${n} star${n > 1 ? "s" : ""}`} onClick={() => setRating(n)}
+              className={`text-2xl leading-none transition ${n <= rating ? "text-amber-500" : "text-muted-foreground/40 hover:text-amber-400"}`}>★</button>
+          ))}
+        </div>
+      </fieldset>
+      <label className="mt-3 block text-xs text-muted-foreground">Your review
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} maxLength={1200} placeholder="What did we do, and what difference has it made?" className="mt-1 block w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground" />
+      </label>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <label className="text-xs text-muted-foreground">Name to show<input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} className="mt-1 block w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground" /></label>
+        <label className="text-xs text-muted-foreground">Business (optional)<input value={biz} onChange={(e) => setBiz(e.target.value)} maxLength={160} className="mt-1 block w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground" /></label>
+      </div>
+      <label className="mt-3 flex items-start gap-2 text-sm"><input type="checkbox" checked={mayPublish} onChange={(e) => setMayPublish(e.target.checked)} className="mt-1" />EmmaForYou may show this review on its website, with the name and business above.</label>
+      {err && <p role="alert" className="mt-2 text-sm text-red-600">{err}</p>}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
+        <button type="submit" disabled={state === "busy"} className="rounded-full bg-[var(--emma-violet)] px-5 py-2 text-sm font-semibold text-white disabled:opacity-50">{state === "busy" ? "Sending…" : "Send review"}</button>
+        <button type="button" onClick={() => { try { localStorage.setItem(laterKey, "1"); } catch { /* ignore */ } setState("later"); }} className="text-sm text-muted-foreground underline">Maybe later</button>
+      </div>
+    </form>
   );
 }
 

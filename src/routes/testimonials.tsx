@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import VerifiedReviews from "../components/reviews/VerifiedReviews";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/testimonials")({
@@ -139,6 +140,8 @@ function TestimonialsPage() {
             <p className="mt-4 text-base text-white/60">Real stories from businesses we've helped grow.</p>
           </div>
         </section>
+
+        <VerifiedReviews />
 
         <section className="sticky top-16 z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
           <div className="mx-auto max-w-7xl px-5">

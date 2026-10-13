@@ -101,6 +101,20 @@ function BlogArticle() {
           <div className="space-y-5 text-[1.05rem] leading-relaxed text-foreground">
             {blocks.map((b: string, i: number) => {
               const trimmed = b.trim();
+              if (trimmed.startsWith("### ")) {
+                return (
+                  <h3 key={i} className="mt-8 font-display text-xl font-bold md:text-2xl">
+                    {trimmed.replace(/^###\s+/, "")}
+                  </h3>
+                );
+              }
+              if (trimmed.startsWith("!> ")) {
+                return (
+                  <aside key={i} className="rounded-2xl border border-[color:var(--emma-violet)]/30 bg-[color:var(--emma-violet)]/5 p-5 text-[0.98rem]">
+                    {renderInline(trimmed.replace(/^!>\s+/gm, ""))}
+                  </aside>
+                );
+              }
               if (trimmed.startsWith("## ")) {
                 return (
                   <h2 key={i} className="mt-10 font-display text-2xl font-bold md:text-3xl">
@@ -140,6 +154,17 @@ function BlogArticle() {
               );
             })}
           </div>
+
+          {post.tool && (
+            <div className="mt-12 flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--emma-violet)]">Free tool</p>
+                <p className="mt-1 font-display text-lg font-bold">{post.tool.label}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{post.tool.text}</p>
+              </div>
+              <Link to={post.tool.to} className="btn-primary-gradient inline-flex shrink-0 items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white">Try it free →</Link>
+            </div>
+          )}
 
           {/* CTA */}
           <div className="mt-14 rounded-3xl p-1" style={{ background: "var(--gradient-brand)" }}>
@@ -203,9 +228,18 @@ function BlogArticle() {
 }
 
 function renderInline(text: string) {
-  // bold support: **text**
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((p, i) =>
-    p.startsWith("**") && p.endsWith("**") ? <strong key={i}>{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>
-  );
+  // **bold** and [label](/internal-path or https://external)
+  const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/g);
+  return parts.map((p, i) => {
+    if (p.startsWith("**") && p.endsWith("**")) return <strong key={i}>{p.slice(2, -2)}</strong>;
+    const link = p.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+    if (link) {
+      const [, label, href] = link;
+      const cls = "font-semibold text-[color:var(--emma-violet)] underline decoration-[color:var(--emma-violet)]/30 underline-offset-4 hover:decoration-[color:var(--emma-violet)]";
+      return href.startsWith("/")
+        ? <Link key={i} to={href} className={cls}>{label}</Link>
+        : <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={cls}>{label}</a>;
+    }
+    return <span key={i}>{p}</span>;
+  });
 }

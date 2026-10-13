@@ -8,13 +8,19 @@ export interface BlogPost {
   author: { name: string; role: string; initials: string };
   cover: { from: string; to: string; emoji: string };
   body: string;
+  /** Optional free tool to try alongside the article. */
+  tool?: { label: string; to: string; text: string };
 }
 
 const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou", initials: "EA" };
 const TEMI = { name: "Temi Adebayo", role: "Head of Growth", initials: "TA" };
 const MARK = { name: "Mark Schneider", role: "Automation Lead", initials: "MS" };
 
-export const POSTS: BlogPost[] = [
+import { POSTS_A } from "./posts/posts-a";
+import { POSTS_B } from "./posts/posts-b";
+import { POSTS_C } from "./posts/posts-c";
+
+const ORIGINAL_POSTS: BlogPost[] = [
   {
     slug: "first-1000-instagram-followers",
     title: "How to Get Your First 1,000 Instagram Followers in 30 Days",
@@ -516,6 +522,9 @@ The first 90 days of a new international market are slow. Plan for:
 If you can't commit 6 months to a new market, don't open it.`,
   },
 ];
+
+/** Newest first. */
+export const POSTS: BlogPost[] = [...POSTS_A, ...POSTS_B, ...POSTS_C, ...ORIGINAL_POSTS];
 
 export function getPost(slug: string) {
   return POSTS.find((p) => p.slug === slug);

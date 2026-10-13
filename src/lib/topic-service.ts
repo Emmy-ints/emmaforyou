@@ -12,6 +12,14 @@ const MAP: Record<string, { label: string; to: string }> = {
   Ecommerce: { label: "Ecommerce & Shopify", to: "/services/ecommerce" },
   "Business Growth": { label: "Digital Marketing Strategy", to: "/expertise/digital-strategy" },
   Strategy: { label: "Digital Marketing Strategy", to: "/expertise/digital-strategy" },
+  "Conversion": { label: "Conversion Rate Optimisation", to: "/expertise/conversion-rate-optimisation" },
+  "UI/UX Design": { label: "UI/UX Design", to: "/expertise/ui-ux-design" },
+  "Web3 & Blockchain": { label: "Web3 & dApp Development", to: "/expertise/web3-development" },
+  "Smart Contracts": { label: "Smart Contracts & Solidity", to: "/expertise/smart-contract-development" },
+  "Consulting": { label: "Business Consulting", to: "/expertise/business-consulting" },
+  "Coaching": { label: "Accountability Coaching", to: "/expertise/accountability-coaching" },
+  "Marketing & Promotion": { label: "Marketing & Promotion", to: "/expertise/marketing-promotion" },
+  "Choosing an Agency": { label: "Book a free strategy call", to: "/book" },
 };
 
 export function serviceForTopic(category: string) {

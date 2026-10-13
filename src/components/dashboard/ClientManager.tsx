@@ -11,6 +11,7 @@ interface Approval { id: string; title: string; status: string; client_note: str
 interface Invoice { id: string; number: string; description: string; amount: number; currency: string; status: string; due_date: string | null }
 interface Message { id: string; sender: string; body: string; created_at: string }
 interface Task { id: string; label: string; week: number; done: boolean }
+interface FileRow { id: string; file_name: string; size_kb: number | null; storage_url: string | null; uploaded_by: string; created_at: string }
 interface Booking { id: string; slot_start: string; name: string; whatsapp: string; email: string | null; business: string | null; topic: string | null; status: string; timezone: string | null }
 
 const waHref = (n: string) => {
@@ -103,18 +104,22 @@ function ClientDetail({ acc }: { acc: Account }) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [files, setFiles] = useState<FileRow[]>([]);
+  const [plan, setPlan] = useState(acc.plan);
+  const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
 
   async function load() {
-    const [p, a, i, m, t] = await Promise.all([
+    const [p, a, i, m, t, fl] = await Promise.all([
       db.from("client_projects").select("*").eq("client_user_id", uid).order("created_at", { ascending: false }),
       db.from("client_approvals").select("*").eq("client_user_id", uid).order("created_at", { ascending: false }),
       db.from("client_invoices").select("*").eq("client_user_id", uid).order("created_at", { ascending: false }),
       db.from("client_messages").select("*").eq("client_user_id", uid).order("created_at"),
       db.from("client_tasks").select("*").eq("client_user_id", uid).order("week"),
+      db.from("client_files").select("*").eq("client_user_id", uid).order("created_at", { ascending: false }),
     ]);
-    setProjects(p.data || []); setApprovals(a.data || []); setInvoices(i.data || []); setMessages(m.data || []); setTasks(t.data || []);
+    setProjects(p.data || []); setApprovals(a.data || []); setInvoices(i.data || []); setMessages(m.data || []); setTasks(t.data || []); setFiles(fl.data || []);
   }
   useEffect(() => { load(); }, [uid]);
 
@@ -125,9 +130,32 @@ function ClientDetail({ acc }: { acc: Account }) {
     await load();
   }
 
+  async function shareFile(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    const path = `${uid}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_").slice(-80)}`;
+    const { error } = await supabase.storage.from("client-files").upload(path, file, { contentType: file.type || undefined });
+    if (error) { setErr(error.message); setUploading(false); return; }
+    await run(db.from("client_files").insert({ client_user_id: uid, file_name: file.name.slice(0, 200), size_kb: Math.max(1, Math.round(file.size / 1024)), category: "From EmmaForYou", storage_url: path, uploaded_by: "team" }));
+    setUploading(false);
+  }
+  async function openFile(f: FileRow) {
+    if (!f.storage_url) return;
+    if (/^https:\/\//.test(f.storage_url)) { window.open(f.storage_url, "_blank", "noopener"); return; }
+    const { data } = await supabase.storage.from("client-files").createSignedUrl(f.storage_url, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
+  }
+
   return (
     <div className="mt-5 grid gap-4 lg:grid-cols-2">
       {err && <p className="col-span-full rounded-xl border border-destructive/40 bg-destructive/5 p-3 text-sm">{err}</p>}
+      <div className="col-span-full flex flex-wrap items-center gap-3 text-sm">
+        <span className="text-muted-foreground">Plan</span>
+        <select value={plan} onChange={(e) => { setPlan(e.target.value); run(db.from("client_accounts").update({ plan: e.target.value }).eq("user_id", uid)); }} className="rounded-lg border border-border bg-background px-2 py-1.5">
+          {["Starter", "Growth", "Pro", "Enterprise", "Custom project", "Consulting", "Coaching"].map((p) => <option key={p}>{p}</option>)}
+        </select>
+        <span className="text-xs text-muted-foreground">Shown in the client's portal header.</span>
+      </div>
 
       <Panel title="Projects">
         {projects.map((p) => (
@@ -175,6 +203,20 @@ function ClientDetail({ acc }: { acc: Account }) {
         {tasks.map((t) => <p key={t.id} className={`text-sm ${t.done ? "text-muted-foreground line-through" : ""}`}>Week {t.week}: {t.label}</p>)}
         <InlineForm fields={[{ name: "week", placeholder: "Week", type: "number", value: "1" }, { name: "label", placeholder: "e.g. Send us your logo files", required: true }]} submit="Add task"
           onSubmit={(v) => run(db.from("client_tasks").insert({ client_user_id: uid, week: Math.max(1, Number(v.week) || 1), label: v.label }))} />
+      </Panel>
+
+      <Panel title="Files">
+        {files.length === 0 && <p className="text-sm text-muted-foreground">No files yet.</p>}
+        {files.map((f) => (
+          <div key={f.id} className="flex items-center justify-between gap-2 text-sm">
+            <span className="min-w-0 truncate">{f.uploaded_by === "client" ? "⬆️" : "⬇️"} {f.file_name} <span className="text-xs text-muted-foreground">{f.size_kb ? `${f.size_kb} KB · ` : ""}{new Date(f.created_at).toLocaleDateString()}</span></span>
+            {f.storage_url && <button onClick={() => openFile(f)} className="shrink-0 rounded-full border border-border px-2.5 py-1 text-xs hover:bg-muted">Open</button>}
+          </div>
+        ))}
+        <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background">
+          <Plus className="h-3.5 w-3.5" />{uploading ? "Uploading…" : "Share a file with this client"}
+          <input type="file" className="sr-only" disabled={uploading} onChange={(e) => { shareFile(e.target.files?.[0]); e.target.value = ""; }} />
+        </label>
       </Panel>
 
       <div className="rounded-2xl border border-border p-4 lg:col-span-2">

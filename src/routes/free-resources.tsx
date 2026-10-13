@@ -130,7 +130,6 @@ function DownloadModal({ magnet, onClose }: { magnet: LeadMagnet; onClose: () =>
           </div>
         )}
       </div>
-      <style>{`.input { display:block; width:100%; padding:0.625rem 0.875rem; border-radius:0.75rem; background: hsl(var(--background)); border:1px solid hsl(var(--border)); color: inherit; font-size:0.95rem; }`}</style>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export const proposalRequestSchema = z.object({
   industry: z.string().max(60),
   location: z.string().trim().max(80).optional().default(""),
   hasWebsite: z.enum(["yes", "no", "outdated"]),
-  goals: z.array(z.string().max(60)).min(1).max(6),
+  goals: z.array(z.string().max(60)).min(1).max(8),
   services: z.array(z.string().max(60)).max(13),
   budget: z.string().max(40),
   timeline: z.string().max(40),

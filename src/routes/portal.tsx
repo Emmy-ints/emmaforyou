@@ -31,9 +31,11 @@ interface ClientAcc { id: string; full_name: string; business_name: string; avat
 function Portal() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, sess) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
       setSession(sess);
       setLoading(false);
     });
@@ -45,11 +47,12 @@ function Portal() {
   }, []);
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-background"><div className="text-sm text-muted-foreground">Loading…</div></div>;
+  if (session && recovering) return <NewPassword onDone={() => setRecovering(false)} />;
   return session ? <PortalDashboard userId={session.user.id} email={session.user.email || ""} /> : <AuthScreen />;
 }
 
 function AuthScreen() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -64,7 +67,11 @@ function AuthScreen() {
     setInfo("");
     setBusy(true);
     try {
-      if (mode === "signup") {
+      if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/portal` });
+        if (error) throw error;
+        setInfo("If that email has an account, a reset link is on its way. Check your inbox (and spam).");
+      } else if (mode === "signup") {
         const redirectUrl = `${window.location.origin}/portal`;
         const { error } = await supabase.auth.signUp({
           email, password,
@@ -94,7 +101,7 @@ function AuthScreen() {
           <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
             <div className="text-center">
               <h1 className="font-display text-3xl font-extrabold">Client Portal</h1>
-              <p className="mt-2 text-sm text-muted-foreground">{mode === "login" ? "Welcome back" : "Create your account"}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{mode === "login" ? "Track your project, approve work, pay invoices and message the team." : mode === "signup" ? "Create your account" : "Reset your password"}</p>
             </div>
 
             <form onSubmit={submit} className="mt-6 space-y-3">
@@ -105,17 +112,20 @@ function AuthScreen() {
                 </>
               )}
               <input className="input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+              {mode !== "forgot" && <input className="input" type="password" placeholder="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />}
               {err && <p className="text-sm text-destructive">{err}</p>}
               {info && <p className="text-sm text-green-600">{info}</p>}
               <button disabled={busy} className="btn-primary-gradient inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white disabled:opacity-60">
-                {busy ? "Working..." : mode === "login" ? "Log in" : "Create account"}
+                {busy ? "Working..." : mode === "login" ? "Log in" : mode === "signup" ? "Create account" : "Send reset link"}
               </button>
             </form>
 
             <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setErr(""); setInfo(""); }} className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground">
-              {mode === "login" ? "No account? Create one" : "Already have an account? Log in"}
+              {mode === "login" ? "No account? Create one" : "Back to log in"}
             </button>
+            {mode === "login" && (
+              <button onClick={() => { setMode("forgot"); setErr(""); setInfo(""); }} className="mt-2 w-full text-center text-sm text-muted-foreground hover:text-foreground">Forgot password?</button>
+            )}
           </div>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
@@ -124,7 +134,6 @@ function AuthScreen() {
         </div>
       </main>
       <Footer />
-      <style>{`.input { display:block; width:100%; padding:0.625rem 0.875rem; border-radius:0.75rem; background: hsl(var(--background)); border:1px solid hsl(var(--border)); color: inherit; font-size:0.95rem; }`}</style>
     </div>
   );
 }
@@ -138,7 +147,42 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [files, setFiles] = useState<FileRow[]>([]);
   const [reply, setReply] = useState("");
-  const [tab, setTab] = useState<"overview" | "approvals" | "invoices" | "tasks" | "messages" | "files">("overview");
+  const [tab, setTab] = useState<"overview" | "approvals" | "invoices" | "tasks" | "messages" | "files" | "settings">("overview");
+  const [uploading, setUploading] = useState(false);
+  const [fileErr, setFileErr] = useState("");
+  const [request, setRequest] = useState("");
+  const [requestSent, setRequestSent] = useState(false);
+
+  async function uploadFile(file: File | undefined) {
+    if (!file) return;
+    setFileErr("");
+    if (file.size > 20 * 1024 * 1024) { setFileErr("Files must be under 20 MB."); return; }
+    setUploading(true);
+    const path = `${userId}/${Date.now()}-${file.name.replace(/[^\w.\-]+/g, "_").slice(-80)}`;
+    const { error } = await supabase.storage.from("client-files").upload(path, file, { contentType: file.type || undefined });
+    if (error) { setFileErr("Upload failed. Please try again."); setUploading(false); return; }
+    const { data } = await pdb.from("client_files").insert({ client_user_id: userId, file_name: file.name.slice(0, 200), size_kb: Math.max(1, Math.round(file.size / 1024)), category: "From you", storage_url: path, uploaded_by: "client" }).select().single();
+    if (data) setFiles((prev) => [data as FileRow, ...prev]);
+    await supabase.from("client_messages").insert({ client_user_id: userId, sender: "client", body: `📎 Uploaded a file: ${file.name}` });
+    setUploading(false);
+  }
+
+  async function openFile(f: FileRow) {
+    if (!f.storage_url) return;
+    if (/^https:\/\//.test(f.storage_url)) { window.open(f.storage_url, "_blank", "noopener"); return; }
+    const { data } = await supabase.storage.from("client-files").createSignedUrl(f.storage_url, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
+  }
+
+  async function sendRequest(e: React.FormEvent) {
+    e.preventDefault();
+    const body = request.trim();
+    if (!body) return;
+    const { data } = await supabase.from("client_messages").insert({ client_user_id: userId, body: `📌 New request: ${body}`, sender: "client" }).select().single();
+    if (data) setMessages((prev) => [...prev, data as Message]);
+    setRequest("");
+    setRequestSent(true);
+  }
 
   useEffect(() => {
     (async () => {
@@ -226,7 +270,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
 
           {/* Tabs */}
           <div className="mt-8 flex gap-2 overflow-x-auto">
-            {(["overview", "approvals", "invoices", "tasks", "messages", "files"] as const).map((t) => {
+            {(["overview", "approvals", "invoices", "tasks", "messages", "files", "settings"] as const).map((t) => {
               const badge = t === "approvals" ? pendingApprovals : t === "invoices" ? unpaid.length : 0;
               return (
                 <button key={t} onClick={() => setTab(t)} className={`relative shrink-0 rounded-full px-4 py-2 text-sm font-medium capitalize transition ${tab === t ? "bg-foreground text-background" : "border border-border bg-card text-muted-foreground hover:text-foreground"}`}>
@@ -251,6 +295,22 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
                       <p className="mt-1 font-display text-2xl font-semibold">{k.value}</p>
                     </button>
                   ))}
+                </div>
+                <div className="col-span-full grid gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+                  <form onSubmit={sendRequest} className="rounded-2xl border border-border bg-card p-4">
+                    <label htmlFor="portal-request" className="text-sm font-semibold">Need something? Send a request</label>
+                    <textarea id="portal-request" value={request} onChange={(e) => { setRequest(e.target.value); setRequestSent(false); }} rows={2} maxLength={1000} placeholder="e.g. Please add our new price list to the website" className="input mt-2" />
+                    <div className="mt-2 flex items-center gap-3">
+                      <button disabled={!request.trim()} className="btn-primary-gradient rounded-full px-5 py-2 text-sm font-semibold text-white disabled:opacity-50">Send request</button>
+                      {requestSent && <span className="text-xs text-emerald-600">Sent. You'll get a reply in Messages.</span>}
+                    </div>
+                  </form>
+                  <div className="grid gap-2 rounded-2xl border border-border bg-card p-4 text-sm">
+                    <p className="font-semibold">Quick actions</p>
+                    <Link to="/book" className="rounded-xl border border-border px-3 py-2 hover:border-[var(--emma-violet)]">📅 Book a call with Emmanuel</Link>
+                    <a href="https://wa.me/message/HHGMMWMRJFYUC1" target="_blank" rel="noopener noreferrer" className="rounded-xl border border-border px-3 py-2 hover:border-[var(--emma-violet)]">💬 WhatsApp the team</a>
+                    <button onClick={() => setTab("files")} className="rounded-xl border border-border px-3 py-2 text-left hover:border-[var(--emma-violet)]">📎 Share files with us</button>
+                  </div>
                 </div>
                 {projects.length === 0 && (
                   <div className="col-span-full rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
@@ -306,6 +366,8 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
               </div>
             )}
 
+            {tab === "settings" && <Settings account={account} email={email} onSaved={(a) => setAccount(a)} />}
+
             {tab === "approvals" && (
               <div className="space-y-4">
                 {approvals.length === 0 && <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">Nothing to review yet. Designs, copy and campaigns for your sign-off will appear here.</div>}
@@ -338,6 +400,16 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
             )}
 
             {tab === "files" && (
+              <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-border bg-card p-4">
+                <label className={`btn-primary-gradient cursor-pointer rounded-full px-5 py-2 text-sm font-semibold text-white ${uploading ? "opacity-60" : ""}`}>
+                  {uploading ? "Uploading…" : "Upload a file"}
+                  <input type="file" className="sr-only" disabled={uploading} onChange={(e) => { uploadFile(e.target.files?.[0]); e.target.value = ""; }} />
+                </label>
+                <p className="text-xs text-muted-foreground">Logos, photos, documents, up to 20 MB. Only you and our team can see them.</p>
+                {fileErr && <p role="alert" className="text-xs text-red-600">{fileErr}</p>}
+              </div>
+            )}
+            {tab === "files" && (
               files.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-border p-12 text-center text-sm text-muted-foreground">Files shared by your manager will appear here.</div>
               ) : (
@@ -345,7 +417,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
                   {files.map((f) => (
                     <li key={f.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                       <div><p className="font-medium">{f.file_name}</p><p className="text-xs text-muted-foreground">{[f.category, f.size_kb ? `${f.size_kb} KB` : null, new Date(f.created_at).toLocaleDateString()].filter(Boolean).join(" · ")}</p></div>
-                      {f.storage_url && /^https:\/\//.test(f.storage_url) && <a href={f.storage_url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:border-[var(--emma-violet)]">Open</a>}
+                      {f.storage_url && <button onClick={() => openFile(f)} className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:border-[var(--emma-violet)]">Open</button>}
                     </li>
                   ))}
                 </ul>
@@ -394,6 +466,76 @@ function ApprovalCard({ a, onDecide }: { a: Approval; onDecide: (a: Approval, s:
           {err && <p role="alert" className="mt-2 text-sm text-red-600">{err}</p>}
         </div>
       ) : a.client_note ? <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-sm">Your note: {a.client_note}</p> : null}
+    </div>
+  );
+}
+
+
+function Settings({ account, email, onSaved }: { account: ClientAcc | null; email: string; onSaved: (a: ClientAcc) => void }) {
+  const [name, setName] = useState(account?.full_name || "");
+  const [biz, setBiz] = useState(account?.business_name || "");
+  const [pw, setPw] = useState("");
+  const [msg, setMsg] = useState("");
+  async function saveProfile(e: React.FormEvent) {
+    e.preventDefault();
+    setMsg("");
+    const { error } = await pdb.rpc("update_my_profile", { p_full_name: name, p_business_name: biz });
+    if (error) { setMsg("Couldn't save. Name and business name are required."); return; }
+    if (account) onSaved({ ...account, full_name: name.trim(), business_name: biz.trim(), avatar_initials: name.trim().slice(0, 2).toUpperCase() });
+    setMsg("Profile saved.");
+  }
+  async function changePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setMsg("");
+    if (pw.length < 8) { setMsg("Use at least 8 characters."); return; }
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    setMsg(error ? error.message : "Password changed.");
+    setPw("");
+  }
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <form onSubmit={saveProfile} className="space-y-3 rounded-2xl border border-border bg-card p-5">
+        <h3 className="font-display text-lg font-semibold">Your profile</h3>
+        <label className="block text-sm text-muted-foreground">Your name<input className="input mt-1" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} /></label>
+        <label className="block text-sm text-muted-foreground">Business name<input className="input mt-1" value={biz} onChange={(e) => setBiz(e.target.value)} maxLength={160} /></label>
+        <p className="text-xs text-muted-foreground">Signed in as {email}. Plan: {account?.plan || "—"} (to change your plan, message us).</p>
+        <button className="btn-primary-gradient rounded-full px-5 py-2 text-sm font-semibold text-white">Save profile</button>
+      </form>
+      <form onSubmit={changePassword} className="space-y-3 rounded-2xl border border-border bg-card p-5">
+        <h3 className="font-display text-lg font-semibold">Change password</h3>
+        <label className="block text-sm text-muted-foreground">New password<input type="password" className="input mt-1" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" minLength={8} /></label>
+        <button className="rounded-full border border-border px-5 py-2 text-sm font-semibold hover:border-[var(--emma-violet)]">Update password</button>
+      </form>
+      {msg && <p role="status" className="text-sm text-foreground md:col-span-2">{msg}</p>}
+    </div>
+  );
+}
+
+function NewPassword({ onDone }: { onDone: () => void }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (pw.length < 8) { setErr("Use at least 8 characters."); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    setBusy(false);
+    if (error) { setErr(error.message); return; }
+    onDone();
+  }
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <main className="flex min-h-[80vh] items-center justify-center px-5 pt-32 pb-20">
+        <form onSubmit={save} className="w-full max-w-md space-y-3 rounded-3xl border border-border bg-card p-8">
+          <h1 className="font-display text-2xl font-semibold">Choose a new password</h1>
+          <input type="password" className="input" placeholder="New password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+          {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
+          <button disabled={busy} className="btn-primary-gradient w-full rounded-full px-6 py-3 font-semibold text-white disabled:opacity-60">{busy ? "Saving…" : "Save and continue"}</button>
+        </form>
+      </main>
+      <Footer />
     </div>
   );
 }

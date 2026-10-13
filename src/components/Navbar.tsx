@@ -7,7 +7,7 @@ import { SERVICES, EXPERTISE } from "@/lib/services-data";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
-type DropdownKey = "services" | "expertise" | "resources" | "tools" | "company";
+type DropdownKey = "services" | "expertise" | "resources" | "tools" | "company" | "account";
 
 const RESOURCES = [
   { to: "/blog", name: "Blog", icon: "📝", short: "Growth insights & guides" },
@@ -26,6 +26,12 @@ const TOOLS = [
   { to: "/growth-quiz", name: "Growth Quiz", icon: "🎯", short: "Find your next step" },
   { to: "/email-generator", name: "Email Generator", icon: "✉️", short: "AI-written emails" },
   { to: "/analyser", name: "Growth Assessment", icon: "🔬", short: "Score your business" },
+];
+
+const ACCOUNT = [
+  { to: "/portal", name: "Client Portal", icon: "🔐", short: "Projects, approvals, invoices, files & messages" },
+  { to: "/dashboard", name: "Dashboard", icon: "📊", short: "Owner: analytics, leads, bookings & clients" },
+  { to: "/book", name: "Book a Call", icon: "📅", short: "Free 30-minute strategy call" },
 ];
 
 const COMPANY = [
@@ -142,6 +148,7 @@ export default function Navbar() {
           {key === "resources" && dropdownPanel(RESOURCES)}
           {key === "tools" && dropdownPanel(TOOLS)}
           {key === "company" && dropdownPanel(COMPANY)}
+          {key === "account" && <div className="[&>div]:left-auto [&>div]:right-0 [&>div]:translate-x-0">{dropdownPanel(ACCOUNT)}</div>}
         </>
       )}
     </div>
@@ -180,6 +187,7 @@ export default function Navbar() {
           {ddBtn("resources", "Resources")}
           {ddBtn("tools", "Tools")}
           <Link to="/pricing" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground">Pricing</Link>
+          {ddBtn("account", "Login")}
           <DarkModeToggle />
           <LanguageSelector />
           <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">
@@ -231,6 +239,10 @@ export default function Navbar() {
             {mobileSection_("resources", "Resources", RESOURCES)}
             {mobileSection_("tools", "Tools", TOOLS)}
             <Link to="/pricing" onClick={() => setMobileOpen(false)} className="font-display text-lg font-bold text-foreground py-3 border-b border-border">Pricing</Link>
+            <div className="mt-6 grid grid-cols-2 gap-2">
+              <Link to="/portal" onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border p-3 text-sm font-semibold text-foreground">🔐 Client Portal<span className="mt-0.5 block text-xs font-normal text-muted-foreground">Projects & invoices</span></Link>
+              <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border p-3 text-sm font-semibold text-foreground">📊 Dashboard<span className="mt-0.5 block text-xs font-normal text-muted-foreground">Owner login</span></Link>
+            </div>
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)} className="btn-gold mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base">
               {t("cta_waitlist")} <span aria-hidden>→</span>
             </a>

@@ -175,6 +175,20 @@ function SignIn() {
           >
             {mode === "login" ? "First time? Create an account" : "Have an account? Sign in"}
           </button>
+          {mode === "login" && (
+            <button
+              type="button"
+              onClick={async () => {
+                setErr("");
+                if (!email.includes("@")) { setErr("Enter your email above first."); return; }
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/portal` });
+                setInfo(error ? error.message : "Password reset link sent. Open it, set a new password, then come back to /dashboard.");
+              }}
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
+            >
+              Forgot password?
+            </button>
+          )}
         </form>
       </div>
       <DashStyles />
@@ -353,6 +367,16 @@ function Dashboard({ email }: { email: string }) {
           <Kpi label="New leads" value={leads.length} />
           <Kpi label="Prototypes made" value={stats.count("prototype_generated") + stats.count("prototype_refined")} />
           <Kpi label="Visitor → action" value={`${stats.conversionRate}%`} hint="Share of visitors who clicked WhatsApp, submitted a form or asked for the real build" />
+        </section>
+
+        {/* AI tools at a glance */}
+        <section className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+          <Kpi label="Receptionist chats" value={stats.count("receptionist_message")} />
+          <Kpi label="Website audits" value={stats.count("audit_run")} />
+          <Kpi label="Proposals made" value={stats.count("proposal_generated")} hint={`${stats.count("proposal_accepted")} accepted`} />
+          <Kpi label="Makeovers" value={stats.count("makeover_generated")} />
+          <Kpi label="Calls booked" value={stats.count("call_booked")} />
+          <Kpi label="Voice / Ask searches" value={stats.count("voice_search")} hint={`${stats.count("page_translated")} page translations`} />
         </section>
 
         {/* Trend */}

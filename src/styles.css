@@ -945,3 +945,8 @@ html { scroll-padding-top: 88px; }
   .print-area .hero-ink * { color: #111 !important; }
   .print-area section, .print-area > div { break-inside: avoid; }
 }
+
+/* Shared form field (portal, affiliate, quiz, email generator, free resources). */
+.input { display: block; width: 100%; padding: 0.7rem 0.9rem; border-radius: 0.75rem; background: var(--background); border: 1px solid var(--input, var(--border)); color: var(--foreground); font-size: 0.95rem; transition: border-color .15s, box-shadow .15s; }
+.input::placeholder { color: var(--muted-foreground); }
+.input:focus { outline: none; border-color: var(--emma-violet); box-shadow: 0 0 0 3px color-mix(in oklab, var(--emma-violet) 18%, transparent); }

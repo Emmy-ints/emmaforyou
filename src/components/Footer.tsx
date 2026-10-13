@@ -21,6 +21,8 @@ const EXPERTISE_LINKS = [
 ];
 
 const LINKS = [
+  { label: "Client Portal", to: "/portal" },
+  { label: "Dashboard", to: "/dashboard" },
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
   { label: "Portfolio", to: "/portfolio" },

@@ -41,7 +41,9 @@ export type AnalyticsEvent =
   | "assistant_lead"
   | "exit_offer_shown"
   | "exit_offer_clicked"
-  | "sticky_cta_click";
+  | "sticky_cta_click"
+  | "newsletter_subscribed"
+  | "review_submitted";
 
 type Props = Record<string, string | number | boolean | null | undefined>;
 

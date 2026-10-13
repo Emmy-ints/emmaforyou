@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import NewsletterSignup from "./NewsletterSignup";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
@@ -50,6 +51,7 @@ const TOOL_LINKS = [
   { label: "90-Day Goal Planner", to: "/goal-planner" },
   { label: "Free Checklists", to: "/checklists" },
   { label: "Comparisons", to: "/compare" },
+  { label: "Newsletter", to: "/newsletter" },
   { label: "Growth Assessment", to: "/analyser" },
   { label: "ROI Calculator", to: "/roi-calculator" },
   { label: "Growth Quiz", to: "/growth-quiz" },
@@ -68,9 +70,12 @@ const LOCATIONS = [
 ];
 
 export default function Footer() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !pathname.startsWith("/fr") && !pathname.startsWith("/de");
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-5 py-16">
+        {showSignup && <div className="mb-14"><NewsletterSignup source="footer" variant="band" /></div>}
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <div className="flex items-baseline gap-0.5">

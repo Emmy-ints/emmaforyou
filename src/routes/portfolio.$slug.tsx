@@ -7,6 +7,8 @@ import ProjectCard, { projectImage } from "../components/portfolio/ProjectCard";
 import { PROJECTS, featuredFor, findProject, projectSlug, socialFor } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
 import { pageHead, breadcrumbLd, creativeWorkLd, clip } from "@/lib/seo";
+import { fetchCaseStudy } from "@/lib/case-studies";
+import { Quote } from "lucide-react";
 
 const SERVICE_FOR_CATEGORY: Record<string, { slug: string; name: string }> = {
   Ecommerce: { slug: "ecommerce", name: "Ecommerce Growth" },
@@ -19,10 +21,11 @@ const SERVICE_FOR_CATEGORY: Record<string, { slug: string; name: string }> = {
 
 export const Route = createFileRoute("/portfolio/$slug")({
   component: CaseStudyPage,
-  loader: ({ params }) => {
+  loader: async ({ params }) => {
     const project = findProject(params.slug);
     if (!project) throw notFound();
-    return { project };
+    const study = await fetchCaseStudy(projectSlug(project.name));
+    return { project, study };
   },
   head: ({ loaderData }) => {
     if (!loaderData) return { meta: [{ title: "Project not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
@@ -32,7 +35,7 @@ export const Route = createFileRoute("/portfolio/$slug")({
     const image = f?.img ?? p.img;
     return pageHead({
       title: `${p.name} — ${p.category} Case Study | EmmaForYou`,
-      description: clip(`${p.desc} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.`),
+      description: clip(loaderData.study?.challenge ? `${p.name}: ${loaderData.study.challenge} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.` : `${p.desc} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.`),
       path,
       image,
       imageAlt: `${p.name} project`,
@@ -64,7 +67,7 @@ const reveal = {
 };
 
 function CaseStudyPage() {
-  const { project: p } = Route.useLoaderData();
+  const { project: p, study } = Route.useLoaderData();
   const featured = featuredFor(p.name);
   const social = socialFor(p.name);
   const service = SERVICE_FOR_CATEGORY[p.category] ?? SERVICE_FOR_CATEGORY.Websites;
@@ -150,6 +153,48 @@ function CaseStudyPage() {
             </motion.aside>
           </div>
         </section>
+
+        {study && (
+          <section className="border-t border-border py-20 md:py-24" aria-labelledby="cs-story">
+            <div className="mx-auto max-w-4xl space-y-12 px-5 md:px-8">
+              <h2 id="cs-story" className="font-display text-3xl font-semibold tracking-tight md:text-4xl">The full story</h2>
+              {study.challenge && (
+                <div><h3 className="font-display text-xl font-semibold">The challenge</h3><p className="mt-3 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{study.challenge}</p></div>
+              )}
+              {(study.approach || study.deliverables.length > 0) && (
+                <div>
+                  <h3 className="font-display text-xl font-semibold">What we did</h3>
+                  {study.approach && <p className="mt-3 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{study.approach}</p>}
+                  {study.deliverables.length > 0 && (
+                    <ul className="mt-4 grid gap-2 sm:grid-cols-2">{study.deliverables.map((d) => <li key={d} className="flex items-start gap-2.5 text-sm"><span className="svc-tick mt-0.5"><Check className="h-3 w-3" /></span>{d}</li>)}</ul>
+                  )}
+                </div>
+              )}
+              {study.results && (
+                <div className="rounded-[22px] border border-border bg-card p-6"><h3 className="font-display text-xl font-semibold">Results</h3><p className="mt-3 whitespace-pre-line leading-relaxed text-foreground">{study.results}</p>{study.timeline && <p className="mt-3 text-sm text-muted-foreground">Timeline: {study.timeline}</p>}</div>
+              )}
+              {study.quote && (
+                <figure className="rounded-[22px] bg-muted p-6 md:p-8">
+                  <Quote className="h-6 w-6 text-[color:var(--emma-violet)]" aria-hidden="true" />
+                  <blockquote className="mt-3 font-display text-xl leading-relaxed">“{study.quote}”</blockquote>
+                  {(study.quote_author || study.client_role) && <figcaption className="mt-4 text-sm text-muted-foreground">— {[study.quote_author, study.client_role].filter(Boolean).join(", ")}</figcaption>}
+                </figure>
+              )}
+              {study.screenshots.length > 0 && (
+                <div>
+                  <h3 className="font-display text-xl font-semibold">Screenshots</h3>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    {study.screenshots.map((src, i) => (
+                      <a key={src} href={src} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-[18px] border border-border">
+                        <img src={src} alt={`${p.name} screenshot ${i + 1}`} loading="lazy" className="w-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         <section className="band-ink bg-[#0b0d24] py-20 text-white">
           <div className="mx-auto flex max-w-5xl flex-col items-center px-5 text-center">

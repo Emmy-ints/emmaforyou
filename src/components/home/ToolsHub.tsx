@@ -4,7 +4,7 @@ import { LayoutGroup, motion } from "framer-motion";
 import {
   ArrowRight, ArrowLeftRight, BookOpen, Briefcase, Calculator, CalendarCheck, ClipboardList, Download, Gauge,
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
-  Bot, Globe2, Languages, Mic, Palette, FileSignature,
+  Bot, Globe, Languages, Mic, Palette, FileSignature,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
 
@@ -25,7 +25,7 @@ interface Tool {
 const TOOLS: Tool[] = [
   // Try it now
   { group: "try", icon: Bot, name: "AI receptionist demo", does: "Chat with, or talk out loud to, an AI receptionist for a sample salon, clinic or restaurant. Ask prices, then book an appointment.", get: "A feel for how your customers would get instant replies and bookings 24/7.", meta: "Live demo · voice", cta: "Talk to it", href: { to: "/ai-receptionist" } },
-  { group: "try", icon: Globe2, name: "AI website audit", does: "Enter your website address. We check speed on a phone (Google Lighthouse), SEO, contact buttons, trust and more.", get: "A score out of 100, a phone screenshot, the top 5 fixes and a downloadable PDF report.", meta: "Free · ~1 minute", cta: "Audit my website", href: { to: "/website-audit" } },
+  { group: "try", icon: Globe, name: "AI website audit", does: "Enter your website address. We check speed on a phone (Google Lighthouse), SEO, contact buttons, trust and more.", get: "A score out of 100, a phone screenshot, the top 5 fixes and a downloadable PDF report.", meta: "Free · ~1 minute", cta: "Audit my website", href: { to: "/website-audit" } },
   { group: "try", icon: Palette, name: "AI website makeover", does: "Upload a screenshot of your website and watch AI redesign it live, keeping your business details.", get: "A before-and-after comparison and a redesign concept you can download.", meta: "Free · ~1 minute", cta: "Redesign my site", href: { to: "/makeover" } },
   { group: "try", icon: FileSignature, name: "Instant proposal & quote", does: "Answer a few questions about your business, goals and budget.", get: "A written proposal with scope, timeline and the right plan, priced from our published plans. Download it or accept online.", meta: "Free · 20 seconds", cta: "Build my proposal", href: { to: "/proposal" } },
   { group: "try", icon: Mic, name: "Ask anything (voice)", does: "Tap the mic and ask a question out loud, like 'how much is a website?', or type it.", get: "The best answer from our FAQs, service pages and guides, read aloud, with a link to read more.", meta: "Voice · instant", cta: "Ask a question", href: { event: "efy-open-ask" } },

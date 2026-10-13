@@ -23,7 +23,18 @@ export type AnalyticsEvent =
   | "quiz_completed"
   | "magnet_downloaded"
   | "affiliate_signup"
-  | "service_tile_click";
+  | "service_tile_click"
+  | "receptionist_message"
+  | "receptionist_booking"
+  | "voice_used"
+  | "audit_run"
+  | "audit_requested"
+  | "proposal_generated"
+  | "proposal_accepted"
+  | "makeover_generated"
+  | "call_booked"
+  | "voice_search"
+  | "page_translated";
 
 type Props = Record<string, string | number | boolean | null | undefined>;
 

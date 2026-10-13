@@ -12,6 +12,14 @@ const SERVICE_LINKS = [
   { label: "App Development", slug: "app-development" },
 ];
 
+const EXPERTISE_LINKS = [
+  { label: "UI/UX Design", slug: "ui-ux-design" },
+  { label: "Conversion Optimisation", slug: "conversion-rate-optimisation" },
+  { label: "Marketing & Promotion", slug: "marketing-promotion" },
+  { label: "Business Consulting", slug: "business-consulting" },
+  { label: "Accountability Coaching", slug: "accountability-coaching" },
+];
+
 const LINKS = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
@@ -73,6 +81,11 @@ export default function Footer() {
             <div className="mt-4 flex flex-col gap-2.5">
               {SERVICE_LINKS.map((l) => (
                 <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                  {l.label}
+                </Link>
+              ))}
+              {EXPERTISE_LINKS.map((l) => (
+                <Link key={l.slug} to="/expertise/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                   {l.label}
                 </Link>
               ))}

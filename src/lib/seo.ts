@@ -18,11 +18,13 @@ export const FOUNDER = {
   name: "Emmanuel Akinloye Oluwaseun",
   jobTitle: "Founder & CEO",
   image: "/images/emmanuel.jpg",
+  /** What Emmanuel does, in his own words (owner-confirmed). */
+  roles: ["Developer", "Marketer & promoter", "UI/UX designer", "Conversion rate optimisation expert", "Business consultant", "Accountability coach"],
 };
 
 /** One-sentence entity description, used verbatim wherever the business is described. */
 export const ORG_DESCRIPTION =
-  "EmmaForYou is an AI automation and digital growth agency founded by Emmanuel Akinloye Oluwaseun. It builds AI chat and booking automation, websites, ecommerce stores, email marketing, social media and paid advertising for small and growing businesses in Nigeria, the USA, Europe and Africa.";
+  "EmmaForYou is an AI automation and digital growth agency founded by Emmanuel Akinloye Oluwaseun. It builds AI chat and booking automation, websites and apps, ecommerce stores, UI/UX design, conversion optimisation, email, social media, paid advertising and promotion, plus business consulting and accountability coaching, for small and growing businesses in Nigeria, the USA, Europe and Africa.";
 
 export const SERVICES_OFFERED = [
   "AI automation and chatbots",
@@ -35,6 +37,11 @@ export const SERVICES_OFFERED = [
   "Lead generation and sales funnels",
   "CRM setup",
   "App development",
+  "UI/UX design",
+  "Conversion rate optimisation",
+  "Marketing and promotion",
+  "Business consulting",
+  "Accountability coaching",
 ];
 
 export const AREAS_SERVED = ["Nigeria", "United States", "United Kingdom", "France", "Germany", "South Africa", "Ghana"];
@@ -168,6 +175,8 @@ export function founderLd(): JsonLd {
     "@id": FOUNDER_ID,
     name: FOUNDER.name,
     jobTitle: FOUNDER.jobTitle,
+    description: `Founder of EmmaForYou. ${FOUNDER.roles.join(", ")}.`,
+    knowsAbout: ["Web and app development", "Digital marketing", "UI/UX design", "Conversion rate optimisation", "Business consulting", "Accountability coaching", "AI automation"],
     image: absoluteUrl(FOUNDER.image),
     worksFor: { "@id": ORG_ID },
     url: absoluteUrl("/about"),

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { pageHead, breadcrumbLd, founderLd } from "@/lib/seo";
@@ -30,6 +30,15 @@ export const Route = createFileRoute("/about")({
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "About", path: "/about" }]), founderLd()],
     }),
 });
+
+const ROLES = [
+  { icon: "💻", title: "Developer", desc: "Websites, web apps and mobile apps", to: "/services/app-development" },
+  { icon: "📣", title: "Marketer & promoter", desc: "Campaigns, launches and paid ads", to: "/expertise/marketing-promotion" },
+  { icon: "🎨", title: "UI/UX designer", desc: "Interfaces people understand", to: "/expertise/ui-ux-design" },
+  { icon: "📈", title: "Conversion optimisation", desc: "More customers from your traffic", to: "/expertise/conversion-rate-optimisation" },
+  { icon: "💼", title: "Business consultant", desc: "Offers, pricing, systems, numbers", to: "/expertise/business-consulting" },
+  { icon: "🎯", title: "Accountability coach", desc: "Follow-through, week after week", to: "/expertise/accountability-coaching" },
+];
 
 function AboutPage() {
   return (
@@ -91,8 +100,21 @@ function AboutPage() {
             <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h2>
             <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
             <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
-              Digital strategist, automation expert, and passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
+              Developer, marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach, and a passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
             </p>
+            <ul className="mx-auto mt-8 grid max-w-3xl gap-3 text-left sm:grid-cols-2 lg:grid-cols-3">
+              {ROLES.map((r) => (
+                <li key={r.title}>
+                  <Link to={r.to} className="flex h-full items-start gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-[var(--emma-violet)]">
+                    <span className="text-2xl" aria-hidden="true">{r.icon}</span>
+                    <span>
+                      <span className="block font-display text-sm font-semibold text-foreground">{r.title}</span>
+                      <span className="mt-0.5 block text-xs text-muted-foreground">{r.desc}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 

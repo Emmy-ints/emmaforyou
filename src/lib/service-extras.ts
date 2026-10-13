@@ -196,6 +196,53 @@ export const SERVICE_EXTRAS: Record<string, ServiceExtra> = {
     ],
     questions: [{ id: "kind", label: "What kind of app?", options: ["Customer portal", "Booking or ordering app", "Internal dashboard", "Marketplace", "Something else"] }, { id: "users", label: "Who will use it?", options: ["Customers", "My team", "Both"] }, START],
   },
+  "ui-ux-design": {
+    audience: "Businesses launching or fixing a website, web app or mobile app, and teams whose developers need a clear design to build from.",
+    deliverables: ["User research and journey maps", "Wireframes of key screens", "High-fidelity UI for mobile and desktop", "Clickable prototype and usability test", "Design system and developer hand-off", "Design review during build"],
+    timeline: "1–6 weeks depending on screens",
+    engagement: "Project",
+    demo: "site",
+    questions: [{ id: "product", label: "What are we designing?", options: ["Website", "Web app or portal", "Mobile app", "Redesign of something existing"] }, START],
+  },
+  "conversion-rate-optimisation": {
+    audience: "Businesses with steady traffic, ad spend or a store that isn't converting as well as it should.",
+    deliverables: ["Tracking and analytics check", "Funnel drop-off analysis", "Heatmap and recording review", "Prioritised fix list", "A/B tests on key pages", "Monthly results report"],
+    timeline: "Audit in 1–2 weeks, then monthly",
+    engagement: "One-off audit or monthly optimisation",
+    demo: "dashboard",
+    questions: [{ id: "where", label: "Where are you losing people?", options: ["Website enquiries", "Online store checkout", "Landing pages from ads", "Not sure"] }, { id: "traffic", label: "Monthly visitors", options: ["Under 1,000", "1,000–10,000", "10,000+", "Don't know"] }, START],
+  },
+  "business-consulting": {
+    audience: "Founders and small teams who want an outside view on offers, pricing, sales, operations and systems.",
+    deliverables: ["Business and offer review", "Sales and operations audit", "90-day priorities", "Pricing and positioning recommendations", "KPI dashboard", "Advisory sessions"],
+    timeline: "Plan in 2 weeks",
+    engagement: "Strategy session or ongoing advisory",
+    demo: "dashboard",
+    questions: [{ id: "challenge", label: "Biggest challenge right now", options: ["Growth has stalled", "Too dependent on me", "Pricing and offer", "Launching something new"] }, START],
+  },
+  "accountability-coaching": {
+    audience: "Founders, freelancers and professionals who know what to do and want structure and follow-through.",
+    deliverables: ["90-day goals", "Weekly commitments", "Scheduled coaching calls", "WhatsApp check-ins", "Monthly progress review"],
+    timeline: "Start within a week",
+    engagement: "Monthly coaching",
+    demo: "workflow",
+    workflow: [
+      { label: "Set goals", detail: "Clear 90-day targets" },
+      { label: "Commit", detail: "This week's 3–5 actions" },
+      { label: "Check in", detail: "Calls and WhatsApp follow-up" },
+      { label: "Review", detail: "What worked, what slipped" },
+      { label: "Reset", detail: "Next week's commitments" },
+    ],
+    questions: [{ id: "goal", label: "What do you want to be accountable for?", options: ["Growing my business", "Launching a project", "Marketing consistency", "Personal productivity"] }, { id: "rhythm", label: "Preferred check-in rhythm", options: ["Weekly", "Every two weeks", "Not sure"] }, START],
+  },
+  "marketing-promotion": {
+    audience: "Brands launching a product, service or event, and businesses that need attention fast.",
+    deliverables: ["Campaign plan and timeline", "Creative for each channel", "Influencer and partner coordination", "Ads and WhatsApp/email broadcasts", "Tracking links and codes", "Results report"],
+    timeline: "Campaigns from 2 weeks",
+    engagement: "Campaign project or monthly",
+    demo: "dashboard",
+    questions: [{ id: "what", label: "What are you promoting?", options: ["A product launch", "An event", "A brand or business", "An offer or sale"] }, CHANNELS, START],
+  },
   "digital-strategy": {
     audience: "Businesses that want a clear plan before spending on marketing.",
     deliverables: ["Business and competitor review", "Channel and budget plan", "90-day roadmap with priorities", "Measurement plan", "Monthly strategy call"],
@@ -281,6 +328,23 @@ export const SERVICE_QA: Record<string, ServiceQA[]> = {
     { q: "When does a business need a custom app?", a: "When spreadsheets and chat threads can't keep up, off-the-shelf tools don't fit how you work, or customers keep asking for updates they could see themselves — a focused custom app can remove that manual work." },
     { q: "How long does it take to build an app?", a: "A focused first version usually takes four to eight weeks after a short discovery phase. Starting small and improving with real usage keeps cost and risk down." },
   ],
+  "ui-ux-design": [
+    { q: "What does a UI/UX designer do?", a: "A UI/UX designer works out how a website or app should work for the people using it (UX), then designs how it looks (UI). In practice that means research, user journeys, wireframes, a clickable prototype and final screens developers can build." },
+    { q: "Why test a prototype before building?", a: "Changing a prototype takes hours; changing a built product takes weeks. Testing clickable screens with a few real users catches confusing steps before they cost development time." },
+  ],
+  "conversion-rate-optimisation": [
+    { q: "How can an ecommerce business improve conversion rates?", a: "Start where shoppers drop off: make product pages answer the key questions (price, delivery, returns, sizing), show reviews near the buy button, speed up mobile pages, simplify checkout and offer the payment methods your customers use. Then follow up abandoned carts by email or WhatsApp." },
+    { q: "What is a good conversion rate?", a: "It varies widely by industry, price and traffic source, so the most useful benchmark is your own: measure today's rate accurately, then improve it step by step." },
+  ],
+  "business-consulting": [
+    { q: "When should a small business hire a consultant?", a: "When growth stalls, when every decision depends on the owner, before a big investment such as a new market or product, or when you need an outside view on pricing and operations." },
+  ],
+  "accountability-coaching": [
+    { q: "Does accountability coaching work for business owners?", a: "It works best for people who already know roughly what to do but struggle to do it consistently. Regular check-ins and written commitments make it harder for important work to slip week after week." },
+  ],
+  "marketing-promotion": [
+    { q: "How do I promote a new business or product launch?", a: "Pick one clear message and offer, build anticipation for 2–4 weeks with teasers and a waitlist, launch across the channels your audience uses (social, WhatsApp, email, partners or influencers), then follow up with people who showed interest. Track each channel with links or codes." },
+  ],
   "digital-strategy": [
     { q: "How do I choose the right digital growth services for my business?", a: "Start with where you lose the most customers today. If people can't find you, fix visibility (website, Google profile, SEO). If they find you but don't buy, fix replies, offers and follow-up. If you're ready to grow, add ads and content. Our free growth assessment shows which applies to you." },
   ],
@@ -304,6 +368,9 @@ export const SERVICE_WORK_MATCH: Record<string, { categories?: string[]; stack?:
   wordpress: { categories: ["Websites"] },
   "app-development": { stack: ["Paystack", "Notion", "Next.js"] },
   "digital-strategy": { categories: ["Ecommerce", "Websites"] },
+  "ui-ux-design": { categories: ["Websites", "Branding"] },
+  "conversion-rate-optimisation": { categories: ["Ecommerce", "Websites"] },
+  "marketing-promotion": { categories: ["Social Media", "Branding"] },
 };
 
 /** Related services shown at the bottom of a service page (by /services or /expertise slug). */

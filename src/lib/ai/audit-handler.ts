@@ -46,7 +46,13 @@ async function readCapped(res: Response): Promise<string> {
   return new TextDecoder().decode(all);
 }
 
-const attr = (tag: string, name: string) => tag.match(new RegExp(`${name}\\s*=\\s*["']([^"']*)["']`, "i"))?.[1] ?? "";
+// Attribute values may be double-quoted, single-quoted or unquoted (common in minified HTML).
+const attr = (tag: string, name: string) => {
+  const m = tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`, "i"));
+  return m ? (m[1] ?? m[2] ?? m[3] ?? "") : "";
+};
+/** Matches name=value in a tag whether or not the value is quoted. */
+const q = (name: string, value: string) => new RegExp(`\\b${name}\\s*=\\s*["']?${value}(?=["'\\s/>])`, "i");
 const metaContent = (html: string, re: RegExp) => {
   const tag = (html.match(/<meta\b[^>]*>/gi) || []).find((t) => re.test(t));
   return tag ? attr(tag, "content") : "";
@@ -89,20 +95,20 @@ function analyse(html: string, res: Response, finalUrl: URL, responseMs: number,
   const lower = html.toLowerCase();
   const pageKb = Math.round(new TextEncoder().encode(html).length / 1024);
   const title = decode(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
-  const description = decode(metaContent(html, /name\s*=\s*["']description["']/i));
-  const viewport = metaContent(html, /name\s*=\s*["']viewport["']/i);
+  const description = decode(metaContent(html, q("name", "description")));
+  const viewport = metaContent(html, q("name", "viewport"));
   const h1s = (html.match(/<h1\b/gi) || []).length;
   const imgs = html.match(/<img\b[^>]*>/gi) || [];
   const noAlt = imgs.filter((t) => !/\balt\s*=/i.test(t)).length;
-  const canonical = (html.match(/<link\b[^>]*rel\s*=\s*["']canonical["'][^>]*>/i) || [""])[0];
-  const ogImage = metaContent(html, /property\s*=\s*["']og:image["']/i);
-  const ogTitle = metaContent(html, /property\s*=\s*["']og:title["']/i);
+  const canonical = (html.match(/<link\b[^>]*>/gi) || []).find((t) => q("rel", "canonical").test(t)) ?? "";
+  const ogImage = metaContent(html, q("property", "og:image"));
+  const ogTitle = metaContent(html, q("property", "og:title"));
   const ld = /application\/ld\+json/i.test(html);
   const langAttr = /<html\b[^>]*\blang\s*=/i.test(html);
-  const noindex = /<meta\b[^>]*name\s*=\s*["']robots["'][^>]*noindex/i.test(html);
+  const noindex = (html.match(/<meta\b[^>]*>/gi) || []).some((t) => q("name", "robots").test(t) && /noindex/i.test(attr(t, "content")));
   const forms = (html.match(/<form\b/gi) || []).length;
-  const tel = /href\s*=\s*["']tel:/i.test(html);
-  const mail = /href\s*=\s*["']mailto:/i.test(html);
+  const tel = /href\s*=\s*["']?tel:/i.test(html);
+  const mail = /href\s*=\s*["']?mailto:/i.test(html);
   const wa = /wa\.me\/|api\.whatsapp\.com|whatsapp:\/\//i.test(html);
   const analytics = /googletagmanager\.com|gtag\(|google-analytics\.com|fbq\(|connect\.facebook\.net|plausible\.io|clarity\.ms|hotjar|posthog|segment\.com|umami/i.test(html);
   const proof = /testimonial|review|trustpilot|what (our )?(clients|customers) say|case stud|★|⭐/i.test(lower);
@@ -147,7 +153,7 @@ function analyse(html: string, res: Response, finalUrl: URL, responseMs: number,
   add({ id: "https", pillar: "trust", label: "Secure connection (HTTPS)", status: https ? "pass" : "fail", detail: https ? "Served over HTTPS." : "Not secure: browsers warn visitors before they even see the page." });
   add({ id: "hsts", pillar: "trust", label: "HTTPS enforced (HSTS)", status: hsts ? "pass" : "warn", detail: hsts ? "Strict-Transport-Security header present." : "No HSTS header." });
   add({ id: "og", pillar: "trust", label: "Link previews", status: ogImage && ogTitle ? "pass" : ogTitle || ogImage ? "warn" : "fail", detail: ogImage && ogTitle ? "Shared links show a title and image on WhatsApp and social." : "Links shared on WhatsApp or social will show a plain, unbranded preview." });
-  add({ id: "favicon", pillar: "trust", label: "Site icon", status: /rel\s*=\s*["'][^"']*icon/i.test(html) ? "pass" : "warn", detail: /rel\s*=\s*["'][^"']*icon/i.test(html) ? "Favicon declared." : "No favicon declared." });
+  add({ id: "favicon", pillar: "trust", label: "Site icon", status: /\brel\s*=\s*["']?[^"'>]*icon/i.test(html) ? "pass" : "warn", detail: /\brel\s*=\s*["']?[^"'>]*icon/i.test(html) ? "Favicon declared." : "No favicon declared." });
 
   return { checks, title, pageKb };
 }

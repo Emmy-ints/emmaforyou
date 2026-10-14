@@ -51,6 +51,8 @@ const TOOL_LINKS = [
   { label: "90-Day Goal Planner", to: "/goal-planner" },
   { label: "Free Checklists", to: "/checklists" },
   { label: "Comparisons", to: "/compare" },
+  { label: "Solutions & demos", to: "/solutions" },
+  { label: "App feature planner", to: "/solutions/app-planner" },
   { label: "Newsletter", to: "/newsletter" },
   { label: "Growth Assessment", to: "/analyser" },
   { label: "ROI Calculator", to: "/roi-calculator" },

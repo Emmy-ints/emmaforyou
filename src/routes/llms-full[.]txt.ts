@@ -6,6 +6,7 @@ import { CATEGORIES } from "@/lib/faq-data";
 import { TIERS } from "@/lib/pricing-data";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
 import { canonicalForExpertise } from "@/lib/seo-routes";
+import { ALL_SOLUTIONS, SOLUTION_CATEGORIES, solutionsIn } from "@/lib/solutions";
 
 /**
  * llms-full.txt: the site's key facts in one plain-text file (services, deliverables, answers,
@@ -54,6 +55,14 @@ function body(): string {
     `- ROI calculator: ${u("/roi-calculator")} · Growth assessment: ${u("/analyser")}`,
     "",
   );
+
+  out.push("## Solutions catalogue (each page has an interactive prototype with sample data)", "");
+  for (const c of SOLUTION_CATEGORIES) {
+    out.push(`### ${c.name}`, `URL: ${u(`/solutions/${c.slug}`)}`, c.intro, "");
+    for (const s of solutionsIn(c.slug)) out.push(`- ${s.name} (${u(`/solutions/${c.slug}/${s.slug}`)}): ${s.tagline} For: ${s.who}`);
+    out.push("");
+  }
+  void ALL_SOLUTIONS;
 
   out.push("## Frequently asked questions", "");
   for (const c of CATEGORIES) for (const i of c.items) out.push(`Q: ${i.q}`, `A: ${i.a}`);

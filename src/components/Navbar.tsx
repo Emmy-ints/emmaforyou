@@ -4,10 +4,11 @@ import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
 import { useI18n } from "@/lib/i18n";
 import { SERVICES, EXPERTISE } from "@/lib/services-data";
+import { SOLUTION_CATEGORIES } from "@/lib/solutions/categories";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
-type DropdownKey = "services" | "expertise" | "resources" | "tools" | "company" | "account";
+type DropdownKey = "services" | "solutions" | "expertise" | "resources" | "tools" | "company" | "account";
 
 const RESOURCES = [
   { to: "/blog", name: "Blog", icon: "📝", short: "Growth insights & guides" },
@@ -63,14 +64,19 @@ export default function Navbar() {
   const [lastY, setLastY] = useState(0);
   const location = useLocation();
   const drawerRef = useRef<HTMLElement | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
+  const [progress, setProgress] = useState(0);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const handleScroll = useCallback(() => {
     const y = window.scrollY;
     setScrolled(y > 20);
-    setHidden(y > lastY && y > 100);
+    // Keep the header visible while a menu is open.
+    setHidden(y > lastY && y > 100 && !openDropdown);
     setLastY(y);
-  }, [lastY]);
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    setProgress(max > 0 ? Math.min(1, y / max) : 0);
+  }, [lastY, openDropdown]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -80,7 +86,29 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
     setMobileSection(null);
+    setOpenDropdown(null);
   }, [location.pathname]);
+
+  // Desktop menus: close with Escape or a click elsewhere.
+  useEffect(() => {
+    if (!openDropdown) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpenDropdown(null); };
+    const onDown = (e: MouseEvent) => { if (navRef.current && !navRef.current.contains(e.target as Node)) setOpenDropdown(null); };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => { document.removeEventListener("keydown", onKey); document.removeEventListener("mousedown", onDown); };
+  }, [openDropdown]);
+
+  const isActive = (prefixes: string[]) => prefixes.some((p) => (p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(`${p}/`)));
+  const SECTION_PATHS: Record<DropdownKey, string[]> = {
+    services: ["/services"],
+    solutions: ["/solutions"],
+    expertise: ["/expertise"],
+    company: COMPANY.map((c) => c.to),
+    resources: RESOURCES.map((c) => c.to),
+    tools: TOOLS.map((c) => c.to),
+    account: ["/portal", "/dashboard"],
+  };
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -111,10 +139,10 @@ export default function Navbar() {
   }, [mobileOpen]);
 
   const dropdownPanel = (items: { to: string; name: string; icon: string; short: string }[], cols: 1 | 2 = 1, width = "w-[340px]") => (
-    <div className={`absolute left-1/2 top-full z-50 mt-2 ${width} -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl grid gap-1`} style={{ gridTemplateColumns: cols === 2 ? "1fr 1fr" : "1fr" }}>
+    <div className={`nav-pop absolute left-1/2 top-full z-50 mt-2 ${width} -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl grid gap-1`} style={{ gridTemplateColumns: cols === 2 ? "1fr 1fr" : "1fr" }}>
       {items.map((it) => (
-        <Link key={it.to} to={it.to} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted">
-          <span className="text-lg">{it.icon}</span>
+        <Link key={it.to} to={it.to} onClick={() => setOpenDropdown(null)} aria-current={pathname === it.to ? "page" : undefined} className="nav-item group/item flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
+          <span className="text-lg transition-transform duration-200 group-hover/item:scale-110" aria-hidden="true">{it.icon}</span>
           <div>
             <div className="text-sm font-semibold text-foreground">{it.name}</div>
             <div className="text-xs text-muted-foreground">{it.short}</div>
@@ -125,17 +153,25 @@ export default function Navbar() {
   );
 
   const ddBtn = (key: DropdownKey, label: string) => (
-    <div className="relative" onMouseEnter={() => setOpenDropdown(key)} onMouseLeave={() => setOpenDropdown(null)}>
-      <button className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground inline-flex items-center gap-1">
-        {label} <span className="text-xs">▾</span>
+    <div className="relative" onMouseEnter={() => setOpenDropdown(key)} onMouseLeave={() => setOpenDropdown((k) => (k === key ? null : k))}>
+      <button
+        type="button"
+        onClick={() => setOpenDropdown(openDropdown === key ? null : key)}
+        aria-expanded={openDropdown === key}
+        aria-haspopup="true"
+        className={`nav-link font-body inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors hover:text-foreground ${openDropdown === key || isActive(SECTION_PATHS[key]) ? "nav-link-active text-foreground" : "text-muted-foreground"}`}
+      >
+        {label} <span aria-hidden="true" className={`text-[10px] transition-transform duration-200 ${openDropdown === key ? "rotate-180" : ""}`}>▾</span>
       </button>
       {openDropdown === key && (
         <>
+          {/* Invisible bridge so the menu doesn't close while the pointer moves down to it. */}
+          <span aria-hidden="true" className="absolute left-0 right-0 top-full h-3" />
           {key === "services" && (
-            <div className="absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
-              <Link to="/services" className="mb-1 flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-foreground">All services <span aria-hidden="true">→</span></Link>
+            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
+              <Link to="/services" onClick={() => setOpenDropdown(null)} className="mb-1 flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-foreground">All services <span aria-hidden="true">→</span></Link>
               {SERVICES.map((s) => (
-                <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted">
+                <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} onClick={() => setOpenDropdown(null)} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
                   <span className="text-lg">{s.icon}</span>
                   <div>
                     <div className="text-sm font-semibold text-foreground">{s.name}</div>
@@ -146,18 +182,37 @@ export default function Navbar() {
             </div>
           )}
           {key === "expertise" && (
-            <div className="absolute left-1/2 top-full z-50 mt-2 grid w-[680px] -translate-x-1/2 grid-cols-2 gap-1 rounded-2xl border border-border bg-background p-2 shadow-xl">
+            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 grid max-h-[70vh] w-[680px] -translate-x-1/2 grid-cols-2 gap-1 overflow-y-auto rounded-2xl border border-border bg-background p-2 shadow-xl">
               {EXPERTISE.map(e => (
-                <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted">
+                <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} onClick={() => setOpenDropdown(null)} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted focus-visible:bg-muted">
                   <span>{e.icon}</span><span className="text-xs font-medium text-foreground">{e.name}</span>
                 </Link>
               ))}
             </div>
           )}
+          {key === "solutions" && (
+            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[720px] -translate-x-1/2 rounded-2xl border border-border bg-background p-3 shadow-xl">
+              <div className="grid grid-cols-2 gap-1">
+                {SOLUTION_CATEGORIES.map((c) => (
+                  <Link key={c.slug} to="/solutions/$category" params={{ category: c.slug }} onClick={() => setOpenDropdown(null)} className="group/item flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
+                    <span className="text-xl transition-transform duration-200 group-hover/item:scale-110" aria-hidden="true">{c.icon}</span>
+                    <div><div className="text-sm font-semibold text-foreground">{c.name}</div><div className="text-xs text-muted-foreground">{c.short}</div></div>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between gap-3 rounded-xl bg-muted px-4 py-3">
+                <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">Try before you hire:</span> every solution has a live demo you can customise.</p>
+                <div className="flex shrink-0 gap-2">
+                  <Link to="/solutions" onClick={() => setOpenDropdown(null)} className="rounded-full bg-[var(--emma-violet)] px-3 py-1.5 text-xs font-semibold text-white">All solutions →</Link>
+                  <Link to="/solutions/app-planner" onClick={() => setOpenDropdown(null)} className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground">App feature planner</Link>
+                </div>
+              </div>
+            </div>
+          )}
           {key === "resources" && dropdownPanel(RESOURCES)}
-          {key === "tools" && dropdownPanel(TOOLS)}
-          {key === "company" && dropdownPanel(COMPANY)}
-          {key === "account" && <div className="[&>div]:left-auto [&>div]:right-0 [&>div]:translate-x-0">{dropdownPanel(ACCOUNT)}</div>}
+          {key === "tools" && dropdownPanel(TOOLS, 2, "w-[600px]")}
+          {key === "company" && dropdownPanel(COMPANY, 2, "w-[560px]")}
+          {key === "account" && <div className="nav-pop-r [&>div]:left-auto [&>div]:right-0 [&>div]:translate-x-0">{dropdownPanel(ACCOUNT)}</div>}
         </>
       )}
     </div>
@@ -165,7 +220,7 @@ export default function Navbar() {
 
   const mobileSection_ = (key: DropdownKey, label: string, items: { to: string; name: string; icon: string }[]) => (
     <>
-      <button onClick={() => setMobileSection(mobileSection === key ? null : key)} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
+      <button onClick={() => setMobileSection(mobileSection === key ? null : key)} aria-expanded={mobileSection === key} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
         {label} <span className={`text-sm transition ${mobileSection === key ? "rotate-180" : ""}`}>▾</span>
       </button>
       {mobileSection === key && (
@@ -181,26 +236,30 @@ export default function Navbar() {
   );
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-5">
+    <header className={`site-header fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass is-scrolled shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
+      <a href="#main-content" onClick={(e) => { const m = document.querySelector("main"); if (!m) return; e.preventDefault(); m.setAttribute("tabindex", "-1"); m.focus(); m.scrollIntoView(); }} className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[200] focus:rounded-full focus:bg-[var(--emma-violet)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">Skip to content</a>
+      <nav ref={navRef} aria-label="Main" className={`mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 transition-[padding] duration-300 sm:px-5 ${scrolled ? "py-2.5" : "py-4"}`}>
         <Link to="/" className="flex min-w-0 items-baseline gap-0.5">
           <span className="truncate font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />
         </Link>
 
-        <div className="hidden items-center gap-5 xl:flex">
-          <Link to="/" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground">{t("nav_home")}</Link>
+        <div className="hidden items-center gap-1.5 xl:flex">
+          <Link to="/" aria-current={pathname === "/" ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>{t("nav_home")}</Link>
           {ddBtn("services", "Services")}
+          {ddBtn("solutions", "Solutions")}
           {ddBtn("expertise", "Expertise")}
           {ddBtn("company", "Company")}
           {ddBtn("resources", "Resources")}
           {ddBtn("tools", "Tools")}
-          <Link to="/pricing" className="font-body text-sm font-medium text-muted-foreground hover:text-foreground">Pricing</Link>
+          <Link to="/pricing" aria-current={pathname === "/pricing" ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/pricing" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Pricing</Link>
           {ddBtn("account", "Login")}
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
           <DarkModeToggle />
           <LanguageSelector />
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">
-            {t("cta_waitlist")} <span aria-hidden>→</span>
+          <Link to="/book" className="nav-cta-secondary ml-1 hidden rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:border-[var(--emma-violet)] hover:text-[var(--emma-violet)] 2xl:inline-flex">Book a call</Link>
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold nav-cta group ml-1 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">
+            {t("cta_waitlist")} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
           </a>
         </div>
 
@@ -218,6 +277,10 @@ export default function Navbar() {
 
         <aside ref={drawerRef} className={`fixed top-0 right-0 z-40 h-screen w-[85vw] max-w-sm overflow-y-auto bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Mobile navigation" aria-hidden={!mobileOpen}>
           <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
+            <div className="mb-5 grid grid-cols-2 gap-2">
+              <Link to="/book" onClick={() => setMobileOpen(false)} className="rounded-2xl bg-[var(--emma-violet)] px-3 py-3 text-center text-sm font-semibold text-white">📅 Book a call</Link>
+              <Link to="/proposal" onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border px-3 py-3 text-center text-sm font-semibold text-foreground">📝 Get a quote</Link>
+            </div>
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">Menu</p>
             <Link to="/" onClick={() => setMobileOpen(false)} className="font-display text-lg font-bold text-foreground py-3 border-b border-border">{t("nav_home")}</Link>
             <button onClick={() => setMobileSection(mobileSection === "services" ? null : "services")} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
@@ -233,6 +296,7 @@ export default function Navbar() {
                 ))}
               </div>
             )}
+            {mobileSection_("solutions", "Solutions & demos", [{ to: "/solutions", name: "All solutions", icon: "✨" }, ...SOLUTION_CATEGORIES.map((c) => ({ to: `/solutions/${c.slug}`, name: c.name, icon: c.icon })), { to: "/solutions/app-planner", name: "App feature planner", icon: "🧮" }])}
             <button onClick={() => setMobileSection(mobileSection === "expertise" ? null : "expertise")} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
               Expertise <span className={`text-sm transition ${mobileSection === "expertise" ? "rotate-180" : ""}`}>▾</span>
             </button>
@@ -259,6 +323,7 @@ export default function Navbar() {
           </div>
         </aside>
       </nav>
+      {scrolled && <div aria-hidden="true" className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[var(--emma-violet)] to-[#9b8cff] transition-[width] duration-150" style={{ width: `${progress * 100}%` }} />}
     </header>
   );
 }

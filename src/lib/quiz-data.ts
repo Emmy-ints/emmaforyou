@@ -23,6 +23,6 @@ export function bucketFor(score: number): QuizResult {
   if (score <= 3) return { bucket: "0-3", title: "The Invisible Business", headline: "Your business is almost completely invisible online — and it's costing you customers every single day.", color: "#d4186b", emoji: "😬" };
   if (score <= 5) return { bucket: "4-5", title: "The Struggling Hustler", headline: "You're working hard, but not working smart. Some digital presence, but it's scattered and inconsistent.", color: "#f97316", emoji: "💪" };
   if (score <= 7) return { bucket: "6-7", title: "The Growing Brand", headline: "You've got solid foundations — now it's time to accelerate. A few strategic upgrades could 2–3x your growth.", color: "#7c3aed", emoji: "🚀" };
-  if (score <= 9) return { bucket: "8-9", title: "The Digital Contender", headline: "You're ahead of 80% of businesses in your space. The top 1% are doing something you're not yet — let's show you.", color: "#1a3fd4", emoji: "🏆" };
-  return { bucket: "10", title: "The Digital Leader", headline: "Congratulations — you're in the top 1% of digitally mature businesses. Time to dominate your market completely.", color: "#10b981", emoji: "👑" };
+  if (score <= 9) return { bucket: "8-9", title: "The Digital Contender", headline: "You've got most of the digital basics in place. A couple of gaps are still costing you — let's show you which.", color: "#1a3fd4", emoji: "🏆" };
+  return { bucket: "10", title: "The Digital Leader", headline: "Congratulations — you ticked every box. Your next gains come from optimising what you already have.", color: "#10b981", emoji: "👑" };
 }

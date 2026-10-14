@@ -5,6 +5,7 @@ import { KNOWLEDGE } from "./knowledge-data";
 import { NICHES } from "./niches";
 import { CHECKLISTS } from "./checklists";
 import { COMPARISONS } from "./comparisons";
+import { ALL_SOLUTIONS, SOLUTION_CATEGORIES } from "./solutions";
 
 /**
  * The seven /services/* pages are the primary commercial pages. Expertise pages that show the
@@ -26,6 +27,8 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/contact", priority: 0.7, changefreq: "yearly" },
   { path: "/checklists", priority: 0.7, changefreq: "monthly" },
   { path: "/compare", priority: 0.7, changefreq: "monthly" },
+  { path: "/solutions", priority: 0.9, changefreq: "monthly" },
+  { path: "/solutions/app-planner", priority: 0.6, changefreq: "monthly" },
   { path: "/newsletter", priority: 0.4, changefreq: "yearly" },
   { path: "/fr", priority: 0.8, changefreq: "monthly" },
   { path: "/de", priority: 0.8, changefreq: "monthly" },
@@ -60,9 +63,11 @@ export function sitemapPaths(): { path: string; priority: number; changefreq: st
   const niches = NICHES.map((n) => ({ path: `/niche/${n.slug}`, priority: 0.6, changefreq: "monthly" }));
   const posts = POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.5, changefreq: "yearly" }));
   const checklists = CHECKLISTS.map((c) => ({ path: `/checklists/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
+  const solutionCats = SOLUTION_CATEGORIES.map((c) => ({ path: `/solutions/${c.slug}`, priority: 0.8, changefreq: "monthly" }));
+  const solutions = ALL_SOLUTIONS.map((s) => ({ path: `/solutions/${s.category}/${s.slug}`, priority: 0.6, changefreq: "monthly" }));
   const compares = COMPARISONS.map((c) => ({ path: `/compare/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
   const articles = KNOWLEDGE.map((a) => ({ path: `/knowledge-base/${a.slug}`, priority: 0.6, changefreq: "yearly" }));
-  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...compares, ...articles];
+  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...compares, ...solutionCats, ...solutions, ...articles];
 }
 
 /** Paths that must never be indexed or listed. */

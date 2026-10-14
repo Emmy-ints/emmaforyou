@@ -6,6 +6,7 @@ import { canonicalForExpertise } from "@/lib/seo-routes";
 import { POSTS } from "@/lib/blog-data";
 import { COMPARISONS } from "@/lib/comparisons";
 import { CHECKLISTS } from "@/lib/checklists";
+import { ALL_SOLUTIONS, SOLUTION_CATEGORIES } from "@/lib/solutions";
 
 /**
  * llms.txt (https://llmstxt.org) — an optional, experimental summary for AI assistants.
@@ -65,6 +66,11 @@ function body(): string {
     "",
     "## Articles",
     ...POSTS.slice(0, 16).map((p) => `- [${p.title}](${u(`/blog/${p.slug}`)}): ${p.excerpt}`),
+    "",
+    "## Solutions with live demos",
+    `- [All solutions](${u("/solutions")}): ${ALL_SOLUTIONS.length} websites, business apps, AI solutions, automations, mobile apps and industry systems, each with an interactive prototype (sample data, clearly labelled).`,
+    ...SOLUTION_CATEGORIES.map((c) => `- [${c.name}](${u(`/solutions/${c.slug}`)}): ${c.intro}`),
+    `- [App feature planner](${u("/solutions/app-planner")}): pick the features an app needs and see what belongs in version 1.`,
     "",
     "## Other languages",
     `- [EmmaForYou en français](${u("/fr")}): services, process, pricing and client work for businesses in Toulon and across France.`,

@@ -3,8 +3,8 @@ export interface LeadMagnet {
   title: string;
   description: string;
   inside: string[];
-  pages: number;
-  downloads: number;
+  /** What the visitor actually gets. */
+  format: string;
   gradient: string;
   icon: string;
 }
@@ -12,6 +12,7 @@ export interface LeadMagnet {
 export const LEAD_MAGNETS: LeadMagnet[] = [
   {
     slug: "digital-checklist",
+    format: "Interactive checklist · 47 checks",
     title: "The Nigerian Business Digital Checklist",
     description: "A 47-point audit checklist covering every digital channel your business should have. Know exactly what's missing and what to fix first.",
     inside: [
@@ -21,15 +22,14 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "Automation audit (9 checkpoints)",
       "Ads & growth audit (8 checkpoints)",
     ],
-    pages: 18,
-    downloads: 1240,
     gradient: "linear-gradient(135deg, #1a3fd4, #7c3aed)",
     icon: "📋",
   },
   {
     slug: "instagram-captions",
+    format: "Copy-ready templates · 50 captions",
     title: "50 Instagram Caption Templates for Every Business",
-    description: "50 proven, copy-paste caption templates categorised by business type. Never stare at a blank screen again.",
+    description: "50 fill-in-the-blank caption templates categorised by business type. Never stare at a blank screen again.",
     inside: [
       "10 captions for product businesses",
       "10 captions for service businesses",
@@ -37,15 +37,14 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "10 promotional captions",
       "10 storytelling captions with hooks",
     ],
-    pages: 24,
-    downloads: 876,
     gradient: "linear-gradient(135deg, #d4186b, #f97316)",
     icon: "📱",
   },
   {
     slug: "ai-automation-starter",
+    format: "Step-by-step guide · 5 systems",
     title: "AI Automation Starter Guide",
-    description: "5 AI automation systems any business can set up this week — even with zero tech experience. Step-by-step with screenshots.",
+    description: "5 AI automation systems any business can set up this week — even with little tech experience. Each one lists what you need, the steps and how to test it.",
     inside: [
       "WhatsApp auto-reply setup (step by step)",
       "Lead capture → CRM automation",
@@ -53,15 +52,14 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "Appointment reminder automation",
       "Review request automation",
     ],
-    pages: 31,
-    downloads: 643,
     gradient: "linear-gradient(135deg, #0f172a, #1a3fd4)",
     icon: "🤖",
   },
   {
     slug: "ad-swipe-file",
+    format: "Copy-ready templates · 30 ads",
     title: "Facebook & Instagram Ads Swipe File",
-    description: "30 proven ad copies for businesses worldwide — headlines, body text and CTAs that have generated real results.",
+    description: "30 ad copy templates for five business types — headlines and body text to adapt and test.",
     inside: [
       "6 Fashion store ad templates",
       "6 Real estate ad templates",
@@ -69,15 +67,14 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "6 Clinic/service ad templates",
       "6 Ecommerce ad templates",
     ],
-    pages: 28,
-    downloads: 932,
     gradient: "linear-gradient(135deg, #7c3aed, #1a3fd4)",
     icon: "📢",
   },
   {
     slug: "whatsapp-playbook",
+    format: "Playbook · 5 sections",
     title: "The WhatsApp Marketing Playbook",
-    description: "How to turn WhatsApp into a lead generation machine — broadcast strategies, response scripts and automation flows.",
+    description: "How to set WhatsApp up for sales — broadcast strategies, response scripts and automation flows.",
     inside: [
       "Setting up WhatsApp Business properly",
       "Building a broadcast list from scratch",
@@ -85,13 +82,12 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "WhatsApp follow-up script (5-day sequence)",
       "Auto-replies that convert",
     ],
-    pages: 22,
-    downloads: 1108,
     gradient: "linear-gradient(135deg, #25D366, #075E54)",
     icon: "💬",
   },
   {
     slug: "growth-planner",
+    format: "Interactive planner · 12 weeks",
     title: "90-Day Digital Growth Planner",
     description: "A week-by-week action plan for transforming your business digital presence in 90 days — for any niche.",
     inside: [
@@ -101,8 +97,6 @@ export const LEAD_MAGNETS: LeadMagnet[] = [
       "Daily habit tracker for digital growth",
       "Monthly review template",
     ],
-    pages: 36,
-    downloads: 421,
     gradient: "linear-gradient(135deg, #f59e0b, #d4186b)",
     icon: "🗓️",
   },

@@ -6,6 +6,7 @@ import { NICHES } from "./niches";
 import { CHECKLISTS } from "./checklists";
 import { COMPARISONS } from "./comparisons";
 import { ALL_SOLUTIONS, SOLUTION_CATEGORIES } from "./solutions";
+import { LEAD_MAGNETS } from "./lead-magnets";
 
 /**
  * The seven /services/* pages are the primary commercial pages. Expertise pages that show the
@@ -66,8 +67,9 @@ export function sitemapPaths(): { path: string; priority: number; changefreq: st
   const solutionCats = SOLUTION_CATEGORIES.map((c) => ({ path: `/solutions/${c.slug}`, priority: 0.8, changefreq: "monthly" }));
   const solutions = ALL_SOLUTIONS.map((s) => ({ path: `/solutions/${s.category}/${s.slug}`, priority: 0.6, changefreq: "monthly" }));
   const compares = COMPARISONS.map((c) => ({ path: `/compare/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
+  const resources = LEAD_MAGNETS.map((m) => ({ path: `/free-resources/${m.slug}`, priority: 0.5, changefreq: "yearly" }));
   const articles = KNOWLEDGE.map((a) => ({ path: `/knowledge-base/${a.slug}`, priority: 0.6, changefreq: "yearly" }));
-  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...compares, ...solutionCats, ...solutions, ...articles];
+  return [...STATIC_PATHS, ...services, ...expertise, ...work, ...niches, ...posts, ...checklists, ...compares, ...solutionCats, ...solutions, ...resources, ...articles];
 }
 
 /** Paths that must never be indexed or listed. */

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { Badge, Btn, Panel, Select, Stat, hash, money, type EngineProps } from "./ui";
+import { Badge, Btn, Field, ListEditor, Outbox, Panel, RoleBar, Select, SettingsPanel, Stat, Toggles, curOf, hash, money, uid, useDemoSetting, type EngineProps, type OutboxItem } from "./ui";
 
 interface Metric { key: string; label: string; base: number; growth: number; fmt: "money" | "num" | "pct" | "unit"; unit?: string; goodUp: boolean }
 const P: Record<string, { segments: string[]; segLabel: string; metrics: Metric[]; table: { cols: string[]; rows: (string | number)[][] }; cur: string }> = {
@@ -27,20 +27,33 @@ const P: Record<string, { segments: string[]; segLabel: string; metrics: Metric[
 };
 const RANGES = [["7", "7 days"], ["30", "30 days"], ["90", "90 days"]] as [string, string][];
 
-export default function DashboardDemo({ preset, brand }: EngineProps) {
-  const cfg = P[preset] ?? P.erp;
+export default function DashboardDemo(props: EngineProps) {
+  const { preset, brand } = props;
+  const base = P[preset] ?? P.erp;
+  const [segList, setSegList] = useDemoSetting<string[]>(props, "segments", base.segments.slice(1));
+  const [visibleKeys, setVisibleKeys] = useDemoSetting<string[]>(props, "kpis", base.metrics.map((m) => m.key));
+  const [targets, setTargets] = useDemoSetting<Record<string, number>>(props, "targets", {});
+  const [schedule, setSchedule] = useDemoSetting(props, "schedule", "weekly");
+  const [recipients, setRecipients] = useDemoSetting(props, "recipients", "owner@yourbusiness.com");
+  const [role, setRole] = useDemoSetting(props, "role", "exec");
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
+  const allLabel = base.segments[0];
+  const cfg = { ...base, cur: curOf(props, base.cur), segments: [allLabel, ...segList], metrics: base.metrics.filter((m) => visibleKeys.includes(m.key)).length ? base.metrics.filter((m) => visibleKeys.includes(m.key)) : base.metrics.slice(0, 1) };
   const [range, setRange] = useState("30");
-  const [seg, setSeg] = useState(cfg.segments[0]);
-  const [metric, setMetric] = useState(cfg.metrics[0].key);
+  const [segPick, setSeg] = useState(cfg.segments[0]);
+  // A segment-level role is locked to the first segment.
+  const seg = role === "segment" ? (segList[0] ?? allLabel) : cfg.segments.includes(segPick) ? segPick : allLabel;
+  const [metricPick, setMetric] = useState(base.metrics[0].key);
+  const metric = cfg.metrics.some((m) => m.key === metricPick) ? metricPick : cfg.metrics[0].key;
   const [readings, setReadings] = useState(0);
   const days = Number(range);
   const segMult = seg === cfg.segments[0] ? 1 : 0.3 + hash(seg) * 0.5;
 
   const series = useMemo(() => {
     const out: Record<string, number[]> = {};
-    for (const m of cfg.metrics) out[m.key] = Array.from({ length: days }, (_, i) => { const noise = (hash(`${preset}${m.key}${seg}${i}${readings}`) - 0.5) * 0.25; const v = m.base * (1 + m.growth * i) * (1 + noise); return m.fmt === "pct" || m.fmt === "unit" ? v : v * segMult; });
+    for (const m of base.metrics) out[m.key] = Array.from({ length: days }, (_, i) => { const noise = (hash(`${preset}${m.key}${seg}${i}${readings}`) - 0.5) * 0.25; const v = m.base * (1 + m.growth * i) * (1 + noise); return m.fmt === "pct" || m.fmt === "unit" ? v : v * segMult; });
     return out;
-  }, [cfg, days, seg, preset, segMult, readings]);
+  }, [base, days, seg, preset, segMult, readings]);
 
   const agg = (m: Metric, arr: number[]) => (m.fmt === "money" || m.fmt === "num" ? arr.reduce((s, v) => s + v, 0) : arr.reduce((s, v) => s + v, 0) / arr.length);
   const fmt = (m: Metric, v: number) => (m.fmt === "money" ? money(Math.round(v), cfg.cur) : m.fmt === "pct" ? `${v.toFixed(1)}%` : m.fmt === "unit" ? `${v.toFixed(1)}${m.unit}` : Math.round(v).toLocaleString());
@@ -53,12 +66,29 @@ export default function DashboardDemo({ preset, brand }: EngineProps) {
   const pts = data.map((v, i) => [(i / (data.length - 1)) * W, H - ((v - min) / (max - min || 1)) * H] as const);
   const path = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 
+  const latest = (m: Metric) => series[m.key][series[m.key].length - 1];
+  const offTarget = (m: Metric) => { const t = targets[m.key]; if (t == null || Number.isNaN(t)) return false; const v = m.fmt === "money" || m.fmt === "num" ? agg(m, series[m.key]) / (days / 30) : latest(m); return m.goodUp ? v < t : v > t; };
+  const sendReport = () => setOutbox((o) => [...o, { id: uid(), channel: "Email", to: recipients || "(no recipients)", text: `${brand} ${schedule} report (${seg}, last ${range} days): ${cfg.metrics.map((m) => `${m.label} ${fmt(m, agg(m, series[m.key]))}`).join(" · ")}.${cfg.metrics.some(offTarget) ? ` Off target: ${cfg.metrics.filter(offTarget).map((m) => m.label).join(", ")}.` : ""}` }].slice(-20));
   const summary = cfg.metrics.map((m) => { const d = delta(m); const good = m.goodUp ? d >= 0 : d <= 0; return `${m.label} ${d >= 0 ? "rose" : "fell"} ${Math.abs(d).toFixed(0)}% (${good ? "good" : "watch this"})`; });
 
   return (
     <div className="space-y-4">
+      <SettingsPanel summary={`${cfg.metrics.length} KPIs · ${schedule} report`}>
+        <Toggles label="KPI cards to show" options={base.metrics.map((m) => [m.key, m.label] as [string, string])} value={visibleKeys} onChange={(v) => setVisibleKeys(v.length ? v : [base.metrics[0].key])} />
+        <fieldset><legend className="text-xs font-semibold text-foreground">Targets (alerts when off target{base.metrics.some((m) => m.fmt === "money" || m.fmt === "num") ? "; totals are per 30 days" : ""})</legend>
+          <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-4">{cfg.metrics.map((m) => (
+            <label key={m.key} className="text-xs text-muted-foreground">{m.label} ({m.goodUp ? "at least" : "at most"})<input type="number" step="any" value={targets[m.key] ?? ""} placeholder="No target" onChange={(e) => { const v = e.target.value; const n = { ...targets }; if (v === "") delete n[m.key]; else n[m.key] = Number(v); setTargets(n); }} className="mt-1 block w-full rounded-lg border border-border bg-background px-2 py-1 text-sm text-foreground" /></label>
+          ))}</div>
+        </fieldset>
+        <ListEditor label={`${cfg.segLabel} list`} items={segList} onChange={setSegList} min={1} max={6} placeholder={`New ${cfg.segLabel.toLowerCase()}`} />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Select label="Scheduled report" value={schedule} onChange={(e) => setSchedule(e.target.value)} options={[["daily", "Daily"], ["weekly", "Weekly (Monday)"], ["monthly", "Monthly"]]} />
+          <Field label="Report recipients" value={recipients} maxLength={120} onChange={(e) => setRecipients(e.target.value)} />
+        </div>
+      </SettingsPanel>
+      <RoleBar roles={[{ id: "exec", label: "Owner / executive", can: `Sees every ${cfg.segLabel.toLowerCase()} and all KPIs.` }, { id: "segment", label: `${cfg.segLabel} manager (${segList[0] ?? "—"})`, can: `Only sees data for ${segList[0] ?? "their own"} ${cfg.segLabel.toLowerCase()}.` }]} value={role} onChange={setRole} />
       <div className="flex flex-wrap items-end gap-3">
-        <Select label={cfg.segLabel} value={seg} onChange={(e) => setSeg(e.target.value)} options={cfg.segments} className="w-44" />
+        <Select label={cfg.segLabel} value={seg} disabled={role === "segment"} onChange={(e) => setSeg(e.target.value)} options={role === "segment" ? [seg] : cfg.segments} className="w-44" />
         <div className="flex rounded-full border border-border p-0.5 text-xs font-semibold" role="group" aria-label="Date range">{RANGES.map(([v, l]) => <button key={v} type="button" aria-pressed={range === v} onClick={() => setRange(v)} className={`rounded-full px-3 py-1 ${range === v ? "bg-[var(--demo-accent)] text-white" : "text-muted-foreground"}`}>{l}</button>)}</div>
         {preset === "iot" && <Btn variant="ghost" onClick={() => setReadings((r) => r + 1)}><RefreshCw className="h-4 w-4" />Request new reading</Btn>}
         <span className="ml-auto text-[11px] text-muted-foreground">Sample data · not live</span>
@@ -68,7 +98,7 @@ export default function DashboardDemo({ preset, brand }: EngineProps) {
           <button key={m.key} type="button" onClick={() => setMetric(m.key)} aria-pressed={metric === m.key} className={`rounded-xl border p-3 text-left ${metric === m.key ? "border-[var(--demo-accent)]" : "border-border"} bg-background`}>
             <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{m.label}</p>
             <p className="mt-1 font-display text-xl font-semibold">{fmt(m, agg(m, series[m.key]))}</p>
-            <Badge tone={good ? "good" : "bad"}>{d >= 0 ? "▲" : "▼"} {Math.abs(d).toFixed(1)}%</Badge>
+            <span className="flex flex-wrap gap-1"><Badge tone={good ? "good" : "bad"}>{d >= 0 ? "▲" : "▼"} {Math.abs(d).toFixed(1)}%</Badge>{offTarget(m) && <Badge tone="warn">Off target</Badge>}</span>
           </button>); })}
       </div>
       <Panel title={`${active.label} · last ${range} days · ${seg}`}>
@@ -85,7 +115,9 @@ export default function DashboardDemo({ preset, brand }: EngineProps) {
         <div className="overflow-x-auto"><table className="w-full min-w-[480px] text-left text-sm"><thead className="text-xs text-muted-foreground"><tr>{cfg.table.cols.map((c) => <th key={c} className="p-2">{c}</th>)}</tr></thead>
           <tbody>{cfg.table.rows.map((r, i) => <tr key={i} className="border-t border-border">{r.map((c, j) => <td key={j} className="p-2">{j === r.length - 1 && typeof c === "string" ? <Badge tone={/ok|approved|on budget|under|planned/i.test(c) ? "good" : /over|overdue|above/i.test(c) ? "bad" : "warn"}>{c}</Badge> : c}</td>)}</tr>)}</tbody></table></div>
       </Panel>
-      {preset === "erp" && <div className="grid grid-cols-2 gap-3 md:grid-cols-3"><Stat label="Profit (period)" value={money(Math.round(agg(cfg.metrics[0], series.rev) - agg(cfg.metrics[1], series.exp)), cfg.cur)} /><Stat label="Pending approvals" value={2} /><Stat label="Audit log entries" value={148 + readings} hint="Every change recorded" /></div>}
+      <div className="flex flex-wrap items-center gap-2"><Btn variant="soft" onClick={sendReport}>Send the {schedule} report now</Btn></div>
+      <Outbox items={outbox} onClear={() => setOutbox([])} />
+      {preset === "erp" && series.rev && series.exp && <div className="grid grid-cols-2 gap-3 md:grid-cols-3"><Stat label="Profit (period)" value={money(Math.round(agg(base.metrics[0], series.rev) - agg(base.metrics[1], series.exp)), cfg.cur)} /><Stat label="Pending approvals" value={2} /><Stat label="Audit log entries" value={148 + readings} hint="Every change recorded" /></div>}
     </div>
   );
 }

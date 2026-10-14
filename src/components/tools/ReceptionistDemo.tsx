@@ -5,7 +5,7 @@ import { DEMO_BUSINESSES, type DemoBooking, type DemoBusiness } from "@/lib/rece
 import { canSpeak, speak, stopSpeaking, useSpeechInput } from "@/lib/use-voice";
 import { track } from "@/lib/analytics";
 
-type Msg = { role: "user" | "assistant"; content: string; booking?: DemoBooking | null };
+type Msg = { role: "user" | "assistant"; content: string; booking?: DemoBooking | null; offline?: boolean };
 
 function todayLabel() {
   const d = new Date();
@@ -62,7 +62,7 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "The receptionist is unavailable right now.");
       setLastReplyMs(Math.round(performance.now() - started));
-      setMessages((m) => [...m, { role: "assistant", content: data.reply, booking: data.booking }]);
+      setMessages((m) => [...m, { role: "assistant", content: data.reply, booking: data.booking, offline: !!data.offline }]);
       track("receptionist_message", { business: bizId, voice: fromVoice });
       if (data.booking) track("receptionist_booking", { business: bizId });
       if (voiceOn || fromVoice) speak(data.reply);

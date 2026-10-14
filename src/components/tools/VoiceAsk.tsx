@@ -7,7 +7,7 @@ import { track } from "@/lib/analytics";
 import type { SearchHit } from "@/lib/site-search";
 
 type SearchModule = typeof import("@/lib/site-search");
-type Msg = { role: "user" | "assistant"; content: string; links?: { label: string; path: string }[] };
+type Msg = { role: "user" | "assistant"; content: string; links?: { label: string; path: string }[]; offline?: boolean };
 
 const GREETING = "Hi, I'm Emma 👋 I can tell you what EmmaForYou can do for your business, what it costs, or point you to the right free tool. What are you working on?";
 const STARTERS = ["I need more customers", "How much is a website?", "Can you build a Web3 app?", "I need accountability coaching"];
@@ -61,7 +61,7 @@ export default function VoiceAsk() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "Emma is unavailable right now.");
-      setMessages((m) => [...m, { role: "assistant", content: data.reply, links: data.links }]);
+      setMessages((m) => [...m, { role: "assistant", content: data.reply, links: data.links, offline: !!data.offline }]);
       if (data.newLead) { setLeadSaved(true); track("assistant_lead", { page: pathname }); }
       if (voiceReplies || fromVoice) speak(data.reply);
     } catch (e) {
@@ -108,6 +108,7 @@ export default function VoiceAsk() {
                   <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div className="max-w-[85%] space-y-1.5">
                       <div className={`whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "rounded-br-md bg-[var(--emma-violet)] text-white" : "rounded-bl-md border border-border bg-card text-foreground"}`}>{m.content}</div>
+                      {m.offline && <p className="text-[11px] text-muted-foreground">Automatic reply: the AI assistant is offline right now.</p>}
                       {m.links && m.links.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
                           {m.links.map((l) => (

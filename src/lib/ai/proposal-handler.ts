@@ -2,6 +2,7 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import { PLAN_NAMES, proposalRequestSchema, type ProposalDoc } from "../proposal";
 import { TIERS } from "../pricing-data";
 import { aiText, checkLimits, checkOrigin, extractJson, readJson } from "./guard";
+import { fallbackProposal } from "../proposal-fallback";
 
 const str = (v: unknown, n: number) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, n);
 const list = (v: unknown, max: number, n: number) => (Array.isArray(v) ? v.map((x) => str(x, n)).filter(Boolean).slice(0, max) : []);
@@ -15,7 +16,7 @@ export const handleProposal = createServerOnlyFn(async (request: Request) => {
   if (!parsed.success) return Response.json({ message: "Please fill in your business name, your name and at least one goal." }, { status: 400 });
   const p = parsed.data;
 
-  const limit = await checkLimits(request, "proposal", { perVisitor: 4, global: 120, label: "proposals" });
+  const limit = await checkLimits(request, "proposal", { perVisitor: 4, global: 120, label: "proposals", worksWithoutAi: true });
   if (!limit.ok) return limit.response;
 
   const plans = TIERS.map((t) => `- ${t.name}: ${"custom" in t && t.custom ? "custom quote" : `$${t.monthly}/month`} — for ${t.audience}. Includes: ${t.features.join("; ")}`).join("\n");
@@ -46,11 +47,11 @@ Budget: ${p.budget}
 Timeline: ${p.timeline}
 Notes from the client: ${p.notes || "none"}`;
 
-  const ai = await aiText(request, limit.key, instructions, [{ role: "user", content: brief }]);
-  if (!ai.ok) return ai.response;
+  const ai = limit.aiPaused ? null : await aiText(request, limit.key, instructions, [{ role: "user", content: brief }]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const j = extractJson<any>(ai.text);
-  if (!j || !j.summary) return Response.json({ message: "The proposal couldn't be drafted. Please try again." }, { status: 502 });
+  const j = ai?.ok ? extractJson<any>(ai.text) : null;
+  // Without AI (or with an unreadable reply), send the rule-based draft built from the published plans.
+  if (!j || !j.summary) return Response.json({ proposal: fallbackProposal(p), remaining: limit.remaining, aiWritten: false }, { headers: { "Cache-Control": "no-store" } });
 
   const plan = (PLAN_NAMES as readonly string[]).includes(j.recommendedPlan) ? j.recommendedPlan : "Growth";
   const doc: ProposalDoc = {

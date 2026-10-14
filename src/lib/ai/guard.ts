@@ -66,17 +66,18 @@ export async function adminDb(): Promise<any> {
 export async function checkLimits(
   request: Request,
   kind: string,
-  limits: { perVisitor: number; global: number; label: string },
-): Promise<{ ok: true; key: string; remaining: number } | Fail> {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) return fail("AI is not configured yet.", 401);
+  limits: { perVisitor: number; global: number; label: string; /** The tool still gives a useful (rule-based) result without AI. */ worksWithoutAi?: boolean },
+): Promise<{ ok: true; key: string; remaining: number; aiPaused: boolean; logId: string | null } | Fail> {
+  const key = process.env["LOVABLE_API_KEY"] || "";
+  if (!key && !limits.worksWithoutAi) return fail("AI is not configured yet.", 401);
   const db = await adminDb();
   const { data: blocked, error: stateError } = await db.from("prototype_ai_access_state").select("updated_at").eq("id", "prototype").maybeSingle();
-  if (stateError) return fail("AI tools are temporarily unavailable. Please try later.", 503);
-  if (blocked && Date.now() - new Date(blocked.updated_at).getTime() < PAUSE_MS) {
+  if (stateError && !limits.worksWithoutAi) return fail("AI tools are temporarily unavailable. Please try later.", 503);
+  const aiPaused = !key || Boolean(blocked && Date.now() - new Date(blocked.updated_at).getTime() < PAUSE_MS);
+  if (aiPaused && !limits.worksWithoutAi) {
     return fail("Our AI tools are taking a short break. Please try again later, or chat with us on WhatsApp.", 503);
   }
-  const visitor = await hashVisitor(request, key);
+  const visitor = await hashVisitor(request, key || "emmaforyou-visitor-salt");
   const since = new Date(Date.now() - HOUR_MS).toISOString();
   const [mine, all] = await Promise.all([
     db.from("prototype_generations").select("created_at").eq("visitor_hash", visitor).eq("kind", kind).gte("created_at", since).order("created_at", { ascending: true }),
@@ -90,8 +91,14 @@ export async function checkLimits(
     return fail(`You've used your ${limits.perVisitor} free ${limits.label} for this hour. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}, or chat with us on WhatsApp.`, 429, { retryAfterMinutes: minutes });
   }
   if ((all.count ?? 0) >= limits.global) return fail("This tool is very busy right now. Please try again in a little while.", 429);
-  await db.from("prototype_generations").insert({ visitor_hash: visitor, kind });
-  return { ok: true, key, remaining: Math.max(0, limits.perVisitor - used - 1) };
+  const { data: logged } = await db.from("prototype_generations").insert({ visitor_hash: visitor, kind }).select("id").maybeSingle();
+  return { ok: true, key, remaining: Math.max(0, limits.perVisitor - used - 1), aiPaused, logId: (logged?.id as string | undefined) ?? null };
+}
+
+/** Give a use back when the request failed for reasons outside the visitor's control (e.g. their site was unreachable). */
+export async function refundLimit(logId: string | null): Promise<void> {
+  if (!logId) return;
+  try { const db = await adminDb(); await db.from("prototype_generations").delete().eq("id", logId); } catch { /* best effort */ }
 }
 
 /** Run one model call and return its full text. Credit/access failures pause all AI tools for a while. */

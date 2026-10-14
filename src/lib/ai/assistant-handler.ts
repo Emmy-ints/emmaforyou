@@ -56,7 +56,7 @@ export const handleAssistant = createServerOnlyFn(async (request: Request) => {
   if (!parsed.success) return Response.json({ message: "Please send a shorter message." }, { status: 400 });
   const input = parsed.data;
 
-  const limit = await checkLimits(request, "assistant", { perVisitor: 40, global: 1500, label: "assistant messages" });
+  const limit = await checkLimits(request, "assistant", { perVisitor: 40, global: 1500, label: "assistant messages", worksWithoutAi: true });
   if (!limit.ok) return limit.response;
 
   const instructions = `You are Emma, the AI assistant on the EmmaForYou website (${input.page}). Your job: help visitors understand how EmmaForYou can help them, recommend the right service or free tool, and when they're interested, get them to book a call or leave their WhatsApp so Emmanuel can follow up.
@@ -72,8 +72,15 @@ Respond with ONLY JSON: {"reply": "<message>", "links": [{"label": "<short>", "p
 KNOWLEDGE
 ${knowledge()}`;
 
-  const ai = await aiText(request, limit.key, instructions, input.messages.map((m) => ({ role: m.role, content: m.content })));
-  if (!ai.ok) return ai.response;
+  const ai = limit.aiPaused ? { ok: false as const } : await aiText(request, limit.key, instructions, input.messages.map((m) => ({ role: m.role, content: m.content })));
+  if (!ai.ok) {
+    // Still useful while the AI is unavailable: point to the fastest human routes.
+    return Response.json({
+      reply: "I can't chat right now, but you can still get help fast: book a free 30-minute call with Emmanuel, get an instant written proposal, or message him on WhatsApp using the green button.",
+      links: [{ label: "Book a free call", path: "/book" }, { label: "Instant proposal", path: "/proposal" }],
+      leadSaved: input.leadSaved, newLead: false, offline: true,
+    }, { headers: { "Cache-Control": "no-store" } });
+  }
   const j = extractJson<{ reply?: string; links?: { label?: string; path?: string }[]; lead?: { name?: string; whatsapp?: string; email?: string; need?: string } | null }>(ai.text);
   const reply = String(j?.reply || ai.text).replace(/^["\s]+|["\s]+$/g, "").slice(0, 1200);
   const validPaths = new Set([...TOOLS.map(([p]) => p), ...SERVICES.map((s) => `/services/${s.slug}`), ...EXPERTISE.map((e) => `/expertise/${e.slug}`), "/faq", "/about"]);

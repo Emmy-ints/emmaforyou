@@ -98,3 +98,17 @@ How to behave:
 
 Respond with ONLY a JSON object: {"reply": "<your message>", "booking": null} or, when confirming, {"reply": "<message>", "booking": {"service": "...", "date": "<weekday and date>", "time": "<time>", "name": "<first name>", "guests": "<number or empty>"}}`;
 }
+
+/** Keyword replies from the same demo data, used when the AI service is unavailable. */
+export function offlineReply(b: DemoBusiness, message: string): string {
+  const m = message.toLowerCase();
+  const words = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length > 3);
+  const service = b.services.find((s) => words(s.name).some((w) => m.includes(w)));
+  const parts: string[] = [];
+  if (service) parts.push(`${service.name}: ${service.price}${service.minutes ? ` (about ${service.minutes >= 60 ? `${Math.round(service.minutes / 60 * 10) / 10} hours` : `${service.minutes} minutes`})` : ""}.`);
+  if (/open|close|hour|time|today|tonight|monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekend/.test(m)) parts.push(`Our hours: ${b.hours}.`);
+  if (/insur|hmo|deposit|cancel|resched|deliver|notice|policy|group|guest/.test(m)) parts.push(...b.policies.filter((p) => words(p).some((w) => m.includes(w))).slice(0, 2).map((p) => `${p}.`));
+  if (/book|appointment|reserve|reservation|table|slot|come in/.test(m)) parts.push("To book, tell me your name, the service, and the day and time you'd like, and the team will confirm.");
+  if (!parts.length) parts.push(`I can help with prices, opening hours and bookings. We offer ${b.services.slice(0, 3).map((s) => s.name.toLowerCase()).join(", ")} and more. What would you like?`);
+  return `${parts.join(" ")}\n\n(Simple mode: the full AI demo is briefly unavailable, so I'm answering from the business's saved information.)`;
+}

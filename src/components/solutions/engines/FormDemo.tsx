@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, Upload } from "lucide-react";
-import { Badge, Btn, Panel, type EngineProps } from "./ui";
+import { Badge, Btn, ListEditor, Outbox, Panel, SettingsPanel, Toggles, uid, useDemoSetting, type EngineProps, type OutboxItem } from "./ui";
 
 interface F { key: string; label: string; type: "text" | "email" | "select" | "textarea" | "date" | "number" | "file" | "radio"; options?: string[]; required?: boolean; showIf?: [string, string]; optional?: boolean }
 interface Cfg { steps: { title: string; fields: F[] }[]; statuses: string[]; submitLabel: string; qualify?: (v: Record<string, string>) => string }
@@ -23,12 +23,21 @@ const P: Record<string, Cfg> = {
     { title: "Incident", fields: [{ key: "date", label: "Date of incident", type: "date", required: true }, { key: "police", label: "Police report number", type: "text", showIf: ["kind", "Motor"] }, { key: "desc", label: "What happened?", type: "textarea", required: true }, { key: "photos", label: "Photos / receipts", type: "file", required: true }] }] },
 };
 
-export default function FormDemo({ preset, brand }: EngineProps) {
-  const cfg = P[preset] ?? P.intake;
+export default function FormDemo(props: EngineProps) {
+  const { preset, brand } = props;
+  const base = P[preset] ?? P.intake;
+  const [statuses, setStatuses] = useDemoSetting<string[]>(props, "statuses", base.statuses);
+  const [hidden, setHidden] = useDemoSetting<string[]>(props, "hidden", []);
+  const [mustHave, setMustHave] = useDemoSetting<string[]>(props, "required", []);
+  const [notify, setNotify] = useDemoSetting<string[]>(props, "notify", ["confirm", "staff", "status"]);
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
+  const push = (channel: string, to: string, text: string) => setOutbox((o) => [...o, { id: uid(), channel, to, text }].slice(-30));
+  // Optional fields can be hidden or made required from the settings.
+  const cfg: Cfg = { ...base, statuses, steps: base.steps.map((s) => ({ ...s, fields: s.fields.map((f) => (f.optional && mustHave.includes(f.key) ? { ...f, required: true } : f)) })) };
+  const optionalFields = base.steps.flatMap((s) => s.fields).filter((f) => f.optional);
   const [step, setStep] = useState(0);
   const [v, setV] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [hidden, setHidden] = useState<string[]>([]);
   const [ref, setRef] = useState<string | null>(null);
   const [status, setStatus] = useState(0);
   const review = step === cfg.steps.length;
@@ -45,19 +54,47 @@ export default function FormDemo({ preset, brand }: EngineProps) {
     setErrors(e); return Object.keys(e).length === 0;
   };
   const next = () => { if (validate(cfg.steps[step].fields)) setStep(step + 1); };
-  const submit = () => { setRef(`${brand.replace(/\W/g, "").slice(0, 3).toUpperCase() || "REF"}-${Math.floor(100000 + Math.random() * 900000)}`); setStatus(0); };
+  const contact = v.email || v.name || v.parent || v.org || "Applicant";
+  const submit = () => {
+    const r = `${brand.replace(/\W/g, "").slice(0, 3).toUpperCase() || "REF"}-${Math.floor(100000 + Math.random() * 900000)}`;
+    setRef(r); setStatus(0);
+    if (notify.includes("confirm")) push("Email", contact, `We've received your ${cfg.submitLabel.toLowerCase().replace("submit ", "")}. Reference ${r}.`);
+    if (notify.includes("staff")) push("Email", `${brand} team`, `New submission ${r}${cfg.qualify ? `: ${cfg.qualify(v)}` : ""}.`);
+  };
   const reset = () => { setRef(null); setStep(0); setV({}); setErrors({}); };
 
+  const settings = (
+    <SettingsPanel summary={`${statuses.length} statuses · ${hidden.length} hidden field${hidden.length === 1 ? "" : "s"}`}>
+      {optionalFields.length > 0 && (
+        <fieldset><legend className="text-xs font-semibold text-foreground">Optional fields</legend>
+          <ul className="mt-1.5 space-y-1 text-sm">{optionalFields.map((f) => (
+            <li key={f.key} className="flex flex-wrap items-center gap-3"><span className="w-44">{f.label}</span>
+              <label className="flex items-center gap-1.5 text-xs"><input type="checkbox" checked={!hidden.includes(f.key)} onChange={(e) => setHidden((h) => (e.target.checked ? h.filter((x) => x !== f.key) : [...h, f.key]))} className="accent-[var(--demo-accent)]" />Show</label>
+              <label className="flex items-center gap-1.5 text-xs"><input type="checkbox" disabled={hidden.includes(f.key)} checked={mustHave.includes(f.key)} onChange={(e) => setMustHave((m) => (e.target.checked ? [...m, f.key] : m.filter((x) => x !== f.key)))} className="accent-[var(--demo-accent)]" />Required</label>
+            </li>))}</ul>
+        </fieldset>
+      )}
+      <ListEditor label="Status stages (shown to the applicant)" items={statuses} onChange={setStatuses} min={2} max={7} placeholder="e.g. Awaiting payment" />
+      <Toggles label="Notifications" options={[["confirm", "Confirmation to the applicant"], ["staff", "New-submission alert to staff"], ["status", "Status updates to the applicant"]]} value={notify} onChange={setNotify} />
+    </SettingsPanel>
+  );
+
   if (ref) return (
+    <div className="space-y-4">
+    {settings}
     <Panel title="Application status (applicant view)" actions={<Btn variant="ghost" onClick={reset}>New submission</Btn>}>
-      <p className="text-sm">Reference <strong>{ref}</strong>. A confirmation email would be sent to the applicant.</p>
+      <p className="text-sm">Reference <strong>{ref}</strong>.</p>
       {cfg.qualify && <p className="mt-1 text-sm"><Badge tone="accent">Auto-routing</Badge> {cfg.qualify(v)}</p>}
-      <ol className="mt-4 flex flex-wrap gap-2">{cfg.statuses.map((s, i) => <li key={s} className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${i <= status ? "bg-[var(--demo-accent)] text-white" : "bg-muted text-muted-foreground"}`}>{i < status && <Check className="h-3 w-3" />}{s}</li>)}</ol>
-      <div className="mt-4 rounded-xl border border-dashed border-border p-3"><p className="text-xs text-muted-foreground">Staff view</p><Btn className="mt-1" disabled={status >= cfg.statuses.length - 1} onClick={() => setStatus((x) => x + 1)}>Move to "{cfg.statuses[Math.min(cfg.statuses.length - 1, status + 1)]}"</Btn><p className="mt-1 text-[11px] text-muted-foreground">Each change notifies the applicant automatically and is logged.</p></div>
+      <ol className="mt-4 flex flex-wrap gap-2">{cfg.statuses.map((s, i) => <li key={`${i}-${s}`} className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${i <= status ? "bg-[var(--demo-accent)] text-white" : "bg-muted text-muted-foreground"}`}>{i < status && <Check className="h-3 w-3" />}{s}</li>)}</ol>
+      <div className="mt-4 rounded-xl border border-dashed border-border p-3"><p className="text-xs text-muted-foreground">Staff view</p><Btn className="mt-1" disabled={status >= cfg.statuses.length - 1} onClick={() => { const n = Math.min(cfg.statuses.length - 1, status + 1); setStatus(n); if (notify.includes("status")) push("Email + SMS", contact, `Update on ${ref}: ${cfg.statuses[n]}.`); }}>Move to "{cfg.statuses[Math.min(cfg.statuses.length - 1, status + 1)]}"</Btn><p className="mt-1 text-[11px] text-muted-foreground">Status changes are logged; applicant updates follow your notification settings.</p></div>
     </Panel>
+    <Outbox items={outbox} onClear={() => setOutbox([])} />
+    </div>
   );
 
   return (
+    <div className="space-y-4">
+    {settings}
     <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
       <Panel title={review ? "Review & submit" : `Step ${step + 1} of ${cfg.steps.length}: ${cfg.steps[step].title}`}>
         <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full bg-[var(--demo-accent)] transition-all" style={{ width: `${(step / cfg.steps.length) * 100}%` }} /></div>
@@ -89,11 +126,15 @@ export default function FormDemo({ preset, brand }: EngineProps) {
           </form>
         )}
       </Panel>
-      <Panel title="Customise the form">
-        <p className="mb-2 text-[11px] text-muted-foreground">Turn optional fields on or off, like you would in the admin.</p>
-        <ul className="space-y-1 text-sm">{cfg.steps.flatMap((s) => s.fields).filter((f) => f.optional).map((f) => <li key={f.key}><label className="flex items-center gap-2"><input type="checkbox" checked={!hidden.includes(f.key)} onChange={(e) => setHidden((h) => (e.target.checked ? h.filter((x) => x !== f.key) : [...h, f.key]))} className="accent-[var(--demo-accent)]" />{f.label}</label></li>)}</ul>
-        <p className="mt-3 text-[11px] text-muted-foreground">Conditional questions appear only when relevant, and required fields are validated before moving on.</p>
+      <Panel title="How this form behaves">
+        <ul className="list-disc space-y-1 pl-4 text-[12px] text-muted-foreground">
+          <li>Conditional questions appear only when relevant.</li>
+          <li>Required fields and email formats are checked before moving on.</li>
+          <li>Show, hide or require optional fields in Demo settings, like an admin would.</li>
+          {cfg.qualify && <li>Answers are scored to route the enquiry.</li>}
+        </ul>
       </Panel>
+    </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, Sparkles } from "lucide-react";
-import { Badge, Btn, Panel, Toast, type EngineProps } from "./ui";
+import { Badge, Btn, ListEditor, Panel, RowsEditor, Select, SettingsPanel, Toast, uid, useDemoSetting, type EngineProps } from "./ui";
 
 const SAMPLES: Record<string, { label: string; text: string }> = {
   invoice: { label: "Supplier invoice (scanned text)", text: "DELTA OFFICE SUPPLIES LTD\nInvoice No: INV-20931\nInvoice date: 02/10/2026\nDue date: 01/11/2026\nBill to: Bloom Dental Ltd\nPO Number: PO-7781\n\n20 x Printer paper A4 @ 4.50 = 90.00\n5 x Toner cartridge @ 62.00 = 310.00\n\nSubtotal: 400.00\nVAT 7.5%: 30.00\nTotal due: USD 430.00\nBank: First Bank 3012345678" },
@@ -16,7 +16,11 @@ const SAMPLES: Record<string, { label: string; text: string }> = {
 interface FieldOut { k: string; v: string; conf: number }
 const m = (t: string, re: RegExp) => t.match(re)?.[1]?.trim() ?? "";
 
-function extract(preset: string, t: string): { fields?: FieldOut[]; lists?: { title: string; items: { text: string; tone?: "good" | "warn" | "bad" | "neutral" | "accent"; tag?: string }[] }[] } {
+interface Rule { id: string; match: string; category: string }
+const BANK_RULES: Rule[] = [["shoprite, spar, market", "Groceries / supplies"], ["airtime, mtn, airtel, glo", "Phone & internet"], ["filling, fuel, total", "Transport"], ["google ads, meta, facebook", "Marketing"], ["salary", "Payroll"], ["transfer from", "Customer payment"], ["supplies, delta", "Supplier payment"]].map(([match, category], i) => ({ id: `r${i}`, match, category }));
+interface Opts { rules: Rule[]; reqs: string[] }
+
+function extract(preset: string, t: string, opts: Opts): { fields?: FieldOut[]; lists?: { title: string; items: { text: string; tone?: "good" | "warn" | "bad" | "neutral" | "accent"; tag?: string }[] }[] } {
   if (preset === "invoice") {
     const f: FieldOut[] = [
       { k: "Supplier", v: t.split("\n")[0].trim(), conf: 0.93 },
@@ -35,17 +39,17 @@ function extract(preset: string, t: string): { fields?: FieldOut[]; lists?: { ti
     return { fields: f, lists: [{ title: "Line items", items: lines }, { title: "Checks", items: checks }] };
   }
   if (preset === "bank") {
-    const rules: [RegExp, string][] = [[/shoprite|spar|market/i, "Groceries / supplies"], [/airtime|mtn|airtel|glo/i, "Phone & internet"], [/filling|fuel|total/i, "Transport"], [/google ads|meta|facebook/i, "Marketing"], [/salary/i, "Payroll"], [/transfer from/i, "Customer payment"], [/supplies|delta/i, "Supplier payment"]];
-    const items = t.split("\n").filter((l) => l.trim()).map((l) => { const cat = rules.find(([re]) => re.test(l))?.[1]; return { text: l.replace(/\s{2,}/g, " · "), tag: cat ?? "Uncategorised — review", tone: cat ? (/[+]/.test(l) ? "good" as const : "neutral" as const) : "warn" as const }; });
+    const rules = opts.rules.map((r) => ({ words: r.match.split(",").map((w) => w.trim().toLowerCase()).filter(Boolean), cat: r.category.trim() || "Uncategorised" }));
+    const items = t.split("\n").filter((l) => l.trim()).map((l) => { const cat = rules.find((r) => r.words.some((w) => l.toLowerCase().includes(w)))?.cat; return { text: l.replace(/\s{2,}/g, " · "), tag: cat ?? "Uncategorised — review", tone: cat ? (/[+]/.test(l) ? "good" as const : "neutral" as const) : "warn" as const }; });
     return { lists: [{ title: "Categorised transactions", items }] };
   }
   if (preset === "cv") {
     const years = Number(m(t, /\((\d+) years?\)/i)) || 0;
     const skills = m(t, /skills:?\s*(.+)/i);
-    const req = ["CRM", "negotiation", "Excel", "Salesforce"];
+    const req = opts.reqs.filter((r) => r.trim());
     return {
       fields: [{ k: "Name", v: t.split("\n")[0].trim(), conf: 0.97 }, { k: "Email", v: m(t, /([\w.+-]+@[\w-]+\.[\w.]+)/), conf: 0.99 }, { k: "Phone", v: m(t, /(\+?\d[\d\s]{7,})/), conf: 0.9 }, { k: "Location", v: m(t, /\|\s*([A-Za-z ]+)\s*$/m), conf: 0.7 }, { k: "Current role", v: m(t, /experience\s*\n(.+?)—/i), conf: 0.85 }, { k: "Years in current role", v: years ? String(years) : "", conf: 0.8 }, { k: "Education", v: m(t, /education:?\s*(.+)/i), conf: 0.92 }],
-      lists: [{ title: "Match against job requirements (stated qualifications only)", items: req.map((r) => ({ text: r, tone: new RegExp(r, "i").test(skills) ? "good" as const : "warn" as const, tag: new RegExp(r, "i").test(skills) ? "Mentioned" : "Not mentioned" })) }],
+      lists: [{ title: "Match against job requirements (stated qualifications only)", items: req.map((r) => { const hit = t.toLowerCase().includes(r.toLowerCase()) || skills.toLowerCase().includes(r.toLowerCase()); return { text: r, tone: hit ? "good" as const : "warn" as const, tag: hit ? "Mentioned" : "Not mentioned" }; }) }],
     };
   }
   const lines = t.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -85,16 +89,47 @@ function extract(preset: string, t: string): { fields?: FieldOut[]; lists?: { ti
   return { lists: [{ title: "Rule checks", items: checks.map(([text, ok]) => ({ text, tone: ok ? "good" : "bad", tag: ok ? "Pass" : "Fix" })) }] };
 }
 
-export default function ExtractDemo({ preset }: EngineProps) {
+const DEST: Record<string, string[]> = { invoice: ["Accounting (QuickBooks)", "Accounting (Xero)", "Google Sheet"], cv: ["Applicant tracking system", "HR spreadsheet"], bank: ["Accounting ledger", "Google Sheet"] };
+
+export default function ExtractDemo(props: EngineProps) {
+  const { preset } = props;
   const sample = SAMPLES[preset] ?? SAMPLES.invoice;
+  const [threshold, setThreshold] = useDemoSetting(props, "threshold", 0.8);
+  const [autoPost, setAutoPost] = useDemoSetting(props, "auto", false);
+  const [dest, setDest] = useDemoSetting(props, "dest", (DEST[preset] ?? ["Your system"])[0]);
+  const [rules, setRules] = useDemoSetting<Rule[]>(props, "rules", BANK_RULES);
+  const [reqs, setReqs] = useDemoSetting<string[]>(props, "reqs", ["CRM", "negotiation", "Excel", "Salesforce"]);
+  const [approvalOver, setApprovalOver] = useDemoSetting(props, "approvalOver", 1000);
   const [text, setText] = useState(sample.text);
   const [out, setOut] = useState<ReturnType<typeof extract> | null>(null);
   const [edits, setEdits] = useState<Record<string, string>>({});
-  const [approved, setApproved] = useState(false);
-  const run = () => { setOut(extract(preset, text)); setEdits({}); setApproved(false); };
-  const review = out?.fields?.filter((f) => f.conf < 0.8) ?? [];
+  const [approved, setApproved] = useState<string | false>(false);
+  const opts: Opts = { rules, reqs };
+  // Re-run automatically when rules change, so settings visibly affect the result.
+  const result = out ? extract(preset, text, opts) : null;
+  const review = result?.fields?.filter((f) => f.conf < threshold) ?? [];
+  const total = Number((edits.Total ?? result?.fields?.find((f) => f.k === "Total")?.v ?? "0").replace(/,/g, "")) || 0;
+  const needsManager = preset === "invoice" && total > approvalOver;
+  const run = () => {
+    const r = extract(preset, text, opts);
+    setOut(r); setEdits({});
+    const low = r.fields?.filter((f) => f.conf < threshold) ?? [];
+    const t = Number(r.fields?.find((f) => f.k === "Total")?.v.replace(/,/g, "") ?? 0);
+    setApproved(autoPost && r.fields && low.length === 0 && !(preset === "invoice" && t > approvalOver) ? "auto" : false);
+  };
 
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={`Review below ${Math.round(threshold * 100)}% confidence${autoPost ? " · auto-post when confident" : ""}`}>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Select label="Send to a person when confidence is below" value={String(threshold)} onChange={(e) => setThreshold(Number(e.target.value))} options={[["0.6", "60%"], ["0.7", "70%"], ["0.8", "80%"], ["0.9", "90%"], ["0.95", "95%"]]} />
+        {DEST[preset] && <Select label="Post results to" value={dest} onChange={(e) => setDest(e.target.value)} options={DEST[preset]} />}
+        {preset === "invoice" && <Select label="Manager approval for totals over" value={String(approvalOver)} onChange={(e) => setApprovalOver(Number(e.target.value))} options={[["100", "100"], ["500", "500"], ["1000", "1,000"], ["5000", "5,000"]]} />}
+      </div>
+      {DEST[preset] && preset !== "bank" && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={autoPost} onChange={(e) => setAutoPost(e.target.checked)} className="accent-[var(--demo-accent)]" />Post automatically when every field is above the threshold (and no approval is needed)</label>}
+      {preset === "bank" && <RowsEditor<Rule> label="Categorisation rules (first match wins)" rows={rules} onChange={setRules} max={10} cols={[{ key: "match", label: "If the line contains (comma-separated)", type: "text" }, { key: "category", label: "Category", type: "text", width: "34%" }]} make={() => ({ id: uid(), match: "uber, bolt", category: "Transport" })} />}
+      {preset === "cv" && <ListEditor label="Job requirements to check" items={reqs} onChange={setReqs} min={1} max={8} placeholder="e.g. Spanish" />}
+    </SettingsPanel>
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel title={sample.label} actions={<Btn variant="ghost" onClick={() => { setText(sample.text); setOut(null); }}>Load sample</Btn>}>
         <textarea value={text} onChange={(e) => setText(e.target.value)} rows={14} maxLength={4000} aria-label="Document text" className="w-full resize-y rounded-xl border border-border bg-background p-3 font-mono text-xs leading-relaxed outline-none focus:border-[var(--demo-accent)]" />
@@ -102,20 +137,21 @@ export default function ExtractDemo({ preset }: EngineProps) {
         <Btn className="mt-2" onClick={run} disabled={!text.trim()}><Sparkles className="h-4 w-4" />Extract</Btn>
       </Panel>
       <div className="space-y-4">
-        {!out ? <Panel><p className="text-sm text-muted-foreground">Press <strong>Extract</strong> to see the structured result.</p></Panel> : (
+        {!result ? <Panel><p className="text-sm text-muted-foreground">Press <strong>Extract</strong> to see the structured result.</p></Panel> : (
           <>
-            {out.fields && (
+            {result.fields && (
               <Panel title="Extracted fields" actions={review.length ? <Badge tone="warn">{review.length} need review</Badge> : <Badge tone="good">High confidence</Badge>}>
-                <ul className="space-y-1.5">{out.fields.map((f) => (
+                <ul className="space-y-1.5">{result.fields.map((f) => (
                   <li key={f.k} className="grid grid-cols-[120px_1fr_auto] items-center gap-2 text-sm">
                     <span className="text-xs text-muted-foreground">{f.k}</span>
-                    <input aria-label={f.k} value={edits[f.k] ?? f.v} onChange={(e) => setEdits({ ...edits, [f.k]: e.target.value })} className={`rounded-md border bg-background px-2 py-1 text-sm ${f.conf < 0.8 ? "border-amber-500/60" : "border-border"}`} placeholder="Not found" />
-                    <Badge tone={f.conf >= 0.9 ? "good" : f.conf >= 0.8 ? "neutral" : "warn"}>{f.conf ? `${Math.round(f.conf * 100)}%` : "missing"}</Badge>
+                    <input aria-label={f.k} value={edits[f.k] ?? f.v} onChange={(e) => setEdits({ ...edits, [f.k]: e.target.value })} className={`rounded-md border bg-background px-2 py-1 text-sm ${f.conf < threshold ? "border-amber-500/60" : "border-border"}`} placeholder="Not found" />
+                    <Badge tone={f.conf >= Math.max(0.9, threshold) ? "good" : f.conf >= threshold ? "neutral" : "warn"}>{f.conf ? `${Math.round(f.conf * 100)}%` : "missing"}</Badge>
                   </li>))}</ul>
-                {approved ? <Toast><Check className="mr-1 inline h-4 w-4" />Approved and posted to the system (demo). The correction is logged for audit.</Toast> : <Btn className="mt-3" onClick={() => setApproved(true)}>Approve & post</Btn>}
+                {needsManager && !approved && <p className="mt-3 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">Total is over {approvalOver.toLocaleString()}: a manager must approve before posting.</p>}
+                {approved ? <Toast><Check className="mr-1 inline h-4 w-4" />{approved === "auto" ? `Posted automatically to ${dest} (simulated): all fields were above ${Math.round(threshold * 100)}%.` : `${needsManager ? "Approved by a manager and posted" : "Approved and posted"} to ${dest} (simulated). Corrections are logged for audit.`}</Toast> : <Btn className="mt-3" onClick={() => setApproved("manual")}>{needsManager ? "Approve as manager & post" : review.length ? `Reviewed ${review.length} field${review.length > 1 ? "s" : ""}: approve & post` : "Approve & post"}</Btn>}
               </Panel>
             )}
-            {out.lists?.map((l) => (
+            {result.lists?.map((l) => (
               <Panel key={l.title} title={l.title}>
                 {l.items.length ? <ul className="space-y-1.5">{l.items.map((it, i) => <li key={i} className="flex items-start justify-between gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5 text-sm"><span>{it.text}</span>{it.tag && <Badge tone={it.tone ?? "neutral"}>{it.tag}</Badge>}</li>)}</ul> : <p className="text-sm text-muted-foreground">Nothing found.</p>}
               </Panel>
@@ -123,6 +159,7 @@ export default function ExtractDemo({ preset }: EngineProps) {
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }

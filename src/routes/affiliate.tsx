@@ -23,20 +23,26 @@ function AffiliatePage() {
   const [whatsapp, setWhatsapp] = useState("");
   const [source, setSource] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
   const [code, setCode] = useState<string | null>(null);
   const link = code ? `https://emmaforyou.lovable.app/?ref=${code}` : "";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+    if (busy) return;
+    setError("");
     const refCode = generateRefCode(name);
-    await submitAffiliate({ full_name: name, email, whatsapp, source, referral_code: refCode });
-    setCode(refCode);
+    const res = await submitAffiliate({ full_name: name, email, whatsapp, source, referral_code: refCode });
     setBusy(false);
+    // Only show a referral link once it's actually registered, otherwise referrals couldn't be credited.
+    if (!res.ok) { setError("We couldn't register you just now. Please try again, or message us on WhatsApp."); return; }
+    setCode(refCode);
   }
 
   function copy() {
-    if (typeof navigator !== "undefined") navigator.clipboard?.writeText(link);
+    try { navigator.clipboard?.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* blocked */ }
   }
 
   return (
@@ -88,6 +94,7 @@ function AffiliatePage() {
                 <button disabled={busy} className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white disabled:opacity-60">
                   {busy ? "Generating..." : "Get my link →"}
                 </button>
+                {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
               </form>
             ) : (
               <div className="text-center">
@@ -95,7 +102,7 @@ function AffiliatePage() {
                 <p className="mt-2 text-sm text-muted-foreground">Your unique referral link:</p>
                 <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row">
                   <input readOnly value={link} className="input flex-1" />
-                  <button onClick={copy} className="btn-gold rounded-full px-5 py-2.5 text-sm">Copy</button>
+                  <button onClick={copy} className="btn-gold rounded-full px-5 py-2.5 text-sm">{copied ? "Copied ✓" : "Copy"}</button>
                 </div>
                 <p className="mt-4 text-xs text-muted-foreground">Your code: <strong>{code}</strong></p>
                 <a href={buildWa(`Hi! I just signed up to the affiliate program. My code is ${code}. What's next?`)} target="_blank" rel="noopener noreferrer" className="btn-primary-gradient mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white">Get onboarded on WhatsApp →</a>

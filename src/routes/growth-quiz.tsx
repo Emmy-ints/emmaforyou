@@ -25,6 +25,8 @@ function QuizPage() {
   const [whatsapp, setWhatsapp] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const score = useMemo(() => answers.filter(Boolean).length, [answers]);
   const result = useMemo(() => bucketFor(score), [score]);
@@ -43,10 +45,14 @@ function QuizPage() {
 
   async function saveResult(e: React.FormEvent) {
     e.preventDefault();
-    await submitQuiz({
+    if (saving) return;
+    setSaving(true); setSaveError("");
+    const res = await submitQuiz({
       name, whatsapp, business_type: businessType,
       score, result_bucket: result.bucket, no_questions: noIdx,
     });
+    setSaving(false);
+    if (!res.ok) { setSaveError("We couldn't save your result. Please try again, or message us on WhatsApp."); return; }
     setSubmitted(true);
   }
 
@@ -117,10 +123,14 @@ function QuizPage() {
                       <input className="input" placeholder="Your name (optional)" value={name} onChange={(e) => setName(e.target.value)} />
                       <input className="input" placeholder="WhatsApp number (optional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
                       <input className="input" placeholder="Business type" value={businessType} onChange={(e) => setBusinessType(e.target.value)} />
-                      <button className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white">Save my result & get fixes →</button>
+                      <button disabled={saving} className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white disabled:opacity-60">{saving ? "Saving…" : "Save my result & get fixes →"}</button>
+                      {saveError && <p role="alert" className="text-sm text-red-600">{saveError}</p>}
                     </form>
                   ) : (
+                    <>
+                    <p role="status" className="mt-6 text-sm font-medium text-emerald-600">Result saved. Emmanuel can follow up with the fixes that matter most for you.</p>
                     <a href={wa} target="_blank" rel="noopener noreferrer" className="btn-gold mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">Talk to a strategist on WhatsApp →</a>
+                    </>
                   )}
                 </div>
               </div>

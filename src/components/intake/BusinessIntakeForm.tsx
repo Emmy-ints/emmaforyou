@@ -159,9 +159,10 @@ export default function BusinessIntakeForm({ onClose, initialDescription }: { on
       language: lang,
     };
     delete (payload as FormData).social_platforms_followers;
-    await submitIntake(payload);
-    setSubmitted(true);
+    const res = await submitIntake(payload);
     setSubmitting(false);
+    if (!res.ok) { setErrors((e) => ({ ...e, submit: "We couldn't send your profile. Your answers are still here: please try again, or message us on WhatsApp." })); return; }
+    setSubmitted(true);
     localStorage.removeItem(STORAGE_KEY);
     setTimeout(() => {
       window.open(buildIntakeWhatsApp(data.business_name || "my business", data.city || data.country || "global"), "_blank");
@@ -234,6 +235,7 @@ export default function BusinessIntakeForm({ onClose, initialDescription }: { on
             {submitting ? "Sending..." : "Submit My Business Profile →"}
           </button>
         )}
+        {errors.submit && <p role="alert" className="mt-3 w-full text-right text-sm text-red-600">{errors.submit}</p>}
       </div>
     </div>
   );

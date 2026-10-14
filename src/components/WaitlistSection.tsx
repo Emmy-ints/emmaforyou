@@ -9,26 +9,17 @@ export default function WaitlistSection() {
   const { t, lang } = useI18n();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [count] = useState(() => {
-    if (typeof window === "undefined") return 247;
-    const stored = localStorage.getItem("emma_waitlist");
-    const entries = stored ? JSON.parse(stored) : [];
-    return 247 + entries.length;
-  });
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!email) return;
-      // Local backup for the counter
-      try {
-        const stored = localStorage.getItem("emma_waitlist");
-        const entries = stored ? JSON.parse(stored) : [];
-        entries.push({ email, date: new Date().toISOString() });
-        localStorage.setItem("emma_waitlist", JSON.stringify(entries));
-      } catch { /* ignore */ }
-      // Persist to Cloud
-      await submitLead({ source: "waitlist", email, language: lang });
+      setBusy(true); setError("");
+      const res = await submitLead({ source: "waitlist", email, language: lang });
+      setBusy(false);
+      if (!res.ok) { setError("That didn't go through. Please check your email address and try again, or message us on WhatsApp."); return; }
       setSubmitted(true);
     },
     [email, lang]
@@ -50,15 +41,6 @@ export default function WaitlistSection() {
           Join the EmmaForYou waitlist and be among the first businesses to access our full suite of AI-powered growth services. Limited spots. Serious results.
         </p>
 
-        <motion.p
-          className="mt-6 text-sm font-semibold text-emma-charcoal/80"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-        >
-          🔥 {count} businesses already on the waitlist
-        </motion.p>
 
         {!submitted ? (
           <motion.form
@@ -80,15 +62,18 @@ export default function WaitlistSection() {
             />
             <motion.button
               type="submit"
-              className="rounded-full px-6 py-3 text-sm font-semibold text-white"
+              disabled={busy}
+              className="rounded-full px-6 py-3 text-sm font-semibold text-white disabled:opacity-60"
               style={{ background: "var(--gradient-dark)" }}
               whileHover={{ scale: 1.06, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              {t("cta_waitlist")}
+              {busy ? "…" : t("cta_waitlist")}
             </motion.button>
           </motion.form>
-        ) : (
+        ) : null}
+        {!submitted && error ? <p role="alert" className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
+        {!submitted ? null : (
           <motion.div
             className="mt-6 rounded-2xl bg-white/60 p-6"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -99,7 +84,7 @@ export default function WaitlistSection() {
               🎉 You're in!
             </p>
             <p className="mt-2 text-sm text-emma-charcoal/70">
-              We'll reach out on WhatsApp soon. While you wait —
+              We'll email you soon. Want to talk sooner?
             </p>
             <a
               href={WHATSAPP_URL}

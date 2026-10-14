@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Plus, Send, Trash2, UserRound } from "lucide-react";
-import { Badge, Btn, Panel, uid, type EngineProps } from "./ui";
+import { Bot, Loader2, Plus, Send, Trash2, UserRound } from "lucide-react";
+import { Badge, Btn, Outbox, Panel, Select, SettingsPanel, uid, useDemoSetting, type EngineProps, type OutboxItem } from "./ui";
 
 interface Doc { id: string; title: string; text: string }
-interface Msg { by: "user" | "bot"; text: string; source?: string; handoff?: boolean }
+interface Msg { by: "user" | "bot"; text: string; source?: string; handoff?: boolean; via?: "ai" | "rules"; note?: string }
 
 const KB: Record<string, { greeting: string; suggestions: string[]; docs: [string, string][] }> = {
   support: { greeting: "Hi! I can help with orders, delivery, returns and payments. What do you need?", suggestions: ["How long is delivery to Abuja?", "Can I return shoes?", "Do you accept bank transfer?"], docs: [
@@ -50,9 +50,16 @@ const tokens = (s: string) => s.toLowerCase().replace(/[^a-z0-9£$₦€% ]/g, "
 
 const QUAL = ["What kind of business is it, and what's the main goal?", "Roughly what monthly budget do you have in mind?", "When would you like to start?", "Great — what's your name and best WhatsApp number? (Demo: nothing is sent)"];
 
-export default function AssistantDemo({ preset, brand }: EngineProps) {
+export default function AssistantDemo(props: EngineProps) {
+  const { preset, brand } = props;
   const cfg = KB[preset] ?? KB.support;
-  const [docs, setDocs] = useState<Doc[]>(() => cfg.docs.map(([title, text]) => ({ id: uid(), title, text })));
+  const [docs, setDocs] = useDemoSetting<Doc[]>(props, "docs", cfg.docs.map(([title, text], i) => ({ id: `d${i}`, title, text })));
+  const [aiMode, setAiMode] = useDemoSetting(props, "ai", true);
+  const [threshold, setThreshold] = useDemoSetting(props, "threshold", 0.2);
+  const [length, setLength] = useDemoSetting(props, "length", 2);
+  const [handoffTo, setHandoffTo] = useDemoSetting(props, "handoffTo", "WhatsApp");
+  const [busy, setBusy] = useState(false);
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
   const [msgs, setMsgs] = useState<Msg[]>([{ by: "bot", text: cfg.greeting }]);
   const [input, setInput] = useState("");
   const [newDoc, setNewDoc] = useState({ title: "", text: "" });
@@ -72,14 +79,45 @@ export default function AssistantDemo({ preset, brand }: EngineProps) {
     const qt = tokens(q);
     const scored = docs.map((d) => { const dt = new Set(tokens(`${d.title} ${d.title} ${d.text}`)); return { d, s: qt.filter((t) => dt.has(t)).length / Math.max(1, qt.length) }; }).sort((a, b) => b.s - a.s);
     const best = scored[0];
-    if (!best || best.s < 0.2) { setHandoffs((h) => h + 1); return { by: "bot", text: `I'm not sure about that from ${brand}'s information, so I've passed it to a person who'll reply shortly.`, handoff: true }; }
+    if (!best || best.s < threshold) return { by: "bot", text: `I'm not sure about that from ${brand}'s information, so I've passed it to a person who'll reply shortly.`, handoff: true, via: "rules" };
     const sentences = best.d.text.split(/(?<=\.)\s+/);
-    const pick = sentences.map((s) => ({ s, n: qt.filter((t) => tokens(s).includes(t)).length })).sort((a, b) => b.n - a.n).slice(0, 2).map((x) => x.s);
-    return { by: "bot", text: pick.join(" "), source: best.d.title };
+    const pick = sentences.map((s) => ({ s, n: qt.filter((t) => tokens(s).includes(t)).length })).sort((a, b) => b.n - a.n).slice(0, length).map((x) => x.s);
+    return { by: "bot", text: pick.join(" "), source: best.d.title, via: "rules" };
   };
-  const ask = (q: string) => { const t = q.trim(); if (!t) return; setMsgs((m) => [...m, { by: "user", text: t }, answer(t)]); setInput(""); };
+  const handoff = (q: string) => { setHandoffs((h) => h + 1); setOutbox((o) => [...o, { id: uid(), channel: handoffTo, to: `${brand} staff`, text: `Customer question the assistant couldn't answer: "${q}"` }].slice(-20)); };
+  const ask = async (q: string) => {
+    const t = q.trim();
+    if (!t || busy) return;
+    setInput("");
+    const history = msgs.slice(1).slice(-6).map((m) => ({ role: m.by === "user" ? "user" as const : "assistant" as const, content: m.text.slice(0, 600) }));
+    setMsgs((m) => [...m, { by: "user", text: t }]);
+    const inQual = preset === "sales" && qual.length < QUAL.length && (qual.length > 0 || /cost|price|budget|start|need|want|business/i.test(t));
+    let reply: Msg | null = null;
+    if (aiMode && !inQual && docs.length) {
+      setBusy(true);
+      try {
+        const res = await fetch("/api/demo-ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "answer", brand, question: t, knowledge: docs.slice(0, 12).map((d) => ({ title: d.title.slice(0, 80), text: d.text.slice(0, 700) })), history }) });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ai) reply = { by: "bot", text: data.answer, source: data.source || undefined, handoff: !!data.handoff, via: "ai" };
+        else { reply = answer(t); reply.note = res.ok ? `AI unavailable (${data.reason ?? "no response"}), keyword match used` : `AI unavailable (${data.message ?? `error ${res.status}`}), keyword match used`; }
+      } catch {
+        reply = answer(t); reply.note = "AI unreachable, keyword match used";
+      } finally { setBusy(false); }
+    } else reply = answer(t);
+    if (reply.handoff) handoff(t);
+    setMsgs((m) => [...m, reply!]);
+  };
 
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={aiMode ? "Real AI answers (OpenAI), grounded in the knowledge" : "Keyword matching only (no AI)"}>
+      <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={aiMode} onChange={(e) => setAiMode(e.target.checked)} className="mt-0.5 accent-[var(--demo-accent)]" /><span><strong>Use real AI</strong> (OpenAI via our server, limited per visitor). It may only answer from the knowledge entries on this page. When it's off or unavailable, a simple keyword matcher answers instead, and every reply is labelled.</span></label>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Select label="Keyword match strictness" value={String(threshold)} onChange={(e) => setThreshold(Number(e.target.value))} options={[["0.1", "Loose (answers more)"], ["0.2", "Balanced"], ["0.4", "Strict (hands over more)"]]} />
+        <Select label="Answer length (keyword mode)" value={String(length)} onChange={(e) => setLength(Number(e.target.value))} options={[["1", "1 sentence"], ["2", "2 sentences"], ["3", "3 sentences"]]} />
+        <Select label="Hand-over goes to" value={handoffTo} onChange={(e) => setHandoffTo(e.target.value)} options={["WhatsApp", "Email", "Help desk ticket", "Slack"]} />
+      </div>
+    </SettingsPanel>
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <div className="flex h-[480px] flex-col rounded-2xl border border-border bg-card">
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--demo-accent)] text-white"><Bot className="h-4 w-4" /></span><div><p className="text-sm font-semibold">{brand} assistant</p><p className="text-[11px] text-muted-foreground">Answers only from the knowledge on the right</p></div>{handoffs > 0 && <Badge tone="warn">{handoffs} handed to a person</Badge>}</div>
@@ -90,18 +128,20 @@ export default function AssistantDemo({ preset, brand }: EngineProps) {
               <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.by === "user" ? "bg-[var(--demo-accent)] text-white" : "bg-muted text-foreground"}`}>
                 {m.text}
                 {m.source && <span className="mt-1 block text-[10px] opacity-70">Source: {m.source}</span>}
-                {m.handoff && <span className="mt-1 block text-[10px] font-semibold opacity-80">Ticket created · conversation passed to staff</span>}
+                {m.handoff && <span className="mt-1 block text-[10px] font-semibold opacity-80">Handed over to staff via {handoffTo} (simulated)</span>}
+                {m.by === "bot" && m.via && <span className="mt-1 block text-[10px] opacity-70">{m.via === "ai" ? "AI answer (OpenAI)" : m.note ?? "Keyword match (no AI)"}</span>}
               </div>
               {m.by === "user" && <UserRound className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />}
             </div>
           ))}
+          {busy && <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" />Thinking…</p>}
           <div ref={endRef} />
         </div>
-        <div className="flex flex-wrap gap-1.5 px-4 pb-2">{cfg.suggestions.map((s) => <button key={s} type="button" onClick={() => ask(s)} className="rounded-full border border-border px-2.5 py-1 text-xs hover:border-[var(--demo-accent)]">{s}</button>)}</div>
-        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="flex gap-2 border-t border-border p-3"><input value={input} onChange={(e) => setInput(e.target.value)} maxLength={300} placeholder="Type a question…" aria-label="Your message" className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm outline-none focus:border-[var(--demo-accent)]" /><Btn type="submit" disabled={!input.trim()} aria-label="Send"><Send className="h-4 w-4" /></Btn></form>
+        <div className="flex flex-wrap gap-1.5 px-4 pb-2">{cfg.suggestions.map((s) => <button key={s} type="button" disabled={busy} onClick={() => ask(s)} className="rounded-full border border-border px-2.5 py-1 text-xs hover:border-[var(--demo-accent)]">{s}</button>)}</div>
+        <form onSubmit={(e) => { e.preventDefault(); ask(input); }} className="flex gap-2 border-t border-border p-3"><input value={input} onChange={(e) => setInput(e.target.value)} maxLength={300} placeholder="Type a question…" aria-label="Your message" className="flex-1 rounded-full border border-border bg-background px-4 py-2 text-sm outline-none focus:border-[var(--demo-accent)]" /><Btn type="submit" disabled={!input.trim() || busy} aria-label="Send"><Send className="h-4 w-4" /></Btn></form>
       </div>
       <Panel title="Knowledge it can use" actions={<Badge tone="accent">{docs.length} entries</Badge>}>
-        <p className="mb-2 text-[11px] text-muted-foreground">Edit or add your own entries, then ask about them. The demo matches keywords; production uses an AI model with retrieval and guardrails.</p>
+        <p className="mb-2 text-[11px] text-muted-foreground">Edit or add your own entries, then ask about them. Entries are saved in this browser only. Production adds retrieval over your real documents, logging and guardrails.</p>
         <ul className="max-h-56 space-y-2 overflow-y-auto">{docs.map((d) => (
           <li key={d.id} className="rounded-xl border border-border p-2 text-xs">
             <div className="flex items-center justify-between gap-2"><input aria-label="Entry title" value={d.title} onChange={(e) => setDocs((ds) => ds.map((x) => (x.id === d.id ? { ...x, title: e.target.value } : x)))} className="flex-1 bg-transparent font-semibold outline-none" /><button type="button" aria-label={`Delete ${d.title}`} onClick={() => setDocs((ds) => ds.filter((x) => x.id !== d.id))} className="text-muted-foreground hover:text-red-600"><Trash2 className="h-3.5 w-3.5" /></button></div>
@@ -113,6 +153,8 @@ export default function AssistantDemo({ preset, brand }: EngineProps) {
           <Btn type="submit" variant="soft" disabled={!newDoc.title.trim() || !newDoc.text.trim()}><Plus className="h-4 w-4" />Add knowledge</Btn>
         </form>
       </Panel>
+    </div>
+    <Outbox items={outbox} onClear={() => setOutbox([])} />
     </div>
   );
 }

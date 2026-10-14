@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Check, Copy, Sparkles } from "lucide-react";
-import { Badge, Btn, Field, Panel, Select, type EngineProps } from "./ui";
+import { Check, Copy, Loader2, Sparkles } from "lucide-react";
+import { Badge, Btn, Field, ListEditor, Panel, RoleBar, Select, SettingsPanel, Toggles, useDemoSetting, type EngineProps } from "./ui";
 
 interface Gen { fields: [key: string, label: string, def: string][]; tones?: string[]; outputs: (v: Record<string, string>, tone: string, brand: string) => { title: string; text: string; limit?: number }[] }
 const toneWord = (t: string) => ({ Friendly: "we'd love to", Professional: "we would be glad to", Bold: "let's" } as Record<string, string>)[t] ?? "we'd love to";
@@ -57,19 +57,49 @@ const CMS: Record<string, { item: string; title: string; body: string; cats: str
   doc: { item: "Document", title: "Client onboarding process", body: "1. Send welcome email\n2. Book kickoff call\n3. Share the client portal login…", cats: ["Operations", "Sales", "HR"] },
 };
 
-export default function WriterDemo({ preset, brand }: EngineProps) {
-  return CMS[preset] ? <Cms preset={preset} brand={brand} /> : <Generator preset={preset} brand={brand} />;
+export default function WriterDemo(props: EngineProps) {
+  return CMS[props.preset] ? <Cms {...props} /> : <Generator {...props} />;
 }
 
-function Generator({ preset, brand }: { preset: string; brand: string }) {
+type Out = { title: string; text: string; limit?: number };
+const TASK: Record<string, string> = { email: "email", social: "social", seo: "seo", ads: "ads", product: "product", outreach: "outreach", prospect: "prospect", briefing: "briefing", repurpose: "repurpose", localise: "localise" };
+
+function Generator(props: EngineProps) {
+  const { preset, brand } = props;
   const g = G[preset] ?? G.email;
+  const [aiMode, setAiMode] = useDemoSetting(props, "ai", true);
+  const [defaultTone, setDefaultTone] = useDemoSetting(props, "tone", g.tones?.[0] ?? "Friendly");
+  const [banned, setBanned] = useDemoSetting<string[]>(props, "banned", ["guaranteed", "best in the world"]);
   const [vals, setVals] = useState<Record<string, string>>(() => Object.fromEntries(g.fields.map(([k, , d]) => [k, d])));
-  const [tone, setTone] = useState(g.tones?.[0] ?? "Friendly");
+  const [toneRaw, setTone] = useState<string | null>(null);
+  const tone = toneRaw ?? defaultTone;
   const [market, setMarket] = useState("France");
-  const [outs, setOuts] = useState<{ title: string; text: string; limit?: number }[] | null>(null);
+  const [outs, setOuts] = useState<Out[] | null>(null);
+  const [via, setVia] = useState<{ ai: boolean; note: string } | null>(null);
+  const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
-  const gen = () => setOuts(g.outputs({ ...vals, market }, tone, brand));
+  const flagged = (t: string) => banned.filter((w) => w.trim() && t.toLowerCase().includes(w.trim().toLowerCase()));
+  const gen = async () => {
+    const template = g.outputs({ ...vals, market }, tone, brand);
+    if (!aiMode || !TASK[preset]) { setOuts(template); setVia({ ai: false, note: "Template version (no AI)" }); return; }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/demo-ai", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "write", brand, task: TASK[preset], tone, inputs: { ...vals, ...(preset === "localise" ? { market } : {}) }, titles: template.map((o) => o.title) }) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ai && Array.isArray(data.outputs)) {
+        setOuts(template.map((o, i) => ({ ...o, text: data.outputs.find((x: Out) => x.title === o.title)?.text ?? data.outputs[i]?.text ?? o.text })));
+        setVia({ ai: true, note: "Written by AI (OpenAI). Check facts and placeholders before using." });
+      } else { setOuts(template); setVia({ ai: false, note: `AI unavailable (${data.reason ?? data.message ?? `error ${res.status}`}): template version shown` }); }
+    } catch { setOuts(template); setVia({ ai: false, note: "AI unreachable: template version shown" }); }
+    finally { setBusy(false); }
+  };
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={`${aiMode ? "AI drafts (OpenAI)" : "Templates only"} · ${defaultTone}`}>
+      <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={aiMode} onChange={(e) => setAiMode(e.target.checked)} className="mt-0.5 accent-[var(--demo-accent)]" /><span><strong>Use real AI</strong> (OpenAI via our server, limited per visitor). Off or unavailable: built-in templates are used, and the result says which.</span></label>
+      {g.tones && <Select label="Default brand tone" value={defaultTone} onChange={(e) => { setDefaultTone(e.target.value); setTone(null); }} options={g.tones} className="max-w-[240px]" />}
+      <ListEditor label="Words and claims to avoid (flagged in drafts)" items={banned} onChange={setBanned} min={0} max={8} placeholder="e.g. cheapest" />
+    </SettingsPanel>
     <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
       <Panel title="Inputs">
         <form onSubmit={(e) => { e.preventDefault(); gen(); }} className="space-y-2.5">
@@ -78,41 +108,61 @@ function Generator({ preset, brand }: { preset: string; brand: string }) {
           ) : <Field key={k} label={label} value={vals[k]} onChange={(e) => setVals({ ...vals, [k]: e.target.value })} maxLength={140} />)}
           {preset === "localise" && <Select label="Market" value={market} onChange={(e) => setMarket(e.target.value)} options={["France", "Germany"]} />}
           {g.tones && <Select label="Tone of voice" value={tone} onChange={(e) => setTone(e.target.value)} options={g.tones} />}
-          <Btn type="submit"><Sparkles className="h-4 w-4" />Generate</Btn>
-          <p className="text-[11px] text-muted-foreground">Template-based demo that runs in your browser. Production uses AI trained on your brand voice, with a person approving before anything is published or sent.</p>
+          <Btn type="submit" disabled={busy}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}{busy ? "Writing…" : "Generate"}</Btn>
+          <p className="text-[11px] text-muted-foreground">Drafts are for review: in production a person approves before anything is published or sent.</p>
         </form>
       </Panel>
       <div className="space-y-3">
+        {via && <p role="status" className={`rounded-xl px-3 py-2 text-xs font-medium ${via.ai ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-muted text-muted-foreground"}`}>{via.note}</p>}
         {!outs ? <Panel><p className="text-sm text-muted-foreground">Fill in the inputs and press <strong>Generate</strong>.</p></Panel> : outs.map((o, i) => (
-          <Panel key={o.title + i} title={o.title} actions={<div className="flex items-center gap-2">{o.limit && <Badge tone={o.text.length > o.limit ? "bad" : "good"}>{o.text.length}/{o.limit}</Badge>}<Btn variant="ghost" className="!px-2.5 !py-1 !text-xs" onClick={() => { try { navigator.clipboard.writeText(o.text); } catch { /* blocked */ } setCopied(i); setTimeout(() => setCopied(null), 1500); }}>{copied === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}{copied === i ? "Copied" : "Copy"}</Btn></div>}>
+          <Panel key={o.title + i} title={o.title} actions={<div className="flex items-center gap-2">{flagged(o.text).length > 0 && <Badge tone="warn">Avoid: {flagged(o.text).join(", ")}</Badge>}{o.limit && <Badge tone={o.text.length > o.limit ? "bad" : "good"}>{o.text.length}/{o.limit}</Badge>}<Btn variant="ghost" className="!px-2.5 !py-1 !text-xs" onClick={() => { try { navigator.clipboard.writeText(o.text); } catch { /* blocked */ } setCopied(i); setTimeout(() => setCopied(null), 1500); }}>{copied === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}{copied === i ? "Copied" : "Copy"}</Btn></div>}>
             <textarea aria-label={o.title} value={o.text} onChange={(e) => setOuts((os) => os!.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))} rows={Math.min(10, Math.max(2, o.text.split("\n").length + 1))} className="w-full resize-y rounded-xl border border-border bg-background p-2.5 text-sm outline-none focus:border-[var(--demo-accent)]" />
           </Panel>
         ))}
       </div>
     </div>
+    </div>
   );
 }
 
-function Cms({ preset, brand }: { preset: string; brand: string }) {
+function Cms(props: EngineProps) {
+  const { preset, brand } = props;
   const c = CMS[preset];
+  const [cats, setCats] = useDemoSetting<string[]>(props, "cats", c.cats);
+  const [steps, setSteps] = useDemoSetting<string[]>(props, "steps", ["review"]);
+  const [minWords, setMinWords] = useDemoSetting(props, "minWords", 300);
+  const [role, setRole] = useDemoSetting(props, "role", "editor");
   const [title, setTitle] = useState(c.title);
   const [body, setBody] = useState(c.body);
-  const [cat, setCat] = useState(c.cats[0]);
+  const [catRaw, setCat] = useState(c.cats[0]);
+  const cat = cats.includes(catRaw) ? catRaw : cats[0];
   const [status, setStatus] = useState<"Draft" | "In review" | "Scheduled" | "Published">("Draft");
   const [versions, setVersions] = useState<string[]>([]);
   const slug = useMemo(() => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 60), [title]);
   const desc = body.replace(/\s+/g, " ").slice(0, 155);
   const words = body.trim().split(/\s+/).filter(Boolean).length;
-  const next = { Draft: "In review", "In review": "Scheduled", Scheduled: "Published", Published: "Published" } as const;
+  // The editorial workflow follows the settings: review and scheduling steps can be turned off.
+  const flow = (["Draft", ...(steps.includes("review") ? ["In review"] : []), ...(steps.includes("schedule") ? ["Scheduled"] : []), "Published"] as const) as readonly ("Draft" | "In review" | "Scheduled" | "Published")[];
+  const nextOf = (st: typeof status) => flow[Math.min(flow.length - 1, flow.indexOf(st) + 1)] ?? "Published";
+  const canAdvance = role === "editor" || status === "Draft";
+  const label = status === "Draft" ? (nextOf(status) === "In review" ? "Send for review" : nextOf(status) === "Scheduled" ? "Schedule" : "Publish now") : status === "In review" ? (nextOf(status) === "Scheduled" ? "Approve & schedule" : "Approve & publish") : status === "Scheduled" ? "Publish now" : "Published";
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={`${flow.join(" → ")} · ${cats.length} categories`}>
+      <Toggles label="Editorial workflow steps" options={[["review", "Editor review before publishing"], ["schedule", "Schedule instead of publishing immediately"]]} value={steps} onChange={setSteps} />
+      <ListEditor label="Categories" items={cats} onChange={setCats} min={1} max={8} placeholder="e.g. Case studies" />
+      <Select label="Minimum length for SEO check" value={String(minWords)} onChange={(e) => setMinWords(Number(e.target.value))} options={[["150", "150 words"], ["300", "300 words"], ["600", "600 words"], ["1000", "1,000 words"]]} className="max-w-[240px]" />
+    </SettingsPanel>
+    <RoleBar roles={[{ id: "editor", label: "Editor", can: "Writes, approves, schedules and publishes." }, { id: "writer", label: "Writer", can: steps.includes("review") ? "Writes drafts and sends them for review. Cannot approve or publish." : "Writes drafts. With review turned off, writers can publish directly." }]} value={role} onChange={setRole} />
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <Panel title={`${c.item} editor`} actions={<Badge tone={status === "Published" ? "good" : status === "Draft" ? "neutral" : "warn"}>{status}</Badge>}>
         <input aria-label="Title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={100} className="w-full border-b border-border bg-transparent pb-2 font-display text-xl font-semibold outline-none focus:border-[var(--demo-accent)]" />
         <textarea aria-label="Body" value={body} onChange={(e) => setBody(e.target.value)} rows={10} className="mt-3 w-full resize-y rounded-xl border border-border bg-background p-3 text-sm leading-relaxed outline-none focus:border-[var(--demo-accent)]" />
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><span>{words} words · ~{Math.max(1, Math.round(words / 200))} min read</span>
-          <Select label="" aria-label="Category" value={cat} onChange={(e) => setCat(e.target.value)} options={c.cats} className="w-36" />
+          <Select label="" aria-label="Category" value={cat} onChange={(e) => setCat(e.target.value)} options={cats} className="w-36" />
           <Btn variant="ghost" onClick={() => setVersions((v) => [`v${v.length + 1} · ${new Date().toLocaleTimeString()} · ${words} words`, ...v])}>Save version</Btn>
-          <Btn onClick={() => setStatus(next[status])} disabled={status === "Published"}>{status === "Draft" ? "Send for review" : status === "In review" ? "Approve & schedule" : status === "Scheduled" ? "Publish now" : "Published"}</Btn>
+          <Btn onClick={() => setStatus(nextOf(status))} disabled={status === "Published" || !canAdvance}>{label}</Btn>
+          {role === "writer" && status !== "Draft" && status !== "Published" && <span>Waiting for an editor</span>}
         </div>
       </Panel>
       <div className="space-y-4">
@@ -120,10 +170,11 @@ function Cms({ preset, brand }: { preset: string; brand: string }) {
           <p className="truncate text-xs text-emerald-700">{brand.toLowerCase().replace(/[^a-z0-9]/g, "") || "yoursite"}.com › {cat.toLowerCase()} › {slug}</p>
           <p className="mt-0.5 text-base text-[#1a0dab] dark:text-sky-400">{title.length > 60 ? `${title.slice(0, 57)}…` : title}</p>
           <p className="text-xs text-muted-foreground">{desc}{body.length > 155 ? "…" : ""}</p>
-          <div className="mt-2 flex flex-wrap gap-1"><Badge tone={title.length <= 60 ? "good" : "warn"}>Title {title.length}/60</Badge><Badge tone={words >= 300 ? "good" : "warn"}>{words >= 300 ? "Length OK" : "Add more detail (300+ words)"}</Badge></div>
+          <div className="mt-2 flex flex-wrap gap-1"><Badge tone={title.length <= 60 ? "good" : "warn"}>Title {title.length}/60</Badge><Badge tone={words >= minWords ? "good" : "warn"}>{words >= minWords ? "Length OK" : `Add more detail (${minWords}+ words)`}</Badge></div>
         </Panel>
         <Panel title="Version history">{versions.length ? <ul className="space-y-1 text-xs text-muted-foreground">{versions.map((v) => <li key={v}>• {v}</li>)}</ul> : <p className="text-xs text-muted-foreground">No saved versions yet.</p>}</Panel>
       </div>
+    </div>
     </div>
   );
 }

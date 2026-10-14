@@ -159,7 +159,7 @@ export default function Navbar() {
         onClick={() => setOpenDropdown(openDropdown === key ? null : key)}
         aria-expanded={openDropdown === key}
         aria-haspopup="true"
-        className={`nav-link font-body inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-sm font-medium transition-colors hover:text-foreground ${openDropdown === key || isActive(SECTION_PATHS[key]) ? "nav-link-active text-foreground" : "text-muted-foreground"}`}
+        className={`nav-link font-body inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-1.5 text-sm font-medium transition-colors hover:text-foreground ${openDropdown === key || isActive(SECTION_PATHS[key]) ? "nav-link-active text-foreground" : "text-muted-foreground"}`}
       >
         {label} <span aria-hidden="true" className={`text-[10px] transition-transform duration-200 ${openDropdown === key ? "rotate-180" : ""}`}>▾</span>
       </button>
@@ -239,8 +239,8 @@ export default function Navbar() {
     <header className={`site-header fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass is-scrolled shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
       <a href="#main-content" onClick={(e) => { const m = document.querySelector("main"); if (!m) return; e.preventDefault(); m.setAttribute("tabindex", "-1"); m.focus(); m.scrollIntoView(); }} className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[200] focus:rounded-full focus:bg-[var(--emma-violet)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">Skip to content</a>
       <nav ref={navRef} aria-label="Main" className={`mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 transition-[padding] duration-300 sm:px-5 ${scrolled ? "py-2.5" : "py-4"}`}>
-        <Link to="/" className="flex min-w-0 items-baseline gap-0.5">
-          <span className="truncate font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>
+        <Link to="/" className="flex shrink-0 items-baseline gap-0.5" aria-label="EmmaForYou home">
+          <span className="font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />
         </Link>
 
@@ -257,8 +257,7 @@ export default function Navbar() {
           <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
           <DarkModeToggle />
           <LanguageSelector />
-          <Link to="/book" className="nav-cta-secondary ml-1 hidden rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground transition hover:border-[var(--emma-violet)] hover:text-[var(--emma-violet)] 2xl:inline-flex">Book a call</Link>
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold nav-cta group ml-1 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm">
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold nav-cta group ml-1 inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-5 py-2.5 text-sm">
             {t("cta_waitlist")} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
           </a>
         </div>

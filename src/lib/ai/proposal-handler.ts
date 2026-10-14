@@ -47,7 +47,7 @@ Budget: ${p.budget}
 Timeline: ${p.timeline}
 Notes from the client: ${p.notes || "none"}`;
 
-  const ai = limit.aiPaused ? null : await aiText(request, limit.key, instructions, [{ role: "user", content: brief }]);
+  const ai = !limit.provider ? null : await aiText(request, limit.provider, instructions, [{ role: "user", content: brief }]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const j = ai?.ok ? extractJson<any>(ai.text) : null;
   // Without AI (or with an unreadable reply), send the rule-based draft built from the published plans.
@@ -67,5 +67,5 @@ Notes from the client: ${p.notes || "none"}`;
     measures: (Array.isArray(j.measures) ? j.measures : []).slice(0, 4).map((x: { metric?: unknown; how?: unknown }) => ({ metric: str(x.metric, 80), how: str(x.how, 200) })).filter((x: { metric: string }) => x.metric),
     nextSteps: list(j.nextSteps, 4, 160),
   };
-  return Response.json({ proposal: doc, remaining: limit.remaining }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ proposal: doc, remaining: limit.remaining, aiWritten: true }, { headers: { "Cache-Control": "no-store" } });
 });

@@ -4,6 +4,8 @@
  */
 import type { ModelMessage } from "ai";
 import { createResponsesCall } from "./responses";
+import { aiProvider, classifyFailure, visitorSalt, type AiProvider, type ProviderFailure, type ProviderId } from "./provider";
+export { aiProvider, type AiProvider } from "./provider";
 
 const HOUR_MS = 60 * 60 * 1000;
 const PAUSE_MS = 30 * 60 * 1000;
@@ -59,31 +61,47 @@ export async function adminDb(): Promise<any> {
   return supabaseAdmin;
 }
 
+/** Is the given provider currently paused after a credit/key failure? */
+export async function providerPaused(provider: AiProvider): Promise<{ paused: boolean; error: boolean }> {
+  const db = await adminDb();
+  const { data, error } = await db.from("prototype_ai_access_state").select("updated_at").eq("id", provider.pauseId).maybeSingle();
+  if (error) return { paused: false, error: true };
+  return { paused: Boolean(data && Date.now() - new Date(data.updated_at).getTime() < PAUSE_MS), error: false };
+}
+
+/** Record a credit/key failure so every AI feature on this provider pauses for a while instead of failing repeatedly. */
+export async function pauseProvider(provider: AiProvider, status: number, message: string): Promise<void> {
+  try {
+    const db = await adminDb();
+    await db.from("prototype_ai_access_state").upsert({ id: provider.pauseId, status, message: message.slice(0, 200), updated_at: new Date().toISOString() });
+  } catch { /* best effort */ }
+}
+
 /**
  * Per-feature limits share the prototype_generations log (kind = feature name), plus the shared
- * pause that kicks in when the AI provider reports exhausted credits or access problems.
+ * pause that kicks in when the AI provider reports a bad key or exhausted credits/quota.
  */
 export async function checkLimits(
   request: Request,
   kind: string,
   limits: { perVisitor: number; global: number; label: string; /** The tool still gives a useful (rule-based) result without AI. */ worksWithoutAi?: boolean },
-): Promise<{ ok: true; key: string; remaining: number; aiPaused: boolean; logId: string | null } | Fail> {
-  const key = process.env["LOVABLE_API_KEY"] || "";
-  if (!key && !limits.worksWithoutAi) return fail("AI is not configured yet.", 401);
+): Promise<{ ok: true; provider: AiProvider | null; remaining: number; aiPaused: boolean; logId: string | null } | Fail> {
+  const configured = aiProvider();
+  if (!configured && !limits.worksWithoutAi) return fail("AI is not configured yet.", 503);
   const db = await adminDb();
-  const { data: blocked, error: stateError } = await db.from("prototype_ai_access_state").select("updated_at").eq("id", "prototype").maybeSingle();
-  if (stateError && !limits.worksWithoutAi) return fail("AI tools are temporarily unavailable. Please try later.", 503);
-  const aiPaused = !key || Boolean(blocked && Date.now() - new Date(blocked.updated_at).getTime() < PAUSE_MS);
+  const state = configured ? await providerPaused(configured) : { paused: true, error: false };
+  if (state.error && !limits.worksWithoutAi) return fail("AI tools are temporarily unavailable. Please try later.", 503);
+  const aiPaused = !configured || state.paused;
   if (aiPaused && !limits.worksWithoutAi) {
     return fail("Our AI tools are taking a short break. Please try again later, or chat with us on WhatsApp.", 503);
   }
-  const visitor = await hashVisitor(request, key || "emmaforyou-visitor-salt");
+  const visitor = await hashVisitor(request, visitorSalt());
   const since = new Date(Date.now() - HOUR_MS).toISOString();
   const [mine, all] = await Promise.all([
     db.from("prototype_generations").select("created_at").eq("visitor_hash", visitor).eq("kind", kind).gte("created_at", since).order("created_at", { ascending: true }),
     db.from("prototype_generations").select("id", { count: "exact", head: true }).eq("kind", kind).gte("created_at", since),
   ]);
-  if (mine.error || all.error) return fail("AI tools are temporarily unavailable. Please try later.", 503);
+  if (mine.error || all.error) return fail("This tool is temporarily unavailable. Please try later.", 503);
   const used = mine.data?.length ?? 0;
   if (used >= limits.perVisitor) {
     const oldest = new Date(mine.data[0].created_at).getTime();
@@ -92,46 +110,43 @@ export async function checkLimits(
   }
   if ((all.count ?? 0) >= limits.global) return fail("This tool is very busy right now. Please try again in a little while.", 429);
   const { data: logged } = await db.from("prototype_generations").insert({ visitor_hash: visitor, kind }).select("id").maybeSingle();
-  return { ok: true, key, remaining: Math.max(0, limits.perVisitor - used - 1), aiPaused, logId: (logged?.id as string | undefined) ?? null };
+  return { ok: true, provider: aiPaused ? null : configured, remaining: Math.max(0, limits.perVisitor - used - 1), aiPaused, logId: (logged?.id as string | undefined) ?? null };
 }
 
-/** Give a use back when the request failed for reasons outside the visitor's control (e.g. their site was unreachable). */
+/** Give a use back when the request failed for reasons outside the visitor's control (e.g. their site was unreachable, or the AI failed and nothing was produced). */
 export async function refundLimit(logId: string | null): Promise<void> {
   if (!logId) return;
   try { const db = await adminDb(); await db.from("prototype_generations").delete().eq("id", logId); } catch { /* best effort */ }
 }
 
-/** Run one model call and return its full text. Credit/access failures pause all AI tools for a while. */
+/** Run one model call and return its full text. Key/credit failures pause all AI tools on that provider for a while. */
 export async function aiText(
   request: Request,
-  key: string,
+  provider: AiProvider,
   instructions: string,
   messages: ModelMessage[],
-): Promise<{ ok: true; text: string } | Fail> {
-  let upstream = "";
-  let status = 0;
+  opts: { model?: string } = {},
+): Promise<{ ok: true; text: string; provider: ProviderId } | Fail> {
+  let failure: ProviderFailure | null = null;
   const call = createResponsesCall(request, {
-    baseURL: "https://ai.gateway.lovable.dev/v1", apiKey: key, model: AI_MODEL,
+    provider,
+    model: opts.model,
     onResponse: async (response) => {
       if (response.ok) return;
-      status = response.status;
-      try {
-        const value = await response.clone().json();
-        upstream = value.message || value.error?.message || "";
-      } catch { /* non-JSON failure */ }
-      if (response.status === 402 || response.status === 403) {
-        const db = await adminDb();
-        await db.from("prototype_ai_access_state").upsert({ id: "prototype", status: response.status, message: upstream || "paused", updated_at: new Date().toISOString() });
-      }
+      failure = await classifyFailure(provider, response);
+      if (failure.pause) await pauseProvider(provider, response.status, `${provider.id} ${response.status}`);
     },
   }, messages, instructions);
   try {
     const text = await call.result.text;
     if (!text.trim()) return fail("The AI service returned nothing. Please try again.", 502);
-    return { ok: true, text };
-  } catch {
-    if (status === 402 || status === 403) return fail("Our AI tools are taking a short break. Please try again later.", 503);
-    return fail(upstream || "The AI service is temporarily unavailable. Please try again.", 502);
+    return { ok: true, text, provider: provider.id };
+  } catch (error) {
+    const f = failure as ProviderFailure | null;
+    if (f) return fail(f.message, f.status);
+    if (request.signal.aborted) return fail("The request was cancelled.", 499);
+    console.error(`[ai:${provider.id}] call failed: ${error instanceof Error ? error.name : "error"}`);
+    return fail("The AI service is temporarily unavailable. Please try again.", 502);
   }
 }
 

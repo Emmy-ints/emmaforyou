@@ -1,7 +1,8 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createResponsesCall } from "./responses";
-import { adminDb, AI_MODEL, checkLimits, checkOrigin, readJson } from "./guard";
+import { checkLimits, checkOrigin, pauseProvider, readJson, refundLimit } from "./guard";
+import { classifyFailure, type ProviderFailure } from "./provider";
 
 const schema = z.object({
   image: z.string().regex(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/).max(1_400_000),
@@ -32,16 +33,14 @@ export const handleMakeover = createServerOnlyFn(async (request: Request) => {
   const [, mediaType, data] = input.image.match(/^data:(image\/\w+);base64,(.*)$/)!;
   let notify: (r: Response | null) => void = () => {};
   const ready = new Promise<Response | null>((resolve) => { notify = resolve; });
-  let upstream = "";
+  let failure: ProviderFailure | null = null;
+  const provider = limit.provider!;
   const call = createResponsesCall(request, {
-    baseURL: "https://ai.gateway.lovable.dev/v1", apiKey: limit.key, model: AI_MODEL,
+    provider, model: provider.creativeModel,
     onResponse: async (response) => {
       if (!response.ok) {
-        try { const v = await response.clone().json(); upstream = v.message || v.error?.message || ""; } catch { /* keep fallback */ }
-        if (response.status === 402 || response.status === 403) {
-          const db = await adminDb();
-          await db.from("prototype_ai_access_state").upsert({ id: "prototype", status: response.status, message: upstream || "paused", updated_at: new Date().toISOString() });
-        }
+        failure = await classifyFailure(provider, response);
+        if (failure.pause) await pauseProvider(provider, response.status, `${provider.id} ${response.status}`);
       }
       notify(response);
     },
@@ -64,16 +63,20 @@ Output ONLY a complete HTML document, no markdown fences or commentary. Inline C
         let hasText = false;
         for await (const part of call.result.fullStream) {
           if (part.type === "text-delta") { hasText = true; send({ type: "text", text: part.text }); }
-          if (part.type === "error") { notify(null); send({ type: "error", message: upstream || "The redesign couldn't be completed. Please try again." }); }
+          if (part.type === "error") { notify(null); send({ type: "error", message: (failure as ProviderFailure | null)?.message || "The redesign couldn't be completed. Please try again." }); }
           if (part.type === "finish") send(hasText ? { type: "done" } : { type: "error", message: "The AI returned no design. Try a clearer screenshot." });
         }
       } catch {
         notify(null);
-        if (!request.signal.aborted) send({ type: "error", message: upstream || "The redesign was interrupted. Please try again." });
+        if (!request.signal.aborted) send({ type: "error", message: (failure as ProviderFailure | null)?.message || "The redesign was interrupted. Please try again." });
       } finally { notify(null); controller.close(); }
     },
   });
   const first = await ready;
-  if (first && !first.ok) return Response.json({ message: upstream || "The AI service is unavailable right now." }, { status: first.status === 402 || first.status === 403 ? 503 : 502 });
+  if (first && !first.ok) {
+    await refundLimit(limit.logId);
+    const f = failure as ProviderFailure | null;
+    return Response.json({ message: f?.message || "The AI service is unavailable right now." }, { status: f?.status ?? 502 });
+  }
   return new Response(stream, { headers: { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Makeovers-Remaining": String(limit.remaining) } });
 });

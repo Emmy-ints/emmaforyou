@@ -2,6 +2,7 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import { prototypeRequestSchema } from "../prototype";
 import { createResponsesCall } from "./responses";
 import { getLovableAiGatewayResponseHeaders } from "./run-id.ts";
+import { aiProvider, classifyFailure, visitorSalt, type ProviderFailure } from "./provider";
 
 export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   const origin = request.headers.get("origin");
@@ -20,11 +21,11 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   } catch {
     return Response.json({ message: "Describe your idea in 8–500 characters." }, { status: 400 });
   }
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) return Response.json({ message: "AI generation is not configured yet." }, { status: 401 });
+  const provider = aiProvider();
+  if (!provider) return Response.json({ message: "The prototype builder isn't available right now. Please chat with us on WhatsApp." }, { status: 503 });
   // Only trusted same-origin generation requests can reach private circuit-breaker state.
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: blocked, error: stateError } = await supabaseAdmin.from("prototype_ai_access_state").select("status,message,updated_at").eq("id", "prototype").maybeSingle();
+  const { data: blocked, error: stateError } = await supabaseAdmin.from("prototype_ai_access_state").select("status,message,updated_at").eq("id", provider.pauseId).maybeSingle();
   if (stateError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
   // A credit/access failure pauses generation for a while, then retries on its own (e.g. after credits are topped up).
   if (blocked && Date.now() - new Date(blocked.updated_at).getTime() < BLOCK_COOLDOWN_MS) {
@@ -32,11 +33,12 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   }
 
   // Visitor limit: a few generations per visitor per hour, plus an overall hourly cap to protect the AI budget.
-  const visitorHash = await hashVisitor(request, key);
+  const visitorHash = await hashVisitor(request, visitorSalt());
   const since = new Date(Date.now() - HOUR_MS).toISOString();
   const [{ data: mine, error: mineError }, { count: everyone, error: allError }] = await Promise.all([
-    supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).gte("created_at", since).order("created_at", { ascending: true }),
-    supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).gte("created_at", since),
+    // Only prototype runs count here; other tools log their own kinds in the same table.
+    supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).in("kind", ["new", "refine"]).gte("created_at", since).order("created_at", { ascending: true }),
+    supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).in("kind", ["new", "refine"]).gte("created_at", since),
   ]);
   if (mineError || allError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
   if ((mine?.length ?? 0) >= PER_VISITOR_PER_HOUR) {
@@ -50,24 +52,21 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   if ((everyone ?? 0) >= GLOBAL_PER_HOUR) {
     return Response.json({ message: "The prototype builder is very busy right now. Please try again in a little while." }, { status: 429, headers: { "Retry-After": "900" } });
   }
-  await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.refinement ? "refine" : "new" });
+  const { data: logged } = await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.refinement ? "refine" : "new" }).select("id").maybeSingle();
   const remaining = PER_VISITOR_PER_HOUR - (mine?.length ?? 0) - 1;
 
   let notifyReady: (response: Response | null) => void = () => {};
   const ready = new Promise<Response | null>((resolve) => { notifyReady = resolve; });
   let upstreamFailure = "";
+  let failure: ProviderFailure | null = null;
   const call = createResponsesCall(request, {
-    baseURL: "https://ai.gateway.lovable.dev/v1", apiKey: key, model: "openai/gpt-6-astra",
+    provider, model: provider.creativeModel,
     onResponse: async (response) => {
       if (!response.ok) {
-        let message = "AI generation is temporarily unavailable. Please try again later.";
-        try {
-          const value = await response.clone().json();
-          message = value.message || value.error?.message || message;
-        } catch { /* Keep safe fallback for non-JSON failures. */ }
-        upstreamFailure = message;
-        if (response.status === 402 || response.status === 403) {
-          await supabaseAdmin.from("prototype_ai_access_state").upsert({ id: "prototype", status: response.status, message, updated_at: new Date().toISOString() });
+        failure = await classifyFailure(provider, response);
+        upstreamFailure = failure.message;
+        if (failure.pause) {
+          await supabaseAdmin.from("prototype_ai_access_state").upsert({ id: provider.pauseId, status: response.status, message: `${provider.id} ${response.status}`, updated_at: new Date().toISOString() });
         }
       }
       notifyReady(response);
@@ -102,9 +101,14 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
     },
   });
   const upstream = await ready;
-  if (upstream && !upstream.ok) return Response.json({ message: upstreamFailure }, { status: upstream.status });
+  if (upstream && !upstream.ok) {
+    // Nothing was generated, so the attempt doesn't count against the visitor's limit.
+    if (logged?.id) await supabaseAdmin.from("prototype_generations").delete().eq("id", logged.id);
+    const f = failure as ProviderFailure | null;
+    return Response.json({ message: upstreamFailure || "AI generation is temporarily unavailable." }, { status: f?.status ?? 502 });
+  }
   if (request.signal.aborted) return new Response(null, { status: 499 });
-  const headers = getLovableAiGatewayResponseHeaders(upstream?.headers, { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) });
+  const headers = provider.id === "openai" ? new Headers({ "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) }) : getLovableAiGatewayResponseHeaders(upstream?.headers, { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) });
   return new Response(stream, { headers });
 });
 

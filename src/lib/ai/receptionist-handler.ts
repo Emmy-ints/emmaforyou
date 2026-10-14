@@ -18,7 +18,7 @@ export const handleReceptionist = createServerOnlyFn(async (request: Request) =>
 
   const business = DEMO_BUSINESSES.find((b) => b.id === input.business)!;
   const today = input.today || new Date().toDateString();
-  const result = limit.aiPaused ? { ok: false as const } : await aiText(request, limit.key, businessPrompt(business, today), input.messages.map((m) => ({ role: m.role, content: m.content })));
+  const result = !limit.provider ? { ok: false as const } : await aiText(request, limit.provider, businessPrompt(business, today), input.messages.map((m) => ({ role: m.role, content: m.content })));
   if (!result.ok) {
     const last = input.messages[input.messages.length - 1].content;
     return Response.json({ reply: offlineReply(business, last), booking: null, remaining: limit.remaining, offline: true }, { headers: { "Cache-Control": "no-store" } });

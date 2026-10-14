@@ -72,7 +72,7 @@ Respond with ONLY JSON: {"reply": "<message>", "links": [{"label": "<short>", "p
 KNOWLEDGE
 ${knowledge()}`;
 
-  const ai = limit.aiPaused ? { ok: false as const } : await aiText(request, limit.key, instructions, input.messages.map((m) => ({ role: m.role, content: m.content })));
+  const ai = !limit.provider ? { ok: false as const } : await aiText(request, limit.provider, instructions, input.messages.map((m) => ({ role: m.role, content: m.content })));
   if (!ai.ok) {
     // Still useful while the AI is unavailable: point to the fastest human routes.
     return Response.json({

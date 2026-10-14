@@ -159,7 +159,7 @@ function Report({ r }: { r: AuditResult }) {
               </li>
             ))}
           </ol>
-          {!r.aiWritten && <p className="mt-4 text-xs text-muted-foreground">Priorities generated from the checks below.</p>}
+          {!r.aiWritten && <p className="mt-4 text-xs text-muted-foreground">Rule-based summary: our AI write-up is unavailable right now, so the priorities below come directly from the checks that failed.</p>}
         </div>
 
         <div className="space-y-4">

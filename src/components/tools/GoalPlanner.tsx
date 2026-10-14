@@ -9,6 +9,7 @@ export default function GoalPlanner() {
   const [form, setForm] = useState<PlanRequest>({ role: ROLES[0], goal: "", why: "", now: "", hours: HOURS[1], obstacle: OBSTACLES[0], startDate: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [aiWritten, setAiWritten] = useState(true);
   const [plan, setPlan] = useState<GoalPlan | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
   const set = <K extends keyof PlanRequest>(k: K, v: PlanRequest[K]) => setForm((f) => ({ ...f, [k]: v }));
@@ -22,6 +23,7 @@ export default function GoalPlanner() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "The plan couldn't be created.");
       setPlan(data.plan);
+      setAiWritten(data.aiWritten !== false);
       setDone(new Set());
       track("plan_generated", { role: form.role, obstacle: form.obstacle });
       window.setTimeout(() => document.getElementById("goal-plan")?.scrollIntoView({ behavior: "smooth" }), 50);
@@ -62,6 +64,7 @@ export default function GoalPlanner() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">Your 90-day plan</p>
             <h2 id="plan-heading" className="mt-2 font-display text-2xl font-semibold tracking-tight md:text-3xl">{plan.headline}</h2>
             <p className="mt-3 flex gap-2 text-foreground"><Flag className="mt-1 h-4 w-4 shrink-0 text-[var(--emma-violet)]" />{plan.northStar}</p>
+            {!aiWritten && <p className="no-print mt-3 rounded-xl bg-muted px-3 py-2 text-xs text-muted-foreground"><strong className="text-foreground">Standard framework.</strong> Our AI planner is unavailable right now, so this is a general 12-week structure built around your goal, time and obstacle. Try again later for a fully personalised plan.</p>}
             <div className="mt-6 grid gap-3 md:grid-cols-3">
               {plan.milestones.map((m) => (
                 <div key={m.month} className="rounded-2xl bg-muted p-4">
@@ -117,7 +120,7 @@ export default function GoalPlanner() {
             <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold hover:border-[var(--emma-violet)]"><Download className="h-4 w-4" /> Download PDF</button>
             <Link to="/expertise/accountability-coaching" className="inline-flex items-center rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold hover:border-[var(--emma-violet)]">How accountability coaching works</Link>
           </div>
-          <LeadCapture tool="Goal planner" title="Want someone to hold you to it?" lead="Most plans fail in week 3. With accountability coaching, Emmanuel checks in every week, helps you clear blockers and keeps you moving." button="Talk about accountability coaching" summary={`Goal: ${form.goal}. Role: ${form.role}. Time: ${form.hours}. Obstacle: ${form.obstacle}. Plan: ${plan.northStar}`} />
+          <LeadCapture tool="Goal planner" title="Want someone to hold you to it?" lead="Plans are easier to keep when someone checks in. With accountability coaching, Emmanuel checks in every week, helps you clear blockers and keeps you moving." button="Talk about accountability coaching" summary={`Goal: ${form.goal}. Role: ${form.role}. Time: ${form.hours}. Obstacle: ${form.obstacle}. Plan: ${plan.northStar}`} />
         </section>
       )}
     </div>

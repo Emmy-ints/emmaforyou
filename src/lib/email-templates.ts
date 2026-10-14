@@ -8,6 +8,13 @@ export interface EmailItem {
 export type SequenceTemplate = (vars: { businessName: string; ownerName: string }) => EmailItem[];
 
 export const SEQUENCES: Record<string, SequenceTemplate> = {
+  "welcome-general": ({ businessName, ownerName }) => [
+    { day: 0, subject: `Welcome to ${businessName} — here's what to expect`, preview: "Thanks for joining us.", body: `Hi friend,\n\nThanks for joining ${businessName}! I'm ${ownerName}. Over the next two weeks I'll share what we do best, how to get the most from it, and a welcome offer.\n\nSpeak soon,\n${ownerName}` },
+    { day: 2, subject: "What most customers come to us for", preview: `The most popular thing at ${businessName}...`, body: `Hi friend,\n\nMost people start with [your best-selling product or service]. Here's why it works and who it's for: [two or three sentences].\n\nTake a look → [link]` },
+    { day: 5, subject: "Questions people ask before buying", preview: "Quick answers to common questions...", body: "Here are short answers to the questions we hear most: delivery, pricing, returns and support. [Add your top 3 FAQs]." },
+    { day: 8, subject: "What our customers say", preview: "In their own words...", body: "A few words from real customers. [Paste two genuine reviews with permission.]" },
+    { day: 12, subject: "Your welcome offer ends soon", preview: "A reminder before it expires...", body: "A quick reminder: your welcome offer ends in 48 hours. [Offer details and link]." },
+  ],
   "welcome-restaurant": ({ businessName, ownerName }) => [
     { day: 0, subject: `Welcome! Here's your exclusive first-visit offer 🍽️`, preview: "We've been waiting for you...",
       body: `Hi friend,\n\nWelcome to ${businessName}! I'm ${ownerName}, and I personally wanted to thank you for joining our list.\n\nAs a welcome gift, here's 15% off your first visit. Just show this email at the table and we'll take care of the rest.\n\nCan't wait to host you,\n${ownerName}\n${businessName}` },
@@ -33,7 +40,7 @@ export const SEQUENCES: Record<string, SequenceTemplate> = {
   ],
   "welcome-coach": ({ businessName, ownerName }) => [
     { day: 0, subject: "Welcome — let's get you results", preview: `From ${ownerName}, your coach.`, body: `Hi friend,\n\nWelcome to ${businessName}! Over the next 12 days, I'll share my 5 most effective insights with you.\n\nLet's go.\n${ownerName}` },
-    { day: 2, subject: "The mistake 90% of [audience] make", preview: "Most of my clients make this exact mistake...", body: "Here's the #1 mistake I see and how to avoid it." },
+    { day: 2, subject: "The most common mistake I see [your audience] make", preview: "Most of my clients make this exact mistake...", body: "Here's the #1 mistake I see and how to avoid it." },
     { day: 5, subject: "My personal framework, free", preview: "The exact 4-step process I use...", body: "Download my framework PDF inside." },
     { day: 8, subject: "Real client transformation 👀", preview: "From X to Y in 90 days...", body: "Case study of a real client transformation." },
     { day: 12, subject: "Want to work together?", preview: "Limited spots open this month...", body: "If you're ready to take this further, I have 3 spots open." },
@@ -62,8 +69,8 @@ export const SEQUENCES: Record<string, SequenceTemplate> = {
 };
 
 export const GOAL_TO_SEQ: Record<string, Record<string, string>> = {
-  Welcome: { Restaurant: "welcome-restaurant", Fashion: "welcome-fashion", Clinic: "welcome-clinic", Coach: "welcome-coach" },
-  "Abandoned cart": { Ecommerce: "abandoned-cart", Fashion: "abandoned-cart" },
+  Welcome: { Restaurant: "welcome-restaurant", Fashion: "welcome-fashion", Clinic: "welcome-clinic", Coach: "welcome-coach", default: "welcome-general" },
+  "Abandoned cart": { default: "abandoned-cart" },
   "Re-engage cold leads": { default: "re-engage" },
   "Launch product/service": { default: "product-launch" },
 };

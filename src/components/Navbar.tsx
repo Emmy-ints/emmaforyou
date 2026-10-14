@@ -30,7 +30,7 @@ const TOOLS = [
   { to: "/goal-planner", name: "90-Day Goal Planner", icon: "🎯", short: "Goals into weekly actions" },
   { to: "/roi-calculator", name: "ROI Calculator", icon: "🧮", short: "Estimate your return" },
   { to: "/growth-quiz", name: "Growth Quiz", icon: "🎯", short: "Find your next step" },
-  { to: "/email-generator", name: "Email Generator", icon: "✉️", short: "AI-written emails" },
+  { to: "/email-generator", name: "Email Generator", icon: "✉️", short: "5-email sequences, AI-assisted" },
   { to: "/analyser", name: "Growth Assessment", icon: "🔬", short: "Score your business" },
 ];
 

@@ -23,6 +23,7 @@ function Chip({ on, children, onClick }: { on: boolean; children: React.ReactNod
 
 export default function ProposalBuilder() {
   const [form, setForm] = useState<ProposalRequest>(EMPTY);
+  const [aiWritten, setAiWritten] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [doc, setDoc] = useState<ProposalDoc | null>(null);
@@ -39,6 +40,7 @@ export default function ProposalBuilder() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "The proposal couldn't be drafted.");
       setDoc(data.proposal);
+      setAiWritten(data.aiWritten !== false);
       track("proposal_generated", { plan: data.proposal.recommendedPlan, industry: form.industry });
       window.setTimeout(() => document.getElementById("proposal-doc")?.scrollIntoView({ behavior: "smooth" }), 50);
     } catch (err) {
@@ -109,6 +111,7 @@ function ProposalDocument({ doc, req, onEdit }: { doc: ProposalDoc; req: Proposa
         <p className="mt-2 text-sm text-white/70">Prepared for {req.contactName}, {req.business} · by Emmanuel Akinloye Oluwaseun, EmmaForYou</p>
       </header>
       <div className="space-y-9 px-6 py-8 md:px-10">
+        {!aiWritten && <p className="no-print rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground"><strong className="text-foreground">Standard draft.</strong> Our AI writer is unavailable right now, so this proposal was built from our published plans and your answers using fixed rules. It's accurate to what you selected; we'll tailor it on a free call.</p>}
         <section><h3 className="font-display text-lg font-semibold">Summary</h3><p className="mt-2 text-muted-foreground">{doc.summary}</p></section>
         <div className="grid gap-6 md:grid-cols-2">
           <section><h3 className="font-display text-lg font-semibold">Your goals</h3><ul className="mt-2 space-y-1.5">{doc.goals.map((g) => <li key={g} className="flex gap-2 text-sm text-foreground"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--emma-violet)]" />{g}</li>)}</ul></section>

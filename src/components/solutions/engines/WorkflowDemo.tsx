@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, Clock, PlayCircle, ShieldCheck, X, Zap } from "lucide-react";
-import { Badge, Btn, Panel, Select, type EngineProps } from "./ui";
+import { Badge, Btn, Panel, Select, SettingsPanel, useDemoSetting, type EngineProps } from "./ui";
 
 type Ev = Record<string, string | number>;
 interface Step { id: string; kind: "action" | "condition" | "wait" | "approval"; label: string; on: boolean; field?: string; op?: ">" | "<" | "=" | "contains"; value?: number | string; editable?: "number" | "text"; hours?: number; elseStop?: boolean }
@@ -51,10 +51,16 @@ const F: Record<string, Flow> = {
 
 interface LogLine { t: number; text: string; tone: "good" | "warn" | "bad" | "neutral" | "accent" }
 
-export default function WorkflowDemo({ preset }: EngineProps) {
+export default function WorkflowDemo(props: EngineProps) {
+  const { preset } = props;
   const flow = F[preset] ?? F.nurture;
-  const [steps, setSteps] = useState<Step[]>(() => flow.steps.map((s) => ({ ...s, on: true })));
+  const [steps, setSteps] = useDemoSetting<Step[]>(props, "steps", flow.steps.map((s) => ({ ...s, on: true })));
+  const [retries, setRetries] = useDemoSetting(props, "retries", 2);
+  const [alertTo, setAlertTo] = useDemoSetting(props, "alertTo", "Email to the ops team");
+  const [failAt, setFailAt] = useState("");
   const [ev, setEv] = useState(0);
+  // A custom test event: start from the selected sample and edit its values.
+  const [custom, setCustom] = useState<Ev | null>(null);
   const [log, setLog] = useState<LogLine[]>([]);
   const [pending, setPending] = useState<{ index: number; t: number } | null>(null);
   const [runs, setRuns] = useState(0);
@@ -68,9 +74,9 @@ export default function WorkflowDemo({ preset }: EngineProps) {
   };
 
   const run = (from = 0, t0 = 0, prev: LogLine[] = []) => {
-    const e = flow.events[ev][1];
+    const e = custom ?? flow.events[ev][1];
     const out = [...prev];
-    if (from === 0) out.push({ t: 0, text: `Trigger: ${flow.trigger} — ${flow.events[ev][0]}`, tone: "accent" });
+    if (from === 0) out.push({ t: 0, text: `Trigger: ${flow.trigger} — ${custom ? `custom event ${JSON.stringify(custom)}` : flow.events[ev][0]}`, tone: "accent" });
     let t = t0;
     for (let i = from; i < steps.length; i++) {
       const s = steps[i];
@@ -87,6 +93,13 @@ export default function WorkflowDemo({ preset }: EngineProps) {
         }
         continue;
       }
+      if (failAt === s.id) {
+        // Simulated outage of the connected app: retry with backoff, then alert and stop.
+        for (let r = 1; r <= retries; r++) { t += 2 ** r; out.push({ t, text: `Error: ${s.label} failed (connected app returned 503). Retry ${r}/${retries} in ${2 ** r} min…`, tone: "warn" }); }
+        out.push({ t, text: `Failed after ${retries} retr${retries === 1 ? "y" : "ies"}. Alert sent: ${alertTo} (simulated). Run paused for manual fix.`, tone: "bad" });
+        out.push({ t, text: "Stopped: step failed.", tone: "bad" });
+        break;
+      }
       t += 1; out.push({ t, text: `Done: ${s.label}`, tone: "good" });
     }
     if (!out.some((l) => l.text.startsWith("Stopped"))) out.push({ t, text: "Workflow complete ✓", tone: "accent" });
@@ -100,7 +113,17 @@ export default function WorkflowDemo({ preset }: EngineProps) {
   const fmtT = (m: number) => (m < 60 ? `+${Math.round(m)}m` : m < 1440 ? `+${(m / 60).toFixed(m % 60 ? 1 : 0)}h` : `+${(m / 1440).toFixed(1)}d`);
   const icon = (k: Step["kind"]) => (k === "action" ? <Zap className="h-4 w-4" /> : k === "wait" ? <Clock className="h-4 w-4" /> : k === "approval" ? <ShieldCheck className="h-4 w-4" /> : <span className="text-xs font-bold">IF</span>);
 
+  const fields = Object.keys(flow.events[ev][1]);
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={`${retries} retries · alerts: ${alertTo}`}>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Select label="Retries when a connected app fails" value={String(retries)} onChange={(e) => setRetries(Number(e.target.value))} options={[["0", "No retries"], ["1", "1 retry"], ["2", "2 retries"], ["3", "3 retries"]]} />
+        <Select label="Failure alerts go to" value={alertTo} onChange={(e) => setAlertTo(e.target.value)} options={["Email to the ops team", "WhatsApp to the owner", "Slack #alerts"]} />
+        <Select label="Simulate an outage at step" value={failAt} onChange={(e) => setFailAt(e.target.value)} options={[["", "No outage"], ...steps.filter((x) => x.kind === "action").map((x) => [x.id, x.label.slice(0, 40)] as [string, string])]} />
+      </div>
+      <p className="text-[11px] text-muted-foreground">Step values, waits and on/off switches (in the workflow below) are saved in this browser. Reset demo restores them.</p>
+    </SettingsPanel>
     <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
       <Panel title="Workflow" actions={<Badge tone="accent">{runs} test run{runs === 1 ? "" : "s"}</Badge>}>
         <p className="mb-3 flex items-center gap-2 rounded-xl bg-[color-mix(in_srgb,var(--demo-accent)_10%,transparent)] px-3 py-2 text-sm font-semibold"><Zap className="h-4 w-4 text-[var(--demo-accent)]" />When: {flow.trigger}</p>
@@ -120,7 +143,11 @@ export default function WorkflowDemo({ preset }: EngineProps) {
       </Panel>
       <div className="space-y-4">
         <Panel title="Test it">
-          <Select label="Sample event" value={String(ev)} onChange={(e) => { setEv(Number(e.target.value)); setLog([]); setPending(null); }} options={flow.events.map(([l], i) => [String(i), l] as [string, string])} />
+          <Select label="Sample event" value={String(ev)} onChange={(e) => { setEv(Number(e.target.value)); setCustom(null); setLog([]); setPending(null); }} options={flow.events.map(([l], i) => [String(i), l] as [string, string])} />
+          <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={!!custom} onChange={(e) => setCustom(e.target.checked ? { ...flow.events[ev][1] } : null)} className="accent-[var(--demo-accent)]" />Edit the event values</label>
+          {custom && <div className="mt-2 grid grid-cols-2 gap-2">{fields.map((k) => (
+            <label key={k} className="text-xs text-muted-foreground">{k}<input aria-label={`Event ${k}`} value={String(custom[k] ?? "")} onChange={(e) => setCustom({ ...custom, [k]: typeof flow.events[ev][1][k] === "number" ? Number(e.target.value) || 0 : e.target.value })} className="mt-1 block w-full rounded-md border border-border bg-background px-2 py-1 text-sm text-foreground" /></label>
+          ))}</div>}
           <Btn className="mt-3" onClick={() => run()} disabled={!!pending}><PlayCircle className="h-4 w-4" />Run test</Btn>
         </Panel>
         <Panel title="Run log">
@@ -130,6 +157,7 @@ export default function WorkflowDemo({ preset }: EngineProps) {
           {pending && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-2.5 text-sm"><ShieldCheck className="h-4 w-4 text-amber-600" />Waiting for approval<Btn onClick={() => decide(true)}><Check className="h-4 w-4" />Approve</Btn><Btn variant="danger" onClick={() => decide(false)}><X className="h-4 w-4" />Reject</Btn></div>}
         </Panel>
       </div>
+    </div>
     </div>
   );
 }

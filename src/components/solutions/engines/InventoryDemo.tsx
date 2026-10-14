@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, ArrowDownUp, Minus, Plus, Search, Share2, Sparkles, Upload, Wand2 } from "lucide-react";
-import { Badge, Btn, Panel, Select, Stat, Toast, money, uid, type EngineProps } from "./ui";
+import { Badge, Btn, Outbox, Panel, RoleBar, RowsEditor, Select, SettingsPanel, Stat, Toast, Toggles, curOf, money, uid, useDemoSetting, type EngineProps, type OutboxItem } from "./ui";
 
 interface Item { id: string; sku: string; name: string; cat: string; stock: number; min: number; cost: number; price: number; loc: string; supplier?: string; supplierStock?: number; sales?: number[] }
 
@@ -51,15 +51,29 @@ const QUALITY: Record<string, { cols: string[]; rows: Record<string, string>[] }
 
 interface FileRow { id: string; name: string; type: string; kb: number; owner: string; shared: boolean; version: number }
 
-export default function InventoryDemo({ preset }: EngineProps) {
-  if (preset === "files") return <Files />;
-  if (QUALITY[preset]) return <Quality preset={preset} />;
-  return <Stock preset={preset} />;
+export default function InventoryDemo(props: EngineProps) {
+  if (props.preset === "files") return <Files {...props} />;
+  if (QUALITY[props.preset]) return <Quality {...props} />;
+  return <Stock {...props} />;
 }
 
-function Stock({ preset }: { preset: string }) {
-  const cfg = STOCK[preset] ?? STOCK.warehouse;
-  const [items, setItems] = useState<Item[]>(() => cfg.items.map((i) => ({ ...i, id: uid() })));
+interface Move { id: string; sku: string; qty: number; reason: string; at: string }
+const REASONS = ["Sale / dispatch", "Goods received", "Damaged / expired", "Stock count correction", "Transfer"];
+
+function Stock(props: EngineProps) {
+  const { preset } = props;
+  const base = STOCK[preset] ?? STOCK.warehouse;
+  const cfg = { ...base, cur: curOf(props, base.cur) };
+  const [items, setItems] = useDemoSetting<Item[]>(props, "items", base.items.map((i, k) => ({ ...i, id: `i${k}` })));
+  const [targetX, setTargetX] = useDemoSetting(props, "target", 2);
+  const [notify, setNotify] = useDemoSetting<string[]>(props, "notify", ["low"]);
+  const [role, setRole] = useDemoSetting(props, "role", "manager");
+  const [reason, setReason] = useState(REASONS[0]);
+  const [moves, setMoves] = useState<Move[]>([]);
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
+  const push = (channel: string, to: string, text: string) => setOutbox((o) => [...o, { id: uid(), channel, to, text }].slice(-30));
+  const canAdjust = role !== "viewer";
+  const canManage = role === "manager";
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const [sort, setSort] = useState<"name" | "stock">("stock");
@@ -74,13 +88,39 @@ function Stock({ preset }: { preset: string }) {
   const low = items.filter((i) => (isDrop ? (i.supplierStock ?? 0) < 20 : i.stock <= i.min));
   const value = items.reduce((s, i) => s + i.stock * i.cost, 0);
   const cats = ["All", ...new Set(items.map((i) => i.cat))];
-  const adjust = (id: string, d: number) => setItems((is) => is.map((i) => (i.id === id ? { ...i, stock: Math.max(0, i.stock + d) } : i)));
-  const suggest = (i: Item) => (isFc ? Math.max(0, forecast(i) * 2 - i.stock) : Math.max(0, i.min * 2 - i.stock));
-  const reorderAll = () => { const lines = low.filter((i) => !isDrop).map((i) => ({ sku: i.sku, qty: suggest(i) })).filter((l) => l.qty > 0); setPo(lines); setMsg(lines.length ? `Draft purchase order created with ${lines.length} line${lines.length > 1 ? "s" : ""}.` : "Nothing needs reordering."); };
+  const adjust = (id: string, d: number) => {
+    const it = items.find((i) => i.id === id);
+    if (!it || !canAdjust) return;
+    const next = Math.max(0, it.stock + d);
+    if (next === it.stock) return;
+    setItems((is) => is.map((i) => (i.id === id ? { ...i, stock: next } : i)));
+    setMoves((m) => [{ id: uid(), sku: it.sku, qty: next - it.stock, reason, at: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...m].slice(0, 30));
+    if (notify.includes("low") && it.stock > it.min && next <= it.min && !isDrop) push("Email", "Purchasing", `Low stock: ${it.name} (${it.sku}) is at ${next}, reorder point ${it.min}.`);
+    if (notify.includes("out") && next === 0) push("WhatsApp", "Store manager", `${it.name} (${it.sku}) is now out of stock.`);
+  };
+  const suggest = (i: Item) => (isFc ? Math.max(0, forecast(i) * targetX - i.stock) : Math.max(0, i.min * targetX - i.stock));
+  const reorderAll = () => {
+    if (!canManage) { setMsg("Only a manager can raise purchase orders."); return; } const lines = low.filter((i) => !isDrop).map((i) => ({ sku: i.sku, qty: suggest(i) })).filter((l) => l.qty > 0); setPo(lines); setMsg(lines.length ? `Draft purchase order created with ${lines.length} line${lines.length > 1 ? "s" : ""}.` : "Nothing needs reordering."); };
   const sync = () => { setItems((is) => is.map((i) => ({ ...i, supplierStock: Math.max(0, (i.supplierStock ?? 0) - Math.round((i.supplierStock ?? 0) * 0.1)) }))); setMsg("Supplier stock synced. Items at 0 are hidden from the store automatically."); };
+
+  const ROLES = [
+    { id: "manager", label: "Inventory manager", can: "Edit products and reorder points, adjust stock, raise and receive purchase orders." },
+    { id: "staff", label: "Warehouse staff", can: "Adjust stock with a reason (every change is logged). Cannot edit products or raise orders." },
+    { id: "viewer", label: "Accountant (read-only)", can: "Sees stock levels, value and the movement log only." },
+  ];
 
   return (
     <div className="space-y-4">
+      <SettingsPanel summary={`${items.length} SKUs · order up to ${targetX}× ${isFc ? "forecast" : "reorder point"}`}>
+        <RowsEditor<Item> label={isDrop ? "Products, supplier cost and supplier stock" : "Products, stock and reorder points"} rows={items} onChange={setItems} max={12}
+          cols={isDrop
+            ? [{ key: "sku", label: "SKU", type: "text", width: "18%" }, { key: "name", label: "Name", type: "text" }, { key: "cost", label: `Supplier cost (${cfg.cur})`, type: "number", min: 0, step: 0.5, width: "18%" }, { key: "supplierStock", label: "Supplier stock", type: "number", min: 0, width: "16%" }]
+            : [{ key: "sku", label: "SKU", type: "text", width: "16%" }, { key: "name", label: "Name", type: "text" }, { key: "stock", label: "On hand", type: "number", min: 0, width: "12%" }, { key: "min", label: "Reorder at", type: "number", min: 0, width: "12%" }, { key: "cost", label: `Cost (${cfg.cur})`, type: "number", min: 0, step: 0.5, width: "13%" }, { key: "loc", label: cfg.label, type: "text", width: "14%" }]}
+          make={() => ({ id: uid(), sku: `NEW-${items.length + 1}`, name: "New item", cat: items[0]?.cat ?? "General", stock: 10, min: 5, cost: 1, price: 0, loc: items[0]?.loc ?? "Main", ...(isDrop ? { supplier: "Supplier A", supplierStock: 50 } : {}), ...(isFc ? { sales: [5, 5, 6, 6] } : {}) })} />
+        {!isDrop && <Select label={isFc ? "Order enough to cover" : "Reorder quantity rule"} value={String(targetX)} onChange={(e) => setTargetX(Number(e.target.value))} options={isFc ? [["1", "1 week of forecast"], ["2", "2 weeks of forecast"], ["3", "3 weeks of forecast"]] : [["2", "Order up to 2× reorder point"], ["3", "Order up to 3× reorder point"], ["4", "Order up to 4× reorder point"]]} className="max-w-[280px]" />}
+        <Toggles label="Alerts" options={[["low", "Low-stock alert to purchasing"], ["out", "Out-of-stock alert to the manager"]]} value={notify} onChange={setNotify} />
+      </SettingsPanel>
+      <RoleBar roles={ROLES} value={role} onChange={setRole} />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="SKUs" value={items.length} />
         <Stat label={isDrop ? "Low at supplier" : "Low / out of stock"} value={low.length} hint={low.length ? "Needs action" : "All good"} />
@@ -95,7 +135,8 @@ function Stock({ preset }: { preset: string }) {
         </label>
         <Select label="Category" value={cat} onChange={(e) => setCat(e.target.value)} options={cats} className="w-40" />
         <Btn variant="ghost" onClick={() => setSort(sort === "name" ? "stock" : "name")}><ArrowDownUp className="h-4 w-4" />Sort: {sort === "name" ? "Name" : "Most urgent"}</Btn>
-        {isDrop ? <Btn onClick={sync}>Sync supplier stock</Btn> : <Btn onClick={reorderAll}>Create reorder</Btn>}
+        {!isDrop && canAdjust && <Select label="Reason for stock changes" value={reason} onChange={(e) => setReason(e.target.value)} options={REASONS} className="w-52" />}
+        {isDrop ? <Btn onClick={sync}>Sync supplier stock</Btn> : <Btn onClick={reorderAll} disabled={!canManage}>Create reorder</Btn>}
       </div>
       {isDrop && <label className="block max-w-sm text-xs font-medium text-muted-foreground">Price rule: supplier cost + {margin}% margin<input type="range" min={10} max={150} step={5} value={margin} onChange={(e) => setMargin(Number(e.target.value))} className="mt-2 block w-full accent-[var(--demo-accent)]" /></label>}
       {msg && <Toast>{msg}</Toast>}
@@ -116,7 +157,7 @@ function Stock({ preset }: { preset: string }) {
                 <td className="p-2.5 font-mono text-xs">{i.sku}</td><td className="p-2.5 font-medium">{i.name}<span className="block text-[11px] text-muted-foreground">{i.cat}</span></td>
                 {isDrop ? <><td className="p-2.5">{i.supplier}</td><td className="p-2.5">{i.supplierStock}</td><td className="p-2.5">{money(Math.round(i.cost * (1 + margin / 100) * 100) / 100, cfg.cur)}</td></> : <>
                   <td className="p-2.5">{i.loc}</td>
-                  <td className="p-2.5"><div className="flex items-center gap-1"><button type="button" aria-label={`Remove one ${i.name}`} onClick={() => adjust(i.id, -1)} className="rounded-full border border-border p-0.5"><Minus className="h-3 w-3" /></button><span className="w-8 text-center font-semibold">{i.stock}</span><button type="button" aria-label={`Add one ${i.name}`} onClick={() => adjust(i.id, 1)} className="rounded-full border border-border p-0.5"><Plus className="h-3 w-3" /></button></div></td>
+                  <td className="p-2.5"><div className="flex items-center gap-1"><button type="button" aria-label={`Remove one ${i.name}`} disabled={!canAdjust} onClick={() => adjust(i.id, -1)} className="rounded-full border border-border p-0.5"><Minus className="h-3 w-3" /></button><span className="w-8 text-center font-semibold">{i.stock}</span><button type="button" aria-label={`Add one ${i.name}`} disabled={!canAdjust} onClick={() => adjust(i.id, 1)} className="rounded-full border border-border p-0.5"><Plus className="h-3 w-3" /></button></div></td>
                   <td className="p-2.5 text-muted-foreground">{isFc ? `${(i.sales ?? []).join(", ")} → ${forecast(i)}` : i.min}</td>
                   <td className="p-2.5">{suggest(i) || "—"}</td></>}
                 <td className="p-2.5">{out ? <Badge tone="bad"><AlertTriangle className="h-3 w-3" />{isDrop ? "Hidden (out at supplier)" : "Out of stock"}</Badge> : lowish ? <Badge tone="warn">Low</Badge> : <Badge tone="good">OK</Badge>}</td>
@@ -129,19 +170,32 @@ function Stock({ preset }: { preset: string }) {
       {po.length > 0 && (
         <Panel title="Draft purchase order" actions={<Btn variant="ghost" onClick={() => setPo([])}>Discard</Btn>}>
           <ul className="text-sm">{po.map((l) => <li key={l.sku} className="flex justify-between border-b border-border py-1.5 last:border-0"><span className="font-mono text-xs">{l.sku}</span><span>{l.qty} units</span></li>)}</ul>
-          <Btn className="mt-3" onClick={() => { setItems((is) => is.map((i) => { const l = po.find((p) => p.sku === i.sku); return l ? { ...i, stock: i.stock + l.qty } : i; })); setPo([]); setMsg("Goods received: stock updated."); }}>Mark as received</Btn>
+          <Btn className="mt-3" disabled={!canManage} onClick={() => { setItems((is) => is.map((i) => { const l = po.find((p) => p.sku === i.sku); return l ? { ...i, stock: i.stock + l.qty } : i; })); setMoves((m) => [...po.map((l) => ({ id: uid(), sku: l.sku, qty: l.qty, reason: "Goods received (PO)", at: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) })), ...m].slice(0, 30)); setPo([]); setMsg("Goods received: stock updated."); }}>Mark as received</Btn>
         </Panel>
       )}
+      {!isDrop && (
+        <Panel title={`Stock movements (${moves.length})`}>
+          {moves.length === 0 ? <p className="text-sm text-muted-foreground">No movements yet. Use + / − (with a reason) or receive a purchase order.</p> : (
+            <ul className="max-h-48 space-y-1 overflow-y-auto text-sm">{moves.map((m) => <li key={m.id} className="flex flex-wrap gap-2"><span className="w-12 text-muted-foreground">{m.at}</span><span className="font-mono text-xs">{m.sku}</span><span className={m.qty > 0 ? "text-emerald-600" : "text-red-600"}>{m.qty > 0 ? `+${m.qty}` : m.qty}</span><span className="text-muted-foreground">{m.reason}</span></li>)}</ul>
+          )}
+        </Panel>
+      )}
+      <Outbox items={outbox} onClear={() => setOutbox([])} />
     </div>
   );
 }
 
-function Quality({ preset }: { preset: string }) {
+const CLEAN_RULES: [string, string][] = [["case", "Fix capitalisation of names, titles and cities"], ["email", "Lower-case and trim emails"], ["number", "Remove thousands separators from amounts"], ["dedupe", "Remove duplicate rows (same email)"]];
+
+function Quality(props: EngineProps) {
+  const { preset } = props;
   const cfg = QUALITY[preset];
+  const [rules, setRules] = useDemoSetting<string[]>(props, "rules", CLEAN_RULES.map(([k]) => k));
+  const [required, setRequired] = useDemoSetting<string[]>(props, "required", cfg.cols);
   const [rows, setRows] = useState<Rec[]>(() => cfg.rows.map((r, i) => ({ id: uid(), name: `Row ${i + 1}`, fields: { ...r } })));
   const [log, setLog] = useState<string[]>([]);
-  const missing = (r: Rec) => cfg.cols.filter((c) => !r.fields[c]?.trim());
-  const complete = Math.round((rows.reduce((s, r) => s + (cfg.cols.length - missing(r).length), 0) / (rows.length * cfg.cols.length || 1)) * 100);
+  const missing = (r: Rec) => cfg.cols.filter((c) => required.includes(c) && !r.fields[c]?.trim());
+  const complete = Math.round((rows.reduce((s, r) => s + (required.length - missing(r).length), 0) / (rows.length * required.length || 1)) * 100);
   const title = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase().replace(/\b\w/g, (m) => m.toUpperCase());
 
   const fix = () => {
@@ -151,16 +205,16 @@ function Quality({ preset }: { preset: string }) {
       for (const c of cfg.cols) {
         const before = f[c] ?? "";
         let v = before;
-        if (/name|title|city|brand/i.test(c)) v = title(v);
-        if (/email/i.test(c)) v = v.trim().toLowerCase();
-        if (/amount/i.test(c)) v = v.replace(/,/g, "");
+        if (rules.includes("case") && /name|title|city|brand/i.test(c)) v = title(v);
+        if (rules.includes("email") && /email/i.test(c)) v = v.trim().toLowerCase();
+        if (rules.includes("number") && /amount/i.test(c)) v = v.replace(/,/g, "");
         if (v !== before) { f[c] = v; changes.push(`${r.name}: ${c} "${before}" → "${v}"`); }
       }
       return { ...r, fields: f };
     });
-    if (preset === "spreadsheet") {
+    if (preset === "spreadsheet" && rules.includes("dedupe")) {
       const seen = new Set<string>();
-      next = next.filter((r) => { const k = r.fields.Email; if (seen.has(k)) { changes.push(`Removed duplicate: ${r.fields.Name} (${k})`); return false; } seen.add(k); return true; });
+      next = next.filter((r) => { const k = r.fields.Email.trim().toLowerCase(); if (seen.has(k)) { changes.push(`Removed duplicate: ${r.fields.Name} (${k})`); return false; } seen.add(k); return true; });
     }
     setRows(next);
     setLog(changes.length ? changes : ["Nothing to clean."]);
@@ -178,12 +232,16 @@ function Quality({ preset }: { preset: string }) {
 
   return (
     <div className="space-y-4">
+      <SettingsPanel summary={`${rules.length} cleaning rules`}>
+        <Toggles label="Cleaning rules" options={preset === "spreadsheet" ? CLEAN_RULES : CLEAN_RULES.filter(([k]) => k === "case")} value={rules} onChange={setRules} />
+        {preset !== "spreadsheet" && <Toggles label="Required fields (count towards completeness)" options={cfg.cols.map((c) => [c, c] as [string, string])} value={required} onChange={setRequired} />}
+      </SettingsPanel>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <Stat label="Records" value={rows.length} />
         <Stat label={preset === "spreadsheet" ? "Rows with problems" : "Completeness"} value={preset === "spreadsheet" ? rows.filter((r) => flags(r).length).length : `${complete}%`} />
         {preset === "spreadsheet" ? <Stat label="=SUM(Amount)" value={total.toLocaleString()} hint="Formula on cleaned data" /> : <Stat label="Ready to publish" value={rows.filter((r) => !missing(r).length).length} />}
       </div>
-      <div className="flex flex-wrap gap-2"><Btn onClick={fix}><Wand2 className="h-4 w-4" />{preset === "spreadsheet" ? "Clean data (trim, case, dedupe)" : "Normalise titles & brands"}</Btn></div>
+      <div className="flex flex-wrap gap-2"><Btn onClick={fix} disabled={rules.length === 0}><Wand2 className="h-4 w-4" />{preset === "spreadsheet" ? "Clean data (trim, case, dedupe)" : "Normalise titles & brands"}</Btn></div>
       <div className="overflow-x-auto rounded-2xl border border-border">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-muted/60 text-xs text-muted-foreground"><tr>{cfg.cols.map((c) => <th key={c} className="p-2.5">{c}</th>)}<th className="p-2.5">Checks</th></tr></thead>
@@ -200,7 +258,10 @@ function Quality({ preset }: { preset: string }) {
   );
 }
 
-function Files() {
+function Files(props: EngineProps) {
+  const [role, setRole] = useDemoSetting(props, "role", "owner");
+  const [expiry, setExpiry] = useDemoSetting(props, "expiry", "7");
+  const canEdit = role !== "viewer";
   const [files, setFiles] = useState<FileRow[]>(() => [
     { id: uid(), name: "Brand guidelines.pdf", type: "PDF", kb: 2400, owner: "Design", shared: false, version: 3 },
     { id: uid(), name: "Q3 report.xlsx", type: "Sheet", kb: 380, owner: "Finance", shared: true, version: 7 },
@@ -212,21 +273,25 @@ function Files() {
   const shown = files.filter((f) => f.name.toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="space-y-4">
+      <SettingsPanel summary={`Links expire ${expiry === "0" ? "never" : `after ${expiry} days`}`}>
+        <Select label="Shared links expire after" value={expiry} onChange={(e) => setExpiry(e.target.value)} options={[["1", "1 day"], ["7", "7 days"], ["30", "30 days"], ["0", "Never (not recommended)"]]} className="max-w-[260px]" />
+      </SettingsPanel>
+      <RoleBar roles={[{ id: "owner", label: "Admin", can: "Upload, version, share, change access and delete files." }, { id: "editor", label: "Editor", can: "Upload and add versions. Cannot change access or delete." }, { id: "viewer", label: "Viewer", can: "Can search and open files only." }]} value={role} onChange={setRole} />
       <div className="flex flex-wrap items-end gap-3">
         <label className="relative block min-w-[200px] flex-1 text-xs font-medium text-muted-foreground">Search files<Search className="pointer-events-none absolute left-2.5 top-[30px] h-4 w-4" /><input value={q} onChange={(e) => setQ(e.target.value)} className="mt-1 block w-full rounded-lg border border-border bg-background py-1.5 pl-8 pr-2.5 text-sm outline-none focus:border-[var(--demo-accent)]" /></label>
-        <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[var(--demo-accent)] px-3.5 py-1.5 text-sm font-semibold text-white"><Upload className="h-4 w-4" />Upload<input type="file" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) setFiles((fs) => [{ id: uid(), name: f.name, type: f.name.split(".").pop()?.toUpperCase() ?? "File", kb: Math.max(1, Math.round(f.size / 1024)), owner: "You", shared: false, version: 1 }, ...fs]); e.target.value = ""; }} /></label>
+        {canEdit && <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[var(--demo-accent)] px-3.5 py-1.5 text-sm font-semibold text-white"><Upload className="h-4 w-4" />Upload<input type="file" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) setFiles((fs) => [{ id: uid(), name: f.name, type: f.name.split(".").pop()?.toUpperCase() ?? "File", kb: Math.max(1, Math.round(f.size / 1024)), owner: "You", shared: false, version: 1 }, ...fs]); e.target.value = ""; }} /></label>}
       </div>
       <p className="text-[11px] text-muted-foreground">Uploads stay in your browser for this demo; nothing is sent anywhere.</p>
-      {link && <Toast>Sharing link (expires in 7 days): {link}</Toast>}
+      {link && <Toast>Sharing link ({expiry === "0" ? "no expiry" : `expires in ${expiry} day${expiry === "1" ? "" : "s"}`}): {link}</Toast>}
       <div className="overflow-x-auto rounded-2xl border border-border">
         <table className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-muted/60 text-xs text-muted-foreground"><tr><th className="p-2.5">Name</th><th className="p-2.5">Owner</th><th className="p-2.5">Size</th><th className="p-2.5">Version</th><th className="p-2.5">Access</th><th className="p-2.5" /></tr></thead>
           <tbody>{shown.map((f) => (
             <tr key={f.id} className="border-t border-border">
               <td className="p-2.5 font-medium">{f.name}<span className="ml-1.5 text-[11px] text-muted-foreground">{f.type}</span></td><td className="p-2.5">{f.owner}</td><td className="p-2.5">{f.kb > 1024 ? `${(f.kb / 1024).toFixed(1)} MB` : `${f.kb} KB`}</td>
-              <td className="p-2.5"><button type="button" onClick={() => setFiles((fs) => fs.map((x) => (x.id === f.id ? { ...x, version: x.version + 1 } : x)))} className="text-[var(--demo-accent)] underline-offset-2 hover:underline">v{f.version} (+ new version)</button></td>
-              <td className="p-2.5"><button type="button" onClick={() => setFiles((fs) => fs.map((x) => (x.id === f.id ? { ...x, shared: !x.shared } : x)))}>{f.shared ? <Badge tone="warn">Shared</Badge> : <Badge tone="good">Private</Badge>}</button></td>
-              <td className="p-2.5"><Btn variant="ghost" onClick={() => setLink(`https://files.example/s/${f.id.slice(-6)}`)} className="!px-2 !py-1 !text-xs"><Share2 className="h-3.5 w-3.5" />Link</Btn></td>
+              <td className="p-2.5">{canEdit ? <button type="button" onClick={() => setFiles((fs) => fs.map((x) => (x.id === f.id ? { ...x, version: x.version + 1 } : x)))} className="text-[var(--demo-accent)] underline-offset-2 hover:underline">v{f.version} (+ new version)</button> : <span>v{f.version}</span>}</td>
+              <td className="p-2.5"><button type="button" disabled={role !== "owner"} aria-label={`Access for ${f.name}: ${f.shared ? "shared" : "private"}`} onClick={() => setFiles((fs) => fs.map((x) => (x.id === f.id ? { ...x, shared: !x.shared } : x)))}>{f.shared ? <Badge tone="warn">Shared</Badge> : <Badge tone="good">Private</Badge>}</button></td>
+              <td className="p-2.5"><div className="flex gap-1"><Btn variant="ghost" disabled={role !== "owner"} onClick={() => setLink(`https://files.example/s/${f.id.slice(-6)}`)} className="!px-2 !py-1 !text-xs"><Share2 className="h-3.5 w-3.5" />Link</Btn>{role === "owner" && <Btn variant="danger" onClick={() => setFiles((fs) => fs.filter((x) => x.id !== f.id))} className="!px-2 !py-1 !text-xs">Delete</Btn>}</div></td>
             </tr>
           ))}</tbody>
         </table>

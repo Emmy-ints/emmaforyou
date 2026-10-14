@@ -181,6 +181,7 @@ export const handleAudit = createServerOnlyFn(async (request: Request) => {
   if (!res.ok) {
     await refundLimit(limit.logId);
     const blocked = [401, 403, 406, 429, 503].includes(res.status);
+    if (res.status >= 520 && res.status <= 530) return Response.json({ message: "We couldn't reach that website. Check the address is spelled correctly and the site is online." }, { status: 422 });
     return Response.json({ message: blocked ? `That website blocked our automated check (error ${res.status}), which some security services do. Try your homepage address, or message us on WhatsApp for a manual audit.` : `That website answered with an error (${res.status}). Check the address and try again.` }, { status: 422 });
   }
   if (!/html/i.test(res.headers.get("content-type") || "")) {

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Check, Minus, Plus, Search, Sparkles, Trash2 } from "lucide-react";
-import { Badge, Btn, Field, Panel, Select, Toast, money, type EngineProps } from "./ui";
+import { Badge, Btn, Field, Outbox, Panel, RoleBar, RowsEditor, Select, SettingsPanel, Toast, Toggles, curOf, hash, money as fmtMoney, uid, useDemoSetting, type EngineProps, type OutboxItem } from "./ui";
 
 interface Prod { id: string; name: string; cat: string; price: number; emoji: string; hue: number; tags: string[]; vendor?: string; sizes?: string[]; available?: boolean; tiers?: [number, number][]; moq?: number }
 interface Line { key: string; p: Prod; qty: number; size?: string; text?: string }
@@ -23,13 +23,31 @@ const P: Record<string, { cur: string; products: Prod[]; ship: number; label?: s
 const VISUAL_SAMPLES: [string, string[]][] = [["📷 Photo: a blue sofa in a living room", ["blue", "sofa"]], ["📷 Photo: a wooden table", ["wood", "table"]], ["📷 Photo: a lamp in a reading nook", ["lamp", "brass"]]];
 const TOGETHER: Record<string, string[]> = { e1: ["e2", "e3"], e4: ["e3", "e5"], e5: ["e6", "e3"], e2: ["e1"], e3: ["e1", "e4"], e6: ["e5", "e4"] };
 
-export default function StoreDemo({ preset, brand }: EngineProps) {
-  const cfg = P[preset] ?? P.fashion;
-  const [products, setProducts] = useState(cfg.products);
+interface Order { id: string; ref: string; name: string; total: number; items: number; status: string }
+const ORDER_STEPS = ["New", "Packed", "Out for delivery", "Delivered"];
+const NOTIFY: [string, string][] = [["confirm", "Order confirmation to the customer"], ["status", "Status updates to the customer"], ["staff", "New-order alert to staff"]];
+
+export default function StoreDemo(props: EngineProps) {
+  const { preset, brand } = props;
+  const base = P[preset] ?? P.fashion;
+  const cur = curOf(props, base.cur);
+  const money = (v: number, _c?: string) => fmtMoney(v, cur);
+  const [products, setProducts] = useDemoSetting<Prod[]>(props, "products", base.products);
+  const [shipFee, setShipFee] = useDemoSetting(props, "ship", base.ship);
+  const [promo, setPromo] = useDemoSetting(props, "promo", { code: "WELCOME10", pct: 10 });
+  const [notify, setNotify] = useDemoSetting<string[]>(props, "notify", ["confirm", "status", "staff"]);
+  const [role, setRole] = useDemoSetting(props, "role", "shopper");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [outbox, setOutbox] = useState<OutboxItem[]>([]);
+  const cfg = { ...base, ship: shipFee };
+  const push = (channel: string, to: string, text: string) => setOutbox((o) => [...o, { id: uid(), channel, to, text }].slice(-30));
+  const promoCode = promo.code.trim().toUpperCase();
   const [cat, setCat] = useState("All");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState("Featured");
-  const [cart, setCart] = useState<Line[]>([]);
+  const [rawCart, setCart] = useState<Line[]>([]);
+  // Cart lines always use the current product record, so edited prices flow into totals and deleted products drop out.
+  const cart = rawCart.flatMap((l) => { const p = products.find((x) => x.id === l.p.id); return p ? [{ ...l, p }] : []; });
   const [size, setSize] = useState<Record<string, string>>({});
   const [custom, setCustom] = useState<Record<string, string>>({});
   const [code, setCode] = useState("");
@@ -63,16 +81,46 @@ export default function StoreDemo({ preset, brand }: EngineProps) {
     setDone(null);
   };
   const subtotal = cart.reduce((s, l) => s + unit(l.p, l.qty) * l.qty, 0);
-  const discount = applied ? subtotal * 0.1 : 0;
+  const discount = applied ? subtotal * Math.min(90, Math.max(0, promo.pct)) / 100 : 0;
   const ship = cart.length && (mode === "Delivery" && cfg.ship) ? cfg.ship : 0;
   const total = subtotal - discount + ship;
   const commission = preset === "marketplace" || preset === "courses" ? subtotal * 0.15 : 0;
   const byVendor = cart.reduce<Record<string, number>>((m, l) => { const v = l.p.vendor ?? brand; m[v] = (m[v] ?? 0) + unit(l.p, l.qty) * l.qty; return m; }, {});
   const recs = preset === "recommend" ? [...new Set(cart.flatMap((l) => TOGETHER[l.p.id] ?? []))].filter((id) => !cart.some((l) => l.p.id === id)).map((id) => products.find((p) => p.id === id)!).filter(Boolean) : [];
-  const checkout = () => { if (!cart.length || (preset !== "pos" && name.trim().length < 2)) return; setDone(`${preset === "pos" ? "Sale" : "Order"} ${preset === "pos" ? "#R" : "#"}${1000 + Math.floor(Math.random() * 9000)}`); };
+  const checkout = () => {
+    if (!cart.length || (preset !== "pos" && name.trim().length < 2)) return;
+    const ref = `${preset === "pos" ? "#R" : "#"}${1000 + orders.length + Math.floor(hash(name + cart.length + orders.length) * 8000)}`;
+    setDone(`${preset === "pos" ? "Sale" : "Order"} ${ref}`);
+    setOrders((o) => [{ id: uid(), ref, name: preset === "pos" ? "Walk-in customer" : name.trim(), total, items: cart.reduce((s, l) => s + l.qty, 0), status: preset === "pos" ? "Delivered" : "New" }, ...o]);
+    if (notify.includes("confirm") && preset !== "pos") push("Email + WhatsApp", name.trim(), `Thanks for your order ${ref} from ${brand}. Total ${money(total)}. We'll tell you when it ships.`);
+    if (notify.includes("staff")) push("WhatsApp", `${brand} staff`, `New ${preset === "pos" ? "sale" : "order"} ${ref}: ${cart.reduce((s, l) => s + l.qty, 0)} item(s), ${money(total)}.`);
+  };
+  const advance = (id: string) => {
+    const o = orders.find((x) => x.id === id);
+    if (!o) return;
+    const next = ORDER_STEPS[Math.min(ORDER_STEPS.length - 1, ORDER_STEPS.indexOf(o.status) + 1)];
+    if (next === o.status) return;
+    setOrders((os) => os.map((x) => (x.id === id ? { ...x, status: next } : x)));
+    if (notify.includes("status")) push("WhatsApp", o.name, `Order ${o.ref} update: ${next}.`);
+  };
+  const manager = role === "manager";
   const change = Number(tendered) - total;
 
   return (
+    <div className="space-y-4">
+    <SettingsPanel summary={`${products.length} products · delivery ${money(shipFee)}`}>
+      <RowsEditor<Prod> label="Products and prices" rows={products} onChange={setProducts} max={12}
+        cols={[{ key: "name", label: "Product", type: "text" }, { key: "cat", label: "Category", type: "text", width: "26%" }, { key: "price", label: `Price (${cur})`, type: "number", min: 0, step: 0.5, width: "18%" }, { key: "available", label: "In stock", type: "checkbox", width: "12%" }]}
+        make={() => { const id = uid(); return { id, name: "New product", cat: products[0]?.cat ?? "General", price: 10, emoji: "🛍️", hue: Math.round(hash(id) * 360), tags: [], available: true }; }}
+        help="Edits update the catalogue, cart prices and totals straight away." />
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field label={`${preset === "restaurant" ? "Delivery" : "Shipping"} fee (${cur})`} type="number" min={0} value={shipFee} onChange={(e) => setShipFee(Math.max(0, Number(e.target.value) || 0))} />
+        <Field label="Discount code" value={promo.code} maxLength={16} onChange={(e) => { setPromo({ ...promo, code: e.target.value.toUpperCase().replace(/\s/g, "") }); setApplied(false); }} />
+        <Field label="Discount %" type="number" min={0} max={90} value={promo.pct} onChange={(e) => { setPromo({ ...promo, pct: Math.min(90, Math.max(0, Number(e.target.value) || 0)) }); }} />
+      </div>
+      <Toggles label="Notifications" options={NOTIFY} value={notify} onChange={setNotify} />
+    </SettingsPanel>
+    <RoleBar roles={[{ id: "shopper", label: "Customer", can: "Browse, add to cart and check out." }, { id: "manager", label: "Store manager", can: "Also sees incoming orders and moves them through packing and delivery (customers are notified at each step if enabled)." }]} value={role} onChange={setRole} />
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
       <div className="space-y-3">
         <div className="flex flex-wrap items-end gap-2">
@@ -129,10 +177,10 @@ export default function StoreDemo({ preset, brand }: EngineProps) {
           )}
           {recs.length > 0 && <div className="mt-3 border-t border-border pt-2"><p className="text-xs font-semibold">Frequently bought together</p>{recs.map((p) => <button key={p.id} type="button" onClick={() => add(p)} className="mt-1 flex w-full items-center justify-between rounded-lg border border-border px-2 py-1 text-xs hover:border-[var(--demo-accent)]"><span>{p.emoji} {p.name}</span><span>+ {money(p.price, cfg.cur)}</span></button>)}</div>}
           {preset === "restaurant" && <div className="mt-3 flex rounded-full border border-border p-0.5 text-xs">{(["Delivery", "Pickup"] as const).map((m) => <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)} className={`flex-1 rounded-full py-1 ${mode === m ? "bg-[var(--demo-accent)] text-white" : ""}`}>{m}</button>)}</div>}
-          {preset !== "pos" && preset !== "wholesale" && <form onSubmit={(e) => { e.preventDefault(); setApplied(code.trim().toUpperCase() === "WELCOME10"); }} className="mt-3 flex gap-1.5"><input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Code (try WELCOME10)" aria-label="Discount code" className="flex-1 rounded-lg border border-border bg-background px-2 py-1 text-xs" /><Btn type="submit" variant="ghost" className="!px-2.5 !py-1 !text-xs">Apply</Btn></form>}
+          {preset !== "pos" && preset !== "wholesale" && <form onSubmit={(e) => { e.preventDefault(); setApplied(!!promoCode && code.trim().toUpperCase() === promoCode); }} className="mt-3 flex gap-1.5"><input value={code} onChange={(e) => setCode(e.target.value)} placeholder={promoCode ? `Code (try ${promoCode})` : "Discount code"} aria-label="Discount code" className="flex-1 rounded-lg border border-border bg-background px-2 py-1 text-xs" /><Btn type="submit" variant="ghost" className="!px-2.5 !py-1 !text-xs">Apply</Btn></form>}
           <dl className="mt-3 space-y-1 border-t border-border pt-2 text-sm">
             <div className="flex justify-between"><dt>Subtotal</dt><dd>{money(subtotal, cfg.cur)}</dd></div>
-            {applied && <div className="flex justify-between text-emerald-600"><dt>WELCOME10</dt><dd>−{money(discount, cfg.cur)}</dd></div>}
+            {applied && <div className="flex justify-between text-emerald-600"><dt>{promoCode} ({promo.pct}%)</dt><dd>−{money(discount, cfg.cur)}</dd></div>}
             {ship > 0 && <div className="flex justify-between"><dt>{preset === "restaurant" ? "Delivery" : "Shipping"}</dt><dd>{money(ship, cfg.cur)}</dd></div>}
             <div className="flex justify-between font-semibold"><dt>Total</dt><dd>{money(total, cfg.cur)}</dd></div>
           </dl>
@@ -146,7 +194,7 @@ export default function StoreDemo({ preset, brand }: EngineProps) {
         {done && (
           <div role="status" className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
             <p className="flex items-center gap-1.5 font-semibold"><Check className="h-4 w-4 text-emerald-600" />{done} confirmed</p>
-            <p className="mt-1 text-xs text-muted-foreground">{preset === "digital" || preset === "courses" ? "Download links / course access would be emailed instantly (expiring, per-buyer links)." : preset === "pos" ? "Receipt printed, stock updated and synced to the online store." : preset === "pod" ? "Print file generated and routed to the nearest print partner." : "Confirmation sent by email and WhatsApp; stock reserved."}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{preset === "digital" || preset === "courses" ? "In a live store, download links / course access would be emailed instantly (expiring, per-buyer links)." : preset === "pos" ? "In a live till, the receipt prints and stock syncs to the online store." : preset === "pod" ? "In a live store, a print file is generated and routed to a print partner." : "In a live store the customer gets an email/WhatsApp confirmation and stock is reserved."}</p>
             <button type="button" className="mt-2 text-xs underline" onClick={() => { setCart([]); setDone(null); setTendered(""); setApplied(false); setCode(""); }}>Start a new {preset === "pos" ? "sale" : "order"}</button>
           </div>
         )}
@@ -154,6 +202,20 @@ export default function StoreDemo({ preset, brand }: EngineProps) {
       </aside>
       {preset === "wholesale" && cart.some((l) => l.qty >= 50) && <div className="lg:col-span-2"><Toast>Volume pricing applied automatically: trade customers see their own tiered prices.</Toast></div>}
       {Object.keys(byVendor).length > 1 && preset === "marketplace" && <div className="lg:col-span-2"><Badge tone="accent">This order will be split into {Object.keys(byVendor).length} vendor shipments</Badge></div>}
+    </div>
+    {manager && (
+      <Panel title={`Orders (${orders.length})`}>
+        {orders.length === 0 ? <p className="text-sm text-muted-foreground">No orders yet. Switch to Customer, check out, then come back.</p> : (
+          <ul className="space-y-2 text-sm">{orders.map((o) => (
+            <li key={o.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-border p-2.5">
+              <span className="font-semibold">{o.ref}</span><span className="text-muted-foreground">{o.name} · {o.items} item(s) · {money(o.total)}</span>
+              <Badge tone={o.status === "Delivered" ? "good" : "accent"}>{o.status}</Badge>
+              <Btn variant="ghost" className="ml-auto !px-2.5 !py-1 !text-xs" disabled={o.status === "Delivered"} onClick={() => advance(o.id)}>{o.status === "Delivered" ? "Completed" : `Mark ${ORDER_STEPS[ORDER_STEPS.indexOf(o.status) + 1].toLowerCase()}`}</Btn>
+            </li>))}</ul>
+        )}
+      </Panel>
+    )}
+    <Outbox items={outbox} onClear={() => setOutbox([])} />
     </div>
   );
 }

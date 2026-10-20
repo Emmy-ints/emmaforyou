@@ -105,7 +105,7 @@ function Pricing(props: EngineProps) {
   const money = (v: number) => fmtMoney(v, cur);
   const [cost, setCost] = useDemoSetting(props, "cost", 12);
   const [price, setPrice] = useDemoSetting(props, "price", 25);
-  const [elasticity, setElasticity] = useState(1.2);
+  const [elasticity, setElasticity] = useDemoSetting(props, "elasticity", 1.2);
   const baseUnits = 1000, basePrice = 25;
   const units = (p: number) => Math.max(0, Math.round(baseUnits * Math.pow(p / basePrice, -elasticity)));
   const scen = [price * 0.9, price, price * 1.1, price * 1.2].map((p) => ({ p: Math.round(p * 100) / 100, u: units(p), profit: (p - cost) * units(p) }));

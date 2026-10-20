@@ -67,6 +67,8 @@ export interface FeedPost {
   engagement: number;
   accepted_comment_id: string | null;
   is_pinned: boolean;
+  /** Set when the post belongs to a group (absent in feed rows). */
+  group_id?: string | null;
   published_at: string | null;
   edited_at: string | null;
   author_username: string;

@@ -81,7 +81,7 @@ function FeedPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (ready) void load(false); }, [filterKey, ready]);
   useEffect(() => { if (ready && showPinned) pinnedPosts(uid).then(setPinned).catch(() => setPinned([])); else setPinned([]); }, [ready, uid, showPinned]);
-  useEffect(() => onPostCreated((p) => { if (p.status === "published") setPosts((list) => (list ? [p, ...list.filter((x) => x.id !== p.id)] : [p])); }), []);
+  useEffect(() => onPostCreated((p) => { if (p.status === "published" && !p.group_id) setPosts((list) => (list ? [p, ...list.filter((x) => x.id !== p.id)] : [p])); }), []);
 
   useEffect(() => {
     const el = sentinel.current;

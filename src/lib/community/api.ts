@@ -38,13 +38,14 @@ export const newKey = () => (typeof crypto !== "undefined" && "randomUUID" in cr
 export interface FeedCursor { ts: string; id: string; score: number }
 export interface FeedPage { posts: FeedPost[]; next: { cursor?: FeedCursor; offset?: number } | null }
 
-export async function fetchFeed(opts: { sort: FeedSort; cursor?: FeedCursor; offset?: number; tag?: string; kind?: string; topic?: string; author?: string; limit?: number }): Promise<FeedPage> {
+export async function fetchFeed(opts: { sort: FeedSort; cursor?: FeedCursor; offset?: number; tag?: string; kind?: string; topic?: string; author?: string; group?: string; limit?: number }): Promise<FeedPage> {
   const limit = opts.limit ?? 12;
   const rows = check(await db.rpc("community_feed", {
     _sort: opts.sort, _limit: limit,
     _cursor_ts: opts.cursor?.ts ?? null, _cursor_id: opts.cursor?.id ?? null, _cursor_score: opts.cursor?.score ?? null,
     _offset: opts.offset ?? 0, _author: opts.author ?? null, _tag: opts.tag ?? null, _kind: opts.kind ?? null,
     ...(opts.topic ? { _topic: opts.topic } : {}),
+    ...(opts.group ? { _group: opts.group } : {}),
   })) as FeedPost[];
   const posts = (rows ?? []).map((p) => ({ ...p, media: Array.isArray(p.media) ? p.media : [], reactions: p.reactions ?? {} }));
   if (posts.length < limit) return { posts, next: null };
@@ -103,8 +104,8 @@ export interface PostInput {
   topic: string | null; poll_options: string[] | null; visibility: "public" | "members"; status: "draft" | "published";
 }
 
-export async function createPost(uid: string, input: PostInput, clientKey: string): Promise<string> {
-  const res = await db.from("community_posts").insert({ ...input, author_id: uid, client_key: clientKey }).select("id").single();
+export async function createPost(uid: string, input: PostInput, clientKey: string, groupId?: string | null): Promise<string> {
+  const res = await db.from("community_posts").insert({ ...input, author_id: uid, client_key: clientKey, ...(groupId ? { group_id: groupId } : {}) }).select("id").single();
   if (res.error?.code === "23505" && !/already posted/i.test(String(res.error.message))) {
     // Same client key: the first submission went through (e.g. a double click or a retry after a timeout).
     const again = await db.from("community_posts").select("id").eq("author_id", uid).eq("client_key", clientKey).maybeSingle();

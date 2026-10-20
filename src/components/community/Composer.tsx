@@ -15,8 +15,8 @@ function fromPost(p: FeedPost): Draft {
 }
 
 /** Create or edit a post. Validation mirrors the database rules; the database has the final say. */
-export default function Composer({ uid, editing, initialKind, staff = false, onDone, onCancel, autoFocus = false }: {
-  uid: string; editing?: FeedPost; initialKind?: PostKind; staff?: boolean; onDone: (post: FeedPost) => void; onCancel?: () => void; autoFocus?: boolean;
+export default function Composer({ uid, editing, initialKind, staff = false, groupId, onDone, onCancel, autoFocus = false }: {
+  uid: string; editing?: FeedPost; initialKind?: PostKind; staff?: boolean; groupId?: string; onDone: (post: FeedPost) => void; onCancel?: () => void; autoFocus?: boolean;
 }) {
   const [d, setD] = useState<Draft>(() => {
     if (editing) return fromPost(editing);
@@ -82,7 +82,7 @@ export default function Composer({ uid, editing, initialKind, staff = false, onD
     try {
       let id = editing?.id;
       if (editing) await updatePost(editing.id, input);
-      else id = await createPost(uid, input, clientKey.current);
+      else id = await createPost(uid, input, clientKey.current, groupId);
       const saved = id ? await getPost(id, uid) : null;
       if (!saved) throw new Error("Saved, but couldn't load the post. Refresh to see it.");
       if (!editing) { try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ } setD(empty()); clientKey.current = newKey(); }

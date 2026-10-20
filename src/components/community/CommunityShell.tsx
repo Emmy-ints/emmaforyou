@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Home, Search, PlusSquare, Bell, User, Bookmark, Settings, BookOpen, ShieldCheck, MessageSquare, Headset, ChevronsLeft, ChevronsRight, Hash, Sparkles, LogIn, ArrowRight,
+  Home, Search, PlusSquare, Bell, User, Bookmark, Settings, BookOpen, ShieldCheck, MessageSquare, Headset, Users, ChevronsLeft, ChevronsRight, Hash, Sparkles, LogIn, ArrowRight,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { useCommunitySession } from "@/lib/community/session";
@@ -14,11 +14,11 @@ import Composer from "./Composer";
 import { Avatar } from "./RichText";
 
 /* ------------------------------------------------------------------ composer launcher */
-let composer: { kind?: PostKind } | null = null;
+let composer: { kind?: PostKind; groupId?: string } | null = null;
 const composerSubs = new Set<() => void>();
 const composerEmit = () => composerSubs.forEach((s) => s());
 /** Opens the post composer from anywhere in the community (the feed listens for new posts). */
-export function openComposer(kind?: PostKind) { composer = { kind }; composerEmit(); }
+export function openComposer(kind?: PostKind, groupId?: string) { composer = { kind, groupId }; composerEmit(); }
 const closeComposer = () => { composer = null; composerEmit(); };
 const createdSubs = new Set<(p: FeedPost) => void>();
 /** Subscribe to posts created from the shared composer (so the feed can show them at once). */
@@ -30,10 +30,10 @@ const COLLAPSE_KEY = "efy_community_nav_collapsed";
 export function useStartPost() {
   const { uid, profile } = useCommunitySession();
   const navigate = useNavigate();
-  return (kind?: PostKind) => {
+  return (kind?: PostKind, groupId?: string) => {
     if (!uid) return openAuth("Join the EmmaForYou Community to post.");
     if (!profile) return navigate({ to: "/community/settings", search: { setup: true } });
-    openComposer(kind);
+    openComposer(kind, groupId);
   };
 }
 
@@ -55,6 +55,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
   const items: { label: string; icon: typeof Home; to: string; params?: Record<string, string>; active: boolean; badge?: number; auth?: boolean }[] = [
     { label: "Home", icon: Home, to: "/community", active: is("/community", true) },
     { label: "Explore", icon: Search, to: "/community/search", active: is("/community/search") },
+    { label: "Groups", icon: Users, to: "/community/groups", active: is("/community/groups") || is("/community/g/") },
     { label: "Notifications", icon: Bell, to: "/community/notifications", active: is("/community/notifications"), badge: unread, auth: true },
     { label: "Messages", icon: MessageSquare, to: "/community/messages", active: is("/community/messages"), auth: true },
     { label: "Saved", icon: Bookmark, to: "/community/saved", active: is("/community/saved"), auth: true },
@@ -148,10 +149,10 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
 
       <Dialog open={Boolean(open)} onOpenChange={(o) => { if (!o) closeComposer(); }}>
         <DialogContent className="max-h-[92dvh] w-[96vw] max-w-2xl overflow-y-auto p-4 sm:p-6">
-          <DialogTitle>Create a post</DialogTitle>
+          <DialogTitle>{open?.groupId ? "Post in this group" : "Create a post"}</DialogTitle>
           <DialogDescription className="sr-only">Write a post for the EmmaForYou Community.</DialogDescription>
           {open && uid && (
-            <Composer uid={uid} staff={staff} initialKind={open.kind} autoFocus onCancel={closeComposer}
+            <Composer uid={uid} staff={staff} initialKind={open.kind} groupId={open.groupId} autoFocus onCancel={closeComposer}
               onDone={(p) => { closeComposer(); createdSubs.forEach((fn) => fn(p)); if (p.status === "published") navigate({ to: "/community/post/$id", params: { id: p.id } }); }} />
           )}
         </DialogContent>

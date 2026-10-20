@@ -107,7 +107,19 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        <div className="min-w-0">{children}</div>
+        <div className="min-w-0">
+          {/* Mobile: the sections the bottom bar has no room for */}
+          <nav aria-label="More community sections" className="-mx-3 mb-4 flex gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+            {items.filter((it) => !["Home", "Explore", "Notifications", "Profile"].includes(it.label)).map((it) => {
+              const Icon = it.icon;
+              const cls = `inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium ${it.active ? "border-[var(--emma-violet)] bg-[var(--emma-violet)]/10 text-[var(--emma-violet)]" : "border-border text-muted-foreground"}`;
+              if (it.auth && !uid) return <button key={it.label} type="button" onClick={() => openAuth(`Join to see your ${it.label.toLowerCase()}.`, "signin")} className={cls}><Icon className="h-3.5 w-3.5" aria-hidden="true" />{it.label}</button>;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              return <Link key={it.label} to={it.to as any} params={it.params as any} aria-current={it.active ? "page" : undefined} className={cls}><Icon className="h-3.5 w-3.5" aria-hidden="true" />{it.label}</Link>;
+            })}
+          </nav>
+          {children}
+        </div>
 
         {/* Right: discovery */}
         <aside aria-label="Discover" className="hidden xl:block">

@@ -391,7 +391,7 @@ export default function Navbar() {
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)} className="nav-ghost justify-center"><MessageCircle className="h-4 w-4" aria-hidden="true" />WhatsApp us</a>
           </div>
 
-          <nav aria-label="Main" className="mt-5">
+          <nav aria-label="Site sections" className="mt-5">
             {MobileTop({ to: "/", label: t("nav_home") })}
             {MobileGroup({ k: "solutions", label: "Solutions", children: <>
               {MobileLink({ to: "/solutions", label: "All solutions", hint: "Live demos you can customise" })}

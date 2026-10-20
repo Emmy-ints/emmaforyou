@@ -292,10 +292,10 @@ export default function Navbar() {
 
         <aside id="mobile-nav" ref={drawerRef} className={`fixed top-0 right-0 z-[95] h-[100dvh] w-[85vw] max-w-sm overflow-y-auto overscroll-contain bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Mobile navigation" aria-hidden={!mobileOpen} inert={!mobileOpen}>
           <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
-            <div className="mb-4 flex items-center justify-between gap-2 min-[400px]:hidden"><span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Theme & language</span><div className="flex items-center gap-2"><DarkModeToggle /><LanguageSelector /></div></div>
-            <div className="mb-5 grid grid-cols-2 gap-2">
-              <Link to="/book" onClick={() => setMobileOpen(false)} className="rounded-2xl bg-[var(--emma-violet)] px-3 py-3 text-center text-sm font-semibold text-white">📅 Book a call</Link>
-              <Link to="/proposal" onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border px-3 py-3 text-center text-sm font-semibold text-foreground">📝 Get a quote</Link>
+            <div className="mb-4 flex items-center justify-between gap-2 min-[400px]:hidden"><span className="whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-muted-foreground">Display</span><div className="flex items-center gap-2"><DarkModeToggle /><LanguageSelector /></div></div>
+            <div className="mb-5 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+              <Link to="/book" onClick={() => setMobileOpen(false)} className="flex min-h-12 items-center justify-center gap-1.5 whitespace-nowrap rounded-2xl bg-[var(--emma-violet)] px-2 py-2.5 text-center text-sm font-semibold text-white"><span aria-hidden="true">📅</span>Book a call</Link>
+              <Link to="/proposal" onClick={() => setMobileOpen(false)} className="flex min-h-12 items-center justify-center gap-1.5 whitespace-nowrap rounded-2xl border border-border px-2 py-2.5 text-center text-sm font-semibold text-foreground"><span aria-hidden="true">📝</span>Get a quote</Link>
             </div>
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">Menu</p>
             <Link to="/" onClick={() => setMobileOpen(false)} className="font-display text-lg font-bold text-foreground py-3 border-b border-border">{t("nav_home")}</Link>

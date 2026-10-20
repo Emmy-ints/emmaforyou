@@ -259,7 +259,7 @@ export default function Navbar() {
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />
         </Link>
 
-        <div className="hidden items-center gap-1.5 xl:flex">
+        <div className="hidden items-center gap-1 xl:flex 2xl:gap-1.5">
           <Link to="/" aria-current={pathname === "/" ? "page" : undefined} className={`nav-link font-body hidden rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground 2xl:inline-flex ${pathname === "/" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>{t("nav_home")}</Link>
           {ddBtn("services", "Services")}
           {ddBtn("solutions", "Solutions")}
@@ -267,8 +267,8 @@ export default function Navbar() {
           {ddBtn("company", "Company")}
           {ddBtn("resources", "Resources")}
           {ddBtn("tools", "Tools")}
-          <Link to="/community" aria-current={pathname.startsWith("/community") ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname.startsWith("/community") ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Community</Link>
-          <Link to="/pricing" aria-current={pathname === "/pricing" ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/pricing" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Pricing</Link>
+          <Link to="/community" aria-current={pathname.startsWith("/community") ? "page" : undefined} className={`nav-link font-body whitespace-nowrap rounded-full px-2 py-1.5 text-sm font-medium hover:text-foreground ${pathname.startsWith("/community") ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Community</Link>
+          <Link to="/pricing" aria-current={pathname === "/pricing" ? "page" : undefined} className={`nav-link font-body whitespace-nowrap rounded-full px-2 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/pricing" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Pricing</Link>
           {ddBtn("account", "Login")}
           <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
           <DarkModeToggle />

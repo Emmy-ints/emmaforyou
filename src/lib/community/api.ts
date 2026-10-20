@@ -43,7 +43,8 @@ export async function fetchFeed(opts: { sort: FeedSort; cursor?: FeedCursor; off
   const rows = check(await db.rpc("community_feed", {
     _sort: opts.sort, _limit: limit,
     _cursor_ts: opts.cursor?.ts ?? null, _cursor_id: opts.cursor?.id ?? null, _cursor_score: opts.cursor?.score ?? null,
-    _offset: opts.offset ?? 0, _author: opts.author ?? null, _tag: opts.tag ?? null, _kind: opts.kind ?? null, _topic: opts.topic ?? null,
+    _offset: opts.offset ?? 0, _author: opts.author ?? null, _tag: opts.tag ?? null, _kind: opts.kind ?? null,
+    ...(opts.topic ? { _topic: opts.topic } : {}),
   })) as FeedPost[];
   const posts = (rows ?? []).map((p) => ({ ...p, media: Array.isArray(p.media) ? p.media : [], reactions: p.reactions ?? {} }));
   if (posts.length < limit) return { posts, next: null };

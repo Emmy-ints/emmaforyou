@@ -48,3 +48,16 @@ Status: **Verified** = tested live on the preview; **Blocked** = needs the owner
 ## Speed
 - [x] Verified — knowledge-base articles and the solutions catalogue no longer ship to every page (main file 614 KB → 406 KB on the preview's development build); pages and server-rendered SEO unchanged.
 - [ ] Pending publish — the live site still serves the old 507 KB main file until the owner publishes.
+
+## Community (2026-10-20)
+- [x] Verified — database security: 40/40 rule tests (ownership, counters, duplicates, blocks, visibility, community sign-ups not turned into portal clients).
+- [x] Verified — pages render signed out at 320–1440px with no sideways scroll: feed, post, profile, settings, saved, notifications, explore, guidelines, moderation, messages, inbox, groups.
+- [x] Built — feed (6 sorts, cursor paging, topic/tag/kind filters, pinned posts), rich posts (polls, media, links with previews, drafts), threaded comments, reactions, saves, follows, blocks, reports, moderation queue + audit log, notifications (live), search, profiles with reputation and badges, settings (profile, drafts, blocks, password, data export, delete).
+- [x] Built — private messages, community AI assistant with specialist routing, "Talk to a person", staff support inbox with take-over / hand-back (control version enforced in the database).
+- [x] Built — groups (public / private with approval, admins, group feeds; private posts members-only).
+- [ ] Owner — signed-in flows (posting, messaging, assistant, groups, moderation) need a real account: sign up at /community and give your account the admin role to see Moderation and Support inbox.
+
+## Automated blog (2026-10-20)
+- [x] Verified — end to end on the preview: 29 RSS sources fetched (24 healthy, 5 refuse automated requests), 240 trend items scored, one article written from its source, failed the gate once (long list item), then a second run published "AI Content and SEO: Why Businesses Need Human Judgment" with 20/20 checks, sources and disclosure; it appears on /blog and in the sitemap.
+- [x] Verified — pg_cron job `emmaforyou-blog-tick` runs every 10 minutes and calls the site; the live site answers 404 until the latest version is published.
+- [ ] Owner — click Publish in Lovable; after that the 4 daily slots (07:00, 11:00, 15:00, 19:00 Africa/Lagos) run with the dashboard closed. Slots missed before then are not back-filled; the dashboard shows the shortfall.

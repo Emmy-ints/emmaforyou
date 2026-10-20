@@ -10,27 +10,25 @@ import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
 import { WHATSAPP_URL, breadcrumbLd, pageHead, serviceLd } from "@/lib/seo";
 import { track } from "@/lib/analytics";
 import { LeadCapture } from "../components/tools/LeadCapture";
+import { getSolutionMeta } from "@/lib/solutions-server";
 
 export const Route = createFileRoute("/solutions/$category/$slug")({
   component: Page,
-  loader: ({ params }) => {
-    const s = findSolution(params.category, params.slug);
-    if (!s) throw notFound();
-    return { category: s.category, slug: s.slug };
+  loader: async ({ params }) => {
+    const meta = await getSolutionMeta({ data: { category: params.category, slug: params.slug } });
+    if (!meta) throw notFound();
+    return meta;
   },
-  head: ({ loaderData }) => {
-    const s = loaderData ? findSolution(loaderData.category, loaderData.slug) : undefined;
-    if (!s) return { meta: [{ title: "Solution not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
-    const cat = findCategory(s.category)!;
-    const path = solutionPath(s);
-    const faqs = solutionFaqs(s);
+  head: ({ loaderData: m }) => {
+    if (!m) return { meta: [{ title: "Solution not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
+    const { path, faqs } = m;
     return pageHead({
-      title: solutionSeoTitle(s),
-      description: solutionDescription(s),
+      title: m.title,
+      description: m.description,
       path,
       jsonLd: [
-        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Solutions", path: "/solutions" }, { name: cat.name, path: `/solutions/${cat.slug}` }, { name: s.name, path }]),
-        serviceLd({ name: s.name, description: `${s.tagline} ${s.who}`, path, serviceType: cat.name }),
+        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Solutions", path: "/solutions" }, { name: m.catName, path: `/solutions/${m.catSlug}` }, { name: m.name, path }]),
+        serviceLd({ name: m.name, description: m.serviceDescription, path, serviceType: m.catName }),
         { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
       ],
     });

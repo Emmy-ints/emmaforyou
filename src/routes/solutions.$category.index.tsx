@@ -3,21 +3,22 @@ import { useMemo, useState } from "react";
 import { ArrowRight, Search } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { SOLUTION_CATEGORIES, findCategory, solutionsIn } from "@/lib/solutions";
+import { findCategory, solutionsIn } from "@/lib/solutions";
+import { SOLUTION_CATEGORIES } from "@/lib/solutions/categories";
+import { getSolutionCategoryMeta } from "@/lib/solutions-server";
 import { ENGINE_TITLES } from "@/lib/solutions/engine-titles";
 import { breadcrumbLd, clip, itemListLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/solutions/$category/")({
   component: Page,
-  loader: ({ params }) => {
-    const c = findCategory(params.category);
+  loader: async ({ params }) => {
+    const c = await getSolutionCategoryMeta({ data: params.category });
     if (!c) throw notFound();
-    return { slug: c.slug };
+    return c;
   },
-  head: ({ loaderData }) => {
-    const c = loaderData ? findCategory(loaderData.slug) : undefined;
+  head: ({ loaderData: c }) => {
     if (!c) return { meta: [{ title: "Not found — EmmaForYou" }, { name: "robots", content: "noindex" }] };
-    const items = solutionsIn(c.slug);
+    const items = c.items;
     const path = `/solutions/${c.slug}`;
     return pageHead({
       title: `${c.name}: ${items.length} Solutions with Live Demos`.length <= 60 ? `${c.name}: ${items.length} Solutions with Live Demos` : `${c.name} — Live Demos`,

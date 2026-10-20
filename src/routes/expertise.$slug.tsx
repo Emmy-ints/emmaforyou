@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import ExpertiseTemplate from "@/components/ExpertiseTemplate";
 import { findExpertise, EXPERTISE } from "@/lib/services-data";
 import { pageHead, breadcrumbLd, serviceLd, clip } from "@/lib/seo";
-import { canonicalForExpertise } from "@/lib/seo-routes";
+import { canonicalForExpertise } from "@/lib/expertise-canonical";
 
 export const Route = createFileRoute("/expertise/$slug")({
   component: ExpertisePage,

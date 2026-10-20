@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Check, PlayCircle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { ALL_SOLUTIONS, SOLUTION_CATEGORIES, findSolution, solutionsIn } from "@/lib/solutions";
+import { ALL_SOLUTIONS, findSolution, solutionsIn } from "@/lib/solutions";
+import { SOLUTION_CATEGORIES } from "@/lib/solutions/categories";
+import { getSolutionCount } from "@/lib/solutions-server";
 import { ENGINE_TITLES } from "@/lib/solutions/engine-titles";
 import { breadcrumbLd, itemListLd, pageHead } from "@/lib/seo";
 
@@ -16,10 +18,11 @@ const FAQS = [
 
 export const Route = createFileRoute("/solutions/")({
   component: Page,
-  head: () =>
+  loader: () => getSolutionCount(),
+  head: ({ loaderData }) =>
     pageHead({
       title: "Solutions & Live Demos — Websites, Apps, AI, Automation",
-      description: `Explore ${ALL_SOLUTIONS.length} websites, business apps, AI solutions and automations, each with a working prototype you can customise and test in your browser.`,
+      description: `Explore ${loaderData ?? ""} websites, business apps, AI solutions and automations, each with a working prototype you can customise and test in your browser.`,
       path: "/solutions",
       jsonLd: [
         breadcrumbLd([{ name: "Home", path: "/" }, { name: "Solutions", path: "/solutions" }]),

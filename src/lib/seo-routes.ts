@@ -1,3 +1,4 @@
+import { canonicalForExpertise } from "./expertise-canonical";
 import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE } from "./services-data";
 import { PROJECTS, projectSlug } from "./portfolio-data";
 import { POSTS } from "./blog-data";
@@ -12,10 +13,7 @@ import { LEAD_MAGNETS } from "./lead-magnets";
  * The seven /services/* pages are the primary commercial pages. Expertise pages that show the
  * same content point their canonical at the matching service URL, so the two never compete.
  */
-export function canonicalForExpertise(expertiseSlug: string): string {
-  const svc = Object.entries(SERVICE_TO_EXPERTISE).find(([, exp]) => exp === expertiseSlug)?.[0];
-  return svc ? `/services/${svc}` : `/expertise/${expertiseSlug}`;
-}
+export { canonicalForExpertise };
 
 /** Indexable static pages (private, account and thin generated pages are deliberately excluded). */
 export const STATIC_PATHS: { path: string; priority: number; changefreq: string }[] = [

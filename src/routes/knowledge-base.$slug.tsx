@@ -2,8 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { KNOWLEDGE } from "@/lib/knowledge-data";
-import { POSTS } from "@/lib/blog-data";
+import { getKnowledgeArticle } from "@/lib/knowledge-server";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
 import { serviceForTopic } from "@/lib/topic-service";
@@ -11,10 +10,10 @@ import { pageHead, breadcrumbLd, articleLd, describe, withBrand } from "@/lib/se
 
 export const Route = createFileRoute("/knowledge-base/$slug")({
   component: ArticlePage,
-  loader: ({ params }) => {
-    const article = KNOWLEDGE.find((a) => a.slug === params.slug);
-    if (!article) throw notFound();
-    return { article };
+  loader: async ({ params }) => {
+    const found = await getKnowledgeArticle({ data: params.slug });
+    if (!found) throw notFound();
+    return found;
   },
   notFoundComponent: () => (
     <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Article not found</h1><Link to="/knowledge-base" className="mt-4 inline-block text-sm underline">Back to knowledge base</Link></div></div>
@@ -22,7 +21,7 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
   head: ({ loaderData }) =>
     loaderData
       ? pageHead({
-          title: POSTS.some((p) => p.title === loaderData.article.title)
+          title: loaderData.sharesBlogTitle
             ? withBrand(`${loaderData.article.title.split(":")[0]} — Small Business Guide`)
             : withBrand(loaderData.article.title),
           description: describe(loaderData.article.excerpt, loaderData.article.body),
@@ -42,9 +41,8 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
 });
 
 function ArticlePage() {
-  const { article } = Route.useLoaderData();
+  const { article, related } = Route.useLoaderData();
   const [voted, setVoted] = useState<null | boolean>(null);
-  const related = KNOWLEDGE.filter((a) => a.category === article.category && a.slug !== article.slug).slice(0, 3);
 
   async function vote(helpful: boolean) {
     setVoted(helpful);

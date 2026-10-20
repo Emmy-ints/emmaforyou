@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ToolShell from "../components/tools/ToolShell";
 import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE } from "@/lib/services-data";
-import { canonicalForExpertise } from "@/lib/seo-routes";
+import { canonicalForExpertise } from "@/lib/expertise-canonical";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 const GROUPS: { title: string; intro: string; slugs: string[] }[] = [

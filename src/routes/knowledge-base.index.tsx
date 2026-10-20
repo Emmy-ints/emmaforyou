@@ -2,13 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { KNOWLEDGE } from "@/lib/knowledge-data";
+import { listKnowledge } from "@/lib/knowledge-server";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/knowledge-base/")({
   component: KbIndex,
-  head: () =>
-    pageHead({
+  loader: () => listKnowledge(),
+  head: ({ loaderData }) => {
+    const KNOWLEDGE = loaderData ?? [];
+    return pageHead({
       title: `Knowledge Base — ${KNOWLEDGE.length} Free Guides on Websites, SEO & Automation`,
       description: `${KNOWLEDGE.length} in-depth guides for business owners on websites, SEO, AI automation, social media, paid ads, email marketing and ecommerce. Free to read.`,
       path: "/knowledge-base",
@@ -16,17 +18,19 @@ export const Route = createFileRoute("/knowledge-base/")({
         breadcrumbLd([{ name: "Home", path: "/" }, { name: "Knowledge base", path: "/knowledge-base" }]),
         itemListLd("EmmaForYou knowledge base", KNOWLEDGE.map((a) => ({ name: a.title, path: `/knowledge-base/${a.slug}` }))),
       ],
-    }),
+    });
+  },
 });
 
 const CATS = ["All", "Business Growth", "Website & SEO", "AI Automation", "Social Media", "Paid Advertising", "Email Marketing", "Ecommerce"];
 
 function KbIndex() {
+  const KNOWLEDGE = Route.useLoaderData();
   const [cat, setCat] = useState("All");
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
     return KNOWLEDGE.filter((a) => (cat === "All" || a.category === cat) && (q === "" || a.title.toLowerCase().includes(q.toLowerCase()) || a.excerpt.toLowerCase().includes(q.toLowerCase())));
-  }, [cat, q]);
+  }, [KNOWLEDGE, cat, q]);
   const featured = KNOWLEDGE.filter((a) => a.featured).slice(0, 3);
 
   return (

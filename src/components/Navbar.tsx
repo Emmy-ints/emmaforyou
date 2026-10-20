@@ -253,7 +253,7 @@ export default function Navbar() {
     <>
     <header className={`site-header fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${mobileOpen ? "bg-background" : scrolled ? "glass is-scrolled shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
       <a href="#main-content" onClick={(e) => { const m = document.querySelector("main"); if (!m) return; e.preventDefault(); m.setAttribute("tabindex", "-1"); m.focus(); m.scrollIntoView(); }} className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[200] focus:rounded-full focus:bg-[var(--emma-violet)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">Skip to content</a>
-      <nav ref={navRef} aria-label="Main" className={`mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 transition-[padding] duration-300 sm:px-5 ${scrolled ? "py-2.5" : "py-4"}`}>
+      <nav ref={navRef} aria-label="Main" className={`mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 2xl:max-w-[1440px] transition-[padding] duration-300 sm:px-5 ${scrolled ? "py-2.5" : "py-4"}`}>
         <Link to="/" className="flex shrink-0 items-baseline gap-0.5" aria-label="EmmaForYou home">
           <span className="font-display text-[1.05rem] font-extrabold tracking-tight text-foreground sm:text-xl">EmmaForYou</span>
           <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />

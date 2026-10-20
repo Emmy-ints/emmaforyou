@@ -62,9 +62,9 @@ export function ListEditor({ label, items, onChange, min = 1, max = 8, placehold
           <li key={i} className="flex items-center gap-1">
             <span className="w-5 text-right text-[11px] text-muted-foreground">{i + 1}.</span>
             <input aria-label={`${label} ${i + 1}`} value={it} maxLength={32} onChange={(e) => onChange(items.map((x, k) => (k === i ? e.target.value : x)))} onBlur={(e) => { if (!e.target.value.trim()) onChange(items.map((x, k) => (k === i ? `${label.replace(/s$/, "")} ${i + 1}` : x))); }} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2 py-1 text-sm outline-none focus:border-[var(--demo-accent)]" />
-            <button type="button" aria-label={`Move ${it} up`} disabled={i === 0} onClick={() => move(i, -1)} className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"><ChevronUp className="h-3.5 w-3.5" /></button>
-            <button type="button" aria-label={`Move ${it} down`} disabled={i === items.length - 1} onClick={() => move(i, 1)} className="rounded p-1 text-muted-foreground hover:bg-muted disabled:opacity-30"><ChevronDown className="h-3.5 w-3.5" /></button>
-            <button type="button" aria-label={`Remove ${it}`} disabled={items.length <= min} onClick={() => onChange(items.filter((_, k) => k !== i))} className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-red-600 disabled:opacity-30"><Trash2 className="h-3.5 w-3.5" /></button>
+            <button type="button" aria-label={`Move ${it} up`} disabled={i === 0} onClick={() => move(i, -1)} className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted disabled:opacity-30"><ChevronUp className="h-3.5 w-3.5" /></button>
+            <button type="button" aria-label={`Move ${it} down`} disabled={i === items.length - 1} onClick={() => move(i, 1)} className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted disabled:opacity-30"><ChevronDown className="h-3.5 w-3.5" /></button>
+            <button type="button" aria-label={`Remove ${it}`} disabled={items.length <= min} onClick={() => onChange(items.filter((_, k) => k !== i))} className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-red-600 disabled:opacity-30"><Trash2 className="h-3.5 w-3.5" /></button>
           </li>
         ))}
       </ol>
@@ -100,7 +100,7 @@ export function RowsEditor<T extends { id: string }>({ label, rows, cols, onChan
                       : <input aria-label={`${c.label} (row ${i + 1})`} type={c.type} min={c.min} step={c.step} value={String(r[c.key] ?? "")} maxLength={40} onChange={(e) => set(r.id, c.key, c.type === "number" ? Math.max(c.min ?? 0, Number(e.target.value) || 0) : e.target.value)} className="w-full rounded-lg border border-border bg-background px-2 py-1 text-sm outline-none focus:border-[var(--demo-accent)]" />}
                   </td>
                 ))}
-                <td className="px-1"><button type="button" aria-label={`Remove row ${i + 1}`} disabled={rows.length <= min} onClick={() => onChange(rows.filter((x) => x.id !== r.id))} className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-red-600 disabled:opacity-30"><Trash2 className="h-3.5 w-3.5" /></button></td>
+                <td className="px-1"><button type="button" aria-label={`Remove row ${i + 1}`} disabled={rows.length <= min} onClick={() => onChange(rows.filter((x) => x.id !== r.id))} className="inline-flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-red-600 disabled:opacity-30"><Trash2 className="h-3.5 w-3.5" /></button></td>
               </tr>
             ))}
           </tbody>

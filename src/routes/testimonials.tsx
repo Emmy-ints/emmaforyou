@@ -148,7 +148,8 @@ function TestimonialsPage() {
           <div className="mx-auto max-w-7xl px-5">
             <h2 className="sr-only">Search and filter testimonials</h2>
             <input
-              type="text"
+              type="search"
+              aria-label="Search testimonials"
               placeholder="Search testimonials..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setShown(30); }}
@@ -159,7 +160,7 @@ function TestimonialsPage() {
                 <button
                   key={n}
                   onClick={() => { setActiveNiche(n); setShown(30); }}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                     activeNiche === n ? "btn-primary-gradient text-white" : "bg-muted text-muted-foreground hover:bg-accent"
                   }`}
                 >

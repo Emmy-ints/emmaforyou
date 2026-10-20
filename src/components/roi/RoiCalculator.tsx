@@ -59,7 +59,7 @@ export default function RoiCalculator({ compact = false }: { compact?: boolean }
           <Panel icon={<Calculator />} title="Your business" note="Your own numbers. Rough estimates are fine.">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Industry">
-                <select className="roi-input" value={industry} onChange={(e) => setIndustry(e.target.value)}>
+                <select aria-label="Industry" className="roi-input" value={industry} onChange={(e) => setIndustry(e.target.value)}>
                   {INDUSTRIES.map((i) => <option key={i}>{i}</option>)}
                 </select>
               </Field>
@@ -285,7 +285,7 @@ function Panel({ icon, title, note, action, children }: { icon: React.ReactNode;
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div role="group" aria-label={label}>
       <span className="mb-1.5 block text-sm font-medium">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}

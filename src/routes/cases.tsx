@@ -131,14 +131,14 @@ function CasesPage() {
             <div className="flex flex-wrap gap-2">
               {NICHES.map(n => (
                 <button key={n} onClick={() => setActiveNiche(n)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${activeNiche === n ? "btn-primary-gradient text-white" : "bg-muted text-muted-foreground"}`}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${activeNiche === n ? "btn-primary-gradient text-white" : "bg-muted text-muted-foreground"}`}
                 >{n}</button>
               ))}
             </div>
             <div className="flex flex-wrap gap-2">
               {RESULT_TYPES.map(r => (
                 <button key={r} onClick={() => setActiveResult(r)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${activeResult === r ? "bg-emma-charcoal text-white" : "bg-muted text-muted-foreground"}`}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${activeResult === r ? "bg-emma-charcoal text-white" : "bg-muted text-muted-foreground"}`}
                 >{r}</button>
               ))}
             </div>

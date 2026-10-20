@@ -99,14 +99,14 @@ export default function Footer() {
 
           <nav aria-label="Services">
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Services</h2>
-            <div className="mt-4 flex flex-col gap-2.5">
+            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
               {SERVICE_LINKS.map((l) => (
-                <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
                   {l.label}
                 </Link>
               ))}
               {EXPERTISE_LINKS.map((l) => (
-                <Link key={l.slug} to="/expertise/$slug" params={{ slug: l.slug }} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                <Link key={l.slug} to="/expertise/$slug" params={{ slug: l.slug }} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
                   {l.label}
                 </Link>
               ))}
@@ -115,9 +115,9 @@ export default function Footer() {
 
           <nav aria-label="Free tools and resources">
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Free Tools</h2>
-            <div className="mt-4 flex flex-col gap-2.5">
+            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
               {TOOL_LINKS.map((l) => (
-                <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                <Link key={l.to} to={l.to} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
                   {l.label}
                 </Link>
               ))}
@@ -126,9 +126,9 @@ export default function Footer() {
 
           <div>
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Company</h2>
-            <div className="mt-4 flex flex-col gap-2.5">
+            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
               {LINKS.map((l) => (
-                <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                <Link key={l.to} to={l.to} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
                   {l.label}
                 </Link>
               ))}
@@ -137,11 +137,11 @@ export default function Footer() {
 
           <div>
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Locations</h2>
-            <div className="mt-4 flex flex-col gap-2.5">
+            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
               {LOCATIONS.map((loc) => (
-                loc === "Toulon, France" ? <Link key={loc} to="/fr" hrefLang="fr" className="text-sm text-muted-foreground hover:text-foreground">{loc} · FR</Link>
-                : loc === "Halle, Germany" ? <Link key={loc} to="/de" hrefLang="de" className="text-sm text-muted-foreground hover:text-foreground">{loc} · DE</Link>
-                : <span key={loc} className="text-sm text-muted-foreground">{loc}</span>
+                loc === "Toulon, France" ? <Link key={loc} to="/fr" hrefLang="fr" className="py-2 text-sm text-muted-foreground hover:text-foreground sm:py-0">{loc} · FR</Link>
+                : loc === "Halle, Germany" ? <Link key={loc} to="/de" hrefLang="de" className="py-2 text-sm text-muted-foreground hover:text-foreground sm:py-0">{loc} · DE</Link>
+                : <span key={loc} className="py-2 text-sm text-muted-foreground sm:py-0">{loc}</span>
               ))}
             </div>
           </div>
@@ -150,8 +150,8 @@ export default function Footer() {
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
           <span>© {new Date().getFullYear()} EmmaForYou. All rights reserved.</span>
           <nav aria-label="Legal" className="flex gap-5">
-            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
-            <Link to="/terms" className="hover:text-foreground">Terms</Link>
+            <Link to="/privacy" className="inline-block py-2 hover:text-foreground sm:py-0">Privacy</Link>
+            <Link to="/terms" className="inline-block py-2 hover:text-foreground sm:py-0">Terms</Link>
           </nav>
         </div>
       </div>

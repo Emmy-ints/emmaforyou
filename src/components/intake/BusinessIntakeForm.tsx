@@ -243,8 +243,8 @@ export default function BusinessIntakeForm({ onClose, initialDescription }: { on
 
 // ============ STEP COMPONENTS ============
 
-function FieldLabel({ children, required }: { children: React.ReactNode; required?: boolean }) {
-  return <label className="mb-2 block text-sm font-semibold">{children}{required && <span className="ml-1 text-emma-pink">*</span>}</label>;
+function FieldLabel({ children, required, htmlFor }: { children: React.ReactNode; required?: boolean; htmlFor?: string }) {
+  return <label htmlFor={htmlFor} className="mb-2 block text-sm font-semibold">{children}{required && <span className="ml-1 text-emma-pink">*</span>}</label>;
 }
 function Err({ msg }: { msg?: string }) {
   return msg ? <p className="mt-1 text-xs font-medium text-emma-pink">{msg}</p> : null;
@@ -264,20 +264,20 @@ function Step1({ data, update, errors }: any) {
       <h3 className="font-display text-2xl font-bold">Your Business Identity</h3>
       <p className="text-sm text-muted-foreground">Let's start with the basics.</p>
       <div>
-        <FieldLabel required>Full Name</FieldLabel>
-        <input value={data.full_name || ""} onChange={(e) => update("full_name", e.target.value)} maxLength={120}
+        <FieldLabel required htmlFor="intake-full-name">Full Name</FieldLabel>
+        <input id="intake-full-name" value={data.full_name || ""} onChange={(e) => update("full_name", e.target.value)} maxLength={120}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         <Err msg={errors.full_name} />
       </div>
       <div>
-        <FieldLabel required>Business Name</FieldLabel>
-        <input value={data.business_name || ""} onChange={(e) => update("business_name", e.target.value)} maxLength={150}
+        <FieldLabel required htmlFor="intake-business-name">Business Name</FieldLabel>
+        <input id="intake-business-name" value={data.business_name || ""} onChange={(e) => update("business_name", e.target.value)} maxLength={150}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         <Err msg={errors.business_name} />
       </div>
       <div>
-        <FieldLabel required>Business Type</FieldLabel>
-        <select value={data.business_type || ""} onChange={(e) => update("business_type", e.target.value)}
+        <FieldLabel required htmlFor="intake-business-type">Business Type</FieldLabel>
+        <select id="intake-business-type" value={data.business_type || ""} onChange={(e) => update("business_type", e.target.value)}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none">
           <option value="">Select your business type...</option>
           {BUSINESS_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -285,8 +285,8 @@ function Step1({ data, update, errors }: any) {
         <Err msg={errors.business_type} />
       </div>
       <div>
-        <FieldLabel>Describe what your business does</FieldLabel>
-        <textarea value={data.business_description || ""} onChange={(e) => update("business_description", e.target.value)} rows={3} maxLength={500}
+        <FieldLabel htmlFor="intake-business-description">Describe what your business does</FieldLabel>
+        <textarea id="intake-business-description" value={data.business_description || ""} onChange={(e) => update("business_description", e.target.value)} rows={3} maxLength={500}
           placeholder="2-3 sentences about your products/services and customers..."
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
@@ -316,8 +316,8 @@ function Step2({ data, update, toggleArr, errors }: any) {
     <div className="space-y-5">
       <h3 className="font-display text-2xl font-bold">Location & Market</h3>
       <div>
-        <FieldLabel required>Country</FieldLabel>
-        <select value={data.country || ""} onChange={(e) => update("country", e.target.value)}
+        <FieldLabel required htmlFor="intake-country">Country</FieldLabel>
+        <select id="intake-country" value={data.country || ""} onChange={(e) => update("country", e.target.value)}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none">
           <option value="">Select country...</option>
           {COUNTRIES.map((c) => <option key={c.name} value={c.name}>{c.code} {c.name}</option>)}
@@ -325,8 +325,8 @@ function Step2({ data, update, toggleArr, errors }: any) {
         <Err msg={errors.country} />
       </div>
       <div>
-        <FieldLabel>City / State</FieldLabel>
-        <input value={data.city || ""} onChange={(e) => update("city", e.target.value)} maxLength={120}
+        <FieldLabel htmlFor="intake-city">City / State</FieldLabel>
+        <input id="intake-city" value={data.city || ""} onChange={(e) => update("city", e.target.value)} maxLength={120}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
       <div>
@@ -390,8 +390,8 @@ function Step3({ data, update, setData }: any) {
       {data.has_website === "Yes" && (
         <>
           <div>
-            <FieldLabel>Website URL</FieldLabel>
-            <input value={data.website_url || ""} onChange={(e) => update("website_url", e.target.value)} maxLength={500}
+            <FieldLabel htmlFor="intake-website-url">Website URL</FieldLabel>
+            <input id="intake-website-url" value={data.website_url || ""} onChange={(e) => update("website_url", e.target.value)} maxLength={500}
               placeholder="https://..."
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
           </div>
@@ -420,7 +420,7 @@ function Step3({ data, update, setData }: any) {
                   <span>{p.icon}</span><span>{p.label}</span>
                 </button>
                 {active && (
-                  <input type="text" inputMode="numeric" placeholder="Followers"
+                  <input aria-label={`${p.label} followers`} type="text" inputMode="numeric" placeholder="Followers"
                     value={data.social_platforms_followers?.[p.id] || ""}
                     onChange={(e) => updateFollowers(p.id, e.target.value)}
                     className="mt-2 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs focus:outline-none" />
@@ -448,8 +448,8 @@ function Step3({ data, update, setData }: any) {
       </div>
       {data.runs_ads === "Yes" && (
         <div>
-          <FieldLabel>Approximate monthly ad spend</FieldLabel>
-          <input value={data.ad_spend || ""} onChange={(e) => update("ad_spend", e.target.value)} maxLength={50}
+          <FieldLabel htmlFor="intake-ad-spend">Approximate monthly ad spend</FieldLabel>
+          <input id="intake-ad-spend" value={data.ad_spend || ""} onChange={(e) => update("ad_spend", e.target.value)} maxLength={50}
             placeholder="e.g. $500 / month"
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         </div>
@@ -552,20 +552,20 @@ function Step6({ data, update, errors }: any) {
         <Err msg={errors.primary_goal} />
       </div>
       <div>
-        <FieldLabel>Revenue goal in 6 months</FieldLabel>
-        <input value={data.revenue_goal || ""} onChange={(e) => update("revenue_goal", e.target.value)} maxLength={50}
+        <FieldLabel htmlFor="intake-revenue-goal">Revenue goal in 6 months</FieldLabel>
+        <input id="intake-revenue-goal" value={data.revenue_goal || ""} onChange={(e) => update("revenue_goal", e.target.value)} maxLength={50}
           placeholder="e.g. $10,000 per month"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
       <div>
-        <FieldLabel>Describe the exact results you want in 3–6 months</FieldLabel>
-        <textarea value={data.desired_outcomes || ""} onChange={(e) => update("desired_outcomes", e.target.value)} rows={4} maxLength={1500}
+        <FieldLabel htmlFor="intake-desired-outcomes">Describe the exact results you want in 3–6 months</FieldLabel>
+        <textarea id="intake-desired-outcomes" value={data.desired_outcomes || ""} onChange={(e) => update("desired_outcomes", e.target.value)} rows={4} maxLength={1500}
           placeholder="e.g. I want to go from 10 leads per week to 50, increase monthly revenue from $2,000 to $8,000, and have a fully automated WhatsApp follow-up system running..."
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
       <div>
-        <FieldLabel>What would make this a 10/10 success for you?</FieldLabel>
-        <input value={data.success_metric || ""} onChange={(e) => update("success_metric", e.target.value)} maxLength={300}
+        <FieldLabel htmlFor="intake-success-metric">What would make this a 10/10 success for you?</FieldLabel>
+        <input id="intake-success-metric" value={data.success_metric || ""} onChange={(e) => update("success_metric", e.target.value)} maxLength={300}
           placeholder="In your own words..."
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
@@ -635,14 +635,14 @@ function Step7({ data, update, toggleArr, errors }: any) {
       </div>
       {data.worked_with_agency === "Yes" && (
         <div>
-          <FieldLabel>What went right or wrong?</FieldLabel>
-          <textarea value={data.agency_experience || ""} onChange={(e) => update("agency_experience", e.target.value)} rows={3} maxLength={800}
+          <FieldLabel htmlFor="intake-agency-experience">What went right or wrong?</FieldLabel>
+          <textarea id="intake-agency-experience" value={data.agency_experience || ""} onChange={(e) => update("agency_experience", e.target.value)} rows={3} maxLength={800}
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         </div>
       )}
       <div>
-        <FieldLabel>What's the ONE thing you're most afraid of?</FieldLabel>
-        <input value={data.biggest_fear || ""} onChange={(e) => update("biggest_fear", e.target.value)} maxLength={300}
+        <FieldLabel htmlFor="intake-biggest-fear">What's the ONE thing you're most afraid of?</FieldLabel>
+        <input id="intake-biggest-fear" value={data.biggest_fear || ""} onChange={(e) => update("biggest_fear", e.target.value)} maxLength={300}
           placeholder="e.g. wasting money on something that doesn't work..."
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
@@ -658,21 +658,21 @@ function Step8({ data, update, errors }: any) {
       <h3 className="font-display text-2xl font-bold">Final Details</h3>
       <p className="text-sm text-muted-foreground">Last step — we'll send your custom plan to WhatsApp within 24 hours.</p>
       <div>
-        <FieldLabel required>Email address</FieldLabel>
-        <input type="email" value={data.email || ""} onChange={(e) => update("email", e.target.value)} maxLength={255}
+        <FieldLabel required htmlFor="intake-email">Email address</FieldLabel>
+        <input id="intake-email" type="email" value={data.email || ""} onChange={(e) => update("email", e.target.value)} maxLength={255}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         <Err msg={errors.email} />
       </div>
       <div>
-        <FieldLabel required>WhatsApp number (with country code)</FieldLabel>
-        <input value={data.whatsapp || ""} onChange={(e) => update("whatsapp", e.target.value)} maxLength={30}
+        <FieldLabel required htmlFor="intake-whatsapp">WhatsApp number (with country code)</FieldLabel>
+        <input id="intake-whatsapp" value={data.whatsapp || ""} onChange={(e) => update("whatsapp", e.target.value)} maxLength={30}
           placeholder="+234 800 123 4567"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         <Err msg={errors.whatsapp} />
       </div>
       <div>
-        <FieldLabel>Instagram handle (optional)</FieldLabel>
-        <input value={data.instagram_handle || ""} onChange={(e) => update("instagram_handle", e.target.value)} maxLength={60}
+        <FieldLabel htmlFor="intake-instagram-handle">Instagram handle (optional)</FieldLabel>
+        <input id="intake-instagram-handle" value={data.instagram_handle || ""} onChange={(e) => update("instagram_handle", e.target.value)} maxLength={60}
           placeholder="@username"
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
@@ -686,8 +686,8 @@ function Step8({ data, update, errors }: any) {
       </div>
       {data.how_found_us === "Referral" && (
         <div>
-          <FieldLabel>Who referred you?</FieldLabel>
-          <input value={data.referrer_name || ""} onChange={(e) => update("referrer_name", e.target.value)} maxLength={120}
+          <FieldLabel htmlFor="intake-referrer-name">Who referred you?</FieldLabel>
+          <input id="intake-referrer-name" value={data.referrer_name || ""} onChange={(e) => update("referrer_name", e.target.value)} maxLength={120}
             className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
         </div>
       )}
@@ -707,8 +707,8 @@ function Step8({ data, update, errors }: any) {
         </label>
       </div>
       <div>
-        <FieldLabel>Anything else we should know?</FieldLabel>
-        <textarea value={data.other_notes || ""} onChange={(e) => update("other_notes", e.target.value)} rows={3} maxLength={1500}
+        <FieldLabel htmlFor="intake-other-notes">Anything else we should know?</FieldLabel>
+        <textarea id="intake-other-notes" value={data.other_notes || ""} onChange={(e) => update("other_notes", e.target.value)} rows={3} maxLength={1500}
           className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:border-emma-blue focus:outline-none" />
       </div>
       <label className="flex items-start gap-3 cursor-pointer">

@@ -159,8 +159,8 @@ function SignIn() {
         </Link>
         <form onSubmit={submit} className="space-y-3 rounded-3xl border border-border bg-card p-7 shadow-sm">
           <h1 className="font-display text-xl font-bold">{mode === "login" ? "Sign in to your dashboard" : "Create your dashboard account"}</h1>
-          <input className="dash-input" type="email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input className="dash-input" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+          <input className="dash-input" type="email" aria-label="Email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="dash-input" type="password" aria-label="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
           {err && <p className="text-sm text-destructive">{err}</p>}
           {info && <p className="text-sm text-muted-foreground">{info}</p>}
           <button disabled={busy} className="btn-gold w-full rounded-full px-6 py-3 text-sm disabled:opacity-60">

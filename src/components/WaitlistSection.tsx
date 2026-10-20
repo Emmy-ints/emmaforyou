@@ -56,6 +56,7 @@ export default function WaitlistSection() {
               required
               maxLength={255}
               placeholder="Enter your email"
+              aria-label="Your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 rounded-full border-2 border-emma-charcoal/20 bg-white/80 px-5 py-3 text-sm text-emma-charcoal placeholder:text-emma-charcoal/40 focus:border-emma-charcoal/50 focus:outline-none"

@@ -50,7 +50,15 @@ function Portal() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center bg-background"><div className="text-sm text-muted-foreground">Loading…</div></div>;
+  if (loading) return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20" aria-busy="true">
+        <h1 className="sr-only">Client Portal</h1>
+        <p role="status" className="text-sm text-muted-foreground">Loading your portal…</p>
+      </main>
+    </div>
+  );
   if (session && recovering) return <NewPassword onDone={() => setRecovering(false)} />;
   return session ? <PortalDashboard userId={session.user.id} email={session.user.email || ""} /> : <AuthScreen />;
 }
@@ -111,12 +119,12 @@ function AuthScreen() {
             <form onSubmit={submit} className="mt-6 space-y-3">
               {mode === "signup" && (
                 <>
-                  <input className="input" placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-                  <input className="input" placeholder="Business name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
+                  <input className="input" aria-label="Full name" autoComplete="name" placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                  <input className="input" aria-label="Business name" autoComplete="organization" placeholder="Business name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
                 </>
               )}
-              <input className="input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              {mode !== "forgot" && <input className="input" type="password" placeholder="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />}
+              <input className="input" type="email" aria-label="Email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              {mode !== "forgot" && <input className="input" type="password" aria-label="Password" placeholder="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />}
               {err && <p className="text-sm text-destructive">{err}</p>}
               {info && <p className="text-sm text-green-600">{info}</p>}
               <button disabled={busy} className="btn-primary-gradient inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white disabled:opacity-60">
@@ -605,7 +613,7 @@ function NewPassword({ onDone }: { onDone: () => void }) {
       <main className="flex min-h-[80vh] items-center justify-center px-5 pt-32 pb-20">
         <form onSubmit={save} className="w-full max-w-md space-y-3 rounded-3xl border border-border bg-card p-8">
           <h1 className="font-display text-2xl font-semibold">Choose a new password</h1>
-          <input type="password" className="input" placeholder="New password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" minLength={8} required />
+          <input type="password" className="input" aria-label="New password" placeholder="New password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" minLength={8} required />
           {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
           <button disabled={busy} className="btn-primary-gradient w-full rounded-full px-6 py-3 font-semibold text-white disabled:opacity-60">{busy ? "Saving…" : "Save and continue"}</button>
         </form>

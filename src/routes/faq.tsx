@@ -42,7 +42,7 @@ function FaqPage() {
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="font-display text-4xl font-extrabold md:text-6xl">Frequently Asked <span className="gradient-text">Questions</span></h1>
             <p className="mt-4 text-base text-muted-foreground">Everything you need to know about working with us.</p>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Search FAQs..."
+            <input type="search" aria-label="Search FAQs" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Search FAQs..."
               className="mt-8 w-full rounded-full border border-border bg-card px-6 py-4 text-sm focus:border-emma-blue focus:outline-none" />
           </div>
 

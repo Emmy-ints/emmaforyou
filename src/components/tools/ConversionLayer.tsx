@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 
 const WA = "https://wa.me/message/HHGMMWMRJFYUC1";
 const EXIT_KEY = "efy_exit_offer_at";
-const QUIET = ["/dashboard", "/portal", "/book", "/proposal"];
+const QUIET = ["/dashboard", "/portal", "/book", "/proposal", "/community"];
 
 /** Mobile action bar + a single, polite exit offer on desktop. */
 export default function ConversionLayer() {
@@ -31,7 +31,7 @@ export default function ConversionLayer() {
     return () => { window.clearTimeout(arm); document.removeEventListener("mouseout", onLeave); };
   }, [pathname, quiet]);
 
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal")) return null;
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal") || pathname.startsWith("/community")) return null;
   const click = (what: string) => track("sticky_cta_click", { what, page: pathname });
 
   return (

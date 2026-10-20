@@ -257,6 +257,8 @@ GRANT SELECT ON public.community_reactions, public.community_comment_reactions T
 GRANT INSERT, UPDATE (kind), DELETE ON public.community_reactions, public.community_comment_reactions TO authenticated;
 GRANT SELECT, INSERT, DELETE ON public.community_poll_votes TO authenticated;
 GRANT SELECT, INSERT, DELETE ON public.community_saves TO authenticated;
+-- Visitors need SELECT so the feed can check "my vote"/"saved"; RLS (authenticated-only policies) returns no rows to them.
+GRANT SELECT ON public.community_poll_votes, public.community_saves TO anon;
 GRANT SELECT ON public.community_follows TO anon, authenticated;
 GRANT INSERT, DELETE ON public.community_follows TO authenticated;
 GRANT SELECT, INSERT, DELETE ON public.community_blocks TO authenticated;

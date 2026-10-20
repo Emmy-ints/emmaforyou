@@ -72,7 +72,7 @@ export default function VoiceAsk() {
   }
 
   const voice = useSpeechInput({ onFinal: (t) => send(t, true) });
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal")) return null;
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal") || pathname.startsWith("/community")) return null;
 
   return (
     <>

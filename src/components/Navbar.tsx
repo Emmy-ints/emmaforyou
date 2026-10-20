@@ -11,6 +11,7 @@ const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 type DropdownKey = "services" | "solutions" | "expertise" | "resources" | "tools" | "company" | "account";
 
 const RESOURCES = [
+  { to: "/community", name: "Community", icon: "💬", short: "Ask, share & learn together" },
   { to: "/blog", name: "Blog", icon: "📝", short: "Growth insights & guides" },
   { to: "/knowledge-base", name: "Knowledge Base", icon: "📚", short: "Deep playbooks" },
   { to: "/checklists", name: "Free Checklists", icon: "✅", short: "Website, CRO, Web3, launch" },
@@ -105,7 +106,7 @@ export default function Navbar() {
     solutions: ["/solutions"],
     expertise: ["/expertise"],
     company: COMPANY.map((c) => c.to),
-    resources: RESOURCES.map((c) => c.to),
+    resources: RESOURCES.filter((c) => c.to !== "/community").map((c) => c.to),
     tools: TOOLS.map((c) => c.to),
     account: ["/portal", "/dashboard"],
   };
@@ -259,13 +260,14 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-1.5 xl:flex">
-          <Link to="/" aria-current={pathname === "/" ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>{t("nav_home")}</Link>
+          <Link to="/" aria-current={pathname === "/" ? "page" : undefined} className={`nav-link font-body hidden rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground 2xl:inline-flex ${pathname === "/" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>{t("nav_home")}</Link>
           {ddBtn("services", "Services")}
           {ddBtn("solutions", "Solutions")}
           {ddBtn("expertise", "Expertise")}
           {ddBtn("company", "Company")}
           {ddBtn("resources", "Resources")}
           {ddBtn("tools", "Tools")}
+          <Link to="/community" aria-current={pathname.startsWith("/community") ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname.startsWith("/community") ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Community</Link>
           <Link to="/pricing" aria-current={pathname === "/pricing" ? "page" : undefined} className={`nav-link font-body rounded-full px-2.5 py-1.5 text-sm font-medium hover:text-foreground ${pathname === "/pricing" ? "nav-link-active text-foreground" : "text-muted-foreground"}`}>Pricing</Link>
           {ddBtn("account", "Login")}
           <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
@@ -299,6 +301,7 @@ export default function Navbar() {
             </div>
             <p className="mb-3 font-body text-xs font-semibold uppercase tracking-widest text-muted-foreground">Menu</p>
             <Link to="/" onClick={() => setMobileOpen(false)} className="font-display text-lg font-bold text-foreground py-3 border-b border-border">{t("nav_home")}</Link>
+            <Link to="/community" onClick={() => setMobileOpen(false)} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border">Community <span className="rounded-full bg-[var(--emma-violet)]/10 px-2 py-0.5 font-body text-xs font-semibold text-[var(--emma-violet)]">Ask & share</span></Link>
             <button onClick={() => setMobileSection(mobileSection === "services" ? null : "services")} className="flex items-center justify-between font-display text-lg font-bold text-foreground py-3 border-b border-border w-full">
               Services <span className={`text-sm transition ${mobileSection === "services" ? "rotate-180" : ""}`}>▾</span>
             </button>

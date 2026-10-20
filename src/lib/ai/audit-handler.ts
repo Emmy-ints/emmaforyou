@@ -121,7 +121,7 @@ function analyse(html: string, res: Response, finalUrl: URL, responseMs: number,
   const ctaWords = /book now|get (a )?quote|contact us|call us|order now|shop now|get started|request|schedule|whatsapp us|chat with us|enquire|enroll|sign up/i.test(lower);
 
   // Speed
-  add({ id: "speed", pillar: "speed", label: "Server response time", status: responseMs < 800 ? "pass" : responseMs < 1800 ? "warn" : "fail", detail: `The page's HTML arrived in ${(responseMs / 1000).toFixed(1)}s from our server.` });
+  add({ id: "speed", pillar: "speed", label: "Server response time", status: responseMs < 800 ? "pass" : responseMs < 1800 ? "warn" : "fail", detail: `The page's HTML arrived in ${responseMs < 1000 ? `${responseMs} ms` : `${(responseMs / 1000).toFixed(1)}s`} from our server.` });
   add({ id: "weight", pillar: "speed", label: "HTML weight", status: pageKb < 150 ? "pass" : pageKb < 500 ? "warn" : "fail", detail: `The HTML alone is ${pageKb} KB${pageKb >= 150 ? "; heavy pages load slowly on mobile data" : ""}.` });
   add({ id: "compression", pillar: "speed", label: "Compression", status: /br|gzip|zstd/i.test(encoding) ? "pass" : "warn", detail: encoding ? `Served with ${encoding} compression.` : "No compression header was returned, or the host hid it." });
   add({ id: "scripts", pillar: "speed", label: "External scripts", status: scripts <= 15 ? "pass" : scripts <= 30 ? "warn" : "fail", detail: `${scripts} external script file${scripts === 1 ? "" : "s"} load on this page.` });

@@ -71,7 +71,13 @@ export async function refreshSources(db: Db, force = false): Promise<{ refreshed
       }
       const rows = r.items
         .filter((i) => !i.published_at || Date.now() - Date.parse(i.published_at) < 14 * 86400000)
-        .map((i) => { const sc = scoreItem(i, industry, s.trust); return { source_id: s.id, url: i.url, title: i.title, summary: i.summary || null, published_at: i.published_at, industry: industry.id, keywords: sc.keywords, score: sc.score, score_detail: sc.detail }; });
+        .map((i) => {
+          // Classify by content, not only by source: an SEO story on an e-commerce site is an SEO story.
+          const own = scoreItem(i, industry, s.trust);
+          const best = INDUSTRIES.map((ind) => ({ ind, sc: scoreItem(i, ind, s.trust) })).sort((a, b) => b.sc.detail.matched.length - a.sc.detail.matched.length)[0];
+          const pick = best && best.ind.id !== industry.id && best.sc.detail.matched.length >= 2 && best.sc.detail.matched.length > own.detail.matched.length ? best : { ind: industry, sc: own };
+          return { source_id: s.id, url: i.url, title: i.title, summary: i.summary || null, published_at: i.published_at, industry: pick.ind.id, keywords: pick.sc.keywords, score: pick.sc.score, score_detail: { ...pick.sc.detail, source_industry: industry.id } };
+        });
       if (rows.length) {
         const ins = await db.from("blog_trends").upsert(rows, { onConflict: "url", ignoreDuplicates: true }).select("id");
         newItems += ins.data?.length ?? 0;

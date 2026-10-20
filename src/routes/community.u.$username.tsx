@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Globe, Calendar, Loader2, MoreHorizontal, Flag, Ban, Pencil, BadgeCheck, Share2 } from "lucide-react";
+import { MapPin, Globe, Calendar, Loader2, MoreHorizontal, Flag, Ban, Pencil, BadgeCheck, Share2, MessageSquare } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { startDirect } from "@/lib/community/messages";
 import { pageHead, breadcrumbLd, absoluteUrl } from "@/lib/seo";
 import { getProfileMeta } from "@/lib/community/meta-server";
 import { fetchFeed, friendly, isFollowing, listFollows, myBlocks, profileByUsername, setBlock, setFollow, type FeedPage } from "@/lib/community/api";
@@ -43,6 +45,12 @@ function ProfilePage() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const isMe = Boolean(p && uid === p.user_id);
+  const navigate = useNavigate();
+  async function message() {
+    if (!p || needProfile()) return;
+    try { const id = await startDirect(p.user_id); navigate({ to: "/community/messages/$id", params: { id } }); }
+    catch (e) { flash(friendly(e)); }
+  }
 
   useEffect(() => {
     if (!ready) return;
@@ -122,7 +130,10 @@ function ProfilePage() {
               {isMe ? (
                 <Link to="/community/settings" className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border px-4 text-sm font-semibold hover:bg-muted"><Pencil className="h-4 w-4" aria-hidden="true" />Edit profile</Link>
               ) : !blocked && (
+                <>
+                <button type="button" onClick={message} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border hover:bg-muted sm:w-auto sm:gap-1.5 sm:px-4 sm:text-sm sm:font-semibold" aria-label={`Message ${p.display_name}`}><MessageSquare className="h-4 w-4" aria-hidden="true" /><span className="hidden sm:inline">Message</span></button>
                 <button type="button" onClick={toggleFollow} aria-pressed={following} className={`min-h-10 rounded-full px-5 text-sm font-semibold ${following ? "border border-border hover:bg-muted" : "btn-primary-gradient text-white"}`}>{following ? "Following" : "Follow"}</button>
+                </>
               )}
               <div className="relative">
                 <button type="button" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-haspopup="menu" aria-label="More options" className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border hover:bg-muted"><MoreHorizontal className="h-4 w-4" aria-hidden="true" /></button>

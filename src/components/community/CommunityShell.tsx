@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  Home, Search, PlusSquare, Bell, User, Bookmark, Settings, BookOpen, ShieldCheck, ChevronsLeft, ChevronsRight, Hash, Sparkles, LogIn, ArrowRight,
+  Home, Search, PlusSquare, Bell, User, Bookmark, Settings, BookOpen, ShieldCheck, MessageSquare, Headset, ChevronsLeft, ChevronsRight, Hash, Sparkles, LogIn, ArrowRight,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { useCommunitySession } from "@/lib/community/session";
@@ -56,11 +56,12 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
     { label: "Home", icon: Home, to: "/community", active: is("/community", true) },
     { label: "Explore", icon: Search, to: "/community/search", active: is("/community/search") },
     { label: "Notifications", icon: Bell, to: "/community/notifications", active: is("/community/notifications"), badge: unread, auth: true },
+    { label: "Messages", icon: MessageSquare, to: "/community/messages", active: is("/community/messages"), auth: true },
     { label: "Saved", icon: Bookmark, to: "/community/saved", active: is("/community/saved"), auth: true },
     { label: "Profile", icon: User, ...profileHref, active: Boolean(profile) && is(`/community/u/${profile?.username}`), auth: true },
     { label: "Settings", icon: Settings, to: "/community/settings", active: is("/community/settings"), auth: true },
     { label: "Guidelines", icon: BookOpen, to: "/community/guidelines", active: is("/community/guidelines") },
-    ...(staff ? [{ label: "Moderation", icon: ShieldCheck, to: "/community/moderation", active: is("/community/moderation") }] : []),
+    ...(staff ? [{ label: "Moderation", icon: ShieldCheck, to: "/community/moderation", active: is("/community/moderation") }, { label: "Support inbox", icon: Headset, to: "/community/inbox", active: is("/community/inbox") }] : []),
   ];
 
   return (

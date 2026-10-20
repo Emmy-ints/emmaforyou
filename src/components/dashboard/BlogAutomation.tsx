@@ -15,6 +15,7 @@ interface Settings { enabled: boolean; timezone: string; slots: string[]; daily_
 interface Run { id: string; slot_key: string; kind: string; status: string; attempts: number; error: string | null; log: { at: string; step: string; detail?: string }[]; local_date: string; started_at: string; finished_at: string | null; article: { slug: string; title: string } | null }
 interface Article { id: string; slug: string; title: string; category: string; status: string; quality_score: number; published_at: string; sources: { url: string }[] }
 interface Source { id: string; name: string; industry: string; enabled: boolean; last_status: string | null; last_error: string | null; last_fetched_at: string | null; item_count: number }
+interface Fix { id: string; kind: string; detail: string; created_at: string; article: { slug: string; title: string } | null }
 interface TickRow { created_at: string; status_code: number | null; timed_out: boolean | null; error: string | null; body: string | null }
 
 function localToday(tz: string) {
@@ -28,6 +29,7 @@ export function BlogAutomation() {
   const [sources, setSources] = useState<Source[]>([]);
   const [ticks, setTicks] = useState<TickRow[]>([]);
   const [trendCount, setTrendCount] = useState(0);
+  const [fixes, setFixes] = useState<Fix[]>([]);
   const [missing, setMissing] = useState(false);
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState("");
@@ -45,6 +47,8 @@ export function BlogAutomation() {
       db.rpc("blog_tick_status", { _limit: 12 }),
       db.from("blog_trends").select("id", { count: "exact", head: true }).is("used_at", null),
     ]);
+    const mx = await db.from("blog_maintenance").select("id,kind,detail,created_at, article:blog_articles(slug,title)").eq("status", "open").order("created_at", { ascending: false }).limit(30);
+    setFixes(mx.data ?? []);
     setRuns(r.data ?? []); setArticles(a.data ?? []); setSources(so.data ?? []); setTicks(t.data ?? []); setTrendCount(tc.count ?? 0);
   }, []);
   useEffect(() => { void load(); }, [load]);
@@ -162,6 +166,20 @@ export function BlogAutomation() {
             </li>
           ))}
         </ul>
+      </details>
+
+      <details className="mt-3" open={fixes.length > 0}>
+        <summary className="cursor-pointer text-xs font-semibold">Maintenance queue ({fixes.length})</summary>
+        {fixes.length === 0 ? <p className="mt-2 text-xs text-muted-foreground">Nothing to fix. Cited sources are re-checked once a day.</p> : (
+          <ul className="mt-2 divide-y divide-border text-xs">
+            {fixes.map((f) => (
+              <li key={f.id} className="flex flex-wrap items-center gap-2 py-2">
+                <span className="min-w-0 flex-1"><span className="font-medium">{f.article?.title ?? "Article"}</span><span className="block truncate text-muted-foreground">{f.kind.replace("_", " ")}: {f.detail}</span></span>
+                <button onClick={async () => { await db.from("blog_maintenance").update({ status: "done", resolved_at: new Date().toISOString() }).eq("id", f.id); void load(); }} className="rounded-full border border-border px-3 py-1 hover:bg-muted">Mark fixed</button>
+              </li>
+            ))}
+          </ul>
+        )}
       </details>
 
       <details className="mt-3">

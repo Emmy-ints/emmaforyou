@@ -89,6 +89,30 @@ export async function refreshSources(db: Db, force = false): Promise<{ refreshed
   return { refreshed: true, sources: list.length, newItems, failed };
 }
 
+/* ---------------------------------------------------------------- maintenance */
+/** Once a day: re-check every cited source of the last 60 articles and queue broken ones for review. */
+export async function maintenance(db: Db, force = false): Promise<{ ran: boolean; checked: number; broken: number }> {
+  const { data: st } = await db.from("blog_settings").select("last_maintenance_at").eq("id", 1).maybeSingle();
+  if (!force && st?.last_maintenance_at && Date.now() - Date.parse(st.last_maintenance_at) < 23 * 3600_000) return { ran: false, checked: 0, broken: 0 };
+  await db.from("blog_settings").update({ last_maintenance_at: new Date().toISOString() }).eq("id", 1);
+  const { data } = await db.from("blog_articles").select("id,sources").eq("status", "published").order("published_at", { ascending: false }).limit(60);
+  const jobs = ((data ?? []) as { id: string; sources: { url: string }[] }[]).flatMap((a) => (a.sources ?? []).map((s) => ({ id: a.id, url: s.url })));
+  let broken = 0;
+  const queue = [...jobs];
+  async function worker() {
+    for (let j = queue.shift(); j; j = queue.shift()) {
+      let status = 0;
+      try { const r = await fetch(j.url, { method: "GET", redirect: "follow", signal: AbortSignal.timeout(8000), headers: { "User-Agent": "Mozilla/5.0 (compatible; EmmaForYouBlogBot/1.0)" } }); status = r.status; try { await r.body?.cancel(); } catch { /* ignore */ } } catch { status = 0; }
+      if (status === 404 || status === 410 || status === 0) {
+        broken++;
+        await db.from("blog_maintenance").upsert({ article_id: j.id, kind: "broken_source", detail: `${j.url} → ${status || "unreachable"}` }, { onConflict: "article_id,kind,detail", ignoreDuplicates: true });
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: 5 }, worker));
+  return { ran: true, checked: jobs.length, broken };
+}
+
 /* ---------------------------------------------------------------- run claiming */
 async function claim(db: Db, slot: { key: string; date: string; scheduledFor: string }, kind: "scheduled" | "manual"): Promise<{ id: string; attempts: number } | { skip: string }> {
   const ins = await db.from("blog_runs").insert({ slot_key: slot.key, kind, scheduled_for: slot.scheduledFor, local_date: slot.date, status: "running", attempts: 1, log: [] }).select("id,attempts").maybeSingle();
@@ -223,9 +247,18 @@ export async function tick(request: Request, opts: { manual?: boolean; refresh?:
     slot = { key: `manual@${now.toISOString()}`, date: localParts(s.timezone, now).date, scheduledFor: now.toISOString() };
   } else {
     const due = dueSlot(s);
-    if (!due) return { ok: true, action: "idle", detail: "no slot due yet today" };
+    if (!due) {
+      const m = await maintenance(db).catch(() => ({ ran: false, checked: 0, broken: 0 }));
+      return { ok: true, action: "idle", detail: m.ran ? `no slot due; checked ${m.checked} sources, ${m.broken} broken` : "no slot due yet today" };
+    }
     const { count } = await db.from("blog_runs").select("id", { count: "exact", head: true }).eq("local_date", due.date).eq("kind", "scheduled").eq("status", "published");
     if ((count ?? 0) >= s.daily_target) return { ok: true, action: "idle", detail: `daily target of ${s.daily_target} reached` };
+    // Between slots (this one already done), use the tick for the daily maintenance pass.
+    const { data: done } = await db.from("blog_runs").select("status").eq("slot_key", due.key).maybeSingle();
+    if (done?.status === "published" || done?.status === "skipped") {
+      const m = await maintenance(db).catch(() => ({ ran: false, checked: 0, broken: 0 }));
+      return { ok: true, action: "idle", slot: due.key, detail: m.ran ? `slot done; checked ${m.checked} sources, ${m.broken} broken` : "slot already published" };
+    }
     slot = due;
   }
 

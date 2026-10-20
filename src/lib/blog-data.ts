@@ -12,6 +12,12 @@ export interface BlogPost {
   body: string;
   /** Optional free tool to try alongside the article. */
   tool?: { label: string; to: string; text: string };
+  /** Sources the article is based on (automated articles always have at least one). */
+  sources?: { title: string; url: string; publisher: string; published_at: string | null }[];
+  /** Written by the automated, source-checked pipeline (blog_articles). */
+  automated?: boolean;
+  /** Exact publish time (automated articles). */
+  publishedAt?: string;
 }
 
 const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou", initials: "EA" };

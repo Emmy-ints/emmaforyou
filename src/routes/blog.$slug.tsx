@@ -153,6 +153,21 @@ function BlogArticle() {
             })}
           </div>
 
+          {post.sources && post.sources.length > 0 && (
+            <section aria-labelledby="sources-h" className="mt-12 rounded-2xl border border-border bg-card p-5 md:p-6">
+              <h2 id="sources-h" className="font-display text-lg font-bold">Sources</h2>
+              <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">
+                {post.sources.map((s) => (
+                  <li key={s.url}>
+                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="font-medium text-foreground underline decoration-border underline-offset-2 hover:decoration-[color:var(--emma-violet)]">{s.title}</a>
+                    <span className="text-muted-foreground"> — {s.publisher}{s.published_at ? `, ${new Date(s.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}` : ""}</span>
+                  </li>
+                ))}
+              </ol>
+              {post.automated && <p className="mt-4 text-xs text-muted-foreground">This article was drafted with AI from the sources above, then published only after passing 20 automated checks: every figure must appear in the sources, links must work, and nothing may be invented. Spotted an error? <Link to="/contact" className="underline">Tell us</Link> and we'll correct it.</p>}
+            </section>
+          )}
+
           {post.tool && (
             <div className="mt-12 flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
               <div>

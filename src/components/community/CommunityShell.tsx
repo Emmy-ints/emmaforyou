@@ -8,6 +8,7 @@ import { useCommunitySession } from "@/lib/community/session";
 import { useUnread } from "@/lib/community/unread";
 import { setFollow, suggestedPeople, trendingTags } from "@/lib/community/api";
 import { TOPICS, type FeedPost, type PostKind } from "@/lib/community/types";
+import { latestBlogPosts } from "@/lib/blog-server";
 import { openAuth, AuthDialogHost } from "./AuthDialog";
 import Composer from "./Composer";
 import { Avatar } from "./RichText";
@@ -169,7 +170,9 @@ export function DiscoverPanel() {
   const [people, setPeople] = useState<Person[] | null>(null);
   const [followed, setFollowed] = useState<Set<string>>(new Set());
   const [q, setQ] = useState("");
+  const [blog, setBlog] = useState<{ slug: string; title: string; category: string }[]>([]);
   const navigate = useNavigate();
+  useEffect(() => { latestBlogPosts({ data: 3 }).then(setBlog).catch(() => setBlog([])); }, []);
   useEffect(() => { trendingTags(8).then(setTags).catch(() => setTags([])); }, []);
   useEffect(() => { if (ready) suggestedPeople(uid, 5).then(setPeople).catch(() => setPeople([])); }, [ready, uid]);
 
@@ -233,6 +236,16 @@ export function DiscoverPanel() {
           </ul>
         )}
       </section>
+
+      {blog.length > 0 && (
+        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="blog-h">
+          <h2 id="blog-h" className="font-display text-base font-bold">Latest from the blog</h2>
+          <ul className="mt-2 space-y-2.5">
+            {blog.map((b) => <li key={b.slug}><Link to="/blog/$slug" params={{ slug: b.slug }} className="block text-sm font-medium leading-snug hover:underline">{b.title}</Link><span className="text-xs text-muted-foreground">{b.category}</span></li>)}
+          </ul>
+          <Link to="/blog" className="mt-2 inline-flex text-xs font-semibold text-[var(--emma-violet)] hover:underline">All articles →</Link>
+        </section>
+      )}
 
       <section className="rounded-2xl border border-border bg-card p-4">
         <h2 className="flex items-center gap-1.5 font-display text-base font-bold"><Sparkles className="h-4 w-4 text-[var(--emma-violet)]" aria-hidden="true" />Need it built?</h2>

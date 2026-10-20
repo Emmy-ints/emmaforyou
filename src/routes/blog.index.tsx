@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { POSTS } from "@/lib/blog-data";
+import { listBlogPosts } from "@/lib/blog-server";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/blog/")({
   component: BlogPage,
+  loader: () => listBlogPosts(),
   head: () =>
     pageHead({
       title: "Blog — Practical Growth Tips for Small Businesses | EmmaForYou",
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/blog/")({
 });
 
 function BlogPage() {
+  const POSTS = Route.useLoaderData();
   return (
     <>
       <Navbar />

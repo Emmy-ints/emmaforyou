@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
 import { ClientManager, SearchVisibility, UpcomingCalls } from "../components/dashboard/ClientManager";
 import { CaseStudyEditor, NewsletterPanel, ReviewsPanel } from "../components/dashboard/ContentManager";
+import { BlogAutomation } from "../components/dashboard/BlogAutomation";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -520,6 +521,7 @@ function Dashboard({ email }: { email: string }) {
         <ReviewsPanel />
         <CaseStudyEditor />
         <NewsletterPanel />
+        <BlogAutomation />
       </main>
       <DashStyles />
     </div>

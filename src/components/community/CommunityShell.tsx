@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { useCommunitySession } from "@/lib/community/session";
-import { useUnread } from "@/lib/community/unread";
+import { useUnread, useUnreadMessages } from "@/lib/community/unread";
 import { setFollow, suggestedPeople, trendingTags } from "@/lib/community/api";
 import { TOPICS, type FeedPost, type PostKind } from "@/lib/community/types";
 import { latestBlogPosts } from "@/lib/blog-server";
@@ -41,6 +41,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
   const session = useCommunitySession();
   const { uid, profile, staff } = session;
   const unread = useUnread(profile ? uid : null);
+  const unreadMessages = useUnreadMessages(profile ? uid : null);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const startPost = useStartPost();
   const [collapsed, setCollapsed] = useState(false);
@@ -57,7 +58,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
     { label: "Explore", icon: Search, to: "/community/search", active: is("/community/search") },
     { label: "Groups", icon: Users, to: "/community/groups", active: is("/community/groups") || is("/community/g/") },
     { label: "Notifications", icon: Bell, to: "/community/notifications", active: is("/community/notifications"), badge: unread, auth: true },
-    { label: "Messages", icon: MessageSquare, to: "/community/messages", active: is("/community/messages"), auth: true },
+    { label: "Messages", icon: MessageSquare, to: "/community/messages", active: is("/community/messages"), badge: unreadMessages, auth: true },
     { label: "Saved", icon: Bookmark, to: "/community/saved", active: is("/community/saved"), auth: true },
     { label: "Profile", icon: User, ...profileHref, active: Boolean(profile) && is(`/community/u/${profile?.username}`), auth: true },
     { label: "Settings", icon: Settings, to: "/community/settings", active: is("/community/settings"), auth: true },

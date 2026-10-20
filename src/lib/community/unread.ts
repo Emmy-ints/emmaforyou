@@ -8,6 +8,7 @@ import { unreadCount } from "./api";
  * and whenever the tab becomes visible. Counts come only from the member's real notifications.
  */
 let count = 0;
+let messages = 0;
 let forUid: string | null = null;
 const subs = new Set<() => void>();
 const emit = () => subs.forEach((s) => s());
@@ -17,8 +18,12 @@ let timer: number | undefined;
 
 async function refresh() {
   if (!forUid) return;
-  const n = await unreadCount().catch(() => count);
-  if (n !== count) { count = n; emit(); }
+  const [n, m] = await Promise.all([
+    unreadCount().catch(() => count),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).rpc("community_unread_conversations").then((r: { data: number | null; error: unknown }) => (r.error ? messages : r.data ?? 0)).catch(() => messages),
+  ]);
+  if (n !== count || m !== messages) { count = n; messages = m; emit(); }
 }
 
 export function refreshUnread() { void refresh(); }
@@ -27,7 +32,7 @@ export function setUnread(n: number) { count = Math.max(0, n); emit(); }
 function attach(uid: string | null) {
   if (uid === forUid) return;
   forUid = uid;
-  count = 0; emit();
+  count = 0; messages = 0; emit();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (channel) { (supabase as any).removeChannel(channel); channel = null; }
   window.clearInterval(timer);
@@ -36,6 +41,7 @@ function attach(uid: string | null) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   channel = (supabase as any).channel(`notifications-${uid}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "community_notifications", filter: `user_id=eq.${uid}` }, () => void refresh())
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "community_conversations" }, () => void refresh())
     .subscribe();
   timer = window.setInterval(() => { if (document.visibilityState === "visible") void refresh(); }, 60_000);
 }
@@ -48,4 +54,10 @@ export function useUnread(uid: string | null): number {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, [uid]);
   return useSyncExternalStore((cb) => { subs.add(cb); return () => subs.delete(cb); }, () => count, () => 0);
+}
+
+/** Conversations with unread messages (shares the notification store's refresh cycle). */
+export function useUnreadMessages(uid: string | null): number {
+  useUnread(uid);
+  return useSyncExternalStore((cb) => { subs.add(cb); return () => subs.delete(cb); }, () => messages, () => 0);
 }

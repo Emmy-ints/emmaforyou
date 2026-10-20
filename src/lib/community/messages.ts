@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CommunityError, friendly, newKey } from "./api";
 import type { Profile } from "./types";
+import { refreshUnread } from "./unread";
 
 /**
  * Private messages and the community assistant (browser side). Membership, blocks, rate limits
@@ -61,6 +62,7 @@ export async function sendMessage(conversationId: string, uid: string, body: str
 
 export async function markConversationRead(conversationId: string, uid: string): Promise<void> {
   await db.from("community_conversation_reads").upsert({ conversation_id: conversationId, user_id: uid, last_read_at: new Date().toISOString() }, { onConflict: "conversation_id,user_id" });
+  refreshUnread();
 }
 
 export async function startDirect(otherId: string): Promise<string> {

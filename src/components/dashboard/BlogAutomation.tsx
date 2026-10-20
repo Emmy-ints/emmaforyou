@@ -53,7 +53,7 @@ export function BlogAutomation() {
     setBusy(action); setMsg("");
     try {
       const { data } = await supabase.auth.getSession();
-      const res = await fetch("/api/blog/tick", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token ?? ""}` }, body: JSON.stringify({ action }) });
+      const res = await fetch("/api/blog-tick", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token ?? ""}` }, body: JSON.stringify({ action }) });
       const j = await res.json().catch(() => ({}));
       setMsg(j.action === "published" ? `Published: ${j.article?.title}` : j.detail || j.error || j.action || `HTTP ${res.status}`);
     } catch { setMsg("Couldn't reach the site."); }
@@ -110,7 +110,7 @@ export function BlogAutomation() {
         {!lastTick ? <p className="mt-1 text-muted-foreground">No scheduler calls recorded yet.</p> : (
           <p className="mt-1 text-muted-foreground">Last call {new Date(lastTick.created_at).toLocaleString()} → {lastTick.status_code ? `HTTP ${lastTick.status_code}` : lastTick.timed_out ? "timed out" : lastTick.error || "waiting for reply"}{lastTick.status_code === 404 ? ". The site at the scheduler address doesn't have the blog endpoint yet: publish the latest version in Lovable." : ""}</p>
         )}
-        <p className="mt-1 text-muted-foreground">Target: {s.site_url}/api/blog/tick</p>
+        <p className="mt-1 text-muted-foreground">Target: {s.site_url}/api/blog-tick</p>
       </div>
 
       {todays.length > 0 && (

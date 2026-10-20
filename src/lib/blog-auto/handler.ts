@@ -1,5 +1,5 @@
 /**
- * /api/blog/tick — called by the database scheduler (pg_cron + pg_net) every 10 minutes.
+ * /api/blog-tick — called by the database scheduler (pg_cron + pg_net) every 10 minutes.
  * Safe to call by anyone: it only does work when the stored schedule says a slot is due, and the
  * database lets each slot publish at most once. Forcing a source refresh or an extra article
  * ("run now") requires a signed-in administrator.

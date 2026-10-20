@@ -165,7 +165,7 @@ DECLARE s public.blog_settings; rid bigint; target text;
 BEGIN
   SELECT * INTO s FROM public.blog_settings WHERE id = 1;
   IF s IS NULL OR NOT s.enabled THEN RETURN; END IF;
-  target := s.site_url || '/api/blog/tick';
+  target := s.site_url || '/api/blog-tick';
   SELECT net.http_post(url := target, body := '{"source":"cron"}'::jsonb,
     headers := '{"Content-Type":"application/json"}'::jsonb, timeout_milliseconds := 290000) INTO rid;
   INSERT INTO public.blog_ticks (request_id, target) VALUES (rid, target);

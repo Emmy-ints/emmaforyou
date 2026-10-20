@@ -35,3 +35,10 @@ export function relatedSolutions(s: Solution, n = 4) {
 }
 
 export const solutionPath = (s: Solution) => `/solutions/${s.category}/${s.slug}`;
+
+import { USE_CASES } from "./use-cases";
+import { INDUSTRY_DETAIL, USE_CASES_MORE } from "./use-cases-more";
+/** Concrete use cases for a solution page (three per solution). */
+export function useCasesFor(s: Solution): string[] {
+  return USE_CASES[s.slug] ?? USE_CASES_MORE[s.slug] ?? INDUSTRY_DETAIL[s.slug]?.useCases ?? [];
+}

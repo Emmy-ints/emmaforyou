@@ -1,4 +1,5 @@
 import type { GroupDefaults, Solution } from "./types";
+import { INDUSTRY_DETAIL } from "./use-cases-more";
 
 export const MORE_DEFAULTS: Record<string, GroupDefaults> = {
   flows: {
@@ -214,9 +215,9 @@ export const INDUSTRY_SOLUTIONS: Solution[] = IND.map(([slug, name, icon, who, a
   slug, category: "industries", group: "industries", name: `${name} Software & AI`, icon,
   tagline: `Apps and AI built around how ${name.toLowerCase()} businesses actually work.`,
   who,
-  problems: ["Generic software misses the details of your sector", "Work tracked in spreadsheets, paper and chat", "Customers expect faster, online service"],
+  problems: INDUSTRY_DETAIL[slug]?.problems ?? ["Generic software misses the details of your sector", "Work tracked in spreadsheets, paper and chat", "Customers expect faster, online service"],
   features: apps.split(", ").map((f) => f.charAt(0).toUpperCase() + f.slice(1)),
   advanced: ai.split(", ").map((f) => `AI: ${f}`),
-  before: "Day-to-day work run on paper, spreadsheets and WhatsApp.", after: "One system for the core workflow, with AI handling repetitive questions and paperwork.",
+  before: INDUSTRY_DETAIL[slug]?.before ?? "Day-to-day work run on paper, spreadsheets and WhatsApp.", after: INDUSTRY_DETAIL[slug]?.after ?? "One system for the core workflow, with AI handling repetitive questions and paperwork.",
   demo: { engine, preset }, clientWork: work,
 }));

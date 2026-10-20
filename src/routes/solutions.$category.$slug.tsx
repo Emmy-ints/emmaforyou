@@ -3,7 +3,7 @@ import { ArrowRight, Check, MessageCircle, PlayCircle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import DemoShell from "../components/solutions/DemoShell";
-import { findCategory, findSolution, groupDefaults, relatedSolutions, solutionPath } from "@/lib/solutions";
+import { findCategory, findSolution, groupDefaults, relatedSolutions, solutionPath, useCasesFor } from "@/lib/solutions";
 import { PROCESS, solutionDescription, solutionFaqs, solutionSeoTitle } from "@/lib/solutions/content";
 import { ENGINE_TITLES } from "@/lib/solutions/engine-titles";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
@@ -86,6 +86,13 @@ function Page() {
             <div className="rounded-[20px] border border-border bg-card p-5"><h3 className="font-display text-lg font-semibold">Problems it solves</h3><ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">{s.problems.map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--emma-violet)]" />{p}</li>)}</ul></div>
           </div>
         </section>
+
+        {useCasesFor(s).length > 0 && (
+          <section className="mx-auto max-w-6xl px-5 pb-14" aria-labelledby="uses-h">
+            <h2 id="uses-h" className="font-display text-2xl font-semibold tracking-tight">Use cases</h2>
+            <ol className="mt-4 grid gap-4 md:grid-cols-3">{useCasesFor(s).map((u, i) => <li key={u} className="rounded-[20px] border border-border bg-card p-5 text-sm leading-relaxed"><span className="mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--emma-violet)_12%,transparent)] text-xs font-semibold text-[var(--emma-violet)]" aria-hidden="true">{i + 1}</span>{u}</li>)}</ol>
+          </section>
+        )}
 
         <section className="bg-muted/50" aria-labelledby="features-h">
           <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 md:grid-cols-2">

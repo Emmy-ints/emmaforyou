@@ -54,7 +54,9 @@ export function runQualityGate(d: Draft, ctx: { evidence: Evidence[]; validPaths
   const wc = words(body);
   const sentences = body.replace(/^#+ .*$/gm, "").split(/[.!?]+\s/).filter((s) => words(s) > 2);
   const avgSentence = sentences.length ? Math.round(sentences.reduce((a, s) => a + words(s), 0) / sentences.length) : 0;
-  const longest = Math.max(0, ...paragraphs.filter((p) => !p.startsWith("#")).map(words));
+  // Lists are measured per item; prose paragraphs as a whole.
+  const units = paragraphs.filter((p) => !p.startsWith("#")).flatMap((p) => (/^(- |\d+\.\s)/.test(p) ? p.split("\n") : [p]));
+  const longest = Math.max(0, ...units.map(words));
   const mostSimilar = ctx.existingTitles.reduce((best, t) => Math.max(best, similarity(d.title, t)), 0);
   const topicOverlap = ctx.evidence.length ? Math.max(...ctx.evidence.map((e) => similarity(`${d.title} ${d.excerpt}`, `${e.title} ${e.text.slice(0, 1500)}`))) : 0;
   const sharedWords = ctx.evidence.length ? [...tokens(d.title)].filter((w) => evidenceText.includes(w)).length : 0;
@@ -79,7 +81,7 @@ export function runQualityGate(d: Draft, ctx: { evidence: Evidence[]; validPaths
     { id: "no_guarantees", label: "No guaranteed outcomes", pass: !/\bguarantee(d|s)?\b|\b100% (success|results)\b|\bovernight success\b/i.test(`${d.title} ${body}`) },
     { id: "not_duplicate", label: "Not a near-duplicate of an existing article", pass: mostSimilar < 0.6, detail: `closest match ${(mostSimilar * 100).toFixed(0)}%` },
     { id: "on_topic", label: "About the same subject as its source", pass: topicOverlap >= 0.03 || sharedWords >= 2, detail: `${sharedWords} title words in sources` },
-    { id: "paragraphs", label: "No paragraph longer than 140 words", pass: longest <= 140, detail: `longest ${longest} words` },
+    { id: "paragraphs", label: "No paragraph or list item longer than 140 words", pass: longest <= 140, detail: `longest ${longest} words` },
     { id: "readable", label: "Average sentence is 28 words or fewer", pass: avgSentence > 0 && avgSentence <= 28, detail: `${avgSentence} words` },
   ];
   const passed = checks.filter((c) => c.pass).length;

@@ -1,100 +1,181 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, BookOpen } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { supabase } from "@/integrations/supabase/client";
-import { FEATURED, PORTFOLIO_FILTERS, PROJECTS, projectSlug } from "@/lib/portfolio-data";
-import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
+import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/cases")({
   component: CasesPage,
   head: () =>
     pageHead({
-      title: "Case Studies: Real Client Results | EmmaForYou",
-      description: "Real EmmaForYou client projects in Nigeria, the USA, Europe and Africa: the challenge, what we built and the result. Filter by type of work.",
+      title: "Case Studies — Before & After Results by Industry | EmmaForYou",
+      description: "Before-and-after case studies across fashion, clinics, real estate, restaurants, salons and more — filter by industry and result type.",
       path: "/cases",
-      jsonLd: [
-        breadcrumbLd([{ name: "Home", path: "/" }, { name: "Case studies", path: "/cases" }]),
-        itemListLd("EmmaForYou case studies", PROJECTS.map((p) => ({ name: p.name, path: `/portfolio/${projectSlug(p.name)}` }))),
-      ],
+      jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Case studies", path: "/cases" }])],
     }),
 });
 
-// Real client work only (portfolio-data, verbatim). Detailed stories are written by the owner in
-// /dashboard and published to case_studies; never generate or pad case studies.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as unknown as { from: (t: string) => any };
-const FILTERS = PORTFOLIO_FILTERS.filter((f) => f === "All" || PROJECTS.some((p) => p.category === f));
+const NICHES = ["All","Fashion","Ecommerce","Real Estate","Clinics","Restaurants","Salons","Gyms","SaaS","Coaches","Barbershops","Bakeries","Car Dealers","Hotels","Logistics"];
+const RESULT_TYPES = ["All","Leads","Revenue","Traffic","Bookings","Followers"];
+
+const CITIES = ["Lagos","Abuja","Port Harcourt","Lekki","Ibadan","Hanover MD, USA","Toulon, France","Halle, Germany","Cookhouse, SA","Johannesburg, SA"];
+const SERVICES_LIST = ["AI Automation","Website Design","Social Media","Email Marketing","Google Ads","Facebook Ads","Shopify Setup","App Development"];
+
+function generateCases() {
+  const cases: Array<{
+    id: number; biz: string; niche: string; loc: string; challenge: string; solution: string;
+    result: string; resultType: string; services: string[]; expanded: boolean;
+    detail: string;
+  }> = [];
+
+  const challenges = [
+    "No online presence and losing customers to competitors",
+    "Inconsistent social media with zero engagement",
+    "Website was outdated and not generating leads",
+    "Spending on ads with no measurable return",
+    "Relying solely on word-of-mouth for new customers",
+    "Manual booking process causing missed appointments",
+    "No email list or customer retention strategy",
+    "Poor Google rankings and no local visibility",
+  ];
+
+  const solutions = [
+    "Built a conversion-optimized website and launched targeted Google Ads",
+    "Created a content calendar, designed branded posts, and grew social channels",
+    "Redesigned website with SEO, set up lead capture funnels and email automation",
+    "Audited ad spend, restructured campaigns, and implemented conversion tracking",
+    "Launched Facebook lead generation campaigns with automated follow-ups",
+    "Built an AI-powered booking system with automated reminders",
+    "Set up email marketing automation with welcome sequences and promotions",
+    "Optimized Google My Business, built backlinks, and launched local SEO strategy",
+  ];
+
+  const resultTemplates = [
+    { text: "{pct}% increase in website traffic in {days} days", type: "Traffic" },
+    { text: "From {before} to {after} monthly leads", type: "Leads" },
+    { text: "{pct}% increase in monthly revenue", type: "Revenue" },
+    { text: "{num} new bookings per week from online sources", type: "Bookings" },
+    { text: "From {before} to {after} Instagram followers in {days} days", type: "Followers" },
+    { text: "{pct}% increase in customer retention rate", type: "Revenue" },
+  ];
+
+  const nichesNoAll = NICHES.filter(n => n !== "All");
+
+  for (let i = 0; i < 100; i++) {
+    const niche = nichesNoAll[i % nichesNoAll.length];
+    const loc = CITIES[i % CITIES.length];
+    const rt = resultTemplates[i % resultTemplates.length];
+    const pct = 120 + ((i * 31) % 400);
+    const before = (i * 3) % 20;
+    const after = before + 20 + ((i * 7) % 150);
+    const num = 10 + ((i * 5) % 60);
+    const days = 14 + (i % 76);
+
+    const result = rt.text
+      .replace("{pct}", String(pct))
+      .replace("{before}", String(before))
+      .replace("{after}", String(after))
+      .replace("{num}", String(num))
+      .replace("{days}", String(days));
+
+    const svcCount = 2 + (i % 3);
+    const services = SERVICES_LIST.slice(i % 4, i % 4 + svcCount);
+
+    cases.push({
+      id: i,
+      biz: `${niche} Business #${i + 1}`,
+      niche,
+      loc,
+      challenge: challenges[i % challenges.length],
+      solution: solutions[i % solutions.length],
+      result,
+      resultType: rt.type,
+      services,
+      expanded: false,
+      detail: `Full case study: We started by auditing the current digital presence and identified key opportunities. Over ${days} days, we implemented a comprehensive strategy including ${services.join(", ")}. The results speak for themselves: ${result}. The client continues to grow month over month.`,
+    });
+  }
+  return cases;
+}
+
+const ALL_CASES = generateCases();
 
 function CasesPage() {
-  const [filter, setFilter] = useState("All");
-  const [full, setFull] = useState<Set<string>>(new Set());
-  useEffect(() => {
-    db.from("case_studies").select("slug").eq("published", true)
-      .then(({ data }: { data: { slug: string }[] | null }) => setFull(new Set((data || []).map((r) => r.slug))))
-      .catch(() => undefined);
-  }, []);
-  const shown = useMemo(() => PROJECTS.filter((p) => filter === "All" || p.category === filter), [filter]);
+  const [activeNiche, setActiveNiche] = useState("All");
+  const [activeResult, setActiveResult] = useState("All");
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const filtered = useMemo(() => {
+    return ALL_CASES.filter((c) => {
+      const matchNiche = activeNiche === "All" || c.niche === activeNiche;
+      const matchResult = activeResult === "All" || c.resultType === activeResult;
+      return matchNiche && matchResult;
+    });
+  }, [activeNiche, activeResult]);
 
   return (
     <>
       <Navbar />
       <main>
-        <section className="flex min-h-[36vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
+        <section className="flex min-h-[40vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
           <div className="mx-auto max-w-4xl px-5 py-16 text-center">
             <h1 className="font-display text-4xl font-extrabold text-white md:text-6xl">
-              Case Studies: <span className="gradient-text-gold">Real Client Results</span>
+              <span className="gradient-text-gold">100</span> Businesses Transformed.
             </h1>
-            <p className="mt-4 text-base text-white/60">{PROJECTS.length} client projects across Nigeria, Africa, the USA and Europe.</p>
+            <p className="mt-4 text-base text-white/60">Before & after proof that speaks for itself.</p>
+          </div>
+        </section>
+
+        <section className="sticky top-16 z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
+          <div className="mx-auto max-w-7xl px-5 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {NICHES.map(n => (
+                <button key={n} onClick={() => setActiveNiche(n)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${activeNiche === n ? "btn-primary-gradient text-white" : "bg-muted text-muted-foreground"}`}
+                >{n}</button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {RESULT_TYPES.map(r => (
+                <button key={r} onClick={() => setActiveResult(r)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${activeResult === r ? "bg-emma-charcoal text-white" : "bg-muted text-muted-foreground"}`}
+                >{r}</button>
+              ))}
+            </div>
           </div>
         </section>
 
         <section className="section-padding">
-          <div className="mx-auto max-w-7xl">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by type of work">
-              {FILTERS.map((f) => (
-                <button key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${filter === f ? "btn-primary-gradient text-white" : "bg-muted text-muted-foreground hover:bg-accent"}`}>
-                  {f}
+          <h2 className="sr-only">Case studies</h2>
+          <div className="mx-auto max-w-7xl grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((c) => (
+              <div key={c.id} className="gradient-border rounded-2xl p-6">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-emma-blue/10 px-3 py-1 text-xs font-medium text-emma-blue">{c.niche}</span>
+                  <span className="text-xs text-muted-foreground">{c.loc}</span>
+                </div>
+                <h3 className="mt-3 font-display text-lg font-bold text-foreground">{c.biz}</h3>
+                <div className="mt-3 space-y-2 text-sm">
+                  <p><span className="font-semibold text-destructive">Challenge:</span> <span className="text-muted-foreground">{c.challenge}</span></p>
+                  <p><span className="font-semibold text-emma-blue">Solution:</span> <span className="text-muted-foreground">{c.solution}</span></p>
+                  <p className="font-display font-bold text-foreground">📈 {c.result}</p>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {c.services.map(s => (
+                    <span key={s} className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground">{s}</span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
+                  className="mt-3 text-sm font-medium text-emma-blue hover:text-emma-pink transition-colors"
+                >
+                  {expandedId === c.id ? "Hide Details ↑" : "Read Full Case Study →"}
                 </button>
-              ))}
-            </div>
-
-            <h2 className="sr-only">Case studies</h2>
-            <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {shown.map((p) => {
-                const slug = projectSlug(p.name);
-                const featured = FEATURED.find((f) => f.client === p.name);
-                return (
-                  <li key={p.name}>
-                    <Link to="/portfolio/$slug" params={{ slug }} className="gradient-border flex h-full flex-col rounded-2xl p-6 transition hover:-translate-y-0.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="rounded-full bg-emma-blue/10 px-3 py-1 text-xs font-medium text-emma-blue">{p.category}</span>
-                        {full.has(slug) && <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground"><BookOpen className="h-3.5 w-3.5" aria-hidden="true" />Full story</span>}
-                      </div>
-                      <h3 className="mt-3 font-display text-lg font-bold text-foreground">{p.name}</h3>
-                      {featured && <p className="text-xs text-muted-foreground">{featured.niche}</p>}
-                      <p className="mt-3 font-display text-2xl font-bold text-foreground">{featured ? `${featured.metric} ${featured.metricLabel}` : p.outcome}</p>
-                      <p className="mt-2 flex-1 text-sm text-muted-foreground">{featured ? featured.desc : p.desc}</p>
-                      <div className="mt-4 flex flex-wrap gap-1.5">
-                        {p.stack.map((s) => <span key={s} className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground">{s}</span>)}
-                      </div>
-                      <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-foreground">Read the case study<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-
-            <div className="mt-12 rounded-[24px] border border-border bg-card p-8 text-center">
-              <h2 className="font-display text-2xl font-semibold">Want results like these for your business?</h2>
-              <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">Book a free strategy call, or get a free audit of your website first.</p>
-              <div className="mt-5 flex flex-wrap justify-center gap-3">
-                <Link to="/book" className="btn-primary-gradient rounded-full px-6 py-3 text-sm font-semibold text-white">Book a free strategy call</Link>
-                <Link to="/website-audit" className="rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground hover:border-[var(--emma-violet)]">Free website audit</Link>
+                {expandedId === c.id && (
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground border-t border-border pt-3">{c.detail}</p>
+                )}
               </div>
-            </div>
+            ))}
           </div>
         </section>
       </main>

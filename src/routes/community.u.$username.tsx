@@ -8,6 +8,7 @@ import { getProfileMeta } from "@/lib/community/meta-server";
 import { fetchFeed, friendly, isFollowing, listFollows, myBlocks, profileByUsername, setBlock, setFollow, type FeedPage } from "@/lib/community/api";
 import { refreshProfile, useCommunitySession } from "@/lib/community/session";
 import { moderate } from "@/lib/community/moderation";
+import { badges, reputation } from "@/lib/community/reputation";
 import type { FeedPost, Profile } from "@/lib/community/types";
 import PostCard from "@/components/community/PostCard";
 import ReportDialog from "@/components/community/ReportDialog";
@@ -163,6 +164,12 @@ function ProfilePage() {
             <ul className="mt-2 flex flex-wrap gap-2">{p.links.filter((l) => /^https?:\/\//i.test(l.url)).map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="text-xs font-semibold text-[var(--emma-violet)] hover:underline">{l.label || l.url}</a></li>)}</ul>
           )}
           {p.skills?.length > 0 && <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Skills">{p.skills.map((s) => <li key={s} className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">{s}</li>)}</ul>}
+          {badges(p).length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Badges">
+              {badges(p).map((b) => <li key={b.id} title={b.description} className="inline-flex items-center gap-1 rounded-full border border-[var(--emma-violet)]/30 bg-[var(--emma-violet)]/5 px-2.5 py-1 text-xs font-semibold text-[var(--emma-violet)]"><BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />{b.label}<span className="sr-only">: {b.description}</span></li>)}
+            </ul>
+          )}
+          <p className="mt-2 text-xs text-muted-foreground"><span className="font-semibold text-foreground">{reputation(p)}</span> reputation points <span className="opacity-80">(10 per helpful answer, 2 per post, 1 per follower)</span></p>
           <dl className="mt-4 grid grid-cols-4 gap-2 border-t border-border pt-3 text-center">
             {[["Posts", p.post_count], ["Followers", p.follower_count], ["Following", p.following_count], ["Helpful", p.helpful_count]].map(([k, v]) => (
               <div key={k as string}><dt className="text-[11px] text-muted-foreground sm:text-xs">{k}</dt><dd className="font-display text-base font-bold sm:text-lg">{v}</dd></div>

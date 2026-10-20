@@ -9,6 +9,11 @@ export default function DarkModeToggle() {
     const next = saved || (prefersDark ? "dark" : "light");
     document.documentElement.setAttribute("data-theme", next);
     setTheme(next);
+    // Several toggles can be mounted (desktop bar, mobile bar, menu drawer): keep their icons in step.
+    const sync = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
+    const mo = new MutationObserver(sync);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => mo.disconnect();
   }, []);
 
   function toggle() {
@@ -20,6 +25,7 @@ export default function DarkModeToggle() {
 
   return (
     <button
+      type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
       className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-base transition-transform hover:rotate-12"

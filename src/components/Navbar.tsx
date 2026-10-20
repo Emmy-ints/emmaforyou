@@ -138,8 +138,21 @@ export default function Navbar() {
     };
   }, [mobileOpen]);
 
+  // Keep a menu panel inside the viewport: it is centred on its button, then nudged (CSS `translate`) if it would overflow.
+  const fitPanel = useCallback((el: HTMLDivElement | null) => {
+    if (!el || el.parentElement?.classList.contains("nav-pop-r")) return;
+    const anchor = el.closest("[data-nav-anchor]");
+    if (!anchor) return;
+    const a = anchor.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const w = el.offsetWidth;
+    const left = a.left + a.width / 2 - w / 2;
+    const clamped = Math.min(Math.max(left, 12), Math.max(12, vw - 12 - w));
+    el.style.setProperty("--nav-shift", `${Math.round(clamped - left)}px`);
+  }, []);
+
   const dropdownPanel = (items: { to: string; name: string; icon: string; short: string }[], cols: 1 | 2 = 1, width = "w-[340px]") => (
-    <div className={`nav-pop absolute left-1/2 top-full z-50 mt-2 ${width} -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl grid gap-1`} style={{ gridTemplateColumns: cols === 2 ? "1fr 1fr" : "1fr" }}>
+    <div ref={fitPanel} className={`nav-pop absolute left-1/2 top-full z-50 mt-2 ${width} max-w-[calc(100vw-24px)] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl grid gap-1`} style={{ gridTemplateColumns: cols === 2 ? "1fr 1fr" : "1fr" }}>
       {items.map((it) => (
         <Link key={it.to} to={it.to} onClick={() => setOpenDropdown(null)} aria-current={pathname === it.to ? "page" : undefined} className="nav-item group/item flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
           <span className="text-lg transition-transform duration-200 group-hover/item:scale-110" aria-hidden="true">{it.icon}</span>
@@ -153,7 +166,7 @@ export default function Navbar() {
   );
 
   const ddBtn = (key: DropdownKey, label: string) => (
-    <div className="relative" onMouseEnter={() => setOpenDropdown(key)} onMouseLeave={() => setOpenDropdown((k) => (k === key ? null : k))}>
+    <div className="relative" data-nav-anchor onPointerEnter={(e) => { if (e.pointerType === "mouse") setOpenDropdown(key); }} onPointerLeave={(e) => { if (e.pointerType === "mouse") setOpenDropdown((k) => (k === key ? null : k)); }}>
       <button
         type="button"
         onClick={() => setOpenDropdown(openDropdown === key ? null : key)}
@@ -168,7 +181,7 @@ export default function Navbar() {
           {/* Invisible bridge so the menu doesn't close while the pointer moves down to it. */}
           <span aria-hidden="true" className="absolute left-0 right-0 top-full h-3" />
           {key === "services" && (
-            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
+            <div ref={fitPanel} className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[340px] -translate-x-1/2 rounded-2xl border border-border bg-background p-2 shadow-xl">
               <Link to="/services" onClick={() => setOpenDropdown(null)} className="mb-1 flex items-center justify-between rounded-xl bg-muted px-3 py-2.5 text-sm font-semibold text-foreground">All services <span aria-hidden="true">→</span></Link>
               {SERVICES.map((s) => (
                 <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} onClick={() => setOpenDropdown(null)} className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
@@ -182,7 +195,7 @@ export default function Navbar() {
             </div>
           )}
           {key === "expertise" && (
-            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 grid max-h-[70vh] w-[680px] -translate-x-1/2 grid-cols-2 gap-1 overflow-y-auto rounded-2xl border border-border bg-background p-2 shadow-xl">
+            <div ref={fitPanel} className="nav-pop absolute left-1/2 top-full z-50 mt-2 grid max-h-[70vh] w-[680px] max-w-[calc(100vw-24px)] -translate-x-1/2 grid-cols-2 gap-1 overflow-y-auto rounded-2xl border border-border bg-background p-2 shadow-xl">
               {EXPERTISE.map(e => (
                 <Link key={e.slug} to="/expertise/$slug" params={{ slug: e.slug }} onClick={() => setOpenDropdown(null)} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-muted focus-visible:bg-muted">
                   <span>{e.icon}</span><span className="text-xs font-medium text-foreground">{e.name}</span>
@@ -191,7 +204,7 @@ export default function Navbar() {
             </div>
           )}
           {key === "solutions" && (
-            <div className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[720px] -translate-x-1/2 rounded-2xl border border-border bg-background p-3 shadow-xl">
+            <div ref={fitPanel} className="nav-pop absolute left-1/2 top-full z-50 mt-2 w-[720px] max-w-[calc(100vw-24px)] -translate-x-1/2 rounded-2xl border border-border bg-background p-3 shadow-xl">
               <div className="grid grid-cols-2 gap-1">
                 {SOLUTION_CATEGORIES.map((c) => (
                   <Link key={c.slug} to="/solutions/$category" params={{ category: c.slug }} onClick={() => setOpenDropdown(null)} className="group/item flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-muted focus-visible:bg-muted">
@@ -236,7 +249,8 @@ export default function Navbar() {
   );
 
   return (
-    <header className={`site-header fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${scrolled ? "glass is-scrolled shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
+    <>
+    <header className={`site-header fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"} ${mobileOpen ? "bg-background" : scrolled ? "glass is-scrolled shadow-sm" : onInkHero ? "nav-on-ink bg-transparent" : "bg-transparent"}`}>
       <a href="#main-content" onClick={(e) => { const m = document.querySelector("main"); if (!m) return; e.preventDefault(); m.setAttribute("tabindex", "-1"); m.focus(); m.scrollIntoView(); }} className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[200] focus:rounded-full focus:bg-[var(--emma-violet)] focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">Skip to content</a>
       <nav ref={navRef} aria-label="Main" className={`mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 transition-[padding] duration-300 sm:px-5 ${scrolled ? "py-2.5" : "py-4"}`}>
         <Link to="/" className="flex shrink-0 items-baseline gap-0.5" aria-label="EmmaForYou home">
@@ -263,19 +277,22 @@ export default function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2 xl:hidden">
-          <DarkModeToggle />
-          <LanguageSelector />
-          <button ref={triggerRef} onClick={() => setMobileOpen(!mobileOpen)} className="relative z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5" aria-label="Toggle menu" aria-expanded={mobileOpen}>
+          <div className="hidden items-center gap-1 min-[400px]:flex sm:gap-2"><DarkModeToggle /><LanguageSelector /></div>
+          <button ref={triggerRef} type="button" onClick={() => setMobileOpen(!mobileOpen)} className="relative z-50 flex h-10 w-10 shrink-0 flex-col items-center justify-center gap-1.5 rounded-full" aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} aria-controls="mobile-nav">
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "translate-y-2 rotate-45" : ""}`} />
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "opacity-0" : ""}`} />
             <span className={`h-0.5 w-6 rounded-full bg-foreground transition-all duration-300 ${mobileOpen ? "-translate-y-2 -rotate-45" : ""}`} />
           </button>
         </div>
 
-        <div onClick={() => setMobileOpen(false)} className={`fixed inset-0 z-30 bg-black/60 backdrop-blur-sm transition-opacity duration-300 xl:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} aria-hidden />
+      </nav>
+      {scrolled && !mobileOpen && <div aria-hidden="true" className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[var(--emma-violet)] to-[#9b8cff] transition-[width] duration-150" style={{ width: `${progress * 100}%` }} />}
+    </header>
+        <div onClick={() => setMobileOpen(false)} className={`fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm transition-opacity duration-300 xl:hidden ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} aria-hidden />
 
-        <aside ref={drawerRef} className={`fixed top-0 right-0 z-40 h-screen w-[85vw] max-w-sm overflow-y-auto bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Mobile navigation" aria-hidden={!mobileOpen}>
+        <aside id="mobile-nav" ref={drawerRef} className={`fixed top-0 right-0 z-[95] h-[100dvh] w-[85vw] max-w-sm overflow-y-auto overscroll-contain bg-background border-l border-border shadow-2xl transition-transform duration-300 ease-out xl:hidden ${mobileOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Mobile navigation" aria-hidden={!mobileOpen} inert={!mobileOpen}>
           <div className="flex flex-col gap-1 px-6 pt-24 pb-10">
+            <div className="mb-4 flex items-center justify-between gap-2 min-[400px]:hidden"><span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Theme & language</span><div className="flex items-center gap-2"><DarkModeToggle /><LanguageSelector /></div></div>
             <div className="mb-5 grid grid-cols-2 gap-2">
               <Link to="/book" onClick={() => setMobileOpen(false)} className="rounded-2xl bg-[var(--emma-violet)] px-3 py-3 text-center text-sm font-semibold text-white">📅 Book a call</Link>
               <Link to="/proposal" onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border px-3 py-3 text-center text-sm font-semibold text-foreground">📝 Get a quote</Link>
@@ -321,8 +338,6 @@ export default function Navbar() {
             </a>
           </div>
         </aside>
-      </nav>
-      {scrolled && <div aria-hidden="true" className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[var(--emma-violet)] to-[#9b8cff] transition-[width] duration-150" style={{ width: `${progress * 100}%` }} />}
-    </header>
+    </>
   );
 }

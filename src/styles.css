@@ -157,7 +157,7 @@
 }
 
 :root[data-theme="dark"] .glass {
-  background: rgba(11, 13, 36, 0.78);
+  background: rgba(11, 13, 36, 0.92);
 }
 
 @layer base {
@@ -268,9 +268,9 @@
 }
 
 .glass {
-  background: rgba(246, 247, 251, 0.82);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(246, 247, 251, 0.94);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
 }
 
 .glass-dark {
@@ -420,6 +420,8 @@
 /* ------------------------------------------------------------------ */
 
 html { scroll-behavior: smooth; }
+/* Slide-in animations and decorative glows must never make the page scroll sideways. clip (not hidden) keeps position: sticky working. */
+html, body { overflow-x: clip; }
 ::selection { background: rgba(109, 91, 255, 0.28); color: var(--foreground); }
 
 .eyebrow {
@@ -632,7 +634,8 @@ html { scroll-behavior: smooth; }
   content: ''; position: absolute; left: 50%; bottom: -2px; width: 16px; height: 2px; border-radius: 2px;
   transform: translateX(-50%); background: var(--emma-violet);
 }
-.nav-pop { animation: navPop 0.18s ease-out both; transform-origin: top center; }
+.nav-pop { animation: navPop 0.18s ease-out both; transform-origin: top center; translate: var(--nav-shift, 0px) 0; }
+.nav-pop-r > .nav-pop { translate: none; }
 @keyframes navPop { from { opacity: 0; transform: translate(-50%, -6px) scale(0.98); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
 .nav-cta { transition: transform 0.2s, box-shadow 0.2s; }
 .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 24px -8px rgba(109, 91, 255, 0.55); }

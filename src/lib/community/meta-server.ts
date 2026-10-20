@@ -36,7 +36,7 @@ export const getPostMeta = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<PostMeta | null> => {
     if (!UUID.test(data)) return null;
     const rows = await rest<{ title: string | null; body: string; kind: string; published_at: string | null; author: { display_name: string; username: string } | null }>(
-      `community_posts?id=eq.${data}&status=eq.published&visibility=eq.public&select=title,body,kind,published_at,author:community_profiles(display_name,username)&limit=1`,
+      `community_posts?id=eq.${data}&status=eq.published&visibility=eq.public&select=title,body,kind,published_at,author:community_profiles!community_posts_author_id_fkey(display_name,username)&limit=1`,
     );
     const r = rows?.[0];
     if (!r || !r.author) return null;

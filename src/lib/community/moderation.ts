@@ -31,8 +31,8 @@ export async function reportQueue(status: "open" | "actioned" | "dismissed" = "o
   const items = [...groups.values()];
   const ids = (t: string) => items.filter((i) => i.target_type === t).map((i) => i.target_id);
   const [posts, comments, profiles] = await Promise.all([
-    ids("post").length ? db.from("community_posts").select("id,title,body,status, author:community_profiles(username,display_name)").in("id", ids("post")) : { data: [] },
-    ids("comment").length ? db.from("community_comments").select("id,post_id,body,status, author:community_profiles(username,display_name)").in("id", ids("comment")) : { data: [] },
+    ids("post").length ? db.from("community_posts").select("id,title,body,status, author:community_profiles!community_posts_author_id_fkey(username,display_name)").in("id", ids("post")) : { data: [] },
+    ids("comment").length ? db.from("community_comments").select("id,post_id,body,status, author:community_profiles!community_comments_author_id_fkey(username,display_name)").in("id", ids("comment")) : { data: [] },
     ids("profile").length ? db.from("community_profiles").select("user_id,username,display_name,headline,bio,suspended_at").in("user_id", ids("profile")) : { data: [] },
   ]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

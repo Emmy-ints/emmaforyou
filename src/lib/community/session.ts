@@ -36,7 +36,13 @@ async function loadFor(uid: string | null, email: string | null) {
 function start() {
   if (started || typeof window === "undefined") return;
   started = true;
-  supabase.auth.getSession().then(({ data }) => loadFor(data.session?.user.id ?? null, data.session?.user.email ?? null));
+  // If session storage never answers (e.g. blocked storage), show the signed-out view rather than a
+  // spinner forever; onAuthStateChange still upgrades the view if a session appears later.
+  const fallback = window.setTimeout(() => { if (!state.ready) set({ ready: true }); }, 5000);
+  supabase.auth.getSession()
+    .then(({ data }) => loadFor(data.session?.user.id ?? null, data.session?.user.email ?? null))
+    .catch(() => loadFor(null, null))
+    .finally(() => window.clearTimeout(fallback));
   supabase.auth.onAuthStateChange((_event, session) => {
     const uid = session?.user.id ?? null;
     if (uid !== state.uid || !state.ready) void loadFor(uid, session?.user.email ?? null);

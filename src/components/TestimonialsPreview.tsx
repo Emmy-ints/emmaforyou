@@ -81,7 +81,7 @@ export default function TestimonialsPreview() {
           Testimonials
         </span>
         <h2 className="mt-4 font-display text-3xl font-extrabold text-foreground md:text-5xl">
-          <span className="gradient-text">500+ Businesses.</span> Real Results.
+          <span className="gradient-text">Real Businesses.</span> Real Results.
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
           Don't take our word for it — hear from businesses we've helped transform.
@@ -107,7 +107,7 @@ export default function TestimonialsPreview() {
         transition={{ duration: 0.5, delay: 0.5 }}
       >
         <a href="/testimonials" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
-          See All 500+ Testimonials →
+          See all testimonials and results →
         </a>
       </motion.div>
     </section>

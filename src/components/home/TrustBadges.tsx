@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const PARTNERS = ["Meta Business Partner", "Google Partner", "Shopify Expert", "Stripe Verified", "Microsoft Partner", "WhatsApp Business"];
 const CREDENTIALS = [
-  { icon: "✓", text: "500+ Verified Client Reviews" },
+  { icon: "✓", text: "Verified Client Reviews" },
   { icon: "🌍", text: "3 Continents Served" },
   { icon: "📅", text: "Operating Since 2019" },
   { icon: "🏆", text: "Featured Digital Agency" },

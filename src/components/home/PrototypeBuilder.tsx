@@ -223,7 +223,7 @@ export default function PrototypeBuilder() {
             </div>
 
             <p className="mt-5 text-xs text-muted-foreground">
-              {remaining !== null && remaining > 0 ? c.remaining.replace("{n}", String(remaining)) : c.freeNote}
+              {remaining !== null && remaining > 0 ? (remaining === 1 ? c.remainingOne : c.remaining.replace("{n}", String(remaining))) : c.freeNote}
             </p>
 
             {error && (

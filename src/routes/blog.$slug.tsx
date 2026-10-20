@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { POSTS, getPost } from "@/lib/blog-data";
+import { getBlogPost } from "@/lib/blog-server";
 import { serviceForTopic } from "@/lib/topic-service";
 import { pageHead, breadcrumbLd, articleLd, describe, withBrand, isoDate } from "@/lib/seo";
 
@@ -9,10 +9,10 @@ const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 export const Route = createFileRoute("/blog/$slug")({
   component: BlogArticle,
-  loader: ({ params }) => {
-    const post = getPost(params.slug);
-    if (!post) throw notFound();
-    return { post };
+  loader: async ({ params }) => {
+    const found = await getBlogPost({ data: params.slug });
+    if (!found) throw notFound();
+    return found;
   },
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">
@@ -49,9 +49,7 @@ export const Route = createFileRoute("/blog/$slug")({
 });
 
 function BlogArticle() {
-  const { post } = Route.useLoaderData();
-  const related = POSTS.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 3);
-  const fallbackRelated = related.length ? related : POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+  const { post, related: fallbackRelated } = Route.useLoaderData();
 
   const blocks = post.body.split(/\n\n+/);
 

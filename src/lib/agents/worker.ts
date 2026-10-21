@@ -981,7 +981,7 @@ const jobDailyPosts: Handler = async (ctx, t) => {
     const pub = await publishedToday(ctx, a, day, tz);
     if (!row) {
       let slot = dailySlot(day, i, agents.length, ctx.settings.post_window_start, ctx.settings.post_window_end, tz, `${a.slug}:${day}`);
-      if (t.payload?.now) slot = new Date();
+      if (t.payload?.now && (!t.payload.agent || t.payload.agent === a.id)) slot = new Date();
       const { data: ins, error } = await ctx.db.from("agent_daily_posts").insert({ agent_id: a.id, day, target: a.daily_post_target ?? 1, slot_at: slot.toISOString(), published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, status: pub.n >= (a.daily_post_target ?? 1) ? "published" : "scheduled" }).select("*").single();
       if (error && error.code !== "23505") throw new Error(`tracker insert failed: ${error.message}`);
       row = ins ?? (await ctx.db.from("agent_daily_posts").select("*").eq("agent_id", a.id).eq("day", day).single()).data;

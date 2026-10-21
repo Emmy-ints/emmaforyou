@@ -5,10 +5,11 @@ import {
   ArrowRight, ArrowLeftRight, BookOpen, Briefcase, Calculator, CalendarCheck, ClipboardList, Download, Gauge,
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
   Bot, Globe, Languages, Mic, Palette, FileSignature, ShieldCheck, Target,
+  Rocket, Search, Store, Stethoscope, Users, Megaphone, MessageSquare, FolderOpen, Plug, Layers, Scale, Sparkles, MessagesSquare,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
 
-type Group = "try" | "learn" | "work" | "proof";
+type Group = "try" | "ecommerce" | "learn" | "work" | "proof";
 
 interface Tool {
   group: Group;
@@ -39,9 +40,28 @@ const TOOLS: Tool[] = [
   { group: "try", icon: ListChecks, name: "Digital growth quiz", does: "Ten yes/no questions that reveal where your business stands online.", get: "Your result plus the three fastest fixes to grow.", meta: "Free · 2 minutes", cta: "Start the quiz", href: { to: "/growth-quiz" } },
   { group: "try", icon: Mail, name: "Email sequence generator", does: "Generate a ready-to-use 5-email sequence: welcome, abandoned cart, re-engage or product launch.", get: "Five written emails tailored to your business, ready to copy.", meta: "Free · 60 seconds", cta: "Generate my emails", href: { to: "/email-generator" } },
 
+  { group: "try", icon: Sparkles, name: "App feature planner", does: "Tick the building blocks your app needs (36 to choose from), or start from a common app type.", get: "What belongs in a first version, a list you can copy, and an optional quote for it.", meta: "Free · 3 minutes", cta: "Plan my app", href: { to: "/solutions/app-planner" } },
+  { group: "try", icon: Layers, name: "Solutions catalogue with live demos", does: "Browse websites, business apps, AI solutions, automation and industry systems. Every page has a clickable demo with sample data.", get: "A clear picture of what each solution does before you talk to anyone.", meta: "Interactive demos", cta: "Explore solutions", href: { to: "/solutions" } },
+
+  // Ecommerce Intelligence
+  { group: "ecommerce", icon: Rocket, name: "Ecommerce launch roadmap", does: "Answer a few questions about your budget, market, products and experience.", get: "A 14-step launch plan for your situation, with tasks you can tick off and save.", meta: "Start a store · free", cta: "Build my roadmap", href: { to: "/ecommerce/start" } },
+  { group: "ecommerce", icon: Search, name: "Product research & validation", does: "Describe a product idea. We check competitors' public product pages, tracked industry news and your costs.", get: "A sourced report that separates evidence from hypotheses, plus your margin per sale. No invented demand figures.", meta: "Free · ~1 minute", cta: "Research a product", href: { to: "/ecommerce/research" } },
+  { group: "ecommerce", icon: Store, name: "Online store audit", does: "Enter any store or product page (Shopify, WooCommerce, Amazon, Jumia and more).", get: "Scores for speed, SEO, trust and product pages, with every issue, its fix and how to check it.", meta: "Free · ~1 minute", cta: "Audit my store", href: { to: "/ecommerce/grow" } },
+  { group: "ecommerce", icon: Stethoscope, name: "Sales diagnosis", does: "Enter your visits, add-to-carts and orders, or upload an orders export (CSV).", get: "Where shoppers drop off, labelled confirmed, likely or unknown, and what to test first.", meta: "Free · CSV import", cta: "Diagnose my sales", href: { to: "/ecommerce/diagnose" } },
+  { group: "ecommerce", icon: Calculator, name: "Profit analyzer", does: "Enter one period's sales, product costs, shipping, fees and ad spend.", get: "Gross, contribution and net profit, break-even orders, CAC and ROAS, with every formula shown.", meta: "Free · 3 minutes", cta: "Check my profit", href: { to: "/ecommerce/profit" } },
+  { group: "ecommerce", icon: Users, name: "Competitor comparison", does: "Paste up to six competitor product pages or stores.", get: "Prices, reviews, shipping and returns info and payment options side by side, as published on their pages.", meta: "Free", cta: "Compare competitors", href: { to: "/ecommerce/competitors" } },
+  { group: "ecommerce", icon: Megaphone, name: "Marketing experiment planner", does: "Plan traffic and conversion tests with a baseline, hypothesis, action, metric and review date.", get: "A tracked list of experiments and a checklist of traffic channels.", meta: "Free account", cta: "Plan experiments", href: { to: "/ecommerce/marketing" } },
+  { group: "ecommerce", icon: ListChecks, name: "Ecommerce action plan", does: "Collects the fixes from your audit, your roadmap's next steps and your experiments.", get: "One prioritised to-do list ranked by impact and effort.", meta: "Free account", cta: "Open my plan", href: { to: "/ecommerce/plan" } },
+  { group: "ecommerce", icon: MessageSquare, name: "AI ecommerce business guide", does: "Ask questions about your store or plan. Answers use the reports you've saved.", get: "Practical next steps for your business; it says when it needs data you haven't given it.", meta: "AI · free account", cta: "Ask the guide", href: { to: "/ecommerce/guide" } },
+  { group: "ecommerce", icon: FolderOpen, name: "Ecommerce workspace", does: "Keep your roadmaps, audits, research and profit reports in one private place.", get: "Saved reports you can compare over time, export or delete.", meta: "Free account", cta: "Open workspace", href: { to: "/ecommerce/workspace" } },
+  { group: "ecommerce", icon: Plug, name: "Platforms & integrations", does: "See which store platforms, marketplaces and analytics tools work with these tools today.", get: "An honest status for each, what a connection would need, and how to import a CSV instead.", meta: "19 platforms", cta: "See integrations", href: { to: "/ecommerce/integrations" } },
+
   // Learn & download
   { group: "learn", icon: Download, name: "Free growth toolkits", does: "Download practical toolkits: digital checklist, Instagram captions, AI automation starter, ad swipe file, WhatsApp playbook and a 90-day planner.", get: "Six downloadable resources you can use today.", meta: "Free download", cta: "Get the toolkits", href: { to: "/free-resources" } },
   { group: "learn", icon: BookOpen, name: "Knowledge base", does: "In-depth guides on websites, SEO, AI automation, social media, ads, email and ecommerce.", get: "Step-by-step answers written for business owners, not marketers.", meta: "Free guides", cta: "Browse the guides", href: { to: "/knowledge-base" } },
+  { group: "learn", icon: MessagesSquare, name: "Community", does: "Ask questions, share projects and learn from other business owners. EmmaForYou's AI specialists (clearly labelled) answer questions too.", get: "Answers to your questions and people working on the same problems.", meta: "Free to join", cta: "Join the community", href: { to: "/community" } },
+  { group: "learn", icon: ListChecks, name: "Free checklists", does: "Step-by-step checklists for website launches, conversion, Web3 projects and more.", get: "A list you can work through today, item by item.", meta: "Free", cta: "Open the checklists", href: { to: "/checklists" } },
+  { group: "learn", icon: Scale, name: "Comparisons", does: "Side-by-side guides like Shopify vs WooCommerce and SEO vs ads.", get: "The trade-offs explained, so you can choose what fits your business.", meta: "Free guides", cta: "Read comparisons", href: { to: "/compare" } },
   { group: "learn", icon: Newspaper, name: "Blog", does: "Short, practical tips — from Instagram growth to WhatsApp automation, ads and SEO.", get: "Ideas you can try this week.", meta: "Free", cta: "Read the blog", href: { to: "/blog" } },
   { group: "learn", icon: PlayCircle, name: "Watch how it works", does: "Emmanuel walks through the 4-step system behind our client work.", get: "A clear view of how we'd approach your business.", meta: "Video", cta: "Watch now", href: { to: "/watch" } },
 
@@ -62,6 +82,7 @@ const TOOLS: Tool[] = [
 
 const GROUPS: { id: Group; label: string; intro: string }[] = [
   { id: "try", label: "Try it now", intro: "Interactive tools that give you a result straight away — free, no sign-up." },
+  { id: "ecommerce", label: "Ecommerce", intro: "Start an online store or grow an existing one: launch plan, research, audits, sales and profit — every figure is observed, yours, or labelled a hypothesis." },
   { id: "learn", label: "Learn & download", intro: "Guides, toolkits and videos to grow on your own." },
   { id: "work", label: "Work with us", intro: "Ways to start a project or talk to Emmanuel." },
   { id: "proof", label: "See our work", intro: "Real client projects, results and reviews." },

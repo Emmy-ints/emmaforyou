@@ -101,12 +101,19 @@ export function sensitive(text: string): string | null {
   return null;
 }
 
+/** A guarantee of results ("we guarantee first-page rankings"), as opposed to honest negations ("rankings aren't guaranteed"). */
+export function promisesOutcome(t: string): boolean {
+  const sentences = t.toLowerCase().split(/(?<=[.!?\n])\s+/);
+  const NEG = /\b(no|not|n'?t|never|nobody|no one|without|nothing|impossible|isn'?t|aren'?t|doesn'?t|don'?t|won'?t|can'?t|cannot|couldn'?t|wouldn'?t|shouldn'?t|beware|avoid|anyone who|anybody who|be wary|red flag|claims? to)\b/;
+  return sentences.some((s) => /\bguarantee(d|s|ing)?\b/.test(s) && !NEG.test(s.split(/\bguarantee/)[0]) && !/\bguarantee(d|s)?\b[^.]{0,30}\b(isn'?t|aren'?t|not|never)\b/.test(s) && !/\b(money-back|satisfaction|refund) guarantee\b/.test(s));
+}
+
 /** Remove claims an automated agent must never make about itself. */
 export function screenReply(text: string): { ok: boolean; reason?: string } {
   const t = text.toLowerCase();
   if (/\b(i am|i'm) (a )?(human|real person|person on the team|employee)\b/.test(t)) return { ok: false, reason: "claims to be human" };
   if (/\b(when i (worked|ran|built|was at)|in my (years|career|experience as)|my (clients|customers) (told|saw))\b/.test(t)) return { ok: false, reason: "claims personal experience" };
-  if (/\bguarantee(d|s)?\b/.test(t) && !/\b(no|not|can'?t|cannot|never|won'?t)\b[^.]{0,40}\bguarantee/.test(t)) return { ok: false, reason: "guarantees an outcome" };
+  if (promisesOutcome(t)) return { ok: false, reason: "guarantees an outcome" };
   if (text.trim().length < 20) return { ok: false, reason: "too short" };
   return { ok: true };
 }

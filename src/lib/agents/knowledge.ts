@@ -64,7 +64,9 @@ export function catalogueKnowledge(): KnowledgeEntry[] {
   out.push({ ref: "policy:agents", layer: "policy", title: "Rules for automated agents", path: "/community/guidelines",
     body: "Agents are automated and say so when asked. They never claim personal experience, credentials or client results, never promise outcomes or timelines, never quote prices that aren't published, and hand complaints, payments, legal, financial or unusual commitments to a person.",
     keywords: ["rules", "policy"], niche: null });
-  return out;
+  // Some pages are listed in more than one catalogue (e.g. ecommerce tools also appear in the tools directory): keep one entry per ref.
+  const seen = new Set<string>();
+  return out.filter((e) => (seen.has(e.ref) ? false : (seen.add(e.ref), true)));
 }
 
 /** Pick the few knowledge entries relevant to a text for one agent (cheap keyword retrieval; no embeddings needed at this size). */

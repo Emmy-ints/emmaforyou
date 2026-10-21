@@ -574,13 +574,17 @@ Set skip=true if the sources aren't useful enough for a genuinely helpful post.`
   const body = `${f.text}${sources.length ? `\n\nSources:\n${sources.map((s) => `- ${s.title || "Source"}: ${s.url}`).join("\n")}` : ""}\n\n— Written by ${agent.name}, an EmmaForYou AI agent.`;
   const policy = agent.publish_policy;
   const status = origin === "admin" ? (policy === "draft" ? "draft" : "pending_review")
-    : policy === "auto" && ctx.settings.auto_publish_posts ? "scheduled" : policy === "draft" ? "draft" : "pending_review";
+    : policy === "auto" && autoPostsAllowed(ctx.settings) ? "scheduled" : policy === "draft" ? "draft" : "pending_review";
   const tags = Array.isArray(out.tags) ? out.tags.map((x: unknown) => String(x).toLowerCase().replace(/[^a-z0-9-]/g, "")).filter((x: string) => x.length >= 2 && x.length <= 30).slice(0, 4) : [];
   const { data: q, error } = await ctx.db.from("agent_content_queue").insert({ agent_id: agent.id, kind: "post", status, title, body: body.slice(0, 9800), post_kind: out.kind === "discussion" ? "discussion" : "tutorial", topic: agent.topics[0] ?? null, tags, sources, research_id: researchId, task_id: t.id, fingerprint: fingerprint(title), reason: String(out.why_useful ?? "").slice(0, 400), publish_at: new Date().toISOString() }).select("id").single();
   if (error) { if (error.code === "23505") return { status: "skipped", outcome: "duplicate topic for this agent", agentId: agent.id }; throw new Error(`queue insert failed: ${error.message}`); }
   if (researchId) await ctx.db.from("agent_research_items").update({ status: "used" }).eq("id", researchId);
   return { status: "done", outcome: `post ${status === "scheduled" ? "scheduled" : status === "draft" ? "saved as draft" : "waiting for review"}: ${title}`, agentId: agent.id, detail: { queue_id: q.id } };
 }
+
+/** Posts publish without review only once the owner has saved team settings with "Allow automatic posts" on
+ *  (until then every post waits in the review queue; same rule as migration 20261021150000). */
+function autoPostsAllowed(s: Settings & { updated_by?: string | null }) { return s.auto_publish_posts && Boolean(s.updated_by); }
 
 /* ================================================================== scheduled jobs */
 const jobUnanswered: Handler = async (ctx) => {

@@ -637,10 +637,16 @@ const jobContentPlan: Handler = async (ctx, t) => {
   eligible.sort((x, y) => x.last - y.last);
   const maxPerRun = Number(t.payload?.config?.max_per_run ?? 2);
   const results: string[] = [];
-  for (const { agent } of eligible.slice(0, maxPerRun)) {
-    if (Date.now() - ctx.started > TIME_BUDGET_MS - 30_000) break;
-    const { data: items } = await ctx.db.from("agent_research_items").select("id,title,url,summary,source_name,published_at").eq("agent_id", agent.id).eq("status", "new").eq("kind", "source").gte("published_at", new Date(Date.now() - 21 * 86400_000).toISOString()).order("relevance", { ascending: false }).limit(3);
+  // Agents without fresh research are skipped without using up a slot, so they can't block the others.
+  let written = 0;
+  const since = new Date(Date.now() - 21 * 86400_000).toISOString();
+  for (const { agent } of eligible) {
+    if (written >= maxPerRun || Date.now() - ctx.started > TIME_BUDGET_MS - 30_000) break;
+    // Fresh = published in the last 21 days, or (when the source gives no date) collected in the last 21 days.
+    const { data: items } = await ctx.db.from("agent_research_items").select("id,title,url,summary,source_name,published_at").eq("agent_id", agent.id).eq("status", "new").eq("kind", "source")
+      .or(`published_at.gte.${since},and(published_at.is.null,created_at.gte.${since})`).order("relevance", { ascending: false }).limit(3);
     if (!items?.length) { results.push(`${agent.slug}: no fresh research`); continue; }
+    written++;
     const main = items[0] as Research;
     await ctx.db.from("agent_research_items").update({ status: "planned" }).eq("id", main.id);
     const r = await writePost(ctx, t, agent, `Explain "${main.title}" and what it means in practice for businesses in your niche.`, items as Research[], main.id, "plan");

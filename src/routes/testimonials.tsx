@@ -144,7 +144,7 @@ function TestimonialsPage() {
 
         <VerifiedReviews />
 
-        <section className="sticky top-16 z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
+        <section className="sticky top-[68px] lg:top-[72px] z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
           <div className="mx-auto max-w-7xl px-5">
             <h2 className="sr-only">Search and filter testimonials</h2>
             <input

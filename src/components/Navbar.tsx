@@ -78,7 +78,7 @@ const ACCOUNT: (Item & { icon: typeof Lock })[] = [
 const SECTION_PATHS: Record<MenuKey, string[]> = {
   solutions: ["/solutions"],
   services: ["/services", "/expertise"],
-  resources: [...LEARN.filter((i) => i.to !== "/community").map((i) => i.to), "/tools", ...TOOLS.map((i) => i.to)],
+  resources: [...LEARN.filter((i) => i.to !== "/community" && i.to !== "/blog").map((i) => i.to), "/tools", ...TOOLS.map((i) => i.to)],
   company: COMPANY.map((i) => i.to),
   account: ["/portal", "/dashboard"],
 };
@@ -98,6 +98,7 @@ export default function Navbar() {
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const closeTimer = useRef<number | undefined>(undefined);
+  const hoveredAt = useRef(0);
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const showProgress = /^\/(blog|knowledge-base|checklists|compare)\/[^/]+$/.test(pathname);
 
@@ -165,7 +166,7 @@ export default function Navbar() {
   }, [mobileOpen]);
 
   const isActive = (prefixes: string[]) => prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  const hoverOpen = (key: MenuKey) => (e: React.PointerEvent) => { if (e.pointerType !== "mouse") return; window.clearTimeout(closeTimer.current); setOpen(key); };
+  const hoverOpen = (key: MenuKey) => (e: React.PointerEvent) => { if (e.pointerType !== "mouse") return; window.clearTimeout(closeTimer.current); if (open !== key) hoveredAt.current = Date.now(); setOpen(key); };
   const hoverClose = (e: React.PointerEvent) => { if (e.pointerType !== "mouse") return; window.clearTimeout(closeTimer.current); closeTimer.current = window.setTimeout(() => setOpen(null), 140); };
   const close = useCallback(() => setOpen(null), []);
   const ink = onInkHero && !scrolled && !mobileOpen;
@@ -178,7 +179,8 @@ export default function Navbar() {
       type="button"
       aria-expanded={open === k}
       aria-controls={`${uid}-${k}-panel`}
-      onClick={() => setOpen(open === k ? null : k)}
+      // A click right after hover opened the menu keeps it open instead of toggling it shut.
+      onClick={() => { if (open === k && Date.now() - hoveredAt.current < 600) return; setOpen(open === k ? null : k); }}
       onPointerEnter={hoverOpen(k)}
       onPointerLeave={hoverClose}
       onKeyDown={(e) => {
@@ -263,6 +265,7 @@ export default function Navbar() {
               <li>{Trigger({ k: "services", label: "Services" })}</li>
               <li>{Trigger({ k: "resources", label: "Resources" })}</li>
               <li>{PlainLink({ to: "/community", label: "Community", match: (p) => p.startsWith("/community") })}</li>
+              <li>{PlainLink({ to: "/blog", label: "Blog", match: (p) => p === "/blog" || p.startsWith("/blog/") })}</li>
               <li>{Trigger({ k: "company", label: "Company" })}</li>
               <li>{PlainLink({ to: "/pricing", label: "Pricing", match: (p) => p === "/pricing" })}</li>
             </ul>
@@ -274,8 +277,8 @@ export default function Navbar() {
             <DarkModeToggle />
             <span className="mx-1.5 h-5 w-px bg-border" aria-hidden="true" />
             {Trigger({ k: "account", label: "Log in" })}
-            <Link to="/book" className="nav-cta group ml-1.5">
-              Book a consultation
+            <Link to="/book" className="nav-cta group ml-1.5" aria-label="Book a consultation">
+              <span className="2xl:hidden">Book a call</span><span className="hidden 2xl:inline">Book a consultation</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
           </div>
@@ -386,7 +389,7 @@ export default function Navbar() {
           <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close menu" className="nav-chip flex h-10 w-10 items-center justify-center rounded-full text-foreground"><X className="h-5 w-5" aria-hidden="true" /></button>
         </div>
         <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-5">
-          <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
             <Link to="/book" onClick={() => setMobileOpen(false)} className="nav-cta justify-center">Book a consultation</Link>
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)} className="nav-ghost justify-center"><MessageCircle className="h-4 w-4" aria-hidden="true" />WhatsApp us</a>
           </div>

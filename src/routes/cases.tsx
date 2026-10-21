@@ -126,7 +126,7 @@ function CasesPage() {
           </div>
         </section>
 
-        <section className="sticky top-16 z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
+        <section className="sticky top-[68px] lg:top-[72px] z-50 border-b border-border bg-background/95 backdrop-blur-md py-4">
           <div className="mx-auto max-w-7xl px-5 space-y-3">
             <div className="flex flex-wrap gap-2">
               {NICHES.map(n => (

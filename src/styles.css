@@ -622,6 +622,9 @@ html, body { overflow-x: clip; }
 .hero-ink-proof li { display: inline-flex; align-items: center; gap: 0.45rem; }
 .hero-ink-proof svg { width: 1rem; height: 1rem; color: var(--emma-cyan); }
 
+/* Header styles sit in the components layer so Tailwind utilities on the same elements
+   (hidden, xl:hidden, justify-center, responsive display) still win. */
+@layer components {
 /* ------------------------------------------------------------------ */
 /* Site header: fixed, always visible, constant height (no layout shift) */
 /* ------------------------------------------------------------------ */
@@ -670,7 +673,7 @@ html, body { overflow-x: clip; }
 
 /* Top-level links */
 .nav-link {
-  position: relative; display: inline-flex; align-items: center; gap: .3rem; height: 38px; padding: 0 .8rem;
+  position: relative; display: inline-flex; align-items: center; gap: .3rem; height: 38px; padding: 0 .7rem;
   border-radius: 999px; white-space: nowrap;
   font-family: var(--font-inter); font-size: .875rem; font-weight: 500; letter-spacing: -0.006em;
   color: color-mix(in srgb, var(--foreground) 72%, transparent);
@@ -684,6 +687,7 @@ html, body { overflow-x: clip; }
 }
 .nav-chevron { opacity: .55; transition: transform .2s ease, opacity .2s ease; }
 .nav-link.is-open .nav-chevron { transform: rotate(180deg); opacity: .9; }
+@media (min-width: 1536px) { .nav-link { padding: 0 .85rem; } }
 
 /* Small utility controls (language, theme, close) */
 .nav-chip {
@@ -725,7 +729,7 @@ html, body { overflow-x: clip; }
 .nav-panel::before { /* keeps the pointer inside while moving from the button to the panel */
   content: ''; position: absolute; left: 0; right: 0; top: -14px; height: 14px;
 }
-@keyframes navPanel { from { opacity: 0; translate: 0 -6px; } to { opacity: 1; translate: 0 0; } }
+@keyframes navPanel { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } } /* transform, not translate: the panel is centred with the translate property */
 .nav-menu-heading { padding: .35rem .75rem .45rem; font-size: .68rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
 .nav-menu-link { display: block; border-radius: 12px; padding-left: .75rem; padding-right: .75rem; transition: background-color .15s ease; }
 .nav-menu-link:hover, .nav-menu-link:focus-visible { background: color-mix(in srgb, var(--foreground) 5.5%, transparent); }
@@ -756,10 +760,10 @@ html, body { overflow-x: clip; }
 .nav-burger span:nth-child(2) { width: 11px; margin-left: 5px; }
 
 /* Drawer (phones and tablets) */
-.nav-scrim { position: fixed; inset: 0; z-index: 140; background: rgba(6, 8, 24, 0.55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.nav-scrim { position: fixed; inset: 0; z-index: 155; background: rgba(6, 8, 24, 0.55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
 .nav-scrim.is-open { opacity: 1; pointer-events: auto; }
 .nav-drawer {
-  position: fixed; top: 0; right: 0; z-index: 150; display: flex; flex-direction: column;
+  position: fixed; top: 0; right: 0; z-index: 160; display: flex; flex-direction: column;
   width: min(420px, 100vw); height: 100dvh; background: var(--background); color: var(--foreground);
   border-left: 1px solid var(--border); box-shadow: -24px 0 60px -30px rgba(11, 13, 36, 0.55);
   transform: translateX(100%); visibility: hidden; transition: transform .32s cubic-bezier(.2, .8, .2, 1), visibility 0s linear .32s;
@@ -778,6 +782,7 @@ html, body { overflow-x: clip; }
 @media (prefers-reduced-motion: reduce) {
   .site-header, .nav-hairline, .nav-link, .nav-chevron, .nav-cta, .nav-drawer, .nav-scrim, .nav-progress { transition: none !important; }
   .nav-panel { animation: none; }
+}
 }
 
 /* ------------------------------------------------------------------ */

@@ -99,7 +99,7 @@ export default function AccountAuthForm({ initialMode = "signin", intent = "acco
         <div role="group" aria-label="Sign in or create an account" className="mb-4 grid grid-cols-2 rounded-full border border-border bg-muted/50 p-1 text-sm font-semibold">
           {(["signin", "signup"] as const).map((m) => (
             <button key={m} type="button" aria-pressed={mode === m} onClick={() => switchTo(m)}
-              className={`rounded-full px-3 py-2 transition ${mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`whitespace-nowrap rounded-full px-2 py-2 text-[13px] transition min-[360px]:text-sm ${mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
               {m === "signin" ? "Sign in" : "Create account"}
             </button>
           ))}

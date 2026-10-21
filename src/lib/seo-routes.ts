@@ -54,6 +54,7 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/watch", priority: 0.5, changefreq: "monthly" },
   { path: "/affiliate", priority: 0.4, changefreq: "monthly" },
   { path: "/privacy", priority: 0.2, changefreq: "yearly" },
+  { path: "/cookies", priority: 0.2, changefreq: "yearly" },
   { path: "/terms", priority: 0.2, changefreq: "yearly" },
 ];
 

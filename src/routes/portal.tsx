@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { pageHead } from "@/lib/seo";
 import { track } from "@/lib/analytics";
+import AccountAuthForm from "@/components/auth/AccountAuthForm";
 
 /** Optional: the owner's Google review link (Google Business Profile → "Ask for reviews"). Leave empty to hide. */
 const GOOGLE_REVIEW_URL = "";
@@ -64,85 +65,19 @@ function Portal() {
 }
 
 function AuthScreen() {
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [businessName, setBusinessName] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const [info, setInfo] = useState("");
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setErr("");
-    setInfo("");
-    setBusy(true);
-    try {
-      if (mode === "forgot") {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/portal` });
-        if (error) throw error;
-        setInfo("If that email has an account, a reset link is on its way. Check your inbox (and spam).");
-      } else if (mode === "signup") {
-        const redirectUrl = `${window.location.origin}/portal`;
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: { full_name: fullName, business_name: businessName },
-          },
-        });
-        if (error) throw error;
-        setInfo("Check your email to confirm your account.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
-    } catch (e2) {
-      setErr(e2 instanceof Error ? e2.message : "Auth error");
-    } finally {
-      setBusy(false);
-    }
-  }
-
+  // The shared EmmaForYou sign-in: the same account and session as the community and dashboard.
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20">
         <div className="w-full max-w-md px-5">
           <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
-            <div className="text-center">
+            <div className="mb-5 text-center">
               <h1 className="font-display text-3xl font-extrabold">Client Portal</h1>
-              <p className="mt-2 text-sm text-muted-foreground">{mode === "login" ? "Track your project, approve work, pay invoices and message the team." : mode === "signup" ? "Create your account" : "Reset your password"}</p>
+              <p className="mt-2 text-sm text-muted-foreground">Track your project, approve work, pay invoices and message the team. Already in the community? Use the same email and password.</p>
             </div>
-
-            <form onSubmit={submit} className="mt-6 space-y-3">
-              {mode === "signup" && (
-                <>
-                  <input className="input" aria-label="Full name" autoComplete="name" placeholder="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-                  <input className="input" aria-label="Business name" autoComplete="organization" placeholder="Business name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} required />
-                </>
-              )}
-              <input className="input" type="email" aria-label="Email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              {mode !== "forgot" && <input className="input" type="password" aria-label="Password" placeholder="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />}
-              {err && <p className="text-sm text-destructive">{err}</p>}
-              {info && <p className="text-sm text-green-600">{info}</p>}
-              <button disabled={busy} className="btn-primary-gradient inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 font-semibold text-white disabled:opacity-60">
-                {busy ? "Working..." : mode === "login" ? "Log in" : mode === "signup" ? "Create account" : "Send reset link"}
-              </button>
-            </form>
-
-            <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); setErr(""); setInfo(""); }} className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground">
-              {mode === "login" ? "No account? Create one" : "Back to log in"}
-            </button>
-            {mode === "login" && (
-              <button onClick={() => { setMode("forgot"); setErr(""); setInfo(""); }} className="mt-2 w-full text-center text-sm text-muted-foreground hover:text-foreground">Forgot password?</button>
-            )}
+            <AccountAuthForm intent="portal" next="/portal" idPrefix="portal-auth" />
           </div>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            New here? <Link to="/intake" className="underline">Start with our intake form</Link>
-          </p>
         </div>
       </main>
       <Footer />
@@ -152,6 +87,11 @@ function AuthScreen() {
 
 function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   const [account, setAccount] = useState<ClientAcc | null>(null);
+  const [accountChecked, setAccountChecked] = useState(false);
+  const [activating, setActivating] = useState(false);
+  const [activateError, setActivateError] = useState("");
+  const [actName, setActName] = useState("");
+  const [actBiz, setActBiz] = useState("");
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -206,6 +146,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
         supabase.from("client_messages").select("*").eq("client_user_id", userId).order("created_at"),
       ]);
       setAccount(acc as ClientAcc | null);
+      setAccountChecked(true);
       setProjects((proj as Project[]) || []);
       setTasks((tk as Task[]) || []);
       setMessages((msg as Message[]) || []);
@@ -260,6 +201,36 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
     const { data } = await supabase.from("client_messages").insert({ client_user_id: userId, body, sender: "client" }).select().single();
     if (data) setMessages((prev) => [...prev, data as Message]);
   }
+
+  // Signed in with an EmmaForYou account that has no client record yet (e.g. made in the community):
+  // offer to open the portal for this same account instead of showing an empty dashboard.
+  async function activatePortal(e: React.FormEvent) {
+    e.preventDefault();
+    setActivating(true); setActivateError("");
+    const { error } = await pdb.rpc("activate_client_portal", { _full_name: actName, _business_name: actBiz });
+    if (error) { setActivateError(/confirm/i.test(error.message) ? "Confirm your email address first, then try again." : "Couldn't open your portal. Please try again."); setActivating(false); return; }
+    const { data } = await supabase.from("client_accounts").select("*").eq("user_id", userId).maybeSingle();
+    setAccount(data as ClientAcc | null); setActivating(false);
+  }
+  if (accountChecked && !account) return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
+      <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20">
+        <div className="w-full max-w-md px-5">
+          <form onSubmit={activatePortal} className="space-y-3 rounded-3xl border border-border bg-card p-8 shadow-sm">
+            <h1 className="font-display text-2xl font-extrabold">Open your client portal</h1>
+            <p className="text-sm text-muted-foreground">You're signed in as <strong className="text-foreground">{email}</strong>. Your portal uses this same account: no new password needed.</p>
+            <div><label htmlFor="act-name" className="text-sm font-medium">Your name</label><input id="act-name" className="input mt-1" value={actName} onChange={(e) => setActName(e.target.value)} maxLength={80} autoComplete="name" /></div>
+            <div><label htmlFor="act-biz" className="text-sm font-medium">Business name</label><input id="act-biz" className="input mt-1" value={actBiz} onChange={(e) => setActBiz(e.target.value)} maxLength={120} autoComplete="organization" /></div>
+            {activateError && <p role="alert" className="text-sm text-destructive">{activateError}</p>}
+            <button disabled={activating} className="btn-primary-gradient inline-flex w-full items-center justify-center rounded-full px-6 py-3 font-semibold text-white disabled:opacity-60">{activating ? "Opening…" : "Open my portal"}</button>
+            <p className="text-center text-xs text-muted-foreground"><Link to="/account" className="underline">Back to your account</Link></p>
+          </form>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
 
   const initials = account?.avatar_initials || email.slice(0, 2).toUpperCase();
 

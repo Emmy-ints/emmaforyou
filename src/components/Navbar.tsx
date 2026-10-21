@@ -8,6 +8,7 @@ import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
 import Wordmark from "./brand/Wordmark";
 import { useI18n } from "@/lib/i18n";
+import { signOutEverywhere, useAccount } from "@/lib/auth/use-account";
 import { SERVICES, EXPERTISE } from "@/lib/services-data";
 import { SOLUTION_CATEGORIES } from "@/lib/solutions/categories";
 import { canonicalForExpertise } from "@/lib/expertise-canonical";
@@ -69,10 +70,11 @@ const COMPANY: Item[] = [
   { to: "/contact", name: "Contact", short: "WhatsApp, call or message" },
 ];
 
-const ACCOUNT: (Item & { icon: typeof Lock })[] = [
+// One EmmaForYou account opens all of these; the dashboard additionally needs the admin role.
+const ACCOUNT: (Item & { icon: typeof Lock; adminOnly?: boolean })[] = [
   { to: "/portal", name: "Client Portal", short: "Projects, approvals, invoices and files", icon: Lock },
-  { to: "/dashboard", name: "Owner Dashboard", short: "Analytics, leads, bookings and clients", icon: BarChart3 },
-  { to: "/community/settings", name: "Community account", short: "Your community profile and settings", icon: Users },
+  { to: "/community", name: "Community", short: "Your profile, posts and messages", icon: Users },
+  { to: "/dashboard", name: "Owner Dashboard", short: "Analytics, leads, bookings and clients", icon: BarChart3, adminOnly: true },
 ];
 
 const SECTION_PATHS: Record<MenuKey, string[]> = {
@@ -80,13 +82,16 @@ const SECTION_PATHS: Record<MenuKey, string[]> = {
   services: ["/services", "/expertise"],
   resources: [...LEARN.filter((i) => i.to !== "/community" && i.to !== "/blog").map((i) => i.to), "/tools", ...TOOLS.map((i) => i.to)],
   company: COMPANY.map((i) => i.to),
-  account: ["/portal", "/dashboard"],
+  account: ["/portal", "/dashboard", "/account", "/login"],
 };
 
 /* ------------------------------------------------------------------ component */
 
 export default function Navbar() {
   const { t } = useI18n();
+  const account = useAccount();
+  const signedIn = account.ready && account.signedIn;
+  const accountItems = ACCOUNT.filter((a) => !a.adminOnly || !signedIn || account.summary?.admin);
   const pathname = useRouterState({ select: (st) => st.location.pathname });
   const onInkHero = pathname === "/" || pathname.startsWith("/services/") || pathname.startsWith("/expertise/") || pathname.startsWith("/portfolio") || /^\/(fr|de)$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
@@ -276,7 +281,7 @@ export default function Navbar() {
             <LanguageSelector />
             <DarkModeToggle />
             <span className="mx-1.5 h-5 w-px bg-border" aria-hidden="true" />
-            {Trigger({ k: "account", label: "Log in" })}
+            {Trigger({ k: "account", label: signedIn ? "Account" : "Log in" })}
             <Link to="/book" className="nav-cta group ml-1.5" aria-label="Book a consultation">
               <span className="2xl:hidden">Book a call</span><span className="hidden 2xl:inline">Book a consultation</span>
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />
@@ -361,9 +366,22 @@ export default function Navbar() {
             </div>
           </> })}
 
-          {Panel({ k: "account", align: "end", width: "w-[330px]", children: <>
+          {Panel({ k: "account", align: "end", width: "w-[340px]", children: <>
             <div className="p-1">
-              {ACCOUNT.map((a) => {
+              {signedIn ? (
+                <div className="mb-1 rounded-xl bg-muted/50 px-3 py-2.5">
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Signed in as</p>
+                  <p className="mt-0.5 truncate text-[0.88rem] font-semibold text-foreground">{account.email}</p>
+                  <Link to="/account" onClick={close} className="nav-feature-link mt-1">Your account <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+                </div>
+              ) : (
+                <div className="mb-1 grid grid-cols-2 gap-1.5 p-1">
+                  <Link to="/login" onClick={close} className="nav-cta nav-cta-sm justify-center">Sign in</Link>
+                  <Link to="/login" search={{ mode: "signup" }} onClick={close} className="nav-ghost h-9 justify-center text-[0.8125rem]">Create account</Link>
+                  <p className="col-span-2 px-1 pt-1 text-[0.74rem] leading-snug text-muted-foreground">One account for the community, client portal and dashboard.</p>
+                </div>
+              )}
+              {accountItems.map((a) => {
                 const Icon = a.icon;
                 return (
                   <Link key={a.to} to={a.to} onClick={close} aria-current={pathname === a.to ? "page" : undefined} className="nav-menu-link flex items-start gap-3 py-2.5">
@@ -372,6 +390,7 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              {signedIn && <button type="button" onClick={async () => { close(); await signOutEverywhere("local"); }} className="nav-menu-link mt-1 w-full py-2 text-left text-[0.86rem] font-medium text-muted-foreground hover:text-foreground">Sign out</button>}
             </div>
           </> })}
         </div>
@@ -425,19 +444,29 @@ export default function Navbar() {
             {MobileTop({ to: "/pricing", label: "Pricing" })}
           </nav>
 
-          <div className="mt-6 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
-            {ACCOUNT.slice(0, 2).map((a) => {
-              const Icon = a.icon;
-              return (
-                <Link key={a.to} to={a.to} onClick={() => setMobileOpen(false)} className="rounded-2xl border border-border bg-card p-3.5">
-                  <Icon className="h-4 w-4 text-[var(--emma-violet)]" aria-hidden="true" />
-                  <span className="mt-2 block text-sm font-semibold text-foreground">{a.name}</span>
-                  <span className="block text-xs text-muted-foreground">{a.to === "/portal" ? "Clients sign in" : "Owner sign in"}</span>
-                </Link>
-              );
-            })}
-          </div>
-          <Link to="/community/settings" onClick={() => setMobileOpen(false)} className="mt-2 flex items-center gap-2 rounded-2xl border border-border bg-card px-3.5 py-3 text-sm font-medium text-foreground"><BookOpen className="h-4 w-4 text-[var(--emma-violet)]" aria-hidden="true" />Community account</Link>
+          <section aria-label="Your account" className="mt-6 rounded-2xl border border-border bg-card p-3.5">
+            {signedIn ? (
+              <>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Signed in as</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-foreground">{account.email}</p>
+                <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+                  <Link to="/account" onClick={() => setMobileOpen(false)} className="nav-ghost justify-center">Your account</Link>
+                  <button type="button" onClick={async () => { setMobileOpen(false); await signOutEverywhere("local"); }} className="nav-ghost justify-center">Sign out</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">One account for the community, client portal and dashboard.</p>
+                <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="nav-cta justify-center">Sign in</Link>
+                  <Link to="/login" search={{ mode: "signup" }} onClick={() => setMobileOpen(false)} className="nav-ghost justify-center">Create account</Link>
+                </div>
+              </>
+            )}
+            <div className="mt-3 grid gap-1 border-t border-border/70 pt-2">
+              {accountItems.map((a) => <Link key={a.to} to={a.to} onClick={() => setMobileOpen(false)} className="nav-mobile-link"><span className="block text-[0.92rem] font-medium text-foreground">{a.name}</span><span className="block text-xs text-muted-foreground">{a.short}</span></Link>)}
+            </div>
+          </section>
 
           <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-3.5 py-3">
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Display</span>

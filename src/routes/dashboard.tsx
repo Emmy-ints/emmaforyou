@@ -5,6 +5,8 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { Download, LogOut, MessageCircle, RefreshCw, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
+import AccountAuthForm from "@/components/auth/AccountAuthForm";
+import Wordmark from "@/components/brand/Wordmark";
 import { ClientManager, SearchVisibility, UpcomingCalls } from "../components/dashboard/ClientManager";
 import { CaseStudyEditor, NewsletterPanel, ReviewsPanel } from "../components/dashboard/ContentManager";
 import { BlogAutomation } from "../components/dashboard/BlogAutomation";
@@ -105,9 +107,10 @@ function DashboardPage() {
             You're signed in as <strong className="text-foreground">{session.user.email}</strong>, but this account doesn't have
             dashboard access yet. Once it's been given the admin role, refresh this page.
           </p>
-          <button onClick={() => supabase.auth.signOut()} className="mt-6 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
-            Sign out
-          </button>
+          <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+            <Link to="/account" className="font-semibold text-foreground underline underline-offset-4">Go to your account</Link>
+            <button onClick={() => supabase.auth.signOut()} className="text-muted-foreground underline underline-offset-4 hover:text-foreground">Sign out</button>
+          </div>
         </div>
       </Centered>
     );
@@ -120,79 +123,16 @@ function Centered({ children }: { children: React.ReactNode }) {
 }
 
 function SignIn() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const [info, setInfo] = useState("");
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setErr("");
-    setInfo("");
-    setBusy(true);
-    try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-        });
-        if (error) throw error;
-        setInfo("Account created. If asked, confirm your email, then sign in.");
-        setMode("login");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
-    } catch (e2) {
-      setErr(e2 instanceof Error ? e2.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  }
-
+  // The shared EmmaForYou sign-in. Access is still decided by the admin role, checked by the database.
   return (
     <Centered>
       <div className="w-full max-w-sm">
-        <Link to="/" className="mb-8 block text-center font-display text-2xl font-extrabold">
-          EmmaForYou<span className="text-emma-gold">.</span>
-        </Link>
-        <form onSubmit={submit} className="space-y-3 rounded-3xl border border-border bg-card p-7 shadow-sm">
-          <h1 className="font-display text-xl font-bold">{mode === "login" ? "Sign in to your dashboard" : "Create your dashboard account"}</h1>
-          <input className="dash-input" type="email" aria-label="Email" autoComplete="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input className="dash-input" type="password" aria-label="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
-          {err && <p className="text-sm text-destructive">{err}</p>}
-          {info && <p className="text-sm text-muted-foreground">{info}</p>}
-          <button disabled={busy} className="btn-gold w-full rounded-full px-6 py-3 text-sm disabled:opacity-60">
-            {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode(mode === "login" ? "signup" : "login");
-              setErr("");
-            }}
-            className="w-full pt-1 text-center text-xs text-muted-foreground hover:text-foreground"
-          >
-            {mode === "login" ? "First time? Create an account" : "Have an account? Sign in"}
-          </button>
-          {mode === "login" && (
-            <button
-              type="button"
-              onClick={async () => {
-                setErr("");
-                if (!email.includes("@")) { setErr("Enter your email above first."); return; }
-                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/portal` });
-                setInfo(error ? error.message : "Password reset link sent. Open it, set a new password, then come back to /dashboard.");
-              }}
-              className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
-            >
-              Forgot password?
-            </button>
-          )}
-        </form>
+        <Link to="/" aria-label="EmmaForYou, home" className="mb-8 flex justify-center"><Wordmark /></Link>
+        <div className="rounded-3xl border border-border bg-card p-7 shadow-sm">
+          <h1 className="mb-1 font-display text-xl font-bold">Owner dashboard</h1>
+          <p className="mb-5 text-sm text-muted-foreground">Sign in with your EmmaForYou account. Only accounts with the admin role can open the dashboard.</p>
+          <AccountAuthForm intent="account" next="/dashboard" idPrefix="dash-auth" />
+        </div>
       </div>
       <DashStyles />
     </Centered>

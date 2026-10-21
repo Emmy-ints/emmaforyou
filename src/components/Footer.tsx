@@ -1,158 +1,117 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ArrowRight, ArrowUpRight, MessageCircle, CalendarDays } from "lucide-react";
 import NewsletterSignup from "./NewsletterSignup";
+import Wordmark from "./brand/Wordmark";
+import { SOLUTION_CATEGORIES } from "@/lib/solutions/categories";
+import { SERVICES } from "@/lib/services-data";
+import { useAccount } from "@/lib/auth/use-account";
 
+/**
+ * The site-wide footer (rendered by the shared page layouts, never per page). Midnight band using
+ * the brand tokens; every link points to an existing route. Contact is WhatsApp and the booking
+ * page only: no social profiles or email addresses are listed because none are verified.
+ */
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
-const SERVICE_LINKS = [
-  { label: "AI Automation", slug: "ai-automation" },
-  { label: "Website Design & Development", slug: "website-design" },
-  { label: "Ecommerce & Shopify", slug: "ecommerce" },
-  { label: "Email Marketing", slug: "email-marketing" },
-  { label: "Social Media Management", slug: "social-media" },
-  { label: "Paid Advertising", slug: "ad-marketing" },
-  { label: "App Development", slug: "app-development" },
+type L = { to: string; label: string; search?: Record<string, string> };
+const COMPANY: L[] = [
+  { to: "/about", label: "About EmmaForYou" },
+  { to: "/why-emmaforyou", label: "Why EmmaForYou" },
+  { to: "/portfolio", label: "Portfolio" },
+  { to: "/cases", label: "Case studies" },
+  { to: "/testimonials", label: "Testimonials" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/contact", label: "Contact" },
+];
+const RESOURCES: L[] = [
+  { to: "/community", label: "Community" },
+  { to: "/blog", label: "Blog" },
+  { to: "/knowledge-base", label: "Knowledge base" },
+  { to: "/tools", label: "Free tools" },
+  { to: "/free-resources", label: "Free resources" },
+  { to: "/faq", label: "FAQ" },
+];
+const LOCATIONS: { label: string; to?: string; lang?: string }[] = [
+  { label: "Lagos, Nigeria" },
+  { label: "Hanover MD, USA" },
+  { label: "Toulon, France", to: "/fr", lang: "fr" },
+  { label: "Halle, Germany", to: "/de", lang: "de" },
+  { label: "Cookhouse, South Africa" },
 ];
 
-const EXPERTISE_LINKS = [
-  { label: "UI/UX Design", slug: "ui-ux-design" },
-  { label: "Conversion Optimisation", slug: "conversion-rate-optimisation" },
-  { label: "Marketing & Promotion", slug: "marketing-promotion" },
-  { label: "Business Consulting", slug: "business-consulting" },
-  { label: "Accountability Coaching", slug: "accountability-coaching" },
-  { label: "Web3 & dApps", slug: "web3-development" },
-  { label: "Smart Contracts (Solidity)", slug: "smart-contract-development" },
-  { label: "Blockchain & Crypto", slug: "blockchain-crypto" },
-];
-
-const LINKS = [
-  { label: "All Services", to: "/services" },
-  { label: "Contact", to: "/contact" },
-  { label: "Why EmmaForYou", to: "/why-emmaforyou" },
-  { label: "Industries", to: "/industries" },
-  { label: "All Free Tools", to: "/tools" },
-  { label: "Client Portal", to: "/portal" },
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Home", to: "/" },
-  { label: "About", to: "/about" },
-  { label: "Portfolio", to: "/portfolio" },
-  { label: "Case Studies", to: "/cases" },
-  { label: "Testimonials", to: "/testimonials" },
-  { label: "Pricing", to: "/pricing" },
-  { label: "FAQ", to: "/faq" },
-];
-
-const TOOL_LINKS = [
-  { label: "Website Audit", to: "/website-audit" },
-  { label: "AI Receptionist Demo", to: "/ai-receptionist" },
-  { label: "AI Website Makeover", to: "/makeover" },
-  { label: "Instant Proposal", to: "/proposal" },
-  { label: "Book a Strategy Call", to: "/book" },
-  { label: "Smart Contract Check", to: "/smart-contract-check" },
-  { label: "90-Day Goal Planner", to: "/goal-planner" },
-  { label: "Free Checklists", to: "/checklists" },
-  { label: "Comparisons", to: "/compare" },
-  { label: "Solutions & demos", to: "/solutions" },
-  { label: "App feature planner", to: "/solutions/app-planner" },
-  { label: "Newsletter", to: "/newsletter" },
-  { label: "Growth Assessment", to: "/analyser" },
-  { label: "ROI Calculator", to: "/roi-calculator" },
-  { label: "Growth Quiz", to: "/growth-quiz" },
-  { label: "Email Sequence Generator", to: "/email-generator" },
-  { label: "Free Toolkits", to: "/free-resources" },
-  { label: "Knowledge Base", to: "/knowledge-base" },
-  { label: "Blog", to: "/blog" },
-];
-
-const LOCATIONS = [
-  "Nigeria",
-  "Hanover MD, USA",
-  "Toulon, France",
-  "Halle, Germany",
-  "Cookhouse, South Africa",
-];
+function Column({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <nav aria-label={title} className="min-w-0">
+      <h2 className="footer-heading">{title}</h2>
+      <ul className="mt-4 space-y-0.5">{children}</ul>
+    </nav>
+  );
+}
+function FLink({ l }: { l: L }) {
+  return <li><Link to={l.to} search={l.search} className="footer-link">{l.label}</Link></li>;
+}
 
 export default function Footer() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { ready, signedIn, summary } = useAccount();
   const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !/^\/(fr|de)(\/|$)/.test(pathname);
+  const account: L[] = ready && signedIn
+    ? [{ to: "/account", label: "Your account" }, { to: "/portal", label: "Client portal" }, { to: "/community/settings", label: "Community profile" }, ...(summary?.admin ? [{ to: "/dashboard", label: "Owner dashboard" }] : [])]
+    : [{ to: "/login", label: "Sign in" }, { to: "/login", label: "Create account", search: { mode: "signup" } }, { to: "/login", label: "Forgot password", search: { mode: "forgot" } }, { to: "/portal", label: "Client portal" }];
+
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-5 py-16">
+    <footer className="site-footer band-ink">
+      <div aria-hidden="true" className="footer-glow" />
+      <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-14 sm:px-6 md:pt-16 lg:px-8">
         {showSignup && <div className="mb-14"><NewsletterSignup source="footer" variant="band" /></div>}
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
-          <div>
-            <div className="flex items-baseline gap-0.5">
-              <span className="font-display text-xl font-extrabold text-foreground">EmmaForYou</span>
-              <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gradient-gold)" }} />
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              Helping businesses grow — from Lagos to the world.
-            </p>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-gold mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm"
-            >
-              Chat on WhatsApp →
-            </a>
+
+        <div className="flex flex-col gap-12">
+          {/* Brand */}
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-md">
+            <Link to="/" aria-label="EmmaForYou, home" className="inline-flex rounded-lg"><Wordmark /></Link>
+            <p className="mt-5 font-display text-[1.05rem] font-semibold leading-snug text-foreground">Helping businesses grow — from Lagos to the world.</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Websites, business apps, AI and automation, designed and built to help businesses win more customers and run more smoothly.</p>
           </div>
-
-          <nav aria-label="Services">
-            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Services</h2>
-            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
-              {SERVICE_LINKS.map((l) => (
-                <Link key={l.slug} to="/services/$slug" params={{ slug: l.slug }} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
-                  {l.label}
-                </Link>
-              ))}
-              {EXPERTISE_LINKS.map((l) => (
-                <Link key={l.slug} to="/expertise/$slug" params={{ slug: l.slug }} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          <nav aria-label="Free tools and resources">
-            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Free Tools</h2>
-            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
-              {TOOL_LINKS.map((l) => (
-                <Link key={l.to} to={l.to} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          <div>
-            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Company</h2>
-            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
-              {LINKS.map((l) => (
-                <Link key={l.to} to={l.to} className="py-2 text-sm text-muted-foreground transition-colors hover:text-foreground sm:py-0">
-                  {l.label}
-                </Link>
-              ))}
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="footer-cta"><MessageCircle className="h-4 w-4" aria-hidden="true" />Chat on WhatsApp<ArrowUpRight className="h-3.5 w-3.5 opacity-70" aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+              <Link to="/book" className="footer-ghost"><CalendarDays className="h-4 w-4" aria-hidden="true" />Book a call</Link>
             </div>
           </div>
 
-          <div>
-            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">Locations</h2>
-            <div className="mt-3 flex flex-col sm:mt-4 sm:gap-2.5">
-              {LOCATIONS.map((loc) => (
-                loc === "Toulon, France" ? <Link key={loc} to="/fr" hrefLang="fr" className="py-2 text-sm text-muted-foreground hover:text-foreground sm:py-0">{loc} · FR</Link>
-                : loc === "Halle, Germany" ? <Link key={loc} to="/de" hrefLang="de" className="py-2 text-sm text-muted-foreground hover:text-foreground sm:py-0">{loc} · DE</Link>
-                : <span key={loc} className="py-2 text-sm text-muted-foreground sm:py-0">{loc}</span>
-              ))}
-            </div>
+          {/* Navigation */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 border-t border-border pt-10 sm:grid-cols-3 lg:grid-cols-5">
+            <Column title="Solutions">
+              {SOLUTION_CATEGORIES.map((c) => <li key={c.slug}><Link to="/solutions/$category" params={{ category: c.slug }} className="footer-link">{c.slug === "ai-solutions" ? "AI Solutions" : c.slug === "mobile-desktop" ? "Mobile & Desktop Apps" : c.name}</Link></li>)}
+              <li><Link to="/solutions" className="footer-link footer-link-strong">All solutions <ArrowRight className="h-3 w-3" aria-hidden="true" /></Link></li>
+            </Column>
+            <Column title="Services">
+              {SERVICES.map((s) => <li key={s.slug}><Link to="/services/$slug" params={{ slug: s.slug }} className="footer-link">{s.name}</Link></li>)}
+              <li><Link to="/services" className="footer-link footer-link-strong">All services <ArrowRight className="h-3 w-3" aria-hidden="true" /></Link></li>
+            </Column>
+            <Column title="Company">{COMPANY.map((l) => <FLink key={l.to} l={l} />)}</Column>
+            <Column title="Resources">{RESOURCES.map((l) => <FLink key={l.to} l={l} />)}</Column>
+            <Column title="Account">{account.map((l) => <FLink key={l.label} l={l} />)}</Column>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <span>© {new Date().getFullYear()} EmmaForYou. All rights reserved.</span>
-          <nav aria-label="Legal" className="flex gap-5">
-            <Link to="/privacy" className="inline-block py-2 hover:text-foreground sm:py-0">Privacy</Link>
-            <Link to="/terms" className="inline-block py-2 hover:text-foreground sm:py-0">Terms</Link>
-          </nav>
+        <div className="mt-14 border-t border-border pt-6">
+          <ul aria-label="Where we work" className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            {LOCATIONS.map((loc) => (
+              <li key={loc.label} className="inline-flex items-center gap-1.5">
+                <span aria-hidden="true" className="h-1 w-1 rounded-full bg-[var(--emma-violet)]" />
+                {loc.to ? <Link to={loc.to} hrefLang={loc.lang} className="footer-link-inline">{loc.label} · {loc.lang?.toUpperCase()}</Link> : loc.label}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-5 flex flex-col-reverse gap-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} EmmaForYou. All rights reserved.</p>
+            <nav aria-label="Legal"><ul className="flex flex-wrap gap-x-5 gap-y-1">
+              <li><Link to="/privacy" className="footer-link-inline">Privacy policy</Link></li>
+              <li><Link to="/terms" className="footer-link-inline">Terms of service</Link></li>
+              <li><Link to="/cookies" className="footer-link-inline">Cookie policy</Link></li>
+            </ul></nav>
+          </div>
         </div>
       </div>
     </footer>

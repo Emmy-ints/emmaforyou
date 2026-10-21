@@ -5,6 +5,7 @@
  * the AI never answers over a human.
  */
 import { adminDb, aiProvider, aiText, providerPaused } from "@/lib/ai/guard";
+import { candidates, scoreAgents, type AgentLite } from "@/lib/agents/logic";
 
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
@@ -48,6 +49,10 @@ export async function handleCommunityAssistant(request: Request): Promise<Respon
     const { data: setting } = await db.from("ai_agent_settings").select("enabled,extra_instructions").eq("id", "community_assistant").maybeSingle();
     if (setting && !setting.enabled) return json({ error: "The assistant is switched off at the moment. Ask the community, or tap “Talk to a person”." }, 503);
 
+    // The agent team's global pause (dashboard → Agents) also stops private AI chat.
+    const { data: team } = await db.from("agent_settings").select("paused").eq("id", 1).maybeSingle();
+    if (team?.paused) return json({ error: "The AI agents are paused at the moment. Ask the community, or tap “Talk to a person”." }, 503);
+
     const provider = aiProvider();
     if (!provider || (await providerPaused(provider)).paused) return json({ error: "The assistant is taking a short break. Ask the community, or tap “Talk to a person”." }, 503);
 
@@ -57,11 +62,19 @@ export async function handleCommunityAssistant(request: Request): Promise<Respon
     if (!lastMember) return json({ handled: "nothing" });
     if (history[history.length - 1]?.sender_kind !== "member") return json({ handled: "already" });
 
-    const spec = route(history.filter((m) => m.sender_kind === "member").slice(-3).map((m) => m.body).join(" "));
-    if (spec.id !== conv.specialist) await db.from("community_conversations").update({ specialist: spec.id }).eq("id", conv.id);
+    const recentText = history.filter((m) => m.sender_kind === "member").slice(-3).map((m) => m.body).join(" ");
+    let spec = route(recentText);
+    // Answer as the matching specialist from the Agent Directory (falls back to the built-in routing if the directory isn't installed).
+    const { data: dir } = await db.from("agent_profiles").select("id,slug,name,title,kind,keywords,topics,enabled,description,voice,scope").is("merged_into", null);
+    let agent: { id: string; name: string; title: string; description: string; voice: string; scope: string } | null = null;
+    if (dir?.length) {
+      const pick = candidates(scoreAgents(dir as AgentLite[], { body: recentText })).primary as unknown as typeof agent;
+      if (pick) { agent = pick; spec = { id: (pick as unknown as AgentLite).slug, label: pick.title, keywords: /.^/, focus: pick.scope || pick.description }; }
+    }
+    if (spec.id !== conv.specialist) await db.from("community_conversations").update({ specialist: agent ? agent.name : spec.id }).eq("id", conv.id);
     const { data: profile } = await db.from("community_profiles").select("display_name").eq("user_id", uid).maybeSingle();
 
-    const instructions = `You are the EmmaForYou Community assistant, currently acting as the ${spec.label} specialist (${spec.focus}). You are an AI, not a person; say so if asked.
+    const instructions = `You are ${agent ? `${agent.name}, EmmaForYou's ${agent.title}, an automated AI agent answering in the member's private EmmaForYou Community assistant chat. ${agent.description} Voice: ${agent.voice}` : `the EmmaForYou Community assistant, currently acting as the ${spec.label} specialist (${spec.focus}).`} You are an AI, not a person; say so if asked.
 Your job inside the community: answer the member's question clearly and practically, help them use the community (posting a question, finding people and topics), and point to relevant pages.
 Rules:
 - Be concise: 2–6 short paragraphs or a short list. Plain language.
@@ -84,7 +97,12 @@ Member's name: ${profile?.display_name ?? "Member"}.`;
       if (ins.error.code === "40001" || /stale_control/.test(ins.error.message)) return json({ handled: "human" });
       return json({ error: "Couldn't save the reply." }, 500);
     }
-    return json({ handled: "ai", specialist: spec.label });
+    // Count the reply in the agent team's records (usage + actions) so the dashboard shows real totals.
+    if (agent) {
+      await db.from("agent_usage_records").insert({ agent_id: agent.id, purpose: "assistant_chat", provider: provider.id, model: provider.model, ok: true, input_tokens: ai.usage.inputTokens, output_tokens: ai.usage.outputTokens }).then(() => undefined, () => undefined);
+      await db.from("agent_community_actions").insert({ agent_id: agent.id, action: "reply", member_id: uid, ok: true, reason: "private assistant chat", detail: { conversation_id: conv.id } }).then(() => undefined, () => undefined);
+    }
+    return json({ handled: "ai", specialist: agent ? agent.name : spec.label });
   } catch (e) {
     console.error("[community-assistant]", e instanceof Error ? e.message : e);
     return json({ error: "The assistant couldn't answer just now." }, 500);

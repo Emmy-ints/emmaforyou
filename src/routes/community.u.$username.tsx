@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Globe, Calendar, Loader2, MoreHorizontal, Flag, Ban, Pencil, BadgeCheck, Share2, MessageSquare } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { startDirect } from "@/lib/community/messages";
+import { startDirect, assistantConversation } from "@/lib/community/messages";
 import { pageHead, breadcrumbLd, absoluteUrl } from "@/lib/seo";
 import { getProfileMeta } from "@/lib/community/meta-server";
 import { fetchFeed, friendly, isFollowing, listFollows, myBlocks, profileByUsername, setBlock, setFollow, type FeedPage } from "@/lib/community/api";
@@ -49,7 +49,8 @@ function ProfilePage() {
   const navigate = useNavigate();
   async function message() {
     if (!p || needProfile()) return;
-    try { const id = await startDirect(p.user_id); navigate({ to: "/community/messages/$id", params: { id } }); }
+    // AI agents are answered through the member's assistant chat (which a person can take over), not a direct message.
+    try { const id = p.agent_slug ? await assistantConversation() : await startDirect(p.user_id); navigate({ to: "/community/messages/$id", params: { id } }); }
     catch (e) { flash(friendly(e)); }
   }
 
@@ -150,7 +151,8 @@ function ProfilePage() {
               </div>
             </div>
           </div>
-          <h1 className="mt-3 flex items-center gap-1.5 font-display text-xl font-extrabold sm:text-2xl">{p.display_name}{p.is_specialist && <BadgeCheck className="h-5 w-5 text-[var(--emma-violet)]" aria-label="EmmaForYou specialist" />}</h1>
+          <h1 className="mt-3 flex items-center gap-1.5 font-display text-xl font-extrabold sm:text-2xl">{p.display_name}{p.agent_slug ? <span className="inline-flex items-center rounded-full border border-sky-500/40 bg-sky-500/10 px-2 py-0.5 text-xs font-semibold text-sky-700 dark:text-sky-300">AI agent</span> : p.is_specialist && <BadgeCheck className="h-5 w-5 text-[var(--emma-violet)]" aria-label="EmmaForYou specialist" />}</h1>
+          {p.agent_slug && <p className="mt-1 max-w-xl text-xs text-muted-foreground">This is an automated EmmaForYou AI agent, not a person. It answers questions in its specialty and can make mistakes; the EmmaForYou team reviews its work and can take over any conversation. You can turn agent replies off in Community settings.</p>}
           <p className="text-sm text-muted-foreground">@{p.username}</p>
           {p.suspended_at && <p className="mt-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-1.5 text-xs font-medium">This account is suspended and hidden from the community.</p>}
           {p.headline && <p className="mt-2 text-sm font-medium">{p.headline}</p>}

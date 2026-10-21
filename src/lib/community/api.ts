@@ -54,7 +54,7 @@ export async function fetchFeed(opts: { sort: FeedSort; cursor?: FeedCursor; off
   return { posts, next: { cursor: { ts: last.published_at as string, id: last.id, score: last.engagement } } };
 }
 
-const POST_SELECT = "*, author:community_profiles!community_posts_author_id_fkey(username,display_name,headline,avatar_url,is_specialist)";
+const POST_SELECT = "*, author:community_profiles!community_posts_author_id_fkey(username,display_name,headline,avatar_url,is_specialist,agent_slug)";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toFeedPost(row: any, mine: { reaction?: ReactionKind | null; vote?: number | null; saved?: boolean } = {}): FeedPost {
@@ -67,6 +67,7 @@ function toFeedPost(row: any, mine: { reaction?: ReactionKind | null; vote?: num
     author_headline: row.author?.headline ?? null,
     author_avatar: row.author?.avatar_url ?? null,
     author_specialist: Boolean(row.author?.is_specialist),
+    author_agent: Boolean(row.author?.agent_slug),
     my_reaction: mine.reaction ?? null,
     my_vote: mine.vote ?? null,
     saved: Boolean(mine.saved),
@@ -156,7 +157,7 @@ export async function savedPosts(uid: string): Promise<FeedPost[]> {
 }
 
 // ---------------------------------------------------------------- Comments
-const COMMENT_SELECT = "id,post_id,author_id,parent_id,depth,body,status,reactions,reaction_count,reply_count,is_helpful,edited_at,created_at, author:community_profiles!community_comments_author_id_fkey(username,display_name,avatar_url,headline,is_specialist)";
+const COMMENT_SELECT = "id,post_id,author_id,parent_id,depth,body,status,reactions,reaction_count,reply_count,is_helpful,edited_at,created_at, author:community_profiles!community_comments_author_id_fkey(username,display_name,avatar_url,headline,is_specialist,agent_slug)";
 
 export async function listComments(postId: string, before?: string): Promise<CommentRow[]> {
   let q = db.from("community_comments").select(COMMENT_SELECT).eq("post_id", postId).order("created_at", { ascending: true }).limit(200);

@@ -23,7 +23,7 @@ export const AGENT_SEEDS: AgentSeed[] = [
     voice: "Calm, practical and curious. Asks one sharp question when the problem is vague. Summarises options plainly and is honest when EmmaForYou isn't the right fit.",
     knowledge: "Knows the whole catalogue at a high level: websites, business apps, AI solutions, automation, mobile apps, industry solutions, marketing services and the free tools. Never invents a service; suggests the closest real option or an outside route.",
     keywords: ["start", "idea", "help", "advice", "business", "problem", "which", "recommend", "options", "stuck"], topics: ["general"], postsPerWeek: 1,
-    assign: [{ type: "tool", keys: ["/tools", "/proposal", "/intake", "/book"] }, { type: "solution_category", keys: ["industries"] }],
+    assign: [{ type: "tool", keys: ["/tools", "/proposal", "/intake", "/book", "/solutions", "/checklists", "/compare", "/free-resources", "/knowledge-base", "/portal"] }, { type: "solution_category", keys: ["industries"] }],
   },
   {
     slug: "vela", name: "Vela", title: "Website Strategy Specialist", kind: "specialist",
@@ -132,6 +132,7 @@ export const AGENT_SEEDS: AgentSeed[] = [
     assign: [
       { type: "expertise", keys: ["social-media-automation", "marketing-promotion"] },
       { type: "solution", keys: ["business-apps/social-media-management", "ai-solutions/ai-social-media-manager", "ai-solutions/ai-content-repurposing", "websites/creator-platform-website", "websites/podcast-website", "business-apps/creator-platform", "business-apps/podcast-management"] },
+      { type: "tool", keys: ["/blog"] },
     ],
   },
   {

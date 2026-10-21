@@ -65,7 +65,7 @@ export function EcomPanel() {
         </>
       )}
       <h3 className="mt-5 text-sm font-semibold">AI agents</h3>
-      <p className="mt-1 text-xs text-muted-foreground">Turning an agent off stops new automated replies immediately. Extra instructions are added to its rules (they can't remove the built-in safety rules). Every automated reply is labelled as AI.</p>
+      <p className="mt-1 text-xs text-muted-foreground">The community specialists, their schedules, leads and limits are managed in the <Link to="/dashboard/agents" className="underline">Agent Control Center</Link>. Turning an agent off here stops new automated replies immediately. Extra instructions are added to its rules (they can't remove the built-in safety rules). Every automated reply is labelled as AI.</p>
       <ul className="mt-3 grid gap-3 lg:grid-cols-2">{agents.map((a) => (
         <li key={a.id} className="rounded-xl border border-border p-3">
           <div className="flex items-start justify-between gap-3">

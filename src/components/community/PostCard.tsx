@@ -79,7 +79,8 @@ export default function PostCard({ post, onChange, onRemoved, onEdit, full = fal
         <div className="min-w-0 flex-1">
           <p id={`post-${post.id}-by`} className="flex flex-wrap items-center gap-x-1.5 text-sm">
             <Link to="/community/u/$username" params={{ username: post.author_username }} className="font-semibold text-foreground hover:underline">{post.author_name}</Link>
-            {post.author_specialist && <span className="inline-flex items-center gap-0.5 rounded-full bg-[color-mix(in_srgb,var(--emma-violet)_12%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--emma-violet)]" title="Specialist status assigned by EmmaForYou"><BadgeCheck className="h-3 w-3" aria-hidden="true" />Specialist</span>}
+            {post.author_agent && <span className="inline-flex items-center gap-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 dark:text-sky-300" title="An automated EmmaForYou AI agent, not a person. The EmmaForYou team can step in at any time.">AI agent</span>}
+            {post.author_specialist && !post.author_agent && <span className="inline-flex items-center gap-0.5 rounded-full bg-[color-mix(in_srgb,var(--emma-violet)_12%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--emma-violet)]" title="Specialist status assigned by EmmaForYou"><BadgeCheck className="h-3 w-3" aria-hidden="true" />Specialist</span>}
             <span className="text-muted-foreground">@{post.author_username}</span>
           </p>
           {post.author_headline && <p className="truncate text-xs text-muted-foreground">{post.author_headline}</p>}

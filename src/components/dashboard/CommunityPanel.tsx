@@ -30,6 +30,7 @@ export function CommunityPanel() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div><h2 id="community-dash-h" className="dash-h2">Community</h2><p className="mt-1 text-xs text-muted-foreground">Members, activity and things that need you.</p></div>
         <div className="flex flex-wrap gap-2 text-xs">
+          <Link to="/dashboard/agents" className="rounded-full bg-foreground px-4 py-2 font-medium text-background hover:opacity-90">AI agent team</Link>
           <Link to="/community/moderation" className="rounded-full border border-border px-4 py-2 font-medium hover:bg-muted">Moderation queue</Link>
           <Link to="/community/inbox" className="rounded-full border border-border px-4 py-2 font-medium hover:bg-muted">Support inbox</Link>
           <Link to="/community" className="rounded-full border border-border px-4 py-2 font-medium hover:bg-muted">Open community</Link>

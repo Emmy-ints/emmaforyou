@@ -126,7 +126,7 @@ export async function aiText(
   instructions: string,
   messages: ModelMessage[],
   opts: { model?: string } = {},
-): Promise<{ ok: true; text: string; provider: ProviderId } | Fail> {
+): Promise<{ ok: true; text: string; provider: ProviderId; usage: { inputTokens: number | null; outputTokens: number | null } } | Fail> {
   let failure: ProviderFailure | null = null;
   const call = createResponsesCall(request, {
     provider,
@@ -140,7 +140,8 @@ export async function aiText(
   try {
     const text = await call.result.text;
     if (!text.trim()) return fail("The AI service returned nothing. Please try again.", 502);
-    return { ok: true, text, provider: provider.id };
+    const u = (await Promise.resolve(call.result.usage).catch(() => null)) as { inputTokens?: number; outputTokens?: number } | null;
+    return { ok: true, text, provider: provider.id, usage: { inputTokens: u?.inputTokens ?? null, outputTokens: u?.outputTokens ?? null } };
   } catch (error) {
     const f = failure as ProviderFailure | null;
     if (f) return fail(f.message, f.status);

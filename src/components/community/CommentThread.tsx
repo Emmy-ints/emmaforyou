@@ -178,7 +178,7 @@ function CommentItem({ c, tree, post, uid, hasProfile, mine, setMine, onUpsert, 
           <div className="min-w-0 flex-1">
             <p className="flex flex-wrap items-center gap-x-1.5 text-sm">
               {c.author ? <Link to="/community/u/$username" params={{ username: c.author.username }} className="font-semibold hover:underline">{name}</Link> : <span className="font-semibold">{name}</span>}
-              {c.author?.is_specialist && <BadgeCheck className="h-3.5 w-3.5 text-[var(--emma-violet)]" aria-label="Specialist" />}
+              {c.author?.agent_slug ? <span className="inline-flex items-center gap-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 dark:text-sky-300" title="An automated EmmaForYou AI agent, not a person. The EmmaForYou team can step in at any time.">AI agent</span> : c.author?.is_specialist && <BadgeCheck className="h-3.5 w-3.5 text-[var(--emma-violet)]" aria-label="Specialist" />}
               {post.author_id === c.author_id && <span className="rounded-full bg-muted px-1.5 text-[10px] font-semibold">Author</span>}
               <span className="text-xs text-muted-foreground"><time dateTime={c.created_at}>{timeAgo(c.created_at)}</time>{c.edited_at && visible ? " · edited" : ""}</span>
             </p>

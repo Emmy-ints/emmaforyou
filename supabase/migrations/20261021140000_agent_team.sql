@@ -163,6 +163,8 @@ CREATE TABLE IF NOT EXISTS public.agent_knowledge_sources (
   layer text NOT NULL CHECK (layer IN ('company', 'service', 'specialist', 'policy', 'admin')),
   title text NOT NULL CHECK (char_length(title) <= 200),
   path text CHECK (path IS NULL OR path ~ '^/[A-Za-z0-9/_\-]*$'),
+  niche_type text,
+  niche_key text,
   body text NOT NULL DEFAULT '' CHECK (char_length(body) <= 6000),
   keywords text[] NOT NULL DEFAULT '{}',
   verified boolean NOT NULL DEFAULT true,
@@ -722,6 +724,12 @@ INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, sou
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/intake', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/book', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'solution_category', 'industries', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/solutions', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/checklists', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/compare', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/free-resources', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/knowledge-base', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/portal', 'seed' FROM public.agent_profiles WHERE slug = 'atlas' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_profiles (slug, name, title, kind, description, scope, voice, knowledge, keywords, topics, posts_per_week, sort) VALUES ('vela', 'Vela', 'Website Strategy Specialist', 'specialist', 'Plans business websites, landing pages, portals and content sites that load fast and turn visitors into enquiries.', 'Website planning, structure, platforms (custom, WordPress), speed, hosting and domains, portals and directories.', 'Clear and structured; likes short checklists and plain explanations of trade-offs.', 'Website types in the catalogue (35), WordPress development, the free website audit and makeover tools.', ARRAY['website','site','landing page','domain','hosting','wordpress','web design','portal','homepage','speed','page']::text[], ARRAY['websites']::text[], 1, 10) ON CONFLICT (slug) DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'expertise', 'website-landing-pages', 'seed' FROM public.agent_profiles WHERE slug = 'vela' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'expertise', 'wordpress', 'seed' FROM public.agent_profiles WHERE slug = 'vela' ON CONFLICT DO NOTHING;
@@ -853,6 +861,7 @@ INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, sou
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'solution', 'websites/podcast-website', 'seed' FROM public.agent_profiles WHERE slug = 'echo' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'solution', 'business-apps/creator-platform', 'seed' FROM public.agent_profiles WHERE slug = 'echo' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'solution', 'business-apps/podcast-management', 'seed' FROM public.agent_profiles WHERE slug = 'echo' ON CONFLICT DO NOTHING;
+INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'tool', '/blog', 'seed' FROM public.agent_profiles WHERE slug = 'echo' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_profiles (slug, name, title, kind, description, scope, voice, knowledge, keywords, topics, posts_per_week, sort) VALUES ('spark', 'Spark', 'Paid Ads & Lead Generation Specialist', 'specialist', 'Helps businesses get predictable leads: Meta and Google ads, lead magnets, lead capture and routing.', 'Facebook/Instagram and Google ads, lead generation systems, lead capture, routing and qualification, advertising budgets and tracking.', 'Numbers-first and candid about budgets; never promises a cost per lead it can''t know.', 'Paid ads and lead generation expertise, AI advertising assistant, lead routing automation.', ARRAY['ads','advert','facebook ads','meta ads','google ads','ppc','leads','lead generation','cost per lead','campaign','budget','roas','pixel']::text[], ARRAY['marketing']::text[], 1, 100) ON CONFLICT (slug) DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'expertise', 'paid-ads', 'seed' FROM public.agent_profiles WHERE slug = 'spark' ON CONFLICT DO NOTHING;
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'expertise', 'lead-generation', 'seed' FROM public.agent_profiles WHERE slug = 'spark' ON CONFLICT DO NOTHING;
@@ -949,3 +958,57 @@ INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, sou
 INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, source) SELECT id, 'solution', 'business-apps/erp-business-management', 'seed' FROM public.agent_profiles WHERE slug = 'anvil' ON CONFLICT DO NOTHING;
 -- Identities for any agent that doesn't have one yet.
 DO $$ DECLARE r record; BEGIN FOR r IN SELECT id FROM public.agent_profiles WHERE user_id IS NULL LOOP PERFORM public.agent_ensure_identity(r.id); END LOOP; END $$;
+
+-- ------------------------------------------------------------------ admin + member extras
+-- Merge one agent into another: its niches, open leads and queued work move; it is disabled and marked merged.
+CREATE OR REPLACE FUNCTION public.agent_admin_merge(p_from uuid, p_into uuid) RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE moved integer;
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'admin'::app_role) THEN RAISE EXCEPTION 'Not authorised.' USING ERRCODE = '42501'; END IF;
+  IF p_from = p_into OR NOT EXISTS (SELECT 1 FROM public.agent_profiles WHERE id = p_into AND merged_into IS NULL) THEN RAISE EXCEPTION 'Choose a different, active agent to merge into.'; END IF;
+  INSERT INTO public.agent_niche_assignments (agent_id, niche_type, niche_key, is_primary, source)
+    SELECT p_into, niche_type, niche_key, is_primary, 'admin' FROM public.agent_niche_assignments WHERE agent_id = p_from ON CONFLICT DO NOTHING;
+  GET DIAGNOSTICS moved = ROW_COUNT;
+  DELETE FROM public.agent_niche_assignments WHERE agent_id = p_from;
+  UPDATE public.agent_lead_records SET agent_id = p_into WHERE agent_id = p_from AND stage NOT IN ('won', 'lost', 'not_suitable');
+  UPDATE public.agent_tasks SET agent_id = p_into WHERE agent_id = p_from AND status = 'queued';
+  UPDATE public.agent_content_queue SET agent_id = p_into WHERE agent_id = p_from AND status IN ('draft', 'pending_review', 'scheduled');
+  UPDATE public.agent_followup_tasks SET agent_id = p_into WHERE agent_id = p_from AND status = 'scheduled';
+  UPDATE public.agent_profiles SET merged_into = p_into, enabled = false WHERE id = p_from;
+  INSERT INTO public.agent_audit_logs (actor_type, actor_id, agent_id, action, target_type, target_id, details)
+    VALUES ('admin', auth.uid(), p_from, 'merge_agent', 'agent_profiles', p_into::text, jsonb_build_object('niches_moved', moved));
+  RETURN moved;
+END $$;
+REVOKE ALL ON FUNCTION public.agent_admin_merge(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.agent_admin_merge(uuid, uuid) TO authenticated;
+
+-- Members can see and delete what the agents remember about them.
+GRANT DELETE ON public.agent_conversation_context TO authenticated;
+DROP POLICY IF EXISTS agent_context_own_read ON public.agent_conversation_context;
+CREATE POLICY agent_context_own_read ON public.agent_conversation_context FOR SELECT TO authenticated USING (member_id = auth.uid());
+DROP POLICY IF EXISTS agent_context_own_delete ON public.agent_conversation_context;
+CREATE POLICY agent_context_own_delete ON public.agent_conversation_context FOR DELETE TO authenticated USING (member_id = auth.uid() OR public.has_role(auth.uid(), 'admin'::app_role));
+
+-- Members can't present themselves as an AI agent (agent names or the "_ai" username suffix).
+CREATE OR REPLACE FUNCTION public.agent_protect_identity() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF auth.uid() IS NULL OR NEW.agent_slug IS NOT NULL OR public.community_is_staff(auth.uid()) THEN RETURN NEW; END IF;
+  IF lower(NEW.username) ~ '_ai$' THEN RAISE EXCEPTION 'Usernames ending in _ai are reserved for EmmaForYou AI agents.' USING ERRCODE = '22023'; END IF;
+  IF EXISTS (SELECT 1 FROM public.agent_profiles WHERE lower(name) = lower(btrim(NEW.display_name))) AND (TG_OP = 'INSERT' OR NEW.display_name IS DISTINCT FROM OLD.display_name) THEN
+    RAISE EXCEPTION 'That name belongs to an EmmaForYou AI agent. Please choose another.' USING ERRCODE = '22023';
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS agent_protect_identity ON public.community_profiles;
+CREATE TRIGGER agent_protect_identity BEFORE INSERT OR UPDATE OF username, display_name ON public.community_profiles FOR EACH ROW EXECUTE FUNCTION public.agent_protect_identity();
+
+-- Disabled or merged agents are suspended in the community so nothing can post as them.
+CREATE OR REPLACE FUNCTION public.agent_sync_suspension() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NEW.user_id IS NOT NULL AND (NEW.enabled, NEW.merged_into) IS DISTINCT FROM (OLD.enabled, OLD.merged_into) THEN
+    UPDATE public.community_profiles SET suspended_at = CASE WHEN NEW.enabled AND NEW.merged_into IS NULL THEN NULL ELSE coalesce(suspended_at, now()) END WHERE user_id = NEW.user_id;
+  END IF;
+  RETURN NULL;
+END $$;
+DROP TRIGGER IF EXISTS agent_sync_suspension ON public.agent_profiles;
+CREATE TRIGGER agent_sync_suspension AFTER UPDATE OF enabled, merged_into ON public.agent_profiles FOR EACH ROW EXECUTE FUNCTION public.agent_sync_suspension();

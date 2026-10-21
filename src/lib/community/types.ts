@@ -76,6 +76,8 @@ export interface FeedPost {
   author_headline: string | null;
   author_avatar: string | null;
   author_specialist: boolean;
+  /** True for EmmaForYou's automated AI agents (always labelled in the UI). */
+  author_agent?: boolean;
   my_reaction: ReactionKind | null;
   my_vote: number | null;
   saved: boolean;
@@ -97,6 +99,8 @@ export interface Profile {
   links: { label: string; url: string }[];
   visibility: "public" | "members";
   is_specialist: boolean;
+  /** Set only for EmmaForYou AI agents (never by members). */
+  agent_slug?: string | null;
   suspended_at: string | null;
   post_count: number;
   follower_count: number;
@@ -119,7 +123,7 @@ export interface CommentRow {
   is_helpful: boolean;
   edited_at: string | null;
   created_at: string;
-  author: Pick<Profile, "username" | "display_name" | "avatar_url" | "headline" | "is_specialist"> | null;
+  author: Pick<Profile, "username" | "display_name" | "avatar_url" | "headline" | "is_specialist" | "agent_slug"> | null;
 }
 
 export interface NotificationRow {
@@ -132,4 +136,4 @@ export interface NotificationRow {
   actor: Pick<Profile, "username" | "display_name" | "avatar_url"> | null;
 }
 
-export const PROFILE_FIELDS = "user_id,username,display_name,headline,bio,location,avatar_url,cover_url,website,skills,interests,links,visibility,is_specialist,suspended_at,post_count,follower_count,following_count,helpful_count,created_at";
+export const PROFILE_FIELDS = "user_id,username,display_name,headline,bio,location,avatar_url,cover_url,website,skills,interests,links,visibility,is_specialist,agent_slug,suspended_at,post_count,follower_count,following_count,helpful_count,created_at";

@@ -10,8 +10,8 @@ import { openAuth } from "@/components/community/AuthDialog";
 import { openComposer } from "@/components/community/CommunityShell";
 import { Avatar, timeAgo } from "@/components/community/RichText";
 
-type Tab = "profile" | "drafts" | "privacy" | "account";
-const TABS: { id: Tab; label: string }[] = [{ id: "profile", label: "Profile" }, { id: "drafts", label: "Drafts" }, { id: "privacy", label: "Privacy & blocks" }, { id: "account", label: "Account" }];
+type Tab = "profile" | "drafts" | "privacy" | "ai" | "account";
+const TABS: { id: Tab; label: string }[] = [{ id: "profile", label: "Profile" }, { id: "drafts", label: "Drafts" }, { id: "privacy", label: "Privacy & blocks" }, { id: "ai", label: "AI agents" }, { id: "account", label: "Account" }];
 
 export const Route = createFileRoute("/community/settings")({
   validateSearch: (s: Record<string, unknown>): { setup?: boolean; tab?: Tab } => ({
@@ -55,6 +55,7 @@ function SettingsPage() {
         {tab === "profile" && <ProfileForm uid={uid} />}
         {tab === "drafts" && <Drafts uid={uid} />}
         {tab === "privacy" && <Privacy uid={uid} />}
+        {tab === "ai" && <AgentPrefs uid={uid} />}
         {tab === "account" && <Account uid={uid} />}
       </div>
     </div>
@@ -278,6 +279,55 @@ function Privacy({ uid }: { uid: string }) {
         </ul>
       )}
       <p className="mt-4 text-sm text-muted-foreground">Profile visibility is set on the <Link to="/community/settings" search={{ tab: "profile" }} className="font-semibold text-foreground underline">Profile</Link> tab.</p>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const adb = supabase as any;
+type AgentPref = { no_replies: boolean; no_followups: boolean; no_memory: boolean };
+
+/** The member's own choices about EmmaForYou's AI agents (stored in agent_member_prefs; only they can change them). */
+function AgentPrefs({ uid }: { uid: string }) {
+  const [p, setP] = useState<AgentPref | null>(null);
+  const [facts, setFacts] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+  useEffect(() => {
+    adb.from("agent_member_prefs").select("no_replies,no_followups,no_memory").eq("user_id", uid).maybeSingle()
+      .then((r: { data: AgentPref | null; error: { message: string } | null }) => { if (r.error) setError("Couldn't load your AI settings."); setP(r.data ?? { no_replies: false, no_followups: false, no_memory: false }); });
+    adb.from("agent_conversation_context").select("facts").eq("member_id", uid).maybeSingle().then((r: { data: { facts: string } | null }) => setFacts(r.data?.facts ?? ""));
+  }, [uid]);
+  async function change(k: keyof AgentPref, v: boolean) {
+    if (!p) return;
+    const next = { ...p, [k]: v }; setP(next); setError(""); setSaved(false);
+    const { error: e } = await adb.from("agent_member_prefs").upsert({ user_id: uid, ...next });
+    if (e) { setP(p); setError("Couldn't save. Please try again."); return; }
+    if (k === "no_memory" && v) setFacts("");
+    setSaved(true);
+  }
+  async function forget() {
+    const { error: e } = await adb.from("agent_conversation_context").delete().eq("member_id", uid);
+    if (e) setError("Couldn't delete. Please try again."); else setFacts("");
+  }
+  const row = (k: keyof AgentPref, title: string, text: string) => (
+    <label className="flex gap-3 py-3"><input type="checkbox" className="mt-1 h-4 w-4 accent-[var(--emma-violet)]" checked={Boolean(p?.[k])} disabled={!p} onChange={(e) => void change(k, e.target.checked)} /><span><span className="block text-sm font-semibold">{title}</span><span className="text-sm text-muted-foreground">{text}</span></span></label>
+  );
+  return (
+    <div className={card}>
+      <h2 className="font-display text-lg font-bold">EmmaForYou AI agents</h2>
+      <p className="mt-1 text-sm text-muted-foreground">EmmaForYou has a team of automated AI specialists (always labelled "AI agent") that answer questions in the community and publish practical guides. They're not people; the EmmaForYou team reviews their work and can step in at any time. You can also tell an agent "stop replying" in any thread.</p>
+      {error && <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>}
+      <div className="mt-2 divide-y divide-border">
+        {row("no_replies", "Don't reply to my posts", "Agents won't answer your posts or comments (other members still can).")}
+        {row("no_followups", "No follow-ups", "Agents won't come back to ask whether your question was solved.")}
+        {row("no_memory", "Don't remember anything about me", "Agents won't keep notes about your business between conversations. Turning this on deletes what they have.")}
+      </div>
+      {saved && <p role="status" className="mt-1 flex items-center gap-1 text-sm text-emerald-600"><Check className="h-4 w-4" aria-hidden="true" />Saved</p>}
+      <h3 className="mt-5 text-sm font-semibold">What the agents remember about you</h3>
+      {facts === null ? <Loader2 className="mt-2 h-4 w-4 animate-spin text-muted-foreground" aria-label="Loading" /> : facts ? (
+        <><p className="mt-1 whitespace-pre-wrap rounded-xl bg-muted/50 p-3 text-sm">{facts}</p><button type="button" onClick={() => void forget()} className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"><Trash2 className="h-3.5 w-3.5" aria-hidden="true" />Delete these notes</button></>
+      ) : <p className="mt-1 text-sm text-muted-foreground">Nothing. Notes are only things you've shared publicly about your business (like your platform or goals), used to tailor advice to you, and never shown to other members.</p>}
     </div>
   );
 }

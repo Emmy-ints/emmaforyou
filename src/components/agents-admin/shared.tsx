@@ -15,7 +15,7 @@ export interface AgentRow {
   description: string; scope: string; voice: string; knowledge: string; problem_workflow: string; sales_workflow: string;
   community_strategy: string; research_strategy: string; limits: string; keywords: string[]; topics: string[]; capabilities: string[];
   enabled: boolean; reply_policy: "auto" | "review" | "off"; publish_policy: "auto" | "review" | "draft" | "off";
-  posts_per_week: number; daily_reply_limit: number; monthly_token_budget: number | null; model: string | null; merged_into: string | null; sort: number;
+  posts_per_week: number; daily_post_target: number; daily_reply_limit: number; monthly_token_budget: number | null; model: string | null; merged_into: string | null; sort: number;
   created_at: string; updated_at: string;
 }
 export interface Assignment { id: number; agent_id: string; niche_type: string; niche_key: string; is_primary: boolean; source: string }

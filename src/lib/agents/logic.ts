@@ -115,3 +115,79 @@ export function estimateCost(inTok: number | null, outTok: number | null, priceI
   if (priceIn == null || priceOut == null || inTok == null || outTok == null) return null;
   return Math.round(((inTok / 1e6) * priceIn + (outTok / 1e6) * priceOut) * 1e6) / 1e6;
 }
+
+/* ------------------------------------------------------------------ v2: natural replies, opportunities, daily posts */
+
+/** Stock chatbot openers/closers are removed rather than rejected (the rest of the reply is usually fine). */
+const STOCK_OPENERS = /^\s*(great|good|excellent|fantastic|awesome) question[!.,]*\s*|^\s*(absolutely|certainly|of course|sure thing)[!.,]+\s*|^\s*i (completely|totally|fully) understand[^.!?\n]*[.!?]\s*|^\s*thanks? (so much )?for (sharing|asking|reaching out|your question)[^.!?\n]*[.!?]\s*/i;
+const STOCK_CLOSERS = /\s*(let me know if (you (have|need)|there'?s) (any(thing)? (else|other questions?)|more questions?)[^.!?\n]*[.!?]?|feel free to (ask|reach out)[^.!?\n]*[.!?]?|hope (this|that) helps[!.]?|happy to help[!.]?)\s*$/i;
+export function stripStock(text: string): string {
+  let t = text.trim();
+  for (let i = 0; i < 2; i++) { const n = t.replace(STOCK_OPENERS, ""); if (n === t) break; t = n.replace(/^[a-z]/, (c) => c.toUpperCase()); }
+  for (let i = 0; i < 2; i++) { const n = t.replace(STOCK_CLOSERS, ""); if (n === t) break; t = n; }
+  return t.trim();
+}
+
+/** Replies that close the door on a possible customer (the agent must refer to Emmanuel instead). */
+export function turnsCustomerAway(text: string): boolean {
+  const t = text.toLowerCase();
+  return /\b(we|emmaforyou|i)\s+(don'?t|do not|can'?t|cannot|won'?t)\s+(offer|provide|do|help with|handle|support|build|take on)\b/.test(t)
+    || /\bnot (one of )?(our|a) services?\b|\bnot something we (offer|do)\b|\b(find|try|look for) (someone|somebody|another (agency|provider|company)) else\b|\blook elsewhere\b|\boutside (of )?(our|what we) (offer|do)\b/.test(t);
+}
+
+/** Cheap signals on a member comment, used to decide whether an uninvolved comment deserves the team's attention. */
+export function commentSignals(text: string): { question: boolean; help: boolean; buying: boolean; frustration: boolean; any: boolean } {
+  const t = ` ${text.toLowerCase()} `;
+  const question = /\?/.test(t) || /\b(how (do|can|should|would)|what('?s| is| are| should)|which|why (is|does|do|won'?t)|is there|can (i|you|someone|anyone)|anyone know|any (tips|advice|ideas))\b/.test(t);
+  const help = /\b(help|stuck|struggl|not working|doesn'?t work|broken|error|issue|problem|can'?t figure|confused)\b/.test(t);
+  const buying = /\b(how much|price|pricing|cost|quote|budget|hire|hiring|looking for (a|an|someone)|need (a|an|someone) (to|who)|can you (build|make|do|help)|do you (offer|do|build)|available for|freelancer|agency|developer|designer)\b/.test(t);
+  const frustration = /\b(frustrat|annoy|fed up|tired of|wasted|nothing works|so hard|giving up|disappointed|ugh)\b/.test(t);
+  return { question, help, buying, frustration, any: question || help || buying || frustration };
+}
+
+/** Good news worth a short, natural congratulation (only when the member shared it themselves). */
+export function sharesAchievement(text: string): boolean {
+  return /\b(just (launched|hit|reached|got|made|closed|finished|shipped|opened)|we launched|i launched|finally (launched|live|done|got)|first (sale|order|client|customer|1000|100)|milestone|went live|is live|celebrat|proud to (share|announce)|excited to (share|announce))\b/i.test(text);
+}
+
+/** Evergreen posts (no sources) must not contain statistics, studies or news claims. */
+export function unsourcedClaims(text: string): string | null {
+  if (/\b\d{1,3}(\.\d+)?\s?%/.test(text)) return "contains a percentage without a source";
+  if (/\b(according to|a (recent )?(study|survey|report) (by|from|found)|research shows|studies show|statistics show|data shows)\b/i.test(text)) return "cites research without a source";
+  if (/\b(this (week|month)|yesterday|recently announced|just announced|breaking)\b/i.test(text)) return "makes a news claim without a source";
+  return null;
+}
+
+/** Post formats, rotated so daily posts don't all read alike. */
+export const POST_FORMATS: { id: string; kind: "tutorial" | "discussion"; brief: string; minChars: number }[] = [
+  { id: "how-to", kind: "tutorial", brief: "a practical step-by-step how-to for one specific task", minChars: 600 },
+  { id: "checklist", kind: "tutorial", brief: "a short, scannable checklist people can work through today", minChars: 450 },
+  { id: "mistakes", kind: "tutorial", brief: "common mistakes in your niche, why they happen and what to do instead", minChars: 550 },
+  { id: "troubleshooting", kind: "tutorial", brief: "a troubleshooting guide for a frequent problem: symptoms → likely causes → fixes", minChars: 550 },
+  { id: "comparison", kind: "tutorial", brief: "a fair comparison of two common options and when each fits", minChars: 550 },
+  { id: "observation", kind: "discussion", brief: "a short, thoughtful observation about a real problem your audience has, ending with a genuine question", minChars: 300 },
+  { id: "question", kind: "discussion", brief: "a discussion starter: frame a real decision your audience faces, give your view briefly, and invite their experience", minChars: 300 },
+];
+export function formatFor(dayIndex: number, agentIndex: number) { return POST_FORMATS[(dayIndex + agentIndex * 3) % POST_FORMATS.length]; }
+
+/* --------------------------- timezone helpers (no library; Intl only) */
+export function localDay(d: Date, tz: string): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+}
+/** The UTC instant for local wall-clock time hh:mm on a YYYY-MM-DD day in `tz`. */
+export function zonedTime(day: string, hour: number, minute: number, tz: string): Date {
+  const [y, m, d] = day.split("-").map(Number);
+  const guess = Date.UTC(y, m - 1, d, hour, minute);
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).formatToParts(new Date(guess));
+  const get = (k: string) => Number(parts.find((p) => p.type === k)?.value);
+  const asLocal = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"));
+  return new Date(guess - (asLocal - guess));
+}
+/** Spread agents' daily slots across the posting window (stable order, small deterministic offset per agent). */
+export function dailySlot(day: string, index: number, count: number, startHour: number, endHour: number, tz: string, seed: string): Date {
+  const start = zonedTime(day, startHour, 0, tz).getTime(), end = zonedTime(day, Math.min(endHour, 23), endHour >= 24 ? 59 : 0, tz).getTime();
+  const span = Math.max(end - start, 3600_000);
+  let h = 0; for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const jitter = ((h % 1000) / 1000 - 0.5) * Math.min(span / Math.max(count, 1), 40 * 60_000) * 0.8;
+  return new Date(start + span * ((index + 0.5) / Math.max(count, 1)) + jitter);
+}

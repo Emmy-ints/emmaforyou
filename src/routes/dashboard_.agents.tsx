@@ -75,7 +75,7 @@ function ControlCenter() {
       </nav>
       {agents.error && tab !== "overview" ? <ErrorText message={agents.error} onRetry={agents.reload} /> : (
         <>
-          {tab === "overview" && <OverviewTab onOpenAgent={openAgent} />}
+          {tab === "overview" && <OverviewTab onOpenAgent={openAgent} agents={list} />}
           {tab === "agents" && <AgentsTab focus={focus} onFocused={clearFocus} />}
           {tab === "content" && <ContentTab agents={list} />}
           {tab === "activity" && <ActivityTab agents={list} />}

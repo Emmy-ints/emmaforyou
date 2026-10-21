@@ -59,7 +59,7 @@ export function catalogueKnowledge(): KnowledgeEntry[] {
     body: TIERS.map((t) => ("custom" in t && t.custom) ? `${t.name}: custom quote (${t.audience}).` : `${t.name}: $${t.monthly}/month or $${t.annual}/month billed annually (${t.audience}). Includes: ${t.features.slice(0, 6).join(", ")}.`).join(" ") + " Project prices outside these plans come from the instant proposal (/proposal) or a call (/book); never estimate them.",
     keywords: ["price", "pricing", "cost", "plan", "monthly", "quote", "budget"], niche: null });
   out.push({ ref: "company:next-steps", layer: "company", title: "How people start working with EmmaForYou", path: "/book",
-    body: "Free 30-minute strategy call: /book. Instant plan and price: /proposal. Project intake form: /intake. Contact (WhatsApp, phone, email): /contact. Free tools: /tools. Client portal for existing clients: /portal.",
+    body: "Free 30-minute strategy call: /book. Instant plan and price: /proposal. Project intake form: /intake. Contact Emmanuel (WhatsApp, phone, email, message form): /contact; Emmanuel reviews custom, unlisted or complex enquiries and partnership proposals there. Free tools: /tools. Client portal for existing clients: /portal.",
     keywords: ["call", "consultation", "hire", "contact", "quote", "start", "work with"], niche: null });
   out.push({ ref: "policy:agents", layer: "policy", title: "Rules for automated agents", path: "/community/guidelines",
     body: "Agents are automated and say so when asked. They never claim personal experience, credentials or client results, never promise outcomes or timelines, never quote prices that aren't published, and hand complaints, payments, legal, financial or unusual commitments to a person.",

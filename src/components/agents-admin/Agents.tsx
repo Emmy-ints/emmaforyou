@@ -43,7 +43,7 @@ export function AgentsTab({ focus, onFocused }: { focus: string | null; onFocuse
               <button type="button" onClick={() => setOpen(a.id)} className={`w-full rounded-xl border p-3 text-left transition hover:border-[var(--emma-violet)] ${open === a.id ? "border-[var(--emma-violet)]" : "border-border"}`}>
                 <span className="flex flex-wrap items-center gap-1.5"><span className="font-semibold">{a.name}</span>{a.kind === "general" && <Pill tone="info">coordinator</Pill>}{a.merged_into ? <Pill>merged</Pill> : !a.enabled ? <Pill tone="bad">off</Pill> : <Pill tone="good">on</Pill>}{a.reply_policy !== "auto" && <Pill tone="warn">replies: {a.reply_policy}</Pill>}{a.publish_policy !== "auto" && <Pill tone="warn">posts: {a.publish_policy}</Pill>}</span>
                 <span className="mt-0.5 block text-sm text-muted-foreground">{a.title}</span>
-                <span className="mt-1 block text-xs text-muted-foreground">{(byAgent.get(a.id) ?? []).length} niches · {a.posts_per_week} post{a.posts_per_week === 1 ? "" : "s"}/week · up to {a.daily_reply_limit} replies/day</span>
+                <span className="mt-1 block text-xs text-muted-foreground">{(byAgent.get(a.id) ?? []).length} niches · {a.daily_post_target ?? 1} post{(a.daily_post_target ?? 1) === 1 ? "" : "s"}/day · up to {a.daily_reply_limit} replies/day</span>
               </button>
             </li>
           ))}</ul>
@@ -58,7 +58,7 @@ export function AgentsTab({ focus, onFocused }: { focus: string | null; onFocuse
 type Draft = Omit<AgentRow, "id" | "user_id" | "created_at" | "updated_at" | "merged_into">;
 const blank: Draft = {
   slug: "", name: "", title: "", kind: "specialist", description: "", scope: "", voice: "", knowledge: "", problem_workflow: "", sales_workflow: "", community_strategy: "", research_strategy: "", limits: "",
-  keywords: [], topics: [], capabilities: [...CAPS], enabled: true, reply_policy: "auto", publish_policy: "review", posts_per_week: 1, daily_reply_limit: 20, monthly_token_budget: null, model: null, sort: 100,
+  keywords: [], topics: [], capabilities: [...CAPS], enabled: true, reply_policy: "auto", publish_policy: "review", posts_per_week: 7, daily_post_target: 1, daily_reply_limit: 20, monthly_token_budget: null, model: null, sort: 100,
 };
 
 function AgentEditor({ agent, all, assignments, onClose, onSaved }: { agent: AgentRow | null; all: AgentRow[]; assignments: Assignment[]; onClose: () => void; onSaved: (id: string) => void }) {
@@ -117,7 +117,7 @@ function AgentEditor({ agent, all, assignments, onClose, onSaved }: { agent: Age
               <select id="ae-reply" className="dash-input mt-1" value={d.reply_policy} onChange={(e) => set("reply_policy", e.target.value as Draft["reply_policy"])}><option value="auto">Publish automatically</option><option value="review">Wait for my approval</option><option value="off">Don't reply</option></select></div>
             <div><label htmlFor="ae-pub" className="text-xs font-semibold">Educational posts</label>
               <select id="ae-pub" className="dash-input mt-1" value={d.publish_policy} onChange={(e) => set("publish_policy", e.target.value as Draft["publish_policy"])}><option value="auto">Publish automatically</option><option value="review">Wait for my approval</option><option value="draft">Save as drafts</option><option value="off">Don't write posts</option></select></div>
-            <div><label htmlFor="ae-ppw" className="text-xs font-semibold">Posts per week (max)</label><input id="ae-ppw" type="number" min={0} max={21} className="dash-input mt-1" value={d.posts_per_week} onChange={(e) => set("posts_per_week", Math.max(0, Math.min(21, Number(e.target.value) || 0)))} /></div>
+            <div><label htmlFor="ae-ppd" className="text-xs font-semibold">Posts per day (minimum)</label><input id="ae-ppd" type="number" min={0} max={10} className="dash-input mt-1" value={d.daily_post_target ?? 1} onChange={(e) => set("daily_post_target", Math.max(0, Math.min(10, Number(e.target.value) || 0)))} /></div>
             <div><label htmlFor="ae-drl" className="text-xs font-semibold">Replies per day (max)</label><input id="ae-drl" type="number" min={0} max={500} className="dash-input mt-1" value={d.daily_reply_limit} onChange={(e) => set("daily_reply_limit", Math.max(0, Math.min(500, Number(e.target.value) || 0)))} /></div>
             <div><label htmlFor="ae-budget" className="text-xs font-semibold">Monthly token budget</label><input id="ae-budget" type="number" min={0} className="dash-input mt-1" placeholder="Team limit only" value={d.monthly_token_budget ?? ""} onChange={(e) => set("monthly_token_budget", e.target.value === "" ? null : Math.max(0, Number(e.target.value)))} /></div>
             <div><label htmlFor="ae-model" className="text-xs font-semibold">Model override</label><input id="ae-model" className="dash-input mt-1" maxLength={64} placeholder="Team default" value={d.model ?? ""} onChange={(e) => set("model", e.target.value)} /></div>

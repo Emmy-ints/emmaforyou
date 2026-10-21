@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Pause, Play, RefreshCw } from "lucide-react";
-import { Btn, Card, check, db, Empty, ErrorText, Loading, Pill, Stat, useLoad, when } from "./shared";
+import { Btn, Card, check, db, Empty, ErrorText, Loading, Pill, Stat, useLoad, when, type AgentRow } from "./shared";
+import { TodayPanel } from "./Today";
 
 interface Overview {
   agents: { total: number; enabled: number };
@@ -17,7 +18,7 @@ interface Settings { paused: boolean; paused_reason: string | null }
 const n = (v: number | undefined | null) => (v ?? 0).toLocaleString();
 const cost = (v: number | null | undefined) => (v == null ? "not priced" : `$${Number(v).toFixed(2)}`);
 
-export function OverviewTab({ onOpenAgent }: { onOpenAgent: (id: string) => void }) {
+export function OverviewTab({ onOpenAgent, agents = [] }: { onOpenAgent: (id: string) => void; agents?: AgentRow[] }) {
   const o = useLoad<Overview>(async () => check(await db.rpc("agent_admin_overview")));
   const s = useLoad<Settings>(async () => check(await db.from("agent_settings").select("paused,paused_reason").eq("id", 1).single()));
   const [busy, setBusy] = useState(false);
@@ -59,6 +60,8 @@ export function OverviewTab({ onOpenAgent }: { onOpenAgent: (id: string) => void
         </div>
         <ErrorText message={err} />
       </Card>
+
+      <TodayPanel agents={agents} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Active agents" value={`${d.agents.enabled}/${d.agents.total}`} />

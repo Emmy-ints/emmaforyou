@@ -27,6 +27,7 @@ const RESOURCES: L[] = [
   { to: "/community", label: "Community" },
   { to: "/blog", label: "Blog" },
   { to: "/knowledge-base", label: "Knowledge base" },
+  { to: "/ecommerce", label: "Ecommerce Intelligence" },
   { to: "/tools", label: "Free tools" },
   { to: "/free-resources", label: "Free resources" },
   { to: "/faq", label: "FAQ" },

@@ -36,6 +36,17 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/pricing", priority: 0.9, changefreq: "monthly" },
   { path: "/about", priority: 0.7, changefreq: "monthly" },
   { path: "/website-audit", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce", priority: 0.9, changefreq: "monthly" },
+  { path: "/ecommerce/start", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce/research", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce/grow", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce/diagnose", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce/profit", priority: 0.8, changefreq: "monthly" },
+  { path: "/ecommerce/competitors", priority: 0.7, changefreq: "monthly" },
+  { path: "/ecommerce/marketing", priority: 0.7, changefreq: "monthly" },
+  { path: "/ecommerce/plan", priority: 0.5, changefreq: "monthly" },
+  { path: "/ecommerce/guide", priority: 0.5, changefreq: "monthly" },
+  { path: "/ecommerce/integrations", priority: 0.5, changefreq: "monthly" },
   { path: "/ai-receptionist", priority: 0.8, changefreq: "monthly" },
   { path: "/makeover", priority: 0.7, changefreq: "monthly" },
   { path: "/proposal", priority: 0.7, changefreq: "monthly" },
@@ -74,4 +85,4 @@ export function sitemapPaths(): { path: string; priority: number; changefreq: st
 }
 
 /** Paths that must never be indexed or listed. */
-export const PRIVATE_PATHS = ["/dashboard", "/portal", "/api/"];
+export const PRIVATE_PATHS = ["/dashboard", "/portal", "/api/", "/ecommerce/workspace"];

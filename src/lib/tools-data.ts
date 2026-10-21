@@ -2,6 +2,10 @@
 export interface ToolInfo { to: string; name: string; icon: string; group: "AI tools" | "Plan & estimate" | "Learn" | "Talk to us"; does: string; get: string; time: string }
 
 export const TOOLS_DIRECTORY: ToolInfo[] = [
+  { to: "/ecommerce/grow", name: "Online store audit", icon: "🛒", group: "AI tools", does: "Scans any store or product page for speed, SEO, trust signals, checkout and product-page quality.", get: "Scores by category and every issue with evidence, a fix and how to verify it.", time: "~1 minute" },
+  { to: "/ecommerce/research", name: "Product research & validation", icon: "🔎", group: "AI tools", does: "Checks a product idea against competitors' public pages, our tracked industry news and your unit costs.", get: "A sourced report separating evidence from hypotheses, plus margin per sale.", time: "~1 minute" },
+  { to: "/ecommerce/start", name: "Ecommerce launch roadmap", icon: "🚀", group: "Plan & estimate", does: "Asks about your budget, market and experience and builds a launch plan.", get: "A 14-step roadmap with tasks you can tick off.", time: "3 minutes" },
+  { to: "/ecommerce/profit", name: "Ecommerce profit calculator", icon: "🧮", group: "Plan & estimate", does: "Works out gross, contribution and net profit from your own numbers or an orders CSV.", get: "Margins, break-even orders, CAC and ROAS, with each formula shown.", time: "3 minutes" },
   { to: "/website-audit", name: "AI website audit", icon: "🩺", group: "AI tools", does: "Checks your homepage for speed, SEO, mobile, contact options and trust.", get: "A score out of 100, the top 5 fixes and a PDF report.", time: "~1 minute" },
   { to: "/ai-receptionist", name: "AI receptionist demo", icon: "🤖", group: "AI tools", does: "Chat or talk to an AI receptionist for a sample salon, clinic or restaurant.", get: "A feel for instant replies and bookings for your own customers.", time: "2 minutes" },
   { to: "/makeover", name: "AI website makeover", icon: "🎨", group: "AI tools", does: "Redesigns a screenshot of your website, keeping your business details.", get: "A before-and-after comparison and a design concept to download.", time: "~1 minute" },

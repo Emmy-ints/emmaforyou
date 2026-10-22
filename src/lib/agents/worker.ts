@@ -29,7 +29,7 @@ interface Settings {
   monthly_cost_limit_usd: number | null; price_input_per_1m: number | null; price_output_per_1m: number | null; model: string | null;
   max_agent_replies_per_thread: number; max_replies_per_member_per_day: number; max_followups_per_member_per_month: number;
   unanswered_after_minutes: number; private_outreach_enabled: boolean; admin_instructions: string | null; tick_secret: string;
-  timezone: string; post_window_start: number; post_window_end: number; reply_delay_seconds: number; monitor_comments: boolean; updated_by: string | null;
+  timezone: string; post_window_start: number; post_window_end: number; reply_delay_seconds: number; monitor_comments: boolean; daily_posters?: number; updated_by: string | null;
 }
 interface Task { id: string; kind: string; agent_id: string | null; payload: Record<string, any>; attempts: number; max_attempts: number; dedupe_key: string }
 interface Outcome { status: "done" | "skipped"; outcome: string; agentId?: string | null; detail?: Record<string, unknown> }
@@ -1058,28 +1058,81 @@ async function markDailyPublished(ctx: Ctx, agent: Agent, queueId: string | null
   await ctx.db.from("agent_daily_posts").update({ published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, status: done ? "published" : "scheduled", ...(nextSlot ? { slot_at: nextSlot } : {}), attempts: 0, last_error: null, queue_ids: queueId ? [...new Set([...(row.queue_ids ?? []), queueId])] : row.queue_ids }).eq("id", row.id);
 }
 
-/** Planner: make sure every posting agent has today's tracker row and a task when its slot is due. */
+const OFF_ROTA = "Not on today's posting rota";
+
+/**
+ * Choose the day's posters: `daily_posters` agents (0 = all), keeping anyone already on today's rota
+ * (or already published), filling free places with the agents who have gone longest without a daily
+ * post, and taking unpublished, not-yet-started agents off when the rota is over the limit.
+ * An admin "write now" for one agent always puts that agent on the rota.
+ */
+async function chooseRota(ctx: Ctx, agents: Agent[], rows: any[], forced: string | null): Promise<Set<string>> {
+  const limit = Math.max(0, Math.floor(ctx.settings.daily_posters ?? 5));
+  if (!limit || limit >= agents.length) return new Set(agents.map((a) => a.id));
+  const byAgent = new Map<string, any>(rows.map((r) => [r.agent_id, r]));
+  const { data: hist } = await ctx.db.from("agent_daily_posts").select("agent_id,day,published_count").gt("published_count", 0).order("day", { ascending: false }).limit(1000);
+  const lastPosted = new Map<string, string>();
+  for (const h of hist ?? []) if (!lastPosted.has(h.agent_id)) lastPosted.set(h.agent_id, h.day);
+  const today = rows[0]?.day;
+  const lastBefore = (id: string) => { for (const h of hist ?? []) if (h.agent_id === id && h.day !== today) return h.day as string; return ""; };
+  const order = (a: Agent, b: Agent) => lastBefore(a.id).localeCompare(lastBefore(b.id)) || (a.sort ?? 100) - (b.sort ?? 100) || a.slug.localeCompare(b.slug);
+  const { data: live } = await ctx.db.from("agent_tasks").select("agent_id").eq("kind", "daily_post").in("status", ["queued", "running"]);
+  const busy = new Set((live ?? []).map((x: any) => x.agent_id));
+  const fixed = (a: Agent) => { const r = byAgent.get(a.id); return a.id === forced || (r && (r.published_count > 0 || ["writing", "awaiting_review", "retrying", "failed"].includes(r.status) || busy.has(a.id))); };
+  const chosen = agents.filter((a) => { const r = byAgent.get(a.id); return fixed(a) || (r && r.on_rota !== false); });
+  if (chosen.length > limit) {
+    // Too many: drop the most recently active, unstarted ones first.
+    const removable = chosen.filter((a) => !fixed(a)).sort(order).reverse();
+    while (chosen.length > limit && removable.length) { const x = removable.shift()!; chosen.splice(chosen.indexOf(x), 1); }
+  } else if (chosen.length < limit) {
+    const pool = agents.filter((a) => !chosen.includes(a) && (!byAgent.get(a.id) || byAgent.get(a.id).on_rota !== false)).sort(order);
+    const extra = agents.filter((a) => !chosen.includes(a) && !pool.includes(a)).sort(order); // off-rota today, only if needed (e.g. a rota agent was paused)
+    for (const a of [...pool, ...extra]) { if (chosen.length >= limit) break; chosen.push(a); }
+  }
+  return new Set(chosen.map((a) => a.id));
+}
+
+/** Planner: give today's rota agents a tracker row and a task when their slot is due; mark the rest off-rota. */
 const jobDailyPosts: Handler = async (ctx, t) => {
   const tz = tzOf(ctx.settings); const day = localDay(new Date(), tz);
   const agents = postingAgents(ctx).sort((a, b) => (a.sort ?? 100) - (b.sort ?? 100) || a.slug.localeCompare(b.slug));
   const { data: rows } = await ctx.db.from("agent_daily_posts").select("*").eq("day", day);
   const byAgent = new Map<string, any>((rows ?? []).map((r: any) => [r.agent_id, r]));
-  let created = 0, queued = 0, done = 0;
-  for (const [i, a] of agents.entries()) {
+  const forced = t.payload?.now && t.payload?.agent ? String(t.payload.agent) : null;
+  const rota = await chooseRota(ctx, agents, rows ?? [], forced);
+  const rotaList = agents.filter((a) => rota.has(a.id));
+  const endOfWindow = zonedTime(day, Math.min(ctx.settings.post_window_end, 23), 0, tz).getTime();
+  let created = 0, queued = 0, done = 0, offRota = 0;
+  for (const a of agents) {
     let row = byAgent.get(a.id);
     const pub = await publishedToday(ctx, a, day, tz);
+    const target = a.daily_post_target ?? 1;
+    if (!rota.has(a.id)) {
+      offRota++;
+      const patch = { on_rota: false, published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, target, status: pub.n >= target ? "published" : "skipped", last_error: pub.n >= target ? null : OFF_ROTA };
+      if (!row) { const { error } = await ctx.db.from("agent_daily_posts").insert({ agent_id: a.id, day, slot_at: new Date(endOfWindow).toISOString(), ...patch }); if (error && error.code !== "23505") throw new Error(`tracker insert failed: ${error.message}`); created++; }
+      else if (row.on_rota !== false || row.status !== patch.status || row.published_count !== pub.n) await ctx.db.from("agent_daily_posts").update(patch).eq("id", row.id);
+      continue;
+    }
+    const i = rotaList.indexOf(a);
     if (!row) {
-      let slot = dailySlot(day, i, agents.length, ctx.settings.post_window_start, ctx.settings.post_window_end, tz, `${a.slug}:${day}`);
+      let slot = dailySlot(day, i, rotaList.length, ctx.settings.post_window_start, ctx.settings.post_window_end, tz, `${a.slug}:${day}`);
       if (t.payload?.now && (!t.payload.agent || t.payload.agent === a.id)) slot = new Date();
-      const { data: ins, error } = await ctx.db.from("agent_daily_posts").insert({ agent_id: a.id, day, target: a.daily_post_target ?? 1, slot_at: slot.toISOString(), published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, status: pub.n >= (a.daily_post_target ?? 1) ? "published" : "scheduled" }).select("*").single();
+      const { data: ins, error } = await ctx.db.from("agent_daily_posts").insert({ agent_id: a.id, day, target, slot_at: slot.toISOString(), on_rota: true, published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, status: pub.n >= target ? "published" : "scheduled" }).select("*").single();
       if (error && error.code !== "23505") throw new Error(`tracker insert failed: ${error.message}`);
       row = ins ?? (await ctx.db.from("agent_daily_posts").select("*").eq("agent_id", a.id).eq("day", day).single()).data;
       created++;
-    } else if (row.published_count !== pub.n || row.target !== (a.daily_post_target ?? 1) || (row.status === "published" && pub.n < row.target) || row.status === "skipped") {
-      const met = pub.n >= (a.daily_post_target ?? 1);
+    } else if (row.on_rota === false) {
+      // Joining the rota during the day: give it a slot in the rest of the window (or now, for "write now").
+      const slot = t.payload?.now && (!t.payload.agent || t.payload.agent === a.id) ? new Date() : new Date(Math.min(endOfWindow, Math.max(Date.now() + 5 * 60_000, new Date(dailySlot(day, i, rotaList.length, ctx.settings.post_window_start, ctx.settings.post_window_end, tz, `${a.slug}:${day}`)).getTime())));
+      const status = pub.n >= target ? "published" : "scheduled";
+      await ctx.db.from("agent_daily_posts").update({ on_rota: true, status, last_error: null, slot_at: slot.toISOString(), published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, target }).eq("id", row.id);
+      row = { ...row, on_rota: true, status, slot_at: slot.toISOString(), published_count: pub.n, target };
+    } else if (row.published_count !== pub.n || row.target !== target || (row.status === "published" && pub.n < row.target) || row.status === "skipped") {
+      const met = pub.n >= target;
       const status = met ? "published" : ["writing", "awaiting_review", "retrying", "failed"].includes(row.status) ? row.status : "scheduled";
-      await ctx.db.from("agent_daily_posts").update({ published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, target: a.daily_post_target ?? 1, status }).eq("id", row.id);
-      row = { ...row, published_count: pub.n, target: a.daily_post_target ?? 1, status };
+      await ctx.db.from("agent_daily_posts").update({ published_count: pub.n, post_ids: pub.ids, last_published_at: pub.last, target, status, ...(row.last_error === OFF_ROTA ? { last_error: null } : {}) }).eq("id", row.id);
+      row = { ...row, published_count: pub.n, target, status };
     }
     if (!row) continue;
     if (pub.n >= row.target) { done++; continue; }
@@ -1093,7 +1146,7 @@ const jobDailyPosts: Handler = async (ctx, t) => {
   const active = new Set(agents.map((a) => a.id));
   const idle = (rows ?? []).filter((r: any) => !active.has(r.agent_id) && r.published_count < r.target && r.status !== "skipped").map((r: any) => r.id);
   if (idle.length) await ctx.db.from("agent_daily_posts").update({ status: "skipped", last_error: "agent paused, merged or not allowed to post" }).in("id", idle);
-  return { status: "done", outcome: `${day}: ${agents.length} posting agents, ${done} at target, ${created} new tracker row(s), ${queued} post task(s) queued${idle.length ? `, ${idle.length} paused` : ""}`, detail: { day, created, queued, done, paused: idle.length } };
+  return { status: "done", outcome: `${day}: ${rotaList.length} of ${agents.length} posting agents on today's rota, ${done} at target, ${created} new tracker row(s), ${queued} post task(s) queued${offRota ? `, ${offRota} off rota` : ""}${idle.length ? `, ${idle.length} paused` : ""}`, detail: { day, rota: rotaList.map((a) => a.slug), created, queued, done, off_rota: offRota, paused: idle.length } };
 };
 
 /** Writer: one post for one agent. Uses fresh research when there is some; otherwise an evergreen post from verified knowledge. */
@@ -1103,6 +1156,7 @@ const jobDailyPost: Handler = async (ctx, t) => {
   const tz = tzOf(ctx.settings); const day = String(t.payload.day ?? localDay(new Date(), tz));
   const { data: row } = await ctx.db.from("agent_daily_posts").select("*").eq("agent_id", agent.id).eq("day", day).maybeSingle();
   if (!row) return { status: "skipped", outcome: "no tracker row for this day" };
+  if (row.on_rota === false) return { status: "skipped", outcome: "not on today's posting rota", agentId: agent.id };
   const pub = await publishedToday(ctx, agent, day, tz);
   if (pub.n >= row.target) { await markDailyPublished(ctx, agent, null); return { status: "skipped", outcome: "daily target already met", agentId: agent.id }; }
   const target = `daily:${agent.id}:${day}:${pub.n + 1}`;
@@ -1160,7 +1214,7 @@ const jobReconcile: Handler = async (ctx) => {
   let revived = 0; const unresolved: string[] = [];
   for (const r of rows ?? []) {
     const agent = ctx.byId.get(r.agent_id);
-    if (!agent || !posting.has(agent.id) || r.published_count >= r.target || r.status === "awaiting_review") continue;
+    if (!agent || !posting.has(agent.id) || r.on_rota === false || r.status === "skipped" || r.published_count >= r.target || r.status === "awaiting_review") continue;
     const pub = await publishedToday(ctx, agent, day, tz);
     if (pub.n >= r.target) { await markDailyPublished(ctx, agent, null); continue; }
     const { data: live } = await ctx.db.from("agent_tasks").select("id").eq("kind", "daily_post").eq("agent_id", r.agent_id).in("status", ["queued", "running"]).limit(1);
@@ -1206,8 +1260,8 @@ const jobReconcile: Handler = async (ctx) => {
   }
   // 3) Yesterday's misses are recorded once for the dashboard.
   const yesterday = localDay(new Date(Date.now() - 86400_000), tz);
-  const { data: missed } = await ctx.db.from("agent_daily_posts").select("id,agent_id,published_count,target,alerted_at,status").eq("day", yesterday);
-  for (const m of (missed ?? []).filter((x: any) => x.published_count < x.target && !x.alerted_at && x.status !== "skipped")) { const a = ctx.byId.get(m.agent_id); if (a) await alertDaily(ctx, a, yesterday, "daily target missed"); }
+  const { data: missed } = await ctx.db.from("agent_daily_posts").select("id,agent_id,published_count,target,alerted_at,status,on_rota").eq("day", yesterday);
+  for (const m of (missed ?? []).filter((x: any) => x.published_count < x.target && !x.alerted_at && x.status !== "skipped" && x.on_rota !== false)) { const a = ctx.byId.get(m.agent_id); if (a) await alertDaily(ctx, a, yesterday, "daily target missed"); }
   return { status: "done", outcome: `${revived} daily post(s) revived, ${unresolved.length} unresolved${afterWindow ? " at window end" : ""}, ${recovered} missed event(s) recovered` };
 };
 

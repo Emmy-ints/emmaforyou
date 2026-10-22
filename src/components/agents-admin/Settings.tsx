@@ -6,9 +6,9 @@ interface Settings {
   paused: boolean; auto_publish_posts: boolean; review_all_replies: boolean; daily_ai_call_limit: number; monthly_token_limit: number; monthly_cost_limit_usd: number | null;
   price_input_per_1m: number | null; price_output_per_1m: number | null; model: string | null; max_agent_replies_per_thread: number; max_replies_per_member_per_day: number;
   max_followups_per_member_per_month: number; unanswered_after_minutes: number; reply_delay_seconds: number; private_outreach_enabled: boolean; admin_instructions: string | null; updated_at: string;
-  timezone: string; post_window_start: number; post_window_end: number; reply_delay_jitter_seconds: number; monitor_comments: boolean;
+  timezone: string; post_window_start: number; post_window_end: number; reply_delay_jitter_seconds: number; monitor_comments: boolean; daily_posters: number;
 }
-const COLS = "paused,auto_publish_posts,review_all_replies,daily_ai_call_limit,monthly_token_limit,monthly_cost_limit_usd,price_input_per_1m,price_output_per_1m,model,max_agent_replies_per_thread,max_replies_per_member_per_day,max_followups_per_member_per_month,unanswered_after_minutes,reply_delay_seconds,private_outreach_enabled,admin_instructions,updated_at,timezone,post_window_start,post_window_end,reply_delay_jitter_seconds,monitor_comments";
+const COLS = "paused,auto_publish_posts,review_all_replies,daily_ai_call_limit,monthly_token_limit,monthly_cost_limit_usd,price_input_per_1m,price_output_per_1m,model,max_agent_replies_per_thread,max_replies_per_member_per_day,max_followups_per_member_per_month,unanswered_after_minutes,reply_delay_seconds,private_outreach_enabled,admin_instructions,updated_at,timezone,post_window_start,post_window_end,reply_delay_jitter_seconds,monitor_comments,daily_posters";
 interface Knowledge { id: string; ref: string; agent_id: string | null; layer: string; title: string; path: string | null; body: string; active: boolean; source: string; updated_at: string }
 
 export function SettingsTab({ agents }: { agents: AgentRow[] }) {
@@ -61,6 +61,7 @@ function TeamSettings() {
         </fieldset>
         <fieldset className="space-y-3"><legend className="mb-1 text-sm font-semibold">Daily posts & usage</legend>
           <div><label htmlFor="ts-tz" className="text-xs font-semibold">Timezone</label><input id="ts-tz" className="dash-input mt-1" maxLength={60} value={d.timezone} onChange={(e) => set("timezone", e.target.value)} /><p className="mt-0.5 text-[11px] text-muted-foreground">Decides when a "day" starts, e.g. Africa/Lagos.</p></div>
+          {num("daily_posters", "Agents posting per day", "A rotating group: each day the agents who have gone longest without a post take a turn. 0 = every agent posts daily. 4–6 keeps the feed from feeling crowded while the community is small.", { max: 100 })}
           <div className="grid grid-cols-2 gap-2">{num("post_window_start", "Posting from (hour)", "Local time, 0–23.", { max: 23 })}{num("post_window_end", "Posting until (hour)", "Agents' posts are spread across this window.", { max: 24 })}</div>
           {num("daily_ai_call_limit", "AI calls per day", "Work beyond this waits until tomorrow.", { max: 100000 })}
           {num("monthly_token_limit", "Tokens per month", "All agents together.")}

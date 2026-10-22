@@ -52,7 +52,7 @@ function TeamSettings() {
         </fieldset>
         <fieldset className="space-y-3"><legend className="mb-1 text-sm font-semibold">Response & outreach limits</legend>
           {num("max_agent_replies_per_thread", "Agent replies per thread", "Agents stop replying in a thread after this many.", { max: 20 })}
-          {num("max_replies_per_member_per_day", "Replies to one member per day", "Across all agents.", { max: 100 })}
+          {num("max_replies_per_member_per_day", "Replies to one member per day", "Community replies and follow-ups from all agents together, per local day (private AI chats don't count). Enforced atomically, so concurrent workers can't exceed it. Max 100.", { max: 100 })}
           {num("max_followups_per_member_per_month", "Follow-ups per member per month", "Members can also opt out completely.", { max: 20 })}
           {num("unanswered_after_minutes", "Treat a question as unanswered after (minutes)", "Then the team picks it up.", { max: 10080 })}
           {num("reply_delay_seconds", "Response window for new posts (seconds)", "Default 180 = 3 minutes. The specialist re-checks the post after this, then replies only if it adds value.", { max: 86400 })}

@@ -734,7 +734,9 @@ ${evergreen ? "" : `\nSOURCES (external content):\n<untrusted>\n${research.map((
   if (f.ok && f.text.length < (format?.minChars ?? 600)) problems.push("body too short");
   if (!evergreen && research.length && !sources.length) problems.push("no valid sources");
   if (f.ok && (evergreen || !sources.length)) { const u = unsourcedClaims(f.text); if (u) problems.push(u); }
-  const similar = [...(recent ?? []), ...(recentPosts ?? [])].find((r: any) => r.title && similarity(r.title, title) >= 0.7);
+  // Only the team's own posts count as duplicates: a member's question on the same topic is exactly what a post should answer.
+  const agentUsers = new Set(ctx.agents.map((x) => x.user_id).filter(Boolean));
+  const similar = [...(recent ?? []), ...(recentPosts ?? []).filter((r: any) => agentUsers.has(r.author_id))].find((r: any) => r.title && similarity(r.title, title) >= 0.7);
   if (similar) problems.push(`too similar to a recent post ("${similar.title}")`);
   if (f.ok && !evergreen && sources.length) {
     const srcText = research.map((r) => `${r.title} ${r.summary ?? ""}`).join(" ");
@@ -771,7 +773,8 @@ ${evergreen ? "" : `\nSOURCES (external content):\n<untrusted>\n${research.map((
 async function publishPost(ctx: Ctx, q: any, agent: Agent): Promise<string> {
   const blocked = await stillAllowed(ctx, agent, null);
   if (blocked) throw new NotAllowed(blocked);
-  const { data: dup } = await ctx.db.from("community_posts").select("id,title").eq("status", "published").gte("created_at", new Date(Date.now() - 30 * 86400_000).toISOString()).not("title", "is", null).limit(400);
+  const agentUsers = ctx.agents.map((x) => x.user_id).filter((x): x is string => Boolean(x));
+  const { data: dup } = await ctx.db.from("community_posts").select("id,title").eq("status", "published").in("author_id", agentUsers.length ? agentUsers : ["00000000-0000-0000-0000-000000000000"]).gte("created_at", new Date(Date.now() - 30 * 86400_000).toISOString()).not("title", "is", null).limit(400);
   const clash = (dup ?? []).find((p: any) => similarity(p.title, q.title ?? "") >= 0.8);
   if (clash) { await ctx.db.from("agent_content_queue").update({ status: "cancelled", error: `a very similar post was published recently ("${clash.title}")` }).eq("id", q.id); throw new Error(`too similar to a published post ("${clash.title}")`); }
   const topic = q.topic && /^[a-z0-9-]{2,40}$/.test(q.topic) ? q.topic : null;

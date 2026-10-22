@@ -149,11 +149,11 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
       </nav>
 
       <Dialog open={Boolean(open)} onOpenChange={(o) => { if (!o) closeComposer(); }}>
-        <DialogContent className="max-h-[92dvh] w-[96vw] max-w-2xl overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-h-[92dvh] w-[96vw] max-w-2xl grid-cols-[minmax(0,1fr)] overflow-y-auto overflow-x-hidden overscroll-contain p-4 max-sm:left-0 max-sm:top-0 max-sm:h-[100dvh] max-sm:max-h-[100dvh] max-sm:w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:content-start max-sm:rounded-none max-sm:border-0 sm:p-6">
           <DialogTitle>{open?.groupId ? "Post in this group" : "Create a post"}</DialogTitle>
           <DialogDescription className="sr-only">Write a post for the EmmaForYou Community.</DialogDescription>
           {open && uid && (
-            <Composer uid={uid} staff={staff} initialKind={open.kind} groupId={open.groupId} autoFocus onCancel={closeComposer}
+            <Composer uid={uid} staff={staff} initialKind={open.kind} groupId={open.groupId} autoFocus stickyActions onCancel={closeComposer}
               onDone={(p) => { closeComposer(); createdSubs.forEach((fn) => fn(p)); if (p.status === "published") navigate({ to: "/community/post/$id", params: { id: p.id } }); }} />
           )}
         </DialogContent>

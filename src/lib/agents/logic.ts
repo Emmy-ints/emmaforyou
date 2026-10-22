@@ -71,12 +71,41 @@ export function fingerprint(text: string): string {
 }
 const STOP = new Set(["this", "that", "with", "your", "from", "have", "what", "when", "will", "about", "they", "their", "there", "into", "more", "than", "just", "like", "help", "need", "does", "make", "best", "good", "some", "here", "much", "very", "should", "could", "would"]);
 
-/** Word-overlap similarity between two titles (0..1), used to stop near-duplicate posts. */
+/** Content words of a text, lightly stemmed (plural/-ing/-ed) so "stores" and "store" match. */
+export function contentWords(text: string): Set<string> {
+  const stem = (w: string) => w.replace(/(ies)$/, "y").replace(/(ing|ed|es|s)$/, "").replace(/(.)\1$/, "$1");
+  return new Set(text.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").split(/\s+/).filter((w) => w.length > 2 && !STOP.has(w) && !EXTRA_STOP.has(w)).map(stem).filter((w) => w.length > 2));
+}
+const EXTRA_STOP = new Set(["the", "and", "for", "you", "are", "how", "why", "can", "our", "its", "it's", "into", "out", "your", "yours", "way", "ways", "tips", "guide", "step", "steps", "simple", "practical", "small", "business", "businesses", "owners", "today", "need", "know"]);
+
+/**
+ * Similarity of two titles (0..1). Jaccard over stemmed content words, but titles that share fewer
+ * than 3 meaningful words are never treated as duplicates (so "Shopify speed" doesn't block every Shopify post).
+ */
 export function similarity(a: string, b: string): number {
-  const A = new Set(fingerprint(a).split("-")), B = new Set(fingerprint(b).split("-"));
+  const A = contentWords(a), B = contentWords(b);
   if (!A.size || !B.size) return 0;
   let inter = 0; A.forEach((w) => { if (B.has(w)) inter++; });
-  return inter / Math.min(A.size, B.size);
+  if (inter < Math.min(3, A.size, B.size)) return inter / Math.max(A.size, B.size) * 0.5;
+  const jaccard = inter / (A.size + B.size - inter);
+  const containment = inter / Math.min(A.size, B.size);
+  return Math.max(jaccard, containment * 0.95);
+}
+
+/** Body overlap (0..1) between two posts, used against the same agent's recent posts to catch disguised duplicates. */
+export function bodyOverlap(a: string, b: string): number {
+  const A = contentWords(a.slice(0, 2500)), B = contentWords(b.slice(0, 2500));
+  if (A.size < 20 || B.size < 20) return 0;
+  let inter = 0; A.forEach((w) => { if (B.has(w)) inter++; });
+  return inter / (A.size + B.size - inter);
+}
+
+/** Figures (percentages, money, large numbers) in a sourced post must appear in its sources. */
+export function figuresNotInSources(body: string, sourceText: string): string[] {
+  const norm = (x: string) => x.replace(/[,\s]/g, "").toLowerCase();
+  const src = norm(sourceText);
+  const figs = body.match(/(\$|€|£|₦)\s?\d[\d,.]*\s?(k|m|bn|billion|million|thousand)?|\b\d[\d,.]*\s?%|\b\d{1,3}(,\d{3})+\b|\b\d+(\.\d+)?\s?(million|billion|thousand)\b/gi) ?? [];
+  return [...new Set(figs.map((f) => f.trim()))].filter((f) => { const n = norm(f).replace(/^[$€£₦]/, "").replace(/(k|m|bn|billion|million|thousand|%)$/, ""); return n.length > 0 && !src.includes(n); }).slice(0, 5);
 }
 
 /** Members can opt out in plain words; checked before any AI call. */

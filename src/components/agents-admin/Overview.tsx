@@ -14,6 +14,11 @@ interface Overview {
   per_agent: { id: string; name: string; slug: string; enabled: boolean; replies_7d: number; posts_7d: number; leads: number; qualified: number; won: number; tokens_month: number; last_run: string | null }[];
 }
 interface Settings { paused: boolean; paused_reason: string | null }
+interface Health {
+  day: string; scheduler: { job: string; schedule: string; active: boolean; last_run: string | null; failed_24h: number; runs_24h: number } | null;
+  worker: { last_completed: string | null; requested_1h: number; completed_1h: number }; stuck_tasks: number; overdue_tasks: number; dead_tasks_7d: number;
+  daily: { agents: number; met: number; failed: number; alerts: number }; leads_awaiting: number; replies_today: number; active_claims: number;
+}
 
 const n = (v: number | undefined | null) => (v ?? 0).toLocaleString();
 const cost = (v: number | null | undefined) => (v == null ? "not priced" : `$${Number(v).toFixed(2)}`);
@@ -21,6 +26,7 @@ const cost = (v: number | null | undefined) => (v == null ? "not priced" : `$${N
 export function OverviewTab({ onOpenAgent, agents = [] }: { onOpenAgent: (id: string) => void; agents?: AgentRow[] }) {
   const o = useLoad<Overview>(async () => check(await db.rpc("agent_admin_overview")));
   const s = useLoad<Settings>(async () => check(await db.from("agent_settings").select("paused,paused_reason").eq("id", 1).single()));
+  const h = useLoad<Health>(async () => check(await db.rpc("agent_admin_health")));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [reason, setReason] = useState("");
@@ -61,6 +67,8 @@ export function OverviewTab({ onOpenAgent, agents = [] }: { onOpenAgent: (id: st
         <ErrorText message={err} />
       </Card>
 
+      {h.data && <HealthCard h={h.data} />}
+      {h.error && <ErrorText message={`Health check unavailable: ${h.error}`} onRetry={h.reload} />}
       <TodayPanel agents={agents} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -109,3 +117,34 @@ export function OverviewTab({ onOpenAgent, agents = [] }: { onOpenAgent: (id: st
     </div>
   );
 }
+
+function HealthCard({ h }: { h: Health }) {
+  const lastRun = h.scheduler?.last_run ? Date.now() - new Date(h.scheduler.last_run).getTime() : null;
+  const lastDone = h.worker.last_completed ? Date.now() - new Date(h.worker.last_completed).getTime() : null;
+  const problems: string[] = [];
+  if (!h.scheduler) problems.push("The scheduler job is missing.");
+  else if (!h.scheduler.active) problems.push("The scheduler job is switched off.");
+  else if (lastRun == null || lastRun > 10 * 60_000) problems.push("The scheduler hasn't run in the last 10 minutes.");
+  if (h.scheduler && h.scheduler.failed_24h > 0) problems.push(`${h.scheduler.failed_24h} scheduler run(s) failed in the last 24 hours.`);
+  if (lastDone == null || lastDone > 15 * 60_000) problems.push("No worker run has completed in the last 15 minutes (is the latest version published and the site up?).");
+  if (h.stuck_tasks) problems.push(`${h.stuck_tasks} task(s) stuck past their lease (they are retried automatically).`);
+  if (h.overdue_tasks) problems.push(`${h.overdue_tasks} task(s) waiting more than 15 minutes past their run time.`);
+  if (h.daily.alerts) problems.push(`${h.daily.alerts} agent(s) couldn't publish today's post after repeated attempts.`);
+  return (
+    <Card title="System health">
+      {problems.length === 0 ? <p className="text-sm"><Pill tone="good">Healthy</Pill> <span className="text-muted-foreground">Scheduler and worker are running; nothing is stuck.</span></p>
+        : <ul className="space-y-1 text-sm">{problems.map((p) => <li key={p} className="text-amber-800 dark:text-amber-300">• {p}</li>)}</ul>}
+      <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4 lg:grid-cols-8">
+        <Stat label="Scheduler runs (24h)" value={h.scheduler ? `${h.scheduler.runs_24h}` : "—"} hint={h.scheduler ? `Every ${h.scheduler.schedule}; last ${when(h.scheduler.last_run)}` : undefined} />
+        <Stat label="Worker last completed" value={when(h.worker.last_completed)} />
+        <Stat label="Worker calls (1h)" value={`${h.worker.completed_1h}/${h.worker.requested_1h}`} hint="Completed / requested" />
+        <Stat label="Stuck / overdue" value={`${h.stuck_tasks} / ${h.overdue_tasks}`} warn={h.stuck_tasks + h.overdue_tasks > 0} />
+        <Stat label="Dead tasks (7d)" value={h.dead_tasks_7d} warn={h.dead_tasks_7d > 0} />
+        <Stat label={`Daily posts (${h.day})`} value={`${h.daily.met}/${h.daily.agents}`} warn={h.daily.alerts > 0} />
+        <Stat label="Replies today" value={h.replies_today} />
+        <Stat label="Leads awaiting Emmanuel" value={h.leads_awaiting} warn={h.leads_awaiting > 0} />
+      </div>
+    </Card>
+  );
+}
+

@@ -2,6 +2,9 @@
  * Strategy-call availability. Owner's working hours in West Africa Time (UTC+1, no daylight saving).
  * Change these to update the booking calendar everywhere.
  */
+/** Emmanuel's live Calendly page: real availability, confirmations and reminders come from Calendly. */
+export const CALENDLY_URL = "https://calendly.com/discosundaysllc/new-meeting";
+
 export const BOOKING = {
   ownerTimezone: "Africa/Lagos",
   utcOffsetMinutes: 60,

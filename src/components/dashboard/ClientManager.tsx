@@ -67,7 +67,7 @@ export function UpcomingCalls() {
   return (
     <section className="dash-card mt-4">
       <h2 className="dash-h2 flex items-center gap-2"><CalendarClock className="h-4 w-4" /> Upcoming strategy calls</h2>
-      <p className="mt-1 text-xs text-muted-foreground">Booked from /book. Times shown in your timezone; send the call link on WhatsApp.</p>
+      <p className="mt-1 text-xs text-muted-foreground">Bookings from the earlier on-site calendar. New calls are booked through Calendly and appear in your Calendly account.</p>
       {!rows ? <div className="mt-4"><Loader2 className="h-4 w-4 animate-spin" /></div> : rows.filter((r) => r.status === "booked").length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">No upcoming calls.</p>
       ) : (

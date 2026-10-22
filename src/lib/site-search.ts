@@ -24,7 +24,7 @@ const TOOLS: SearchDoc[] = [
   { kind: "Tool", title: "AI website makeover redesign", answer: "Upload a screenshot of your website and see it redesigned by AI in about a minute.", href: "/makeover" },
   { kind: "Tool", title: "Free smart contract check (Solidity security review)", answer: "Paste Solidity code and get a free security and gas review ranked by severity, with fixes. Not a substitute for a full audit.", href: "/smart-contract-check" },
   { kind: "Tool", title: "90-day goal planner and accountability", answer: "Turn a goal into monthly milestones and 12 weeks of concrete actions, with habits and a plan for your biggest obstacle.", href: "/goal-planner" },
-  { kind: "Tool", title: "Book a free strategy call", answer: "Pick a time for a free 30-minute strategy call with Emmanuel; the call link arrives on WhatsApp.", href: "/book" },
+  { kind: "Tool", title: "Book a free strategy call", answer: "Pick a time for a free 30-minute strategy call with Emmanuel; confirmation and reminders arrive by email.", href: "/book" },
   { kind: "Tool", title: "ROI calculator", answer: "Estimate the extra revenue from faster replies, automated follow-up and better marketing using your own numbers.", href: "/roi-calculator" },
   { kind: "Tool", title: "Business growth assessment", answer: "Eight questions that score how customers find you, buy from you and hear back from you, with a prioritised plan.", href: "/analyser" },
   { kind: "Tool", title: "Portfolio of client work", answer: "See websites, stores, automation and campaigns we've delivered for real clients.", href: "/portfolio" },

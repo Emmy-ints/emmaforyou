@@ -15,7 +15,7 @@ export const Route = createFileRoute("/cookies")({
 
 function CookiesPage() {
   return (
-    <LegalPage title="Cookie policy" updated="21 October 2026">
+    <LegalPage title="Cookie policy" updated="22 October 2026">
       <p>This page explains what this website stores on your device. In short: we don't use advertising cookies, we don't use third-party tracking scripts, and we honour Do Not Track and Global Privacy Control signals. What we do store is needed to make the site work or to remember choices you made.</p>
 
       <h2>What we store and why</h2>
@@ -31,7 +31,7 @@ function CookiesPage() {
       <p>You can clear this information at any time from your browser settings (look for "site data" or "cookies and site data"). Clearing it signs you out and resets your preferences and drafts. You can also turn on Do Not Track or Global Privacy Control, and we won't record visit statistics.</p>
 
       <h2>Embedded content</h2>
-      <p>Some pages link to or open services such as WhatsApp. Those services have their own policies, which apply once you use them.</p>
+      <p>Some pages link to or open services such as WhatsApp. On the booking page, Calendly's booking calendar loads only after you choose "Show available times"; Calendly may then set its own cookies under its own policy. These services have their own policies, which apply once you use them.</p>
 
       <h2>Changes</h2>
       <p>If we change what the site stores, we'll update this page and the date at the top. Questions? <Link to="/contact">Contact us</Link>.</p>

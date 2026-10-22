@@ -36,7 +36,7 @@ function Page() {
             <MessageCircle className="h-6 w-6 shrink-0 text-[#25d366]" /><span><span className="block font-semibold">WhatsApp</span><span className="block text-sm text-muted-foreground">Message Emmanuel directly. Best for quick questions and projects.</span></span>
           </a>
           <Link to="/book" className="flex items-start gap-4 rounded-[20px] border border-border bg-card p-5 hover:border-[var(--emma-violet)]">
-            <CalendarCheck className="h-6 w-6 shrink-0 text-[var(--emma-violet)]" /><span><span className="block font-semibold">Book a free strategy call</span><span className="block text-sm text-muted-foreground">30 minutes, at a time that suits you. Link sent on WhatsApp.</span></span>
+            <CalendarCheck className="h-6 w-6 shrink-0 text-[var(--emma-violet)]" /><span><span className="block font-semibold">Book a free strategy call</span><span className="block text-sm text-muted-foreground">30 minutes, at a time that suits you. Confirmation by email.</span></span>
           </Link>
           <button onClick={() => window.dispatchEvent(new Event("efy-open-ask"))} className="flex w-full items-start gap-4 rounded-[20px] border border-border bg-card p-5 text-left hover:border-[var(--emma-violet)]">
             <Sparkles className="h-6 w-6 shrink-0 text-[var(--emma-violet)]" /><span><span className="block font-semibold">Ask Emma AI</span><span className="block text-sm text-muted-foreground">Instant answers about services, prices and timelines, any time.</span></span>

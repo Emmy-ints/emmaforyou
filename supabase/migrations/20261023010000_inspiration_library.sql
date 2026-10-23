@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS public.inspiration_sources (
   theme text CHECK (theme IN ('light', 'dark')),
   enabled boolean NOT NULL DEFAULT true,
   use_source_images boolean NOT NULL DEFAULT true,
-  max_new_per_run integer NOT NULL DEFAULT 12 CHECK (max_new_per_run BETWEEN 0 AND 100),
+  max_new_per_run integer NOT NULL DEFAULT 20 CHECK (max_new_per_run BETWEEN 0 AND 100),
   max_sitemaps_per_run integer NOT NULL DEFAULT 2 CHECK (max_sitemaps_per_run BETWEEN 0 AND 20),
   refresh_hours integer NOT NULL DEFAULT 24 CHECK (refresh_hours BETWEEN 1 AND 720),
   min_delay_ms integer NOT NULL DEFAULT 1500 CHECK (min_delay_ms BETWEEN 500 AND 60000),

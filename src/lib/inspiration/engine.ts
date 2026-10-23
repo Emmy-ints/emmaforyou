@@ -9,7 +9,7 @@
  */
 import { adminDb } from "@/lib/ai/guard";
 import { allowed, parseRobots, USER_AGENT, type RobotsRules } from "./robots";
-import { canonicalKey, classify, cleanTitle, cleanUrl, hostOf, orderChildSitemaps, parseSitemap, pickOriginal, readPage, stripTracking, tagsFrom, type Kind, type SitemapEntry } from "./extract";
+import { canonicalKey, classify, cleanTitle, cleanUrl, hostOf, orderChildSitemaps, parseSitemap, pickOriginal, readPage, splitEmailTitle, stripTracking, tagsFrom, type Kind, type SitemapEntry } from "./extract";
 
 interface Source {
   id: string; name: string; home_url: string; category: string; default_kind: Kind; method: "sitemap" | "listing" | "manual";
@@ -197,10 +197,11 @@ async function processItem(db: any, c: Crawler, s: Source, q: any, run: Run): Pr
   const facets = classify({ defaultKind: hintKind ?? s.default_kind, sourcePlatform: s.platform, sourceTheme: s.theme, tags, byPrefix, title, description: meta.description, keywords: meta.keywords });
   if (hintKind) facets.kind = hintKind;
   const img = s.use_source_images || external ? cleanUrl(meta.image, g.url) : null;
-  const brand = isEmail ? (/^(.{2,60}?)\s*[:|–—-]\s+/.exec(title)?.[1] ?? null) : null;
+  const split = isEmail ? splitEmailTitle(title) : { subject: title, brand: null };
+  const brand = split.brand;
   const row = {
     source_id: s.id, listing_url: listing.toString().slice(0, 600), original_url: original ? original.toString().slice(0, 600) : null, canonical_key: key,
-    title: title.slice(0, 200), brand, description: meta.description, kind: facets.kind, tags: tags.slice(0, 16), industries: facets.industries, styles: facets.styles,
+    title: split.subject.slice(0, 200), brand, description: meta.description, kind: facets.kind, tags: tags.slice(0, 16), industries: facets.industries, styles: facets.styles,
     colors: facets.colors, theme: facets.theme, platform: facets.platform, image_url: img && img.protocol === "https:" ? img.toString().slice(0, 800) : null,
     image_status: img ? "unknown" : "none", attribution: `Listed on ${s.name}`, source_published_at: (() => { const d = meta.published ?? q.lastmod; const t = d ? Date.parse(d) : NaN; return Number.isFinite(t) ? new Date(t).toISOString() : null; })(),
     manual: Boolean(q.manual), updated_at: nowIso(),
@@ -247,68 +248,77 @@ async function verifyLinks(db: any, c: Crawler, limit: number, reverifyDays: num
 }
 
 // ------------------------------------------------------------------ the tick
-export async function inspirationTick(trigger: string): Promise<Record<string, unknown>> {
-  const db = await adminDb();
-  const { data: settings } = await db.from("inspiration_settings").select("*").eq("id", 1).maybeSingle();
-  if (!settings?.enabled) return { ok: true, skipped: "library crawling is switched off" };
-  const deadline = Date.now() + TIME_BUDGET_MS;
-  // A due source first; otherwise any source with pending pages (manual imports work for disabled sources too).
-  const { data: due } = await db.from("inspiration_sources").select("*").eq("enabled", true).neq("method", "manual").lte("next_run_at", nowIso()).order("next_run_at").limit(1);
-  let source: Source | null = due?.[0] ?? null;
-  if (!source) {
-    const { data: q } = await db.from("inspiration_queue").select("source_id,manual").eq("status", "pending").lte("next_attempt_at", nowIso()).order("next_attempt_at").limit(20);
-    const { data: all } = await db.from("inspiration_sources").select("*");
-    const pick = (q ?? []).find((x: any) => { const s = (all ?? []).find((y: any) => y.id === x.source_id); return s && (s.enabled || x.manual); });
-    source = pick ? (all ?? []).find((y: any) => y.id === pick.source_id) : null;
+type Settings = { enabled: boolean; verify_per_tick: number; reverify_days: number };
+
+/** Claim up to `max` sources for this tick: due ones first, then any with pages waiting (incl. manual imports). */
+async function claimSources(db: any, max: number): Promise<Source[]> {
+  const out: Source[] = [];
+  const { data: due } = await db.from("inspiration_sources").select("*").eq("enabled", true).neq("method", "manual").lte("next_run_at", nowIso()).order("next_run_at").limit(10);
+  const { data: q } = await db.from("inspiration_queue").select("source_id,manual").eq("status", "pending").lte("next_attempt_at", nowIso()).order("next_attempt_at").limit(200);
+  const { data: all } = await db.from("inspiration_sources").select("*");
+  const waiting = [...new Set((q ?? []).filter((x: any) => { const s = (all ?? []).find((y: any) => y.id === x.source_id); return s && (s.enabled || x.manual); }).map((x: any) => x.source_id))];
+  const candidates: { s: Source; due: boolean }[] = [...(due ?? []).map((s: Source) => ({ s, due: true })), ...waiting.filter((id) => !(due ?? []).some((d: Source) => d.id === id)).map((id) => ({ s: (all ?? []).find((y: any) => y.id === id) as Source, due: false }))];
+  for (const c of candidates) {
+    if (out.length >= max) break;
+    // Atomic claim: only one tick can move next_run_at forward from its current value.
+    const { data: claimed } = await db.from("inspiration_sources").update({ next_run_at: new Date(Date.now() + 15 * 60_000).toISOString(), last_run_at: nowIso() }).eq("id", c.s.id).eq("next_run_at", (c.s as any).next_run_at).select("*");
+    if (claimed?.length) out.push({ ...(claimed[0] as Source), state: c.s.state, _due: c.due } as Source);
   }
-  const run: Run = { discovered: 0, queued: 0, imported: 0, updated: 0, duplicates: 0, skipped: 0, failed: 0, verified: 0, broken: 0, requests: 0, errors: [], samples: [], notes: [] };
-  const c = new Crawler(deadline, source?.min_delay_ms ?? 1500);
-  let runId: number | null = null;
-  if (source) {
-    // Claim the source for this tick so a parallel tick can't crawl it at the same time.
-    const { data: claimed } = await db.from("inspiration_sources").update({ next_run_at: new Date(Date.now() + 15 * 60_000).toISOString(), last_run_at: nowIso() }).eq("id", source.id).lte("next_run_at", due?.[0]?.id === source.id ? nowIso() : "9999-01-01").select("id");
-    if (!claimed?.length) source = null;
-  }
-  if (source) {
-    const s = source;
-    const { data: r } = await db.from("inspiration_runs").insert({ source_id: s.id, trigger }).select("id").single();
-    runId = r?.id ?? null;
-    try {
-      const discoveryDue = s.method !== "manual" && s.enabled && (!s.last_discovery_at || Date.now() - Date.parse(s.last_discovery_at) > s.refresh_hours * 3600_000 || trigger === "admin");
-      if (discoveryDue) await discover(db, c, s, run);
-      let q = db.from("inspiration_queue").select("*").eq("source_id", s.id).eq("status", "pending").lte("next_attempt_at", nowIso()).order("manual", { ascending: false }).order("created_at").limit(Math.max(1, s.max_new_per_run));
-      if (!s.enabled) q = q.eq("manual", true);
-      const { data: items } = await q;
-      for (const it of items ?? []) { if (c.timeLeft() < 12000) break; await processItem(db, c, s, it, run); }
-    } catch (e) {
-      run.errors.push({ error: e instanceof Error ? e.message.slice(0, 300) : "run failed" });
-    }
-    // Status from what actually happened, never from intent.
-    const { count: pending } = await db.from("inspiration_queue").select("url", { count: "exact", head: true }).eq("source_id", s.id).eq("status", "pending");
-    const { count: total } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id);
-    const { count: withOriginal } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id).not("original_url", "is", null);
-    const blockedNote = run.notes.find((n) => /blocked|refused/.test(n));
-    let status = s.status, reason: string | null = null;
-    if (s.method === "manual") { status = "blocked"; }
-    else if ((total ?? 0) === 0 && blockedNote) { status = "blocked"; reason = blockedNote; }
-    else if ((total ?? 0) === 0 && run.notes.some((n) => n.startsWith("no individual"))) { status = "blocked"; reason = "No individual example links are published in pages we're allowed to read (the site renders them in the browser or hides them)."; }
-    else if ((total ?? 0) > 0) {
-      const expectsOriginal = s.default_kind !== "email" && s.category !== "design";
-      const lowOriginal = expectsOriginal && (withOriginal ?? 0) < (total ?? 0) * 0.5;
-      status = run.failed > run.imported + run.updated + run.duplicates || lowOriginal ? "partial" : "working";
-      reason = lowOriginal ? `Only ${withOriginal} of ${total} examples have a verified link to the original site; the others link to the gallery page.` : run.failed ? `${run.failed} page(s) failed this run and will be retried.` : null;
-    }
-    const ok = run.imported + run.updated + run.duplicates > 0 || (run.discovered > 0 && run.failed === 0);
-    await db.from("inspiration_sources").update({
-      status, status_reason: reason, imported_total: total ?? 0,
-      next_run_at: new Date(Date.now() + ((pending ?? 0) > 0 ? 10 * 60_000 : s.refresh_hours * 3600_000)).toISOString(),
-      ...(ok ? { last_success_at: nowIso() } : {}), updated_at: nowIso(),
-    }).eq("id", s.id);
-  }
-  await verifyLinks(db, c, settings.verify_per_tick ?? 6, settings.reverify_days ?? 14, run);
-  run.requests = c.requests;
-  const summary = { ok: true, source: source?.id ?? null, ...run, errors: run.errors.slice(0, 25), notes: run.notes.join("; ") || null };
-  if (runId) await db.from("inspiration_runs").update({ finished_at: nowIso(), ok: run.failed === 0 || run.imported + run.updated > 0, discovered: run.discovered, queued: run.queued, imported: run.imported, updated: run.updated, duplicates: run.duplicates, skipped: run.skipped, failed: run.failed, verified: run.verified, broken: run.broken, requests: run.requests, notes: summary.notes, errors: summary.errors, samples: run.samples }).eq("id", runId);
-  return summary;
+  return out;
 }
 
+async function runSource(db: any, s: Source, trigger: string, deadline: number): Promise<Run & { source: string }> {
+  const run: Run = { discovered: 0, queued: 0, imported: 0, updated: 0, duplicates: 0, skipped: 0, failed: 0, verified: 0, broken: 0, requests: 0, errors: [], samples: [], notes: [] };
+  const c = new Crawler(deadline, s.min_delay_ms ?? 1500);
+  const { data: r } = await db.from("inspiration_runs").insert({ source_id: s.id, trigger }).select("id").single();
+  const runId = r?.id ?? null;
+  try {
+    const discoveryDue = s.method !== "manual" && s.enabled && (!s.last_discovery_at || Date.now() - Date.parse(s.last_discovery_at) > s.refresh_hours * 3600_000 || (trigger === "admin" && !s.state?.discovery_done && Boolean((s as any)._due)));
+    if (discoveryDue) await discover(db, c, s, run);
+    let q = db.from("inspiration_queue").select("*").eq("source_id", s.id).eq("status", "pending").lte("next_attempt_at", nowIso()).order("manual", { ascending: false }).order("created_at").limit(Math.max(1, s.max_new_per_run));
+    if (!s.enabled) q = q.eq("manual", true);
+    const { data: items } = await q;
+    for (const it of items ?? []) { if (c.timeLeft() < 12000) break; await processItem(db, c, s, it, run); }
+  } catch (e) {
+    run.errors.push({ error: e instanceof Error ? e.message.slice(0, 300) : "run failed" });
+  }
+  // Status from what actually happened, never from intent.
+  const { count: pending } = await db.from("inspiration_queue").select("url", { count: "exact", head: true }).eq("source_id", s.id).eq("status", "pending");
+  const { count: total } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id);
+  const { count: withOriginal } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id).not("original_url", "is", null);
+  const blockedNote = run.notes.find((n) => /blocked|refused/.test(n));
+  let status = s.status, reason: string | null = (s as any).status_reason ?? null;
+  if (s.method === "manual") { status = "blocked"; reason = null; }
+  else if ((total ?? 0) === 0 && blockedNote) { status = "blocked"; reason = blockedNote === "the site refused our requests" ? "The site refuses automated requests (HTTP 403/429), so nothing can be collected without permission." : "robots.txt doesn't allow these pages to be read (or couldn't be read, which counts as no)."; }
+  else if ((total ?? 0) === 0 && run.notes.some((n) => n.startsWith("no individual"))) { status = "blocked"; reason = "No individual example links are published in pages we're allowed to read (the site renders them in the browser or hides them)."; }
+  else if ((total ?? 0) > 0) {
+    const expectsOriginal = s.default_kind !== "email" && s.category !== "design";
+    const lowOriginal = expectsOriginal && (withOriginal ?? 0) < (total ?? 0) * 0.5;
+    status = run.failed > run.imported + run.updated + run.duplicates || lowOriginal ? "partial" : "working";
+    reason = lowOriginal ? `Only ${withOriginal} of ${total} examples have a verified link to the original site; the others link to the gallery page.` : run.failed ? `${run.failed} page(s) failed in the last run and will be retried.` : null;
+  }
+  const ok = run.imported + run.updated + run.duplicates > 0 || (run.discovered > 0 && run.failed === 0);
+  await db.from("inspiration_sources").update({
+    status, status_reason: reason, imported_total: total ?? 0,
+    next_run_at: new Date(Date.now() + ((pending ?? 0) > 0 ? 10 * 60_000 : s.refresh_hours * 3600_000)).toISOString(),
+    ...(ok ? { last_success_at: nowIso() } : {}), updated_at: nowIso(),
+  }).eq("id", s.id);
+  run.requests = c.requests;
+  if (runId) await db.from("inspiration_runs").update({ finished_at: nowIso(), ok: run.failed === 0 || run.imported + run.updated > 0, discovered: run.discovered, queued: run.queued, imported: run.imported, updated: run.updated, duplicates: run.duplicates, skipped: run.skipped, failed: run.failed, verified: 0, broken: 0, requests: run.requests, notes: run.notes.join("; ") || null, errors: run.errors.slice(0, 25), samples: run.samples }).eq("id", runId);
+  return { ...run, source: s.id };
+}
+
+/** One tick: up to 3 sources in parallel (different sites, each with its own polite pacing), then link checks. */
+export async function inspirationTick(trigger: string): Promise<Record<string, unknown>> {
+  const db = await adminDb();
+  const { data: settings } = await db.from("inspiration_settings").select("*").eq("id", 1).maybeSingle() as { data: Settings | null };
+  if (!settings?.enabled) return { ok: true, skipped: "library crawling is switched off" };
+  const deadline = Date.now() + TIME_BUDGET_MS;
+  const sources = await claimSources(db, 3);
+  const results = await Promise.all(sources.map((s) => runSource(db, s, trigger, deadline).catch((e) => ({ source: s.id, error: e instanceof Error ? e.message : "failed" }))));
+  const check: Run = { discovered: 0, queued: 0, imported: 0, updated: 0, duplicates: 0, skipped: 0, failed: 0, verified: 0, broken: 0, requests: 0, errors: [], samples: [], notes: [] };
+  const c = new Crawler(deadline + 20_000, 1500);
+  await verifyLinks(db, c, settings.verify_per_tick ?? 6, settings.reverify_days ?? 14, check);
+  if (check.verified) await db.from("inspiration_runs").insert({ source_id: null, trigger: "verify", finished_at: nowIso(), ok: true, verified: check.verified, broken: check.broken, requests: c.requests });
+  return { ok: true, sources: results.map((r: any) => ({ source: r.source, discovered: r.discovered, queued: r.queued, imported: r.imported, updated: r.updated, duplicates: r.duplicates, skipped: r.skipped, failed: r.failed, notes: r.notes?.join?.("; ") || r.error || null })), verified: check.verified, broken: check.broken };
+}

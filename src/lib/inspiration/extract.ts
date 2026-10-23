@@ -55,7 +55,7 @@ export function orderChildSitemaps(entries: SitemapEntry[], pick?: string | null
 export interface Anchor { href: URL; text: string; rel: string; title: string; img: string | null }
 export interface PageMeta {
   title: string | null; description: string | null; image: string | null; canonical: string | null; siteName: string | null;
-  published: string | null; anchors: Anchor[]; jsonldUrls: string[]; keywords: string[];
+  published: string | null; anchors: Anchor[]; contentAnchors: Anchor[]; jsonldUrls: string[]; keywords: string[];
 }
 
 function attr(tag: string, name: string): string | null {
@@ -74,14 +74,21 @@ export function readPage(html: string, pageUrl: URL): PageMeta {
   const head = html.slice(0, 400_000);
   const title = meta(head, ["og:title", "twitter:title"]) ?? (/<title[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1] ?? null);
   const canonicalTag = /<link\b[^>]*rel=["']?canonical["']?[^>]*>/i.exec(head)?.[0];
-  const anchors: Anchor[] = [];
-  for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
-    if (anchors.length >= 3000) break;
-    const href = cleanUrl(attr(m[1], "href"), pageUrl);
-    if (!href) continue;
-    const img = /<img\b[^>]*>/i.exec(m[2])?.[0];
-    anchors.push({ href, text: text(m[2], 120), rel: (attr(m[1], "rel") ?? "").toLowerCase(), title: (attr(m[1], "title") ?? attr(m[1], "aria-label") ?? "").slice(0, 120), img: img ? (attr(img, "src") ?? attr(img, "data-src")) : null });
-  }
+  const links = (h: string) => {
+    const out: Anchor[] = [];
+    for (const m of h.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+      if (out.length >= 3000) break;
+      const href = cleanUrl(attr(m[1], "href"), pageUrl);
+      if (!href) continue;
+      const img = /<img\b[^>]*>/i.exec(m[2])?.[0];
+      out.push({ href, text: text(m[2], 120), rel: (attr(m[1], "rel") ?? "").toLowerCase(), title: (attr(m[1], "title") ?? attr(m[1], "aria-label") ?? "").slice(0, 120), img: img ? (attr(img, "src") ?? attr(img, "data-src")) : null });
+    }
+    return out;
+  };
+  const anchors = links(html);
+  // Tags are read only from the page's own content, never from site-wide menus, headers or footers.
+  const main = /<main\b[^>]*>([\s\S]*?)<\/main>/i.exec(html)?.[1] ?? /<article\b[^>]*>([\s\S]*?)<\/article>/i.exec(html)?.[1] ?? html;
+  const contentAnchors = links(main.replace(/<(nav|header|footer|aside)\b[\s\S]*?<\/\1>/gi, " "));
   const jsonldUrls: string[] = []; let published: string | null = null;
   for (const m of head.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
     try {
@@ -108,7 +115,7 @@ export function readPage(html: string, pageUrl: URL): PageMeta {
     canonical: canonicalTag ? attr(canonicalTag, "href") : null,
     siteName: (() => { const s = meta(head, ["og:site_name", "application-name"]); return s ? text(s, 80) : null; })(),
     published: published ?? meta(head, ["article:published_time"]),
-    anchors, jsonldUrls,
+    anchors, contentAnchors, jsonldUrls,
     keywords: kw ? kw.split(",").map((x) => text(x, 40).toLowerCase()).filter(Boolean).slice(0, 20) : [],
   };
 }
@@ -164,10 +171,10 @@ export function cleanTitle(raw: string | null, sourceName: string): string | nul
   const name = sourceName.toLowerCase().replace(/[^a-z0-9]/g, "");
   const parts = t.split(/\s+[|–—·•-]\s+|\s+::\s+/);
   if (parts.length > 1) {
-    const kept = parts.filter((p) => !p.toLowerCase().replace(/[^a-z0-9]/g, "").includes(name) && !/^(landing page|website|email|inspiration|design|examples?)( (design|inspiration|examples?))?$/i.test(p.trim()));
+    const kept = parts.filter((p) => !p.toLowerCase().replace(/[^a-z0-9]/g, "").includes(name) && !/^(landing page|website|email|inspiration|design|examples?|(desktop|mobile) email view)( (design|inspiration|examples?))?$/i.test(p.trim()));
     if (kept.length) t = kept.join(" | ");
   }
-  t = t.replace(/^email inspiration from\s+/i, "").replace(/\s+(website|landing page)\s+(design|inspiration)$/i, "");
+  t = t.replace(/^email inspiration from\s+/i, "").replace(/\s*\|?\s*(desktop|mobile) email view$/i, "").replace(/\s+(website|landing page)\s+(design|inspiration)$/i, "");
   return t.slice(0, 200) || null;
 }
 
@@ -175,7 +182,7 @@ export function cleanTitle(raw: string | null, sourceName: string): string | nul
 export function tagsFrom(meta: PageMeta, pageUrl: URL, prefixes: string[]): { tags: string[]; byPrefix: Record<string, string[]> } {
   const own = hostOf(pageUrl); const byPrefix: Record<string, string[]> = {}; const tags = new Set<string>();
   if (!prefixes.length) return { tags: [], byPrefix };
-  for (const a of meta.anchors) {
+  for (const a of meta.contentAnchors) {
     if (hostOf(a.href) !== own) continue;
     const pq = a.href.pathname + a.href.search;
     const p = prefixes.find((x) => pq.toLowerCase().startsWith(x.toLowerCase()));
@@ -185,7 +192,7 @@ export function tagsFrom(meta: PageMeta, pageUrl: URL, prefixes: string[]): { ta
     if (!label || label.length < 2 || label.length > 40 || /^(all|more|see all|view all|\d+)$/.test(label)) continue;
     (byPrefix[p] ??= []).includes(label) || byPrefix[p].push(label);
     tags.add(label);
-    if (tags.size >= 24) break;
+    if (tags.size >= 12) break;
   }
   return { tags: [...tags], byPrefix };
 }
@@ -253,4 +260,11 @@ export function classify(opts: { defaultKind: Kind; sourcePlatform: string | nul
     else if (/\b(saas)\b/.test(tagText) && (kind === "website" || kind === "landing_page")) kind = "saas";
   }
   return { kind, industries, styles: theme === "dark" && !styles.includes("dark") ? [...styles, "dark"].slice(0, 5) : styles, colors, theme, platform };
+}
+
+/** Email titles often read "<subject> from <Brand>": split them so the brand is filterable. */
+export function splitEmailTitle(title: string): { subject: string; brand: string | null } {
+  const m = /^(.{3,180}?)\s+from\s+([^|]{2,60})$/i.exec(title.trim());
+  if (m) return { subject: m[1].trim(), brand: m[2].trim() };
+  return { subject: title, brand: null };
 }

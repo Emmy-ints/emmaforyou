@@ -7,7 +7,7 @@ import ExampleCard from "@/components/inspiration/ExampleCard";
 import { useSaves } from "@/components/inspiration/useSaves";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
-import { CARD_COLUMNS, KIND_LABEL, KIND_ORDER, STATUS_LABEL, cleanQuery, validateSearch, type Example, type Facets, type Search as S, type SourceInfo } from "@/lib/inspiration/ui";
+import { CARD_COLUMNS, KIND_LABEL, KIND_ORDER, cleanQuery, validateSearch, type Example, type Facets, type Search as S, type SourceInfo } from "@/lib/inspiration/ui";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
@@ -159,19 +159,35 @@ function Page() {
           </section>
         </div>
 
-        <section className="mt-20" aria-labelledby="insp-sources">
-          <h2 id="insp-sources" className="font-display text-2xl font-semibold tracking-tight">Where these examples come from</h2>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">We read each gallery's public pages and sitemaps within its robots.txt rules, link to the original, and credit the source on every card. Preview images are the galleries' own link previews; nothing is copied or re-hosted. Sources that don't allow automated collection are added by hand only.</p>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sources.map((s) => (
-              <li key={s.id} className="rounded-2xl border border-border bg-card p-4">
-                <div className="flex items-start justify-between gap-2"><a href={s.home_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-[var(--emma-violet)]">{s.name}</a><span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${s.status === "working" ? "bg-emerald-500/12 text-emerald-700 dark:text-emerald-300" : s.status === "partial" ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : s.status === "blocked" ? "bg-red-500/10 text-red-700 dark:text-red-300" : "bg-muted text-muted-foreground"}`}>{STATUS_LABEL[s.status] ?? s.status}</span></div>
-                <p className="mt-1 text-xs text-muted-foreground">{(facets?.sources[s.id] ?? 0).toLocaleString()} examples{s.last_success_at ? ` · updated ${new Date(s.last_success_at).toLocaleDateString()}` : ""}</p>
-                {(s.restriction || s.status_reason) && <p className="mt-2 text-xs text-muted-foreground">{s.restriction ?? s.status_reason}</p>}
-              </li>
-            ))}
-          </ul>
+        <section className="mt-20 overflow-hidden rounded-[28px] border border-border bg-card p-6 shadow-[var(--shadow-card)] md:p-10" aria-labelledby="insp-next">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">From inspiration to launch</p>
+              <h2 id="insp-next" className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">Found a look you love? Let's build yours.</h2>
+              <p className="mt-3 text-muted-foreground">Save the sites, stores and emails that feel right, then bring them to a free strategy call. We'll turn what you like about them into a design that fits your brand, your customers and your goals.</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/book" className="btn-primary-gradient inline-flex min-h-11 items-center rounded-full px-6 text-sm font-semibold text-white">Book a free strategy call</Link>
+                <Link to="/intake" className="inline-flex min-h-11 items-center rounded-full border border-border px-6 text-sm font-semibold hover:border-[var(--emma-violet)]">Start a project</Link>
+                <Link to="/portfolio" className="inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-[var(--emma-violet)] hover:underline">See our client work →</Link>
+              </div>
+              {saves.saves.length > 0 && <p className="mt-4 text-sm text-muted-foreground">You've saved <strong className="text-foreground">{new Set(saves.saves.map((x) => x.example_id)).size}</strong> example{new Set(saves.saves.map((x) => x.example_id)).size === 1 ? "" : "s"}. Mention them when you book and we'll review them together.</p>}
+            </div>
+            <ol className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+              {[
+                ["1", "Collect", "Save examples by type, industry or style. Group them into collections for each project."],
+                ["2", "Discuss", "On a free call we look at what works in them and what your customers need."],
+                ["3", "Build", "We design and build your site, store or emails around your brand, ready to launch."],
+              ].map(([n, t, d]) => (
+                <li key={n} className="rounded-2xl border border-border bg-background p-5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--emma-violet)] text-sm font-bold text-white">{n}</span>
+                  <h3 className="mt-3 font-display text-lg font-semibold">{t}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{d}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
+        <p className="mt-6 text-xs text-muted-foreground">Examples are collected from public design galleries and remain the work of their owners. Each card credits the gallery it came from and links to the original.</p>
       </main>
 
       {filtersOpen && (

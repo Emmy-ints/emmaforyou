@@ -11,3 +11,8 @@ UPDATE public.inspiration_sources SET status_reason = 'The site refuses automate
 UPDATE public.inspiration_sources SET status = 'partial', status_reason = 'The site asked us to slow down (HTTP 429). We wait and try again at the next refresh.', last_discovery_at = NULL, next_run_at = now() + interval '6 hours' WHERE id = 'siteinspire' AND imported_total = 0;
 UPDATE public.inspiration_sources SET status = 'not_started', status_reason = 'Example pages found and waiting to be read.' WHERE id IN ('awwwards', 'framer-gallery') AND imported_total = 0;
 UPDATE public.inspiration_settings SET verify_per_tick = 12 WHERE id = 1;
+-- Listing sources now rotate through their category pages (from their sitemap or links found on earlier pages).
+UPDATE public.inspiration_sources SET sitemaps = '{https://land-book.com/sitemap.designs.xml}', sitemap_pick = '/design/', next_run_at = now() WHERE id = 'land-book';
+UPDATE public.inspiration_sources SET sitemaps = '{https://landingfolio.com/sitemap.xml}', sitemap_pick = '/inspiration/', next_run_at = now() WHERE id = 'landingfolio';
+UPDATE public.inspiration_sources SET next_run_at = now() WHERE id IN ('framer-gallery', 'awwwards', 'dark-design', 'designspiration');
+UPDATE public.inspiration_sources SET max_new_per_run = 30 WHERE id IN ('lapa-ninja', 'really-good-emails', 'one-page-love', 'email-love', 'saasframe');

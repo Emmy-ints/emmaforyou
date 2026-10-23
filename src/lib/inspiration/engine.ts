@@ -151,8 +151,7 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
     const list = [...pool];
     let cursor = Number(s.state.listing_cursor ?? 0) % Math.max(1, list.length);
     const batch = [...new Set([list[0], ...Array.from({ length: Math.min(5, Math.max(0, list.length - 1)) }, (_, i) => list[1 + ((cursor + i) % Math.max(1, list.length - 1))])])].filter(Boolean);
-    const wrapped = cursor + 5 >= list.length - 1;
-    cursor = list.length > 1 ? (cursor + 5) % (list.length - 1) : 0;
+    const nextCursor = cursor + 5;
     const prefixes = s.tag_prefixes.filter((x) => x.startsWith("/") && !x.includes("?"));
     for (const page of batch) {
       const u = cleanUrl(page); if (!u || c.timeLeft() < 15000) break;
@@ -167,6 +166,10 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
         if (!found.has(clean.toString())) found.set(clean.toString(), { lastmod: null, hint: { title: a.text || a.title || null } });
       }
     }
+    // A full pass is done when the rotation reaches the end of the (possibly grown) pool.
+    const finalLen = Math.min(pool.size, 400);
+    const wrapped = finalLen <= 1 || nextCursor >= finalLen - 1;
+    cursor = finalLen > 1 ? nextCursor % (finalLen - 1) : 0;
     await db.from("inspiration_sources").update({ state: { ...s.state, listing_pool: [...pool].slice(0, 400), listing_cursor: cursor, listing_sitemap_read: true, listing_cycle_done: Boolean(s.state.listing_cycle_done) || wrapped } }).eq("id", s.id);
     run.notes.push(`read ${batch.length} of ${pool.size} listing page(s)`);
   }
@@ -302,7 +305,7 @@ async function runSource(db: any, s: Source, trigger: string, deadline: number):
   const runId = r?.id ?? null;
   try {
     // Listing sources keep reading new category pages each run until they've covered them all once.
-    const listingBackfill = s.method === "listing" && !s.state?.listing_cycle_done && ((s.state?.listing_pool as string[] | undefined)?.length ?? s.listing_pages.length + (s.sitemaps.length ? 2 : 0)) > 1;
+    const listingBackfill = s.method === "listing" && !s.state?.listing_cycle_done && (((s.state?.listing_pool as string[] | undefined)?.length ?? 0) > 1 || s.tag_prefixes.some((x) => x.startsWith("/") && !x.includes("?")) || s.sitemaps.length > 0 || s.listing_pages.length > 1);
     const discoveryDue = s.method !== "manual" && s.enabled && (listingBackfill || !s.last_discovery_at || Date.now() - Date.parse(s.last_discovery_at) > s.refresh_hours * 3600_000 || (trigger === "admin" && !s.state?.discovery_done && Boolean((s as any)._due)));
     if (discoveryDue) await discover(db, c, s, run);
     let q = db.from("inspiration_queue").select("*").eq("source_id", s.id).eq("status", "pending").lte("next_attempt_at", nowIso()).order("manual", { ascending: false }).order("created_at").limit(Math.max(1, s.max_new_per_run));

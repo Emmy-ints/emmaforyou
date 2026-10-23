@@ -2,7 +2,7 @@
  * Where to send someone after signing in. Only paths on this site that belong to an
  * account area are allowed, so a crafted link can't bounce people to another website.
  */
-const ALLOWED = ["/account", "/portal", "/dashboard", "/community"];
+const ALLOWED = ["/account", "/portal", "/dashboard", "/community", "/inspiration"];
 
 export function safeNext(raw: unknown, fallback = "/account"): string {
   if (typeof raw !== "string") return fallback;

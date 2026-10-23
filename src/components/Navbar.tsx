@@ -41,6 +41,7 @@ const LEARN: Item[] = [
   { to: "/knowledge-base", name: "Knowledge Base", short: "In-depth playbooks" },
   { to: "/checklists", name: "Free Checklists", short: "Website, CRO, Web3, launch" },
   { to: "/compare", name: "Comparisons", short: "Shopify vs Woo, SEO vs ads" },
+  { to: "/inspiration", name: "Inspiration Library", short: "Real sites, stores and emails" },
   { to: "/free-resources", name: "Free Resources", short: "Templates and guides" },
   { to: "/faq", name: "FAQ", short: "Common questions answered" },
 ];

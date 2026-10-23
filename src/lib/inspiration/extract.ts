@@ -171,7 +171,7 @@ export function cleanTitle(raw: string | null, sourceName: string): string | nul
   const name = sourceName.toLowerCase().replace(/[^a-z0-9]/g, "");
   const parts = t.split(/\s+[|–—·•-]\s+|\s+::\s+/);
   if (parts.length > 1) {
-    const kept = parts.filter((p) => !p.toLowerCase().replace(/[^a-z0-9]/g, "").includes(name) && !/^(landing page|website|email|inspiration|design|examples?|(desktop|mobile) email view)( (design|inspiration|examples?))?$/i.test(p.trim()));
+    const kept = parts.filter((p) => !p.toLowerCase().replace(/[^a-z0-9]/g, "").includes(name) && !/^(landing page|website|email|inspiration|design|examples?|(desktop|mobile) email view|(one page )?website award|site of the day|honorable mention|developer award|template review( and demo)?)( (design|inspiration|examples?))?$/i.test(p.trim()));
     if (kept.length) t = kept.join(" | ");
   }
   t = t.replace(/^email inspiration from\s+/i, "").replace(/\s*\|?\s*(desktop|mobile) email view$/i, "").replace(/\s+(website|landing page)\s+(design|inspiration)$/i, "");
@@ -189,7 +189,7 @@ export function tagsFrom(meta: PageMeta, pageUrl: URL, prefixes: string[]): { ta
     if (!p) continue;
     const slug = decodeURIComponent(pq.slice(p.length)).split(/[/?&#]/)[0].replace(/[-_+]+/g, " ").trim();
     const label = (a.text && a.text.length <= 40 ? a.text : slug).toLowerCase().replace(/[^a-z0-9&.+# -]/g, "").replace(/\s+/g, " ").trim();
-    if (!label || label.length < 2 || label.length > 40 || /^(all|more|see all|view all|\d+)$/.test(label)) continue;
+    if (!label || label.length < 2 || label.length > 40 || /^(all|more|see all|view all|\d+)$/.test(label) || /\b(view all|see all|versions?|load more|next|previous|page \d+)\b/.test(label)) continue;
     (byPrefix[p] ??= []).includes(label) || byPrefix[p].push(label);
     tags.add(label);
     if (tags.size >= 12) break;

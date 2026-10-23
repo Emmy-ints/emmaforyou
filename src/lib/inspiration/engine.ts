@@ -97,7 +97,7 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
   const matches = (u: URL) => hostOf(u) === hostOf(home) && (!inc || inc.test(u.pathname)) && !(exc && exc.test(u.pathname));
   const found = new Map<string, { lastmod: string | null; hint: Record<string, unknown> }>();
   const seen: string[] = [];
-  let refused = 0, robotsBlocked = 0, fetched = 0;
+  let refused = 0, robotsBlocked = 0, fetched = 0, rateLimited = 0;
 
   if (s.method === "sitemap") {
     let roots = s.sitemaps;
@@ -110,7 +110,7 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
     const readSitemap = async (loc: string, depth: number): Promise<void> => {
       const u = cleanUrl(loc); if (!u || c.timeLeft() < 15000) return;
       const g = await c.get(u); fetched++;
-      if (!g.ok) { if (g.blocked === "robots") robotsBlocked++; if (g.blocked === "refused") refused++; run.errors.push({ url: u.toString(), error: g.error ?? `HTTP ${g.status}` }); return; }
+      if (!g.ok) { if (g.blocked === "robots") robotsBlocked++; if (g.blocked === "refused") { if (g.status === 429) rateLimited++; else refused++; } run.errors.push({ url: u.toString(), error: g.error ?? `HTTP ${g.status}` }); return; }
       const sm = parseSitemap(g.body);
       if (sm.kind === "index" && depth < 2) {
         const ordered = orderChildSitemaps(sm.entries, s.sitemap_pick);
@@ -135,7 +135,7 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
     for (const page of s.listing_pages.slice(0, 6)) {
       const u = cleanUrl(page); if (!u || c.timeLeft() < 15000) break;
       const g = await c.get(u); fetched++;
-      if (!g.ok) { if (g.blocked === "robots") robotsBlocked++; if (g.blocked === "refused") refused++; run.errors.push({ url: u.toString(), error: g.error ?? `HTTP ${g.status}` }); continue; }
+      if (!g.ok) { if (g.blocked === "robots") robotsBlocked++; if (g.blocked === "refused") { if (g.status === 429) rateLimited++; else refused++; } run.errors.push({ url: u.toString(), error: g.error ?? `HTTP ${g.status}` }); continue; }
       const meta = readPage(g.body, g.url);
       for (const a of meta.anchors) {
         if (hostOf(a.href) === hostOf(home) && seen.length < 12 && !seen.includes(a.href.pathname)) seen.push(a.href.pathname);
@@ -149,7 +149,8 @@ async function discover(db: any, c: Crawler, s: Source, run: Run): Promise<void>
   run.discovered += found.size;
   if (!found.size) {
     run.samples = seen;
-    if (fetched && (refused + robotsBlocked) >= fetched) run.notes.push(robotsBlocked ? "discovery blocked by robots.txt" : "the site refused our requests");
+    if (fetched && rateLimited && rateLimited >= fetched) run.notes.push("rate limited by the site (HTTP 429)");
+    else if (fetched && (refused + robotsBlocked) >= fetched) run.notes.push(robotsBlocked ? "discovery blocked by robots.txt" : "the site refused our requests");
     else run.notes.push("no individual example URLs found in the published pages");
   } else run.samples = [...found.keys()].slice(0, 5);
 
@@ -187,6 +188,8 @@ async function processItem(db: any, c: Crawler, s: Source, q: any, run: Run): Pr
   const external = hostOf(g.url) !== hostOf(new URL(s.home_url));
   const title = cleanTitle(meta.title ?? (q.hint?.title as string | undefined) ?? null, s.name) ?? (external ? meta.siteName : null);
   if (!title) return skip("no title on the page");
+  // Vendor template reviews and template/theme catalogues aren't real-world examples.
+  if (/\btemplate review\b|^[\w\s]{0,30}\btemplates?$/i.test(meta.title ?? "") && !q.manual) return skip("template listing, not a real example");
   const isEmail = s.default_kind === "email";
   // A manually imported link to the site itself is its own original; gallery pages point to it.
   const original = isEmail ? null : external ? stripTracking(g.url) : pickOriginal(meta, g.url, s.id === "dark-design" ? ["framer.com"] : []);
@@ -286,9 +289,11 @@ async function runSource(db: any, s: Source, trigger: string, deadline: number):
   const { count: pending } = await db.from("inspiration_queue").select("url", { count: "exact", head: true }).eq("source_id", s.id).eq("status", "pending");
   const { count: total } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id);
   const { count: withOriginal } = await db.from("inspiration_examples").select("id", { count: "exact", head: true }).eq("source_id", s.id).not("original_url", "is", null);
+  const rateLimitedNote = run.notes.includes("rate limited by the site (HTTP 429)");
   const blockedNote = run.notes.find((n) => /blocked|refused/.test(n));
   let status = s.status, reason: string | null = (s as any).status_reason ?? null;
   if (s.method === "manual") { status = "blocked"; reason = null; }
+  else if ((total ?? 0) === 0 && rateLimitedNote) { status = "partial"; reason = "The site asked us to slow down (HTTP 429). We wait and try again at the next refresh."; }
   else if ((total ?? 0) === 0 && blockedNote) { status = "blocked"; reason = blockedNote === "the site refused our requests" ? "The site refuses automated requests (HTTP 403/429), so nothing can be collected without permission." : "robots.txt doesn't allow these pages to be read (or couldn't be read, which counts as no)."; }
   else if ((total ?? 0) === 0 && run.notes.some((n) => n.startsWith("no individual"))) { status = "blocked"; reason = "No individual example links are published in pages we're allowed to read (the site renders them in the browser or hides them)."; }
   else if ((total ?? 0) > 0) {
@@ -300,7 +305,8 @@ async function runSource(db: any, s: Source, trigger: string, deadline: number):
   const ok = run.imported + run.updated + run.duplicates > 0 || (run.discovered > 0 && run.failed === 0);
   await db.from("inspiration_sources").update({
     status, status_reason: reason, imported_total: total ?? 0,
-    next_run_at: new Date(Date.now() + ((pending ?? 0) > 0 ? 10 * 60_000 : s.refresh_hours * 3600_000)).toISOString(),
+    next_run_at: new Date(Date.now() + (rateLimitedNote ? 6 * 3600_000 : (pending ?? 0) > 0 ? 10 * 60_000 : s.refresh_hours * 3600_000)).toISOString(),
+    ...(rateLimitedNote ? { last_discovery_at: null } : {}),
     ...(ok ? { last_success_at: nowIso() } : {}), updated_at: nowIso(),
   }).eq("id", s.id);
   run.requests = c.requests;

@@ -68,6 +68,9 @@ CREATE POLICY insp_sources_read ON public.inspiration_sources FOR SELECT TO anon
 DROP POLICY IF EXISTS insp_sources_admin ON public.inspiration_sources;
 CREATE POLICY insp_sources_admin ON public.inspiration_sources FOR UPDATE TO authenticated USING (public.has_role(auth.uid(), 'admin'::app_role)) WITH CHECK (public.has_role(auth.uid(), 'admin'::app_role));
 
+-- array_to_string isn't marked immutable, so generated columns use this wrapper.
+CREATE OR REPLACE FUNCTION public.insp_join(a text[]) RETURNS text LANGUAGE sql IMMUTABLE PARALLEL SAFE AS $$ SELECT coalesce(array_to_string(a, ' '), '') $$;
+
 CREATE TABLE IF NOT EXISTS public.inspiration_examples (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   source_id text NOT NULL REFERENCES public.inspiration_sources(id) ON DELETE CASCADE,
@@ -98,7 +101,7 @@ CREATE TABLE IF NOT EXISTS public.inspiration_examples (
   updated_at timestamptz NOT NULL DEFAULT now(),
   search tsvector GENERATED ALWAYS AS (
     setweight(to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(brand, '')), 'A') ||
-    setweight(to_tsvector('simple', array_to_string(tags, ' ') || ' ' || array_to_string(industries, ' ') || ' ' || array_to_string(styles, ' ') || ' ' || coalesce(platform, '') || ' ' || kind), 'B') ||
+    setweight(to_tsvector('simple', public.insp_join(tags) || ' ' || public.insp_join(industries) || ' ' || public.insp_join(styles) || ' ' || coalesce(platform, '') || ' ' || kind), 'B') ||
     setweight(to_tsvector('english', coalesce(description, '')), 'C')
   ) STORED
 );

@@ -293,6 +293,7 @@ async function runSource(db: any, s: Source, trigger: string, deadline: number):
   const blockedNote = run.notes.find((n) => /blocked|refused/.test(n));
   let status = s.status, reason: string | null = (s as any).status_reason ?? null;
   if (s.method === "manual") { status = "blocked"; reason = null; }
+  else if ((total ?? 0) === 0 && (pending ?? 0) > 0) { status = "not_started"; reason = `${pending} example page(s) found and waiting to be read.`; }
   else if ((total ?? 0) === 0 && rateLimitedNote) { status = "partial"; reason = "The site asked us to slow down (HTTP 429). We wait and try again at the next refresh."; }
   else if ((total ?? 0) === 0 && blockedNote) { status = "blocked"; reason = blockedNote === "the site refused our requests" ? "The site refuses automated requests (HTTP 403/429), so nothing can be collected without permission." : "robots.txt doesn't allow these pages to be read (or couldn't be read, which counts as no)."; }
   else if ((total ?? 0) === 0 && run.notes.some((n) => n.startsWith("no individual"))) { status = "blocked"; reason = "No individual example links are published in pages we're allowed to read (the site renders them in the browser or hides them)."; }

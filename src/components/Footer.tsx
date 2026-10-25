@@ -57,6 +57,7 @@ export default function Footer() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { ready, signedIn, summary } = useAccount();
   const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !/^\/(fr|de)(\/|$)/.test(pathname);
+  const showClosing = !/^\/(book|contact|intake|login|account|portal|dashboard)(\/|$)/.test(pathname);
   const account: L[] = ready && signedIn
     ? [{ to: "/account", label: "Your account" }, { to: "/portal", label: "Client portal" }, { to: "/community/settings", label: "Community profile" }, ...(summary?.admin ? [{ to: "/dashboard", label: "Owner dashboard" }] : [])]
     : [{ to: "/login", label: "Sign in" }, { to: "/login", label: "Create account", search: { mode: "signup" } }, { to: "/login", label: "Forgot password", search: { mode: "forgot" } }, { to: "/portal", label: "Client portal" }];
@@ -65,6 +66,20 @@ export default function Footer() {
     <footer className="site-footer band-ink">
       <div aria-hidden="true" className="footer-glow" />
       <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-14 sm:px-6 md:pt-16 lg:px-8">
+        {showClosing && (
+          <section aria-labelledby="footer-closing" className="lg-strong relative mb-14 overflow-hidden rounded-[32px] px-6 py-12 sm:px-10 md:py-16" style={{ background: "linear-gradient(150deg, rgba(255,255,255,.07), rgba(255,255,255,.015))" }}>
+            <div aria-hidden="true" className="efy-orb -right-24 -top-24 w-[340px] opacity-80 md:-right-10 md:w-[420px]"><div className="efy-orb-fallback" /></div>
+            <div className="relative max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-cyan)]">Your next chapter</p>
+              <h2 id="footer-closing" className="mt-3 font-display text-3xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl">Let's build what your customers see next.</h2>
+              <p className="mt-4 max-w-xl text-muted-foreground">A free 30-minute strategy call: we look at how customers find you, contact you and buy from you today, and map the next steps.</p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link to="/book" className="btn-gold inline-flex min-h-11 items-center gap-2 rounded-full px-6 py-3 text-[15px]"><CalendarDays className="h-4 w-4" aria-hidden="true" />Book a free call</Link>
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hero-ghost-btn"><MessageCircle className="h-4 w-4" aria-hidden="true" />Chat on WhatsApp<span className="sr-only"> (opens in a new tab)</span></a>
+              </div>
+            </div>
+          </section>
+        )}
         {showSignup && <div className="mb-14"><NewsletterSignup source="footer" variant="band" /></div>}
 
         <div className="flex flex-col gap-12">
@@ -116,6 +131,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      <p aria-hidden="true" className="pointer-events-none select-none overflow-hidden text-center font-display text-[18vw] font-bold leading-[0.8] tracking-[-0.06em] text-transparent opacity-60 [-webkit-text-stroke:1px_rgba(139,123,255,.22)] md:text-[13vw]">EmmaForYou</p>
     </footer>
   );
 }

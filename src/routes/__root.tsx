@@ -11,6 +11,7 @@ import appCss from "../styles.css?url";
 import PageTranslator from "../components/tools/PageTranslator";
 import VoiceAsk from "../components/tools/VoiceAsk";
 import ConversionLayer from "../components/tools/ConversionLayer";
+import MotionRuntime from "../components/future/MotionRuntime";
 
 function NotFoundComponent() {
   return (
@@ -81,6 +82,7 @@ function RootComponent() {
   return (
     <I18nProvider>
       <AnalyticsTracker />
+      <MotionRuntime />
       <Outlet />
       <PageTranslator />
       <VoiceAsk />

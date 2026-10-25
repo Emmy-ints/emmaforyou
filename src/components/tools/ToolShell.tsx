@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
+import { KineticText } from "../future/Kinetic";
 
 /** Shared layout for the interactive tools: one H1, a direct intro, the tool, then plain-language answers. */
 export default function ToolShell({ eyebrow, title, intro, children, answers, width = "max-w-6xl" }: {
@@ -15,13 +16,14 @@ export default function ToolShell({ eyebrow, title, intro, children, answers, wi
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className={`mx-auto ${width} px-5 pb-24 pt-32`}>
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">{eyebrow}</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+      <main id="main-content" className={`relative mx-auto ${width} px-5 pb-24 pt-32`}>
+        <div aria-hidden="true" className="pointer-events-none absolute -top-10 left-1/2 z-0 h-[420px] w-[min(1100px,100vw)] -translate-x-1/2 bg-[radial-gradient(closest-side,rgba(109,91,255,.16),transparent)] blur-2xl" />
+        <div className="relative max-w-3xl">
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[var(--emma-cyan)] shadow-[0_0_12px_var(--emma-cyan)]" />{eyebrow}</p>
+          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl"><KineticText text={title} base={60} /></h1>
           <p className="mt-4 text-lg text-muted-foreground">{intro}</p>
         </div>
-        <div className="mt-10">{children}</div>
+        <div className="relative mt-10">{children}</div>
         {answers && answers.length > 0 && (
           <section className="mt-16 max-w-3xl" aria-labelledby="tool-answers">
             <h2 id="tool-answers" className="font-display text-2xl font-semibold tracking-tight">Good to know</h2>

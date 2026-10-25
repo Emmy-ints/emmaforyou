@@ -17,6 +17,9 @@ import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
+import GrowthStory from "../components/home/GrowthStory";
+import FutureOrb from "../components/future/FutureOrb";
+import { KineticText } from "../components/future/Kinetic";
 import SelectedWork from "../components/home/SelectedWork";
 import ToolsHub from "../components/home/ToolsHub";
 import ResultsTicker from "../components/home/ResultsTicker";
@@ -63,8 +66,10 @@ function HomePage() {
         <section className="hero-ink relative overflow-hidden">
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
+          {/* Signature liquid-glass orb (live WebGL, CSS fallback) floating behind the product demo */}
+          <FutureOrb className="-right-40 -top-6 z-0 w-[300px] opacity-40 sm:-right-36 sm:top-16 sm:w-[460px] sm:opacity-60 lg:-right-10 lg:top-16 lg:w-[600px] lg:opacity-100" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-32 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:pb-28 lg:pt-40">
-            <div className="hero-ink-copy">
+            <div className="hero-ink-copy relative z-10">
               <motion.p
                 className="hero-kicker"
                 initial={{ opacity: 0, y: 12 }}
@@ -74,14 +79,10 @@ function HomePage() {
                 <span className="hero-kicker-dot" aria-hidden="true" />
                 AI-native growth studio for ambitious businesses
               </motion.p>
-              <motion.h1
-                className="hero-ink-title"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {t("hero_title_1")} {t("hero_title_2")} {t("hero_title_3")}<span className="whitespace-nowrap">{t("hero_title_4")}.</span>
-              </motion.h1>
+              <h1 className="hero-ink-title">
+                <KineticText text={`${t("hero_title_1")} ${t("hero_title_2")} ${t("hero_title_3")}${t("hero_title_4")}.`} shine={t("hero_title_4").split(" ")} />
+              </h1>
+              <p className="mt-4 text-sm font-medium tracking-wide text-[var(--emma-cyan)]/90">Helping businesses grow — from Lagos to the world.</p>
               <motion.p
                 className="hero-ink-sub"
                 initial={{ opacity: 0, y: 16 }}
@@ -116,6 +117,7 @@ function HomePage() {
               </motion.ul>
             </div>
             <motion.div
+              className="relative z-10"
               initial={{ opacity: 0, y: 30, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -126,6 +128,7 @@ function HomePage() {
         </section>
 
         <ResultsTicker />
+        <GrowthStory />
         <SelectedWork />
         <ToolsHub />
         <SocialProofBar />

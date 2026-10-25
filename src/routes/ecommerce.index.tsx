@@ -80,7 +80,7 @@ function Hub() {
       <section className="mt-10 grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-3">
         <div><h2 className="font-display text-base font-bold">What these tools can see</h2><p className="mt-1 text-sm text-muted-foreground">Public store pages, competitors' public product data, our tracked industry news, and any numbers or exports you provide.</p></div>
         <div><h2 className="font-display text-base font-bold">What they can't</h2><p className="mt-1 text-sm text-muted-foreground">Your private traffic, orders or ad spend unless you enter or upload them. No connected-store integrations are live yet; see Integrations.</p></div>
-        <div><h2 className="font-display text-base font-bold">Want it done for you?</h2><p className="mt-1 text-sm text-muted-foreground">Our team builds stores, product pages and automations. <Link to="/services/$slug" params={{ slug: "shopify-ecommerce" }} className="font-semibold text-foreground underline">Ecommerce services</Link> or <Link to="/book" className="font-semibold text-foreground underline">book a call</Link>.</p></div>
+        <div><h2 className="font-display text-base font-bold">Want it done for you?</h2><p className="mt-1 text-sm text-muted-foreground">Our team builds stores, product pages and automations. <Link to="/services/$slug" params={{ slug: "ecommerce" }} className="font-semibold text-foreground underline">Ecommerce services</Link> or <Link to="/book" className="font-semibold text-foreground underline">book a call</Link>.</p></div>
       </section>
       <p className="mt-6 text-sm text-muted-foreground">Questions? Ask in the <Link to="/community" className="font-semibold text-foreground underline">Community</Link>.</p>
     </div>

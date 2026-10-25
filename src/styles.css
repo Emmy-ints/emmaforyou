@@ -1206,6 +1206,8 @@ html[data-motion="cinematic"] { --rv-distance: 30px; --rv-blur: 8px; --rv-dur: 1
 /* Atmosphere: soft light fields behind every page that uses the standard page wrapper */
 body { background-image: var(--atmos); background-attachment: fixed; }
 .min-h-screen.bg-background { background-image: var(--atmos); background-attachment: fixed; }
+/* Fixed backgrounds repaint on every scroll on many phones: let the light fields scroll there. */
+@media (pointer: coarse), (max-width: 1023px) { body, .min-h-screen.bg-background { background-attachment: scroll; } }
 .efy-grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 :root[data-theme="dark"] .efy-grain { opacity: .05; }

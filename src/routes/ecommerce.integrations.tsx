@@ -69,7 +69,7 @@ function Integrations() {
             </li>
           ))}</ul>
         </Card>
-        <p className="text-xs text-muted-foreground">Need a store connected now? Our team can set up reporting directly in your own accounts. <Link to="/services/ecommerce" className="underline">Ecommerce services</Link> · <Link to="/book" className="underline">Book a call</Link></p>
+        <p className="text-xs text-muted-foreground">Need a store connected now? Our team can set up reporting directly in your own accounts. <Link to="/services/$slug" params={{ slug: "shopify-ecommerce" }} className="underline">Ecommerce services</Link> · <Link to="/book" className="underline">Book a call</Link></p>
       </div>
     </div>
   );

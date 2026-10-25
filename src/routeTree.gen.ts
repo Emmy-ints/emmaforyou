@@ -9,35 +9,143 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WhyEmmaforyouRouteImport } from './routes/why-emmaforyou'
+import { Route as WebsiteAuditRouteImport } from './routes/website-audit'
 import { Route as WatchRouteImport } from './routes/watch'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as ToolsRouteImport } from './routes/tools'
 import { Route as TestimonialsRouteImport } from './routes/testimonials'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SmartContractCheckRouteImport } from './routes/smart-contract-check'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RoiCalculatorRouteImport } from './routes/roi-calculator'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as ProposalRouteImport } from './routes/proposal'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PortalRouteImport } from './routes/portal'
+import { Route as NewsletterRouteImport } from './routes/newsletter'
+import { Route as MakeoverRouteImport } from './routes/makeover'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as IntakeRouteImport } from './routes/intake'
+import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as GrowthQuizRouteImport } from './routes/growth-quiz'
-import { Route as FreeResourcesRouteImport } from './routes/free-resources'
+import { Route as GoalPlannerRouteImport } from './routes/goal-planner'
+import { Route as FrRouteImport } from './routes/fr'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EmailGeneratorRouteImport } from './routes/email-generator'
+import { Route as EcommerceRouteImport } from './routes/ecommerce'
+import { Route as DeRouteImport } from './routes/de'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CookiesRouteImport } from './routes/cookies'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CasesRouteImport } from './routes/cases'
+import { Route as BookRouteImport } from './routes/book'
 import { Route as AnalyserRouteImport } from './routes/analyser'
+import { Route as AiReceptionistRouteImport } from './routes/ai-receptionist'
 import { Route as AffiliateRouteImport } from './routes/affiliate'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolutionsIndexRouteImport } from './routes/solutions.index'
+import { Route as ServicesIndexRouteImport } from './routes/services.index'
+import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as KnowledgeBaseIndexRouteImport } from './routes/knowledge-base.index'
+import { Route as InspirationIndexRouteImport } from './routes/inspiration.index'
+import { Route as FreeResourcesIndexRouteImport } from './routes/free-resources.index'
+import { Route as EcommerceIndexRouteImport } from './routes/ecommerce.index'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
+import { Route as CommunityIndexRouteImport } from './routes/community.index'
+import { Route as ChecklistsIndexRouteImport } from './routes/checklists.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as SolutionsAppPlannerRouteImport } from './routes/solutions.app-planner'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
+import { Route as PortfolioSlugRouteImport } from './routes/portfolio.$slug'
 import { Route as NicheSlugRouteImport } from './routes/niche.$slug'
 import { Route as KnowledgeBaseSlugRouteImport } from './routes/knowledge-base.$slug'
+import { Route as InspirationIdRouteImport } from './routes/inspiration.$id'
+import { Route as FreeResourcesSlugRouteImport } from './routes/free-resources.$slug'
 import { Route as ExpertiseSlugRouteImport } from './routes/expertise.$slug'
+import { Route as EcommerceWorkspaceRouteImport } from './routes/ecommerce.workspace'
+import { Route as EcommerceStartRouteImport } from './routes/ecommerce.start'
+import { Route as EcommerceResearchRouteImport } from './routes/ecommerce.research'
+import { Route as EcommerceProfitRouteImport } from './routes/ecommerce.profit'
+import { Route as EcommercePlanRouteImport } from './routes/ecommerce.plan'
+import { Route as EcommerceMarketingRouteImport } from './routes/ecommerce.marketing'
+import { Route as EcommerceIntegrationsRouteImport } from './routes/ecommerce.integrations'
+import { Route as EcommerceGuideRouteImport } from './routes/ecommerce.guide'
+import { Route as EcommerceGrowRouteImport } from './routes/ecommerce.grow'
+import { Route as EcommerceDiagnoseRouteImport } from './routes/ecommerce.diagnose'
+import { Route as EcommerceCompetitorsRouteImport } from './routes/ecommerce.competitors'
+import { Route as DashboardInspirationRouteImport } from './routes/dashboard_.inspiration'
+import { Route as DashboardAgentsRouteImport } from './routes/dashboard_.agents'
+import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
+import { Route as CommunitySettingsRouteImport } from './routes/community.settings'
+import { Route as CommunitySearchRouteImport } from './routes/community.search'
+import { Route as CommunitySavedRouteImport } from './routes/community.saved'
+import { Route as CommunityNotificationsRouteImport } from './routes/community.notifications'
+import { Route as CommunityModerationRouteImport } from './routes/community.moderation'
+import { Route as CommunityGuidelinesRouteImport } from './routes/community.guidelines'
+import { Route as CommunityGroupsRouteImport } from './routes/community.groups'
+import { Route as ChecklistsSlugRouteImport } from './routes/checklists.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ApiTranslateRouteImport } from './routes/api/translate'
+import { Route as ApiReceptionistRouteImport } from './routes/api/receptionist'
 import { Route as ApiPrototypeRouteImport } from './routes/api/prototype'
+import { Route as ApiProposalRouteImport } from './routes/api/proposal'
+import { Route as ApiMakeoverRouteImport } from './routes/api/makeover'
+import { Route as ApiInspirationTickRouteImport } from './routes/api/inspiration-tick'
+import { Route as ApiIndexnowRouteImport } from './routes/api/indexnow'
+import { Route as ApiGoalPlanRouteImport } from './routes/api/goal-plan'
+import { Route as ApiEmailSequenceRouteImport } from './routes/api/email-sequence'
+import { Route as ApiEcomScanRouteImport } from './routes/api/ecom-scan'
+import { Route as ApiEcomResearchRouteImport } from './routes/api/ecom-research'
+import { Route as ApiEcomGuideRouteImport } from './routes/api/ecom-guide'
+import { Route as ApiEcomAuditRouteImport } from './routes/api/ecom-audit'
+import { Route as ApiDemoAiRouteImport } from './routes/api/demo-ai'
+import { Route as ApiContractCheckRouteImport } from './routes/api/contract-check'
+import { Route as ApiCommunityAssistantRouteImport } from './routes/api/community-assistant'
+import { Route as ApiBlogTickRouteImport } from './routes/api/blog-tick'
+import { Route as ApiAuditRouteImport } from './routes/api/audit'
+import { Route as ApiAssistantRouteImport } from './routes/api/assistant'
+import { Route as ApiAiStatusRouteImport } from './routes/api/ai-status'
+import { Route as ApiAgentsTickRouteImport } from './routes/api/agents-tick'
+import { Route as SolutionsCategoryIndexRouteImport } from './routes/solutions.$category.index'
+import { Route as CommunityMessagesIndexRouteImport } from './routes/community.messages.index'
+import { Route as CommunityInboxIndexRouteImport } from './routes/community.inbox.index'
+import { Route as SolutionsCategorySlugRouteImport } from './routes/solutions.$category.$slug'
+import { Route as CommunityUUsernameRouteImport } from './routes/community.u.$username'
+import { Route as CommunityPostIdRouteImport } from './routes/community.post.$id'
+import { Route as CommunityMessagesIdRouteImport } from './routes/community.messages.$id'
+import { Route as CommunityInboxIdRouteImport } from './routes/community.inbox.$id'
+import { Route as CommunityGSlugRouteImport } from './routes/community.g.$slug'
 
+const WhyEmmaforyouRoute = WhyEmmaforyouRouteImport.update({
+  id: '/why-emmaforyou',
+  path: '/why-emmaforyou',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WebsiteAuditRoute = WebsiteAuditRouteImport.update({
+  id: '/website-audit',
+  path: '/website-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WatchRoute = WatchRouteImport.update({
   id: '/watch',
   path: '/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoute = ToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TestimonialsRoute = TestimonialsRouteImport.update({
@@ -45,9 +153,39 @@ const TestimonialsRoute = TestimonialsRouteImport.update({
   path: '/testimonials',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SmartContractCheckRoute = SmartContractCheckRouteImport.update({
+  id: '/smart-contract-check',
+  path: '/smart-contract-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoiCalculatorRoute = RoiCalculatorRouteImport.update({
   id: '/roi-calculator',
   path: '/roi-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProposalRoute = ProposalRouteImport.update({
+  id: '/proposal',
+  path: '/proposal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -55,14 +193,34 @@ const PricingRoute = PricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsletterRoute = NewsletterRouteImport.update({
+  id: '/newsletter',
+  path: '/newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MakeoverRoute = MakeoverRouteImport.update({
+  id: '/makeover',
+  path: '/makeover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsFullDottxtRoute = LlmsFullDottxtRouteImport.update({
+  id: '/llms-full.txt',
+  path: '/llms-full.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntakeRoute = IntakeRouteImport.update({
@@ -70,14 +228,24 @@ const IntakeRoute = IntakeRouteImport.update({
   path: '/intake',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndustriesRoute = IndustriesRouteImport.update({
+  id: '/industries',
+  path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GrowthQuizRoute = GrowthQuizRouteImport.update({
   id: '/growth-quiz',
   path: '/growth-quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FreeResourcesRoute = FreeResourcesRouteImport.update({
-  id: '/free-resources',
-  path: '/free-resources',
+const GoalPlannerRoute = GoalPlannerRouteImport.update({
+  id: '/goal-planner',
+  path: '/goal-planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FrRoute = FrRouteImport.update({
+  id: '/fr',
+  path: '/fr',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -90,9 +258,34 @@ const EmailGeneratorRoute = EmailGeneratorRouteImport.update({
   path: '/email-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EcommerceRoute = EcommerceRouteImport.update({
+  id: '/ecommerce',
+  path: '/ecommerce',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeRoute = DeRouteImport.update({
+  id: '/de',
+  path: '/de',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasesRoute = CasesRouteImport.update({
@@ -100,14 +293,29 @@ const CasesRoute = CasesRouteImport.update({
   path: '/cases',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookRoute = BookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnalyserRoute = AnalyserRouteImport.update({
   id: '/analyser',
   path: '/analyser',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiReceptionistRoute = AiReceptionistRouteImport.update({
+  id: '/ai-receptionist',
+  path: '/ai-receptionist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AffiliateRoute = AffiliateRouteImport.update({
   id: '/affiliate',
   path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -120,9 +328,54 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolutionsIndexRoute = SolutionsIndexRouteImport.update({
+  id: '/solutions/',
+  path: '/solutions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesIndexRoute = ServicesIndexRouteImport.update({
+  id: '/services/',
+  path: '/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
+  id: '/portfolio/',
+  path: '/portfolio/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KnowledgeBaseIndexRoute = KnowledgeBaseIndexRouteImport.update({
   id: '/knowledge-base/',
   path: '/knowledge-base/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InspirationIndexRoute = InspirationIndexRouteImport.update({
+  id: '/inspiration/',
+  path: '/inspiration/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeResourcesIndexRoute = FreeResourcesIndexRouteImport.update({
+  id: '/free-resources/',
+  path: '/free-resources/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcommerceIndexRoute = EcommerceIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityIndexRoute = CommunityIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const ChecklistsIndexRoute = ChecklistsIndexRouteImport.update({
+  id: '/checklists/',
+  path: '/checklists/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -130,9 +383,19 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolutionsAppPlannerRoute = SolutionsAppPlannerRouteImport.update({
+  id: '/solutions/app-planner',
+  path: '/solutions/app-planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesSlugRoute = ServicesSlugRouteImport.update({
   id: '/services/$slug',
   path: '/services/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioSlugRoute = PortfolioSlugRouteImport.update({
+  id: '/portfolio/$slug',
+  path: '/portfolio/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NicheSlugRoute = NicheSlugRouteImport.update({
@@ -145,9 +408,129 @@ const KnowledgeBaseSlugRoute = KnowledgeBaseSlugRouteImport.update({
   path: '/knowledge-base/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InspirationIdRoute = InspirationIdRouteImport.update({
+  id: '/inspiration/$id',
+  path: '/inspiration/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FreeResourcesSlugRoute = FreeResourcesSlugRouteImport.update({
+  id: '/free-resources/$slug',
+  path: '/free-resources/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExpertiseSlugRoute = ExpertiseSlugRouteImport.update({
   id: '/expertise/$slug',
   path: '/expertise/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EcommerceWorkspaceRoute = EcommerceWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceStartRoute = EcommerceStartRouteImport.update({
+  id: '/start',
+  path: '/start',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceResearchRoute = EcommerceResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceProfitRoute = EcommerceProfitRouteImport.update({
+  id: '/profit',
+  path: '/profit',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommercePlanRoute = EcommercePlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceMarketingRoute = EcommerceMarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceIntegrationsRoute = EcommerceIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceGuideRoute = EcommerceGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceGrowRoute = EcommerceGrowRouteImport.update({
+  id: '/grow',
+  path: '/grow',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceDiagnoseRoute = EcommerceDiagnoseRouteImport.update({
+  id: '/diagnose',
+  path: '/diagnose',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const EcommerceCompetitorsRoute = EcommerceCompetitorsRouteImport.update({
+  id: '/competitors',
+  path: '/competitors',
+  getParentRoute: () => EcommerceRoute,
+} as any)
+const DashboardInspirationRoute = DashboardInspirationRouteImport.update({
+  id: '/dashboard_/inspiration',
+  path: '/dashboard/inspiration',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAgentsRoute = DashboardAgentsRouteImport.update({
+  id: '/dashboard_/agents',
+  path: '/dashboard/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareSlugRoute = CompareSlugRouteImport.update({
+  id: '/compare/$slug',
+  path: '/compare/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunitySettingsRoute = CommunitySettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunitySearchRoute = CommunitySearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunitySavedRoute = CommunitySavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityNotificationsRoute = CommunityNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityModerationRoute = CommunityModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
+  id: '/guidelines',
+  path: '/guidelines',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityGroupsRoute = CommunityGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const ChecklistsSlugRoute = ChecklistsSlugRouteImport.update({
+  id: '/checklists/$slug',
+  path: '/checklists/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -155,213 +538,971 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTranslateRoute = ApiTranslateRouteImport.update({
+  id: '/api/translate',
+  path: '/api/translate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReceptionistRoute = ApiReceptionistRouteImport.update({
+  id: '/api/receptionist',
+  path: '/api/receptionist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPrototypeRoute = ApiPrototypeRouteImport.update({
   id: '/api/prototype',
   path: '/api/prototype',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProposalRoute = ApiProposalRouteImport.update({
+  id: '/api/proposal',
+  path: '/api/proposal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMakeoverRoute = ApiMakeoverRouteImport.update({
+  id: '/api/makeover',
+  path: '/api/makeover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInspirationTickRoute = ApiInspirationTickRouteImport.update({
+  id: '/api/inspiration-tick',
+  path: '/api/inspiration-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIndexnowRoute = ApiIndexnowRouteImport.update({
+  id: '/api/indexnow',
+  path: '/api/indexnow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGoalPlanRoute = ApiGoalPlanRouteImport.update({
+  id: '/api/goal-plan',
+  path: '/api/goal-plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailSequenceRoute = ApiEmailSequenceRouteImport.update({
+  id: '/api/email-sequence',
+  path: '/api/email-sequence',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEcomScanRoute = ApiEcomScanRouteImport.update({
+  id: '/api/ecom-scan',
+  path: '/api/ecom-scan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEcomResearchRoute = ApiEcomResearchRouteImport.update({
+  id: '/api/ecom-research',
+  path: '/api/ecom-research',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEcomGuideRoute = ApiEcomGuideRouteImport.update({
+  id: '/api/ecom-guide',
+  path: '/api/ecom-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEcomAuditRoute = ApiEcomAuditRouteImport.update({
+  id: '/api/ecom-audit',
+  path: '/api/ecom-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDemoAiRoute = ApiDemoAiRouteImport.update({
+  id: '/api/demo-ai',
+  path: '/api/demo-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiContractCheckRoute = ApiContractCheckRouteImport.update({
+  id: '/api/contract-check',
+  path: '/api/contract-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCommunityAssistantRoute = ApiCommunityAssistantRouteImport.update({
+  id: '/api/community-assistant',
+  path: '/api/community-assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBlogTickRoute = ApiBlogTickRouteImport.update({
+  id: '/api/blog-tick',
+  path: '/api/blog-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuditRoute = ApiAuditRouteImport.update({
+  id: '/api/audit',
+  path: '/api/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAssistantRoute = ApiAssistantRouteImport.update({
+  id: '/api/assistant',
+  path: '/api/assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiStatusRoute = ApiAiStatusRouteImport.update({
+  id: '/api/ai-status',
+  path: '/api/ai-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAgentsTickRoute = ApiAgentsTickRouteImport.update({
+  id: '/api/agents-tick',
+  path: '/api/agents-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsCategoryIndexRoute = SolutionsCategoryIndexRouteImport.update({
+  id: '/solutions/$category/',
+  path: '/solutions/$category/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityMessagesIndexRoute = CommunityMessagesIndexRouteImport.update({
+  id: '/messages/',
+  path: '/messages/',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityInboxIndexRoute = CommunityInboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const SolutionsCategorySlugRoute = SolutionsCategorySlugRouteImport.update({
+  id: '/solutions/$category/$slug',
+  path: '/solutions/$category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityUUsernameRoute = CommunityUUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityPostIdRoute = CommunityPostIdRouteImport.update({
+  id: '/post/$id',
+  path: '/post/$id',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityMessagesIdRoute = CommunityMessagesIdRouteImport.update({
+  id: '/messages/$id',
+  path: '/messages/$id',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityInboxIdRoute = CommunityInboxIdRouteImport.update({
+  id: '/inbox/$id',
+  path: '/inbox/$id',
+  getParentRoute: () => CommunityRoute,
+} as any)
+const CommunityGSlugRoute = CommunityGSlugRouteImport.update({
+  id: '/g/$slug',
+  path: '/g/$slug',
+  getParentRoute: () => CommunityRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/affiliate': typeof AffiliateRoute
+  '/ai-receptionist': typeof AiReceptionistRoute
   '/analyser': typeof AnalyserRoute
+  '/book': typeof BookRoute
   '/cases': typeof CasesRoute
+  '/community': typeof CommunityRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
+  '/de': typeof DeRoute
+  '/ecommerce': typeof EcommerceRouteWithChildren
   '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
-  '/free-resources': typeof FreeResourcesRoute
+  '/fr': typeof FrRoute
+  '/goal-planner': typeof GoalPlannerRoute
   '/growth-quiz': typeof GrowthQuizRoute
+  '/industries': typeof IndustriesRoute
   '/intake': typeof IntakeRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/makeover': typeof MakeoverRoute
+  '/newsletter': typeof NewsletterRoute
   '/portal': typeof PortalRoute
-  '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/proposal': typeof ProposalRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/roi-calculator': typeof RoiCalculatorRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/smart-contract-check': typeof SmartContractCheckRoute
+  '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/tools': typeof ToolsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/watch': typeof WatchRoute
+  '/website-audit': typeof WebsiteAuditRoute
+  '/why-emmaforyou': typeof WhyEmmaforyouRoute
+  '/api/agents-tick': typeof ApiAgentsTickRoute
+  '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/assistant': typeof ApiAssistantRoute
+  '/api/audit': typeof ApiAuditRoute
+  '/api/blog-tick': typeof ApiBlogTickRoute
+  '/api/community-assistant': typeof ApiCommunityAssistantRoute
+  '/api/contract-check': typeof ApiContractCheckRoute
+  '/api/demo-ai': typeof ApiDemoAiRoute
+  '/api/ecom-audit': typeof ApiEcomAuditRoute
+  '/api/ecom-guide': typeof ApiEcomGuideRoute
+  '/api/ecom-research': typeof ApiEcomResearchRoute
+  '/api/ecom-scan': typeof ApiEcomScanRoute
+  '/api/email-sequence': typeof ApiEmailSequenceRoute
+  '/api/goal-plan': typeof ApiGoalPlanRoute
+  '/api/indexnow': typeof ApiIndexnowRoute
+  '/api/inspiration-tick': typeof ApiInspirationTickRoute
+  '/api/makeover': typeof ApiMakeoverRoute
+  '/api/proposal': typeof ApiProposalRoute
   '/api/prototype': typeof ApiPrototypeRoute
+  '/api/receptionist': typeof ApiReceptionistRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checklists/$slug': typeof ChecklistsSlugRoute
+  '/community/groups': typeof CommunityGroupsRoute
+  '/community/guidelines': typeof CommunityGuidelinesRoute
+  '/community/moderation': typeof CommunityModerationRoute
+  '/community/notifications': typeof CommunityNotificationsRoute
+  '/community/saved': typeof CommunitySavedRoute
+  '/community/search': typeof CommunitySearchRoute
+  '/community/settings': typeof CommunitySettingsRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/dashboard/agents': typeof DashboardAgentsRoute
+  '/dashboard/inspiration': typeof DashboardInspirationRoute
+  '/ecommerce/competitors': typeof EcommerceCompetitorsRoute
+  '/ecommerce/diagnose': typeof EcommerceDiagnoseRoute
+  '/ecommerce/grow': typeof EcommerceGrowRoute
+  '/ecommerce/guide': typeof EcommerceGuideRoute
+  '/ecommerce/integrations': typeof EcommerceIntegrationsRoute
+  '/ecommerce/marketing': typeof EcommerceMarketingRoute
+  '/ecommerce/plan': typeof EcommercePlanRoute
+  '/ecommerce/profit': typeof EcommerceProfitRoute
+  '/ecommerce/research': typeof EcommerceResearchRoute
+  '/ecommerce/start': typeof EcommerceStartRoute
+  '/ecommerce/workspace': typeof EcommerceWorkspaceRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
+  '/free-resources/$slug': typeof FreeResourcesSlugRoute
+  '/inspiration/$id': typeof InspirationIdRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/solutions/app-planner': typeof SolutionsAppPlannerRoute
   '/blog/': typeof BlogIndexRoute
+  '/checklists/': typeof ChecklistsIndexRoute
+  '/community/': typeof CommunityIndexRoute
+  '/compare/': typeof CompareIndexRoute
+  '/ecommerce/': typeof EcommerceIndexRoute
+  '/free-resources/': typeof FreeResourcesIndexRoute
+  '/inspiration/': typeof InspirationIndexRoute
   '/knowledge-base/': typeof KnowledgeBaseIndexRoute
+  '/portfolio/': typeof PortfolioIndexRoute
+  '/services/': typeof ServicesIndexRoute
+  '/solutions/': typeof SolutionsIndexRoute
+  '/community/g/$slug': typeof CommunityGSlugRoute
+  '/community/inbox/$id': typeof CommunityInboxIdRoute
+  '/community/messages/$id': typeof CommunityMessagesIdRoute
+  '/community/post/$id': typeof CommunityPostIdRoute
+  '/community/u/$username': typeof CommunityUUsernameRoute
+  '/solutions/$category/$slug': typeof SolutionsCategorySlugRoute
+  '/community/inbox/': typeof CommunityInboxIndexRoute
+  '/community/messages/': typeof CommunityMessagesIndexRoute
+  '/solutions/$category/': typeof SolutionsCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/affiliate': typeof AffiliateRoute
+  '/ai-receptionist': typeof AiReceptionistRoute
   '/analyser': typeof AnalyserRoute
+  '/book': typeof BookRoute
   '/cases': typeof CasesRoute
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
+  '/de': typeof DeRoute
   '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
-  '/free-resources': typeof FreeResourcesRoute
+  '/fr': typeof FrRoute
+  '/goal-planner': typeof GoalPlannerRoute
   '/growth-quiz': typeof GrowthQuizRoute
+  '/industries': typeof IndustriesRoute
   '/intake': typeof IntakeRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/makeover': typeof MakeoverRoute
+  '/newsletter': typeof NewsletterRoute
   '/portal': typeof PortalRoute
-  '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/proposal': typeof ProposalRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/roi-calculator': typeof RoiCalculatorRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/smart-contract-check': typeof SmartContractCheckRoute
+  '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/tools': typeof ToolsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/watch': typeof WatchRoute
+  '/website-audit': typeof WebsiteAuditRoute
+  '/why-emmaforyou': typeof WhyEmmaforyouRoute
+  '/api/agents-tick': typeof ApiAgentsTickRoute
+  '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/assistant': typeof ApiAssistantRoute
+  '/api/audit': typeof ApiAuditRoute
+  '/api/blog-tick': typeof ApiBlogTickRoute
+  '/api/community-assistant': typeof ApiCommunityAssistantRoute
+  '/api/contract-check': typeof ApiContractCheckRoute
+  '/api/demo-ai': typeof ApiDemoAiRoute
+  '/api/ecom-audit': typeof ApiEcomAuditRoute
+  '/api/ecom-guide': typeof ApiEcomGuideRoute
+  '/api/ecom-research': typeof ApiEcomResearchRoute
+  '/api/ecom-scan': typeof ApiEcomScanRoute
+  '/api/email-sequence': typeof ApiEmailSequenceRoute
+  '/api/goal-plan': typeof ApiGoalPlanRoute
+  '/api/indexnow': typeof ApiIndexnowRoute
+  '/api/inspiration-tick': typeof ApiInspirationTickRoute
+  '/api/makeover': typeof ApiMakeoverRoute
+  '/api/proposal': typeof ApiProposalRoute
   '/api/prototype': typeof ApiPrototypeRoute
+  '/api/receptionist': typeof ApiReceptionistRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checklists/$slug': typeof ChecklistsSlugRoute
+  '/community/groups': typeof CommunityGroupsRoute
+  '/community/guidelines': typeof CommunityGuidelinesRoute
+  '/community/moderation': typeof CommunityModerationRoute
+  '/community/notifications': typeof CommunityNotificationsRoute
+  '/community/saved': typeof CommunitySavedRoute
+  '/community/search': typeof CommunitySearchRoute
+  '/community/settings': typeof CommunitySettingsRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/dashboard/agents': typeof DashboardAgentsRoute
+  '/dashboard/inspiration': typeof DashboardInspirationRoute
+  '/ecommerce/competitors': typeof EcommerceCompetitorsRoute
+  '/ecommerce/diagnose': typeof EcommerceDiagnoseRoute
+  '/ecommerce/grow': typeof EcommerceGrowRoute
+  '/ecommerce/guide': typeof EcommerceGuideRoute
+  '/ecommerce/integrations': typeof EcommerceIntegrationsRoute
+  '/ecommerce/marketing': typeof EcommerceMarketingRoute
+  '/ecommerce/plan': typeof EcommercePlanRoute
+  '/ecommerce/profit': typeof EcommerceProfitRoute
+  '/ecommerce/research': typeof EcommerceResearchRoute
+  '/ecommerce/start': typeof EcommerceStartRoute
+  '/ecommerce/workspace': typeof EcommerceWorkspaceRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
+  '/free-resources/$slug': typeof FreeResourcesSlugRoute
+  '/inspiration/$id': typeof InspirationIdRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/solutions/app-planner': typeof SolutionsAppPlannerRoute
   '/blog': typeof BlogIndexRoute
+  '/checklists': typeof ChecklistsIndexRoute
+  '/community': typeof CommunityIndexRoute
+  '/compare': typeof CompareIndexRoute
+  '/ecommerce': typeof EcommerceIndexRoute
+  '/free-resources': typeof FreeResourcesIndexRoute
+  '/inspiration': typeof InspirationIndexRoute
   '/knowledge-base': typeof KnowledgeBaseIndexRoute
+  '/portfolio': typeof PortfolioIndexRoute
+  '/services': typeof ServicesIndexRoute
+  '/solutions': typeof SolutionsIndexRoute
+  '/community/g/$slug': typeof CommunityGSlugRoute
+  '/community/inbox/$id': typeof CommunityInboxIdRoute
+  '/community/messages/$id': typeof CommunityMessagesIdRoute
+  '/community/post/$id': typeof CommunityPostIdRoute
+  '/community/u/$username': typeof CommunityUUsernameRoute
+  '/solutions/$category/$slug': typeof SolutionsCategorySlugRoute
+  '/community/inbox': typeof CommunityInboxIndexRoute
+  '/community/messages': typeof CommunityMessagesIndexRoute
+  '/solutions/$category': typeof SolutionsCategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/account': typeof AccountRoute
   '/affiliate': typeof AffiliateRoute
+  '/ai-receptionist': typeof AiReceptionistRoute
   '/analyser': typeof AnalyserRoute
+  '/book': typeof BookRoute
   '/cases': typeof CasesRoute
+  '/community': typeof CommunityRouteWithChildren
+  '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRoute
+  '/de': typeof DeRoute
+  '/ecommerce': typeof EcommerceRouteWithChildren
   '/email-generator': typeof EmailGeneratorRoute
   '/faq': typeof FaqRoute
-  '/free-resources': typeof FreeResourcesRoute
+  '/fr': typeof FrRoute
+  '/goal-planner': typeof GoalPlannerRoute
   '/growth-quiz': typeof GrowthQuizRoute
+  '/industries': typeof IndustriesRoute
   '/intake': typeof IntakeRoute
+  '/llms-full.txt': typeof LlmsFullDottxtRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/makeover': typeof MakeoverRoute
+  '/newsletter': typeof NewsletterRoute
   '/portal': typeof PortalRoute
-  '/portfolio': typeof PortfolioRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/proposal': typeof ProposalRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/roi-calculator': typeof RoiCalculatorRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/smart-contract-check': typeof SmartContractCheckRoute
+  '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/tools': typeof ToolsRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/watch': typeof WatchRoute
+  '/website-audit': typeof WebsiteAuditRoute
+  '/why-emmaforyou': typeof WhyEmmaforyouRoute
+  '/api/agents-tick': typeof ApiAgentsTickRoute
+  '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/assistant': typeof ApiAssistantRoute
+  '/api/audit': typeof ApiAuditRoute
+  '/api/blog-tick': typeof ApiBlogTickRoute
+  '/api/community-assistant': typeof ApiCommunityAssistantRoute
+  '/api/contract-check': typeof ApiContractCheckRoute
+  '/api/demo-ai': typeof ApiDemoAiRoute
+  '/api/ecom-audit': typeof ApiEcomAuditRoute
+  '/api/ecom-guide': typeof ApiEcomGuideRoute
+  '/api/ecom-research': typeof ApiEcomResearchRoute
+  '/api/ecom-scan': typeof ApiEcomScanRoute
+  '/api/email-sequence': typeof ApiEmailSequenceRoute
+  '/api/goal-plan': typeof ApiGoalPlanRoute
+  '/api/indexnow': typeof ApiIndexnowRoute
+  '/api/inspiration-tick': typeof ApiInspirationTickRoute
+  '/api/makeover': typeof ApiMakeoverRoute
+  '/api/proposal': typeof ApiProposalRoute
   '/api/prototype': typeof ApiPrototypeRoute
+  '/api/receptionist': typeof ApiReceptionistRoute
+  '/api/translate': typeof ApiTranslateRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/checklists/$slug': typeof ChecklistsSlugRoute
+  '/community/groups': typeof CommunityGroupsRoute
+  '/community/guidelines': typeof CommunityGuidelinesRoute
+  '/community/moderation': typeof CommunityModerationRoute
+  '/community/notifications': typeof CommunityNotificationsRoute
+  '/community/saved': typeof CommunitySavedRoute
+  '/community/search': typeof CommunitySearchRoute
+  '/community/settings': typeof CommunitySettingsRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/dashboard_/agents': typeof DashboardAgentsRoute
+  '/dashboard_/inspiration': typeof DashboardInspirationRoute
+  '/ecommerce/competitors': typeof EcommerceCompetitorsRoute
+  '/ecommerce/diagnose': typeof EcommerceDiagnoseRoute
+  '/ecommerce/grow': typeof EcommerceGrowRoute
+  '/ecommerce/guide': typeof EcommerceGuideRoute
+  '/ecommerce/integrations': typeof EcommerceIntegrationsRoute
+  '/ecommerce/marketing': typeof EcommerceMarketingRoute
+  '/ecommerce/plan': typeof EcommercePlanRoute
+  '/ecommerce/profit': typeof EcommerceProfitRoute
+  '/ecommerce/research': typeof EcommerceResearchRoute
+  '/ecommerce/start': typeof EcommerceStartRoute
+  '/ecommerce/workspace': typeof EcommerceWorkspaceRoute
   '/expertise/$slug': typeof ExpertiseSlugRoute
+  '/free-resources/$slug': typeof FreeResourcesSlugRoute
+  '/inspiration/$id': typeof InspirationIdRoute
   '/knowledge-base/$slug': typeof KnowledgeBaseSlugRoute
   '/niche/$slug': typeof NicheSlugRoute
+  '/portfolio/$slug': typeof PortfolioSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/solutions/app-planner': typeof SolutionsAppPlannerRoute
   '/blog/': typeof BlogIndexRoute
+  '/checklists/': typeof ChecklistsIndexRoute
+  '/community/': typeof CommunityIndexRoute
+  '/compare/': typeof CompareIndexRoute
+  '/ecommerce/': typeof EcommerceIndexRoute
+  '/free-resources/': typeof FreeResourcesIndexRoute
+  '/inspiration/': typeof InspirationIndexRoute
   '/knowledge-base/': typeof KnowledgeBaseIndexRoute
+  '/portfolio/': typeof PortfolioIndexRoute
+  '/services/': typeof ServicesIndexRoute
+  '/solutions/': typeof SolutionsIndexRoute
+  '/community/g/$slug': typeof CommunityGSlugRoute
+  '/community/inbox/$id': typeof CommunityInboxIdRoute
+  '/community/messages/$id': typeof CommunityMessagesIdRoute
+  '/community/post/$id': typeof CommunityPostIdRoute
+  '/community/u/$username': typeof CommunityUUsernameRoute
+  '/solutions/$category/$slug': typeof SolutionsCategorySlugRoute
+  '/community/inbox/': typeof CommunityInboxIndexRoute
+  '/community/messages/': typeof CommunityMessagesIndexRoute
+  '/solutions/$category/': typeof SolutionsCategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/account'
     | '/affiliate'
+    | '/ai-receptionist'
     | '/analyser'
+    | '/book'
     | '/cases'
+    | '/community'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
+    | '/de'
+    | '/ecommerce'
     | '/email-generator'
     | '/faq'
-    | '/free-resources'
+    | '/fr'
+    | '/goal-planner'
     | '/growth-quiz'
+    | '/industries'
     | '/intake'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/login'
+    | '/makeover'
+    | '/newsletter'
     | '/portal'
-    | '/portfolio'
     | '/pricing'
+    | '/privacy'
+    | '/proposal'
+    | '/robots.txt'
     | '/roi-calculator'
+    | '/sitemap.xml'
+    | '/smart-contract-check'
+    | '/terms'
     | '/testimonials'
+    | '/tools'
+    | '/unsubscribe'
     | '/watch'
+    | '/website-audit'
+    | '/why-emmaforyou'
+    | '/api/agents-tick'
+    | '/api/ai-status'
+    | '/api/assistant'
+    | '/api/audit'
+    | '/api/blog-tick'
+    | '/api/community-assistant'
+    | '/api/contract-check'
+    | '/api/demo-ai'
+    | '/api/ecom-audit'
+    | '/api/ecom-guide'
+    | '/api/ecom-research'
+    | '/api/ecom-scan'
+    | '/api/email-sequence'
+    | '/api/goal-plan'
+    | '/api/indexnow'
+    | '/api/inspiration-tick'
+    | '/api/makeover'
+    | '/api/proposal'
     | '/api/prototype'
+    | '/api/receptionist'
+    | '/api/translate'
     | '/blog/$slug'
+    | '/checklists/$slug'
+    | '/community/groups'
+    | '/community/guidelines'
+    | '/community/moderation'
+    | '/community/notifications'
+    | '/community/saved'
+    | '/community/search'
+    | '/community/settings'
+    | '/compare/$slug'
+    | '/dashboard/agents'
+    | '/dashboard/inspiration'
+    | '/ecommerce/competitors'
+    | '/ecommerce/diagnose'
+    | '/ecommerce/grow'
+    | '/ecommerce/guide'
+    | '/ecommerce/integrations'
+    | '/ecommerce/marketing'
+    | '/ecommerce/plan'
+    | '/ecommerce/profit'
+    | '/ecommerce/research'
+    | '/ecommerce/start'
+    | '/ecommerce/workspace'
     | '/expertise/$slug'
+    | '/free-resources/$slug'
+    | '/inspiration/$id'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/portfolio/$slug'
     | '/services/$slug'
+    | '/solutions/app-planner'
     | '/blog/'
+    | '/checklists/'
+    | '/community/'
+    | '/compare/'
+    | '/ecommerce/'
+    | '/free-resources/'
+    | '/inspiration/'
     | '/knowledge-base/'
+    | '/portfolio/'
+    | '/services/'
+    | '/solutions/'
+    | '/community/g/$slug'
+    | '/community/inbox/$id'
+    | '/community/messages/$id'
+    | '/community/post/$id'
+    | '/community/u/$username'
+    | '/solutions/$category/$slug'
+    | '/community/inbox/'
+    | '/community/messages/'
+    | '/solutions/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/account'
     | '/affiliate'
+    | '/ai-receptionist'
     | '/analyser'
+    | '/book'
     | '/cases'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
+    | '/de'
     | '/email-generator'
     | '/faq'
-    | '/free-resources'
+    | '/fr'
+    | '/goal-planner'
     | '/growth-quiz'
+    | '/industries'
     | '/intake'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/login'
+    | '/makeover'
+    | '/newsletter'
     | '/portal'
-    | '/portfolio'
     | '/pricing'
+    | '/privacy'
+    | '/proposal'
+    | '/robots.txt'
     | '/roi-calculator'
+    | '/sitemap.xml'
+    | '/smart-contract-check'
+    | '/terms'
     | '/testimonials'
+    | '/tools'
+    | '/unsubscribe'
     | '/watch'
+    | '/website-audit'
+    | '/why-emmaforyou'
+    | '/api/agents-tick'
+    | '/api/ai-status'
+    | '/api/assistant'
+    | '/api/audit'
+    | '/api/blog-tick'
+    | '/api/community-assistant'
+    | '/api/contract-check'
+    | '/api/demo-ai'
+    | '/api/ecom-audit'
+    | '/api/ecom-guide'
+    | '/api/ecom-research'
+    | '/api/ecom-scan'
+    | '/api/email-sequence'
+    | '/api/goal-plan'
+    | '/api/indexnow'
+    | '/api/inspiration-tick'
+    | '/api/makeover'
+    | '/api/proposal'
     | '/api/prototype'
+    | '/api/receptionist'
+    | '/api/translate'
     | '/blog/$slug'
+    | '/checklists/$slug'
+    | '/community/groups'
+    | '/community/guidelines'
+    | '/community/moderation'
+    | '/community/notifications'
+    | '/community/saved'
+    | '/community/search'
+    | '/community/settings'
+    | '/compare/$slug'
+    | '/dashboard/agents'
+    | '/dashboard/inspiration'
+    | '/ecommerce/competitors'
+    | '/ecommerce/diagnose'
+    | '/ecommerce/grow'
+    | '/ecommerce/guide'
+    | '/ecommerce/integrations'
+    | '/ecommerce/marketing'
+    | '/ecommerce/plan'
+    | '/ecommerce/profit'
+    | '/ecommerce/research'
+    | '/ecommerce/start'
+    | '/ecommerce/workspace'
     | '/expertise/$slug'
+    | '/free-resources/$slug'
+    | '/inspiration/$id'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/portfolio/$slug'
     | '/services/$slug'
+    | '/solutions/app-planner'
     | '/blog'
+    | '/checklists'
+    | '/community'
+    | '/compare'
+    | '/ecommerce'
+    | '/free-resources'
+    | '/inspiration'
     | '/knowledge-base'
+    | '/portfolio'
+    | '/services'
+    | '/solutions'
+    | '/community/g/$slug'
+    | '/community/inbox/$id'
+    | '/community/messages/$id'
+    | '/community/post/$id'
+    | '/community/u/$username'
+    | '/solutions/$category/$slug'
+    | '/community/inbox'
+    | '/community/messages'
+    | '/solutions/$category'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/account'
     | '/affiliate'
+    | '/ai-receptionist'
     | '/analyser'
+    | '/book'
     | '/cases'
+    | '/community'
+    | '/contact'
+    | '/cookies'
     | '/dashboard'
+    | '/de'
+    | '/ecommerce'
     | '/email-generator'
     | '/faq'
-    | '/free-resources'
+    | '/fr'
+    | '/goal-planner'
     | '/growth-quiz'
+    | '/industries'
     | '/intake'
+    | '/llms-full.txt'
+    | '/llms.txt'
+    | '/login'
+    | '/makeover'
+    | '/newsletter'
     | '/portal'
-    | '/portfolio'
     | '/pricing'
+    | '/privacy'
+    | '/proposal'
+    | '/robots.txt'
     | '/roi-calculator'
+    | '/sitemap.xml'
+    | '/smart-contract-check'
+    | '/terms'
     | '/testimonials'
+    | '/tools'
+    | '/unsubscribe'
     | '/watch'
+    | '/website-audit'
+    | '/why-emmaforyou'
+    | '/api/agents-tick'
+    | '/api/ai-status'
+    | '/api/assistant'
+    | '/api/audit'
+    | '/api/blog-tick'
+    | '/api/community-assistant'
+    | '/api/contract-check'
+    | '/api/demo-ai'
+    | '/api/ecom-audit'
+    | '/api/ecom-guide'
+    | '/api/ecom-research'
+    | '/api/ecom-scan'
+    | '/api/email-sequence'
+    | '/api/goal-plan'
+    | '/api/indexnow'
+    | '/api/inspiration-tick'
+    | '/api/makeover'
+    | '/api/proposal'
     | '/api/prototype'
+    | '/api/receptionist'
+    | '/api/translate'
     | '/blog/$slug'
+    | '/checklists/$slug'
+    | '/community/groups'
+    | '/community/guidelines'
+    | '/community/moderation'
+    | '/community/notifications'
+    | '/community/saved'
+    | '/community/search'
+    | '/community/settings'
+    | '/compare/$slug'
+    | '/dashboard_/agents'
+    | '/dashboard_/inspiration'
+    | '/ecommerce/competitors'
+    | '/ecommerce/diagnose'
+    | '/ecommerce/grow'
+    | '/ecommerce/guide'
+    | '/ecommerce/integrations'
+    | '/ecommerce/marketing'
+    | '/ecommerce/plan'
+    | '/ecommerce/profit'
+    | '/ecommerce/research'
+    | '/ecommerce/start'
+    | '/ecommerce/workspace'
     | '/expertise/$slug'
+    | '/free-resources/$slug'
+    | '/inspiration/$id'
     | '/knowledge-base/$slug'
     | '/niche/$slug'
+    | '/portfolio/$slug'
     | '/services/$slug'
+    | '/solutions/app-planner'
     | '/blog/'
+    | '/checklists/'
+    | '/community/'
+    | '/compare/'
+    | '/ecommerce/'
+    | '/free-resources/'
+    | '/inspiration/'
     | '/knowledge-base/'
+    | '/portfolio/'
+    | '/services/'
+    | '/solutions/'
+    | '/community/g/$slug'
+    | '/community/inbox/$id'
+    | '/community/messages/$id'
+    | '/community/post/$id'
+    | '/community/u/$username'
+    | '/solutions/$category/$slug'
+    | '/community/inbox/'
+    | '/community/messages/'
+    | '/solutions/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AccountRoute: typeof AccountRoute
   AffiliateRoute: typeof AffiliateRoute
+  AiReceptionistRoute: typeof AiReceptionistRoute
   AnalyserRoute: typeof AnalyserRoute
+  BookRoute: typeof BookRoute
   CasesRoute: typeof CasesRoute
+  CommunityRoute: typeof CommunityRouteWithChildren
+  ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   DashboardRoute: typeof DashboardRoute
+  DeRoute: typeof DeRoute
+  EcommerceRoute: typeof EcommerceRouteWithChildren
   EmailGeneratorRoute: typeof EmailGeneratorRoute
   FaqRoute: typeof FaqRoute
-  FreeResourcesRoute: typeof FreeResourcesRoute
+  FrRoute: typeof FrRoute
+  GoalPlannerRoute: typeof GoalPlannerRoute
   GrowthQuizRoute: typeof GrowthQuizRoute
+  IndustriesRoute: typeof IndustriesRoute
   IntakeRoute: typeof IntakeRoute
+  LlmsFullDottxtRoute: typeof LlmsFullDottxtRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  LoginRoute: typeof LoginRoute
+  MakeoverRoute: typeof MakeoverRoute
+  NewsletterRoute: typeof NewsletterRoute
   PortalRoute: typeof PortalRoute
-  PortfolioRoute: typeof PortfolioRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ProposalRoute: typeof ProposalRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   RoiCalculatorRoute: typeof RoiCalculatorRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SmartContractCheckRoute: typeof SmartContractCheckRoute
+  TermsRoute: typeof TermsRoute
   TestimonialsRoute: typeof TestimonialsRoute
+  ToolsRoute: typeof ToolsRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   WatchRoute: typeof WatchRoute
+  WebsiteAuditRoute: typeof WebsiteAuditRoute
+  WhyEmmaforyouRoute: typeof WhyEmmaforyouRoute
+  ApiAgentsTickRoute: typeof ApiAgentsTickRoute
+  ApiAiStatusRoute: typeof ApiAiStatusRoute
+  ApiAssistantRoute: typeof ApiAssistantRoute
+  ApiAuditRoute: typeof ApiAuditRoute
+  ApiBlogTickRoute: typeof ApiBlogTickRoute
+  ApiCommunityAssistantRoute: typeof ApiCommunityAssistantRoute
+  ApiContractCheckRoute: typeof ApiContractCheckRoute
+  ApiDemoAiRoute: typeof ApiDemoAiRoute
+  ApiEcomAuditRoute: typeof ApiEcomAuditRoute
+  ApiEcomGuideRoute: typeof ApiEcomGuideRoute
+  ApiEcomResearchRoute: typeof ApiEcomResearchRoute
+  ApiEcomScanRoute: typeof ApiEcomScanRoute
+  ApiEmailSequenceRoute: typeof ApiEmailSequenceRoute
+  ApiGoalPlanRoute: typeof ApiGoalPlanRoute
+  ApiIndexnowRoute: typeof ApiIndexnowRoute
+  ApiInspirationTickRoute: typeof ApiInspirationTickRoute
+  ApiMakeoverRoute: typeof ApiMakeoverRoute
+  ApiProposalRoute: typeof ApiProposalRoute
   ApiPrototypeRoute: typeof ApiPrototypeRoute
+  ApiReceptionistRoute: typeof ApiReceptionistRoute
+  ApiTranslateRoute: typeof ApiTranslateRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  ChecklistsSlugRoute: typeof ChecklistsSlugRoute
+  CompareSlugRoute: typeof CompareSlugRoute
+  DashboardAgentsRoute: typeof DashboardAgentsRoute
+  DashboardInspirationRoute: typeof DashboardInspirationRoute
   ExpertiseSlugRoute: typeof ExpertiseSlugRoute
+  FreeResourcesSlugRoute: typeof FreeResourcesSlugRoute
+  InspirationIdRoute: typeof InspirationIdRoute
   KnowledgeBaseSlugRoute: typeof KnowledgeBaseSlugRoute
   NicheSlugRoute: typeof NicheSlugRoute
+  PortfolioSlugRoute: typeof PortfolioSlugRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
+  SolutionsAppPlannerRoute: typeof SolutionsAppPlannerRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ChecklistsIndexRoute: typeof ChecklistsIndexRoute
+  CompareIndexRoute: typeof CompareIndexRoute
+  FreeResourcesIndexRoute: typeof FreeResourcesIndexRoute
+  InspirationIndexRoute: typeof InspirationIndexRoute
   KnowledgeBaseIndexRoute: typeof KnowledgeBaseIndexRoute
+  PortfolioIndexRoute: typeof PortfolioIndexRoute
+  ServicesIndexRoute: typeof ServicesIndexRoute
+  SolutionsIndexRoute: typeof SolutionsIndexRoute
+  SolutionsCategorySlugRoute: typeof SolutionsCategorySlugRoute
+  SolutionsCategoryIndexRoute: typeof SolutionsCategoryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/why-emmaforyou': {
+      id: '/why-emmaforyou'
+      path: '/why-emmaforyou'
+      fullPath: '/why-emmaforyou'
+      preLoaderRoute: typeof WhyEmmaforyouRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/website-audit': {
+      id: '/website-audit'
+      path: '/website-audit'
+      fullPath: '/website-audit'
+      preLoaderRoute: typeof WebsiteAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/watch': {
       id: '/watch'
       path: '/watch'
       fullPath: '/watch'
       preLoaderRoute: typeof WatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools': {
+      id: '/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/testimonials': {
@@ -371,11 +1512,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestimonialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/smart-contract-check': {
+      id: '/smart-contract-check'
+      path: '/smart-contract-check'
+      fullPath: '/smart-contract-check'
+      preLoaderRoute: typeof SmartContractCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/roi-calculator': {
       id: '/roi-calculator'
       path: '/roi-calculator'
       fullPath: '/roi-calculator'
       preLoaderRoute: typeof RoiCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proposal': {
+      id: '/proposal'
+      path: '/proposal'
+      fullPath: '/proposal'
+      preLoaderRoute: typeof ProposalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -385,18 +1568,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/portal': {
       id: '/portal'
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/newsletter': {
+      id: '/newsletter'
+      path: '/newsletter'
+      fullPath: '/newsletter'
+      preLoaderRoute: typeof NewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/makeover': {
+      id: '/makeover'
+      path: '/makeover'
+      fullPath: '/makeover'
+      preLoaderRoute: typeof MakeoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms-full.txt': {
+      id: '/llms-full.txt'
+      path: '/llms-full.txt'
+      fullPath: '/llms-full.txt'
+      preLoaderRoute: typeof LlmsFullDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/intake': {
@@ -406,6 +1617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntakeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/industries': {
+      id: '/industries'
+      path: '/industries'
+      fullPath: '/industries'
+      preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/growth-quiz': {
       id: '/growth-quiz'
       path: '/growth-quiz'
@@ -413,11 +1631,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GrowthQuizRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/free-resources': {
-      id: '/free-resources'
-      path: '/free-resources'
-      fullPath: '/free-resources'
-      preLoaderRoute: typeof FreeResourcesRouteImport
+    '/goal-planner': {
+      id: '/goal-planner'
+      path: '/goal-planner'
+      fullPath: '/goal-planner'
+      preLoaderRoute: typeof GoalPlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fr': {
+      id: '/fr'
+      path: '/fr'
+      fullPath: '/fr'
+      preLoaderRoute: typeof FrRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -434,11 +1659,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ecommerce': {
+      id: '/ecommerce'
+      path: '/ecommerce'
+      fullPath: '/ecommerce'
+      preLoaderRoute: typeof EcommerceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/de': {
+      id: '/de'
+      path: '/de'
+      fullPath: '/de'
+      preLoaderRoute: typeof DeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cases': {
@@ -448,6 +1708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CasesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/book': {
+      id: '/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof BookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/analyser': {
       id: '/analyser'
       path: '/analyser'
@@ -455,11 +1722,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyserRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-receptionist': {
+      id: '/ai-receptionist'
+      path: '/ai-receptionist'
+      fullPath: '/ai-receptionist'
+      preLoaderRoute: typeof AiReceptionistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/affiliate': {
       id: '/affiliate'
       path: '/affiliate'
       fullPath: '/affiliate'
       preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -476,11 +1757,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/': {
+      id: '/solutions/'
+      path: '/solutions'
+      fullPath: '/solutions/'
+      preLoaderRoute: typeof SolutionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/': {
+      id: '/services/'
+      path: '/services'
+      fullPath: '/services/'
+      preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio/': {
+      id: '/portfolio/'
+      path: '/portfolio'
+      fullPath: '/portfolio/'
+      preLoaderRoute: typeof PortfolioIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/knowledge-base/': {
       id: '/knowledge-base/'
       path: '/knowledge-base'
       fullPath: '/knowledge-base/'
       preLoaderRoute: typeof KnowledgeBaseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inspiration/': {
+      id: '/inspiration/'
+      path: '/inspiration'
+      fullPath: '/inspiration/'
+      preLoaderRoute: typeof InspirationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-resources/': {
+      id: '/free-resources/'
+      path: '/free-resources'
+      fullPath: '/free-resources/'
+      preLoaderRoute: typeof FreeResourcesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecommerce/': {
+      id: '/ecommerce/'
+      path: '/'
+      fullPath: '/ecommerce/'
+      preLoaderRoute: typeof EcommerceIndexRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/': {
+      id: '/community/'
+      path: '/'
+      fullPath: '/community/'
+      preLoaderRoute: typeof CommunityIndexRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/checklists/': {
+      id: '/checklists/'
+      path: '/checklists'
+      fullPath: '/checklists/'
+      preLoaderRoute: typeof ChecklistsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -490,11 +1834,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/app-planner': {
+      id: '/solutions/app-planner'
+      path: '/solutions/app-planner'
+      fullPath: '/solutions/app-planner'
+      preLoaderRoute: typeof SolutionsAppPlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/$slug': {
       id: '/services/$slug'
       path: '/services/$slug'
       fullPath: '/services/$slug'
       preLoaderRoute: typeof ServicesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio/$slug': {
+      id: '/portfolio/$slug'
+      path: '/portfolio/$slug'
+      fullPath: '/portfolio/$slug'
+      preLoaderRoute: typeof PortfolioSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/niche/$slug': {
@@ -511,11 +1869,179 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBaseSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inspiration/$id': {
+      id: '/inspiration/$id'
+      path: '/inspiration/$id'
+      fullPath: '/inspiration/$id'
+      preLoaderRoute: typeof InspirationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/free-resources/$slug': {
+      id: '/free-resources/$slug'
+      path: '/free-resources/$slug'
+      fullPath: '/free-resources/$slug'
+      preLoaderRoute: typeof FreeResourcesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/expertise/$slug': {
       id: '/expertise/$slug'
       path: '/expertise/$slug'
       fullPath: '/expertise/$slug'
       preLoaderRoute: typeof ExpertiseSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ecommerce/workspace': {
+      id: '/ecommerce/workspace'
+      path: '/workspace'
+      fullPath: '/ecommerce/workspace'
+      preLoaderRoute: typeof EcommerceWorkspaceRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/start': {
+      id: '/ecommerce/start'
+      path: '/start'
+      fullPath: '/ecommerce/start'
+      preLoaderRoute: typeof EcommerceStartRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/research': {
+      id: '/ecommerce/research'
+      path: '/research'
+      fullPath: '/ecommerce/research'
+      preLoaderRoute: typeof EcommerceResearchRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/profit': {
+      id: '/ecommerce/profit'
+      path: '/profit'
+      fullPath: '/ecommerce/profit'
+      preLoaderRoute: typeof EcommerceProfitRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/plan': {
+      id: '/ecommerce/plan'
+      path: '/plan'
+      fullPath: '/ecommerce/plan'
+      preLoaderRoute: typeof EcommercePlanRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/marketing': {
+      id: '/ecommerce/marketing'
+      path: '/marketing'
+      fullPath: '/ecommerce/marketing'
+      preLoaderRoute: typeof EcommerceMarketingRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/integrations': {
+      id: '/ecommerce/integrations'
+      path: '/integrations'
+      fullPath: '/ecommerce/integrations'
+      preLoaderRoute: typeof EcommerceIntegrationsRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/guide': {
+      id: '/ecommerce/guide'
+      path: '/guide'
+      fullPath: '/ecommerce/guide'
+      preLoaderRoute: typeof EcommerceGuideRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/grow': {
+      id: '/ecommerce/grow'
+      path: '/grow'
+      fullPath: '/ecommerce/grow'
+      preLoaderRoute: typeof EcommerceGrowRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/diagnose': {
+      id: '/ecommerce/diagnose'
+      path: '/diagnose'
+      fullPath: '/ecommerce/diagnose'
+      preLoaderRoute: typeof EcommerceDiagnoseRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/ecommerce/competitors': {
+      id: '/ecommerce/competitors'
+      path: '/competitors'
+      fullPath: '/ecommerce/competitors'
+      preLoaderRoute: typeof EcommerceCompetitorsRouteImport
+      parentRoute: typeof EcommerceRoute
+    }
+    '/dashboard_/inspiration': {
+      id: '/dashboard_/inspiration'
+      path: '/dashboard/inspiration'
+      fullPath: '/dashboard/inspiration'
+      preLoaderRoute: typeof DashboardInspirationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard_/agents': {
+      id: '/dashboard_/agents'
+      path: '/dashboard/agents'
+      fullPath: '/dashboard/agents'
+      preLoaderRoute: typeof DashboardAgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$slug': {
+      id: '/compare/$slug'
+      path: '/compare/$slug'
+      fullPath: '/compare/$slug'
+      preLoaderRoute: typeof CompareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/settings': {
+      id: '/community/settings'
+      path: '/settings'
+      fullPath: '/community/settings'
+      preLoaderRoute: typeof CommunitySettingsRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/search': {
+      id: '/community/search'
+      path: '/search'
+      fullPath: '/community/search'
+      preLoaderRoute: typeof CommunitySearchRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/saved': {
+      id: '/community/saved'
+      path: '/saved'
+      fullPath: '/community/saved'
+      preLoaderRoute: typeof CommunitySavedRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/notifications': {
+      id: '/community/notifications'
+      path: '/notifications'
+      fullPath: '/community/notifications'
+      preLoaderRoute: typeof CommunityNotificationsRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/moderation': {
+      id: '/community/moderation'
+      path: '/moderation'
+      fullPath: '/community/moderation'
+      preLoaderRoute: typeof CommunityModerationRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/guidelines': {
+      id: '/community/guidelines'
+      path: '/guidelines'
+      fullPath: '/community/guidelines'
+      preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/groups': {
+      id: '/community/groups'
+      path: '/groups'
+      fullPath: '/community/groups'
+      preLoaderRoute: typeof CommunityGroupsRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/checklists/$slug': {
+      id: '/checklists/$slug'
+      path: '/checklists/$slug'
+      fullPath: '/checklists/$slug'
+      preLoaderRoute: typeof ChecklistsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/$slug': {
@@ -525,6 +2051,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/translate': {
+      id: '/api/translate'
+      path: '/api/translate'
+      fullPath: '/api/translate'
+      preLoaderRoute: typeof ApiTranslateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/receptionist': {
+      id: '/api/receptionist'
+      path: '/api/receptionist'
+      fullPath: '/api/receptionist'
+      preLoaderRoute: typeof ApiReceptionistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/prototype': {
       id: '/api/prototype'
       path: '/api/prototype'
@@ -532,35 +2072,359 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPrototypeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/proposal': {
+      id: '/api/proposal'
+      path: '/api/proposal'
+      fullPath: '/api/proposal'
+      preLoaderRoute: typeof ApiProposalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/makeover': {
+      id: '/api/makeover'
+      path: '/api/makeover'
+      fullPath: '/api/makeover'
+      preLoaderRoute: typeof ApiMakeoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inspiration-tick': {
+      id: '/api/inspiration-tick'
+      path: '/api/inspiration-tick'
+      fullPath: '/api/inspiration-tick'
+      preLoaderRoute: typeof ApiInspirationTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/indexnow': {
+      id: '/api/indexnow'
+      path: '/api/indexnow'
+      fullPath: '/api/indexnow'
+      preLoaderRoute: typeof ApiIndexnowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/goal-plan': {
+      id: '/api/goal-plan'
+      path: '/api/goal-plan'
+      fullPath: '/api/goal-plan'
+      preLoaderRoute: typeof ApiGoalPlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email-sequence': {
+      id: '/api/email-sequence'
+      path: '/api/email-sequence'
+      fullPath: '/api/email-sequence'
+      preLoaderRoute: typeof ApiEmailSequenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ecom-scan': {
+      id: '/api/ecom-scan'
+      path: '/api/ecom-scan'
+      fullPath: '/api/ecom-scan'
+      preLoaderRoute: typeof ApiEcomScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ecom-research': {
+      id: '/api/ecom-research'
+      path: '/api/ecom-research'
+      fullPath: '/api/ecom-research'
+      preLoaderRoute: typeof ApiEcomResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ecom-guide': {
+      id: '/api/ecom-guide'
+      path: '/api/ecom-guide'
+      fullPath: '/api/ecom-guide'
+      preLoaderRoute: typeof ApiEcomGuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ecom-audit': {
+      id: '/api/ecom-audit'
+      path: '/api/ecom-audit'
+      fullPath: '/api/ecom-audit'
+      preLoaderRoute: typeof ApiEcomAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/demo-ai': {
+      id: '/api/demo-ai'
+      path: '/api/demo-ai'
+      fullPath: '/api/demo-ai'
+      preLoaderRoute: typeof ApiDemoAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/contract-check': {
+      id: '/api/contract-check'
+      path: '/api/contract-check'
+      fullPath: '/api/contract-check'
+      preLoaderRoute: typeof ApiContractCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/community-assistant': {
+      id: '/api/community-assistant'
+      path: '/api/community-assistant'
+      fullPath: '/api/community-assistant'
+      preLoaderRoute: typeof ApiCommunityAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/blog-tick': {
+      id: '/api/blog-tick'
+      path: '/api/blog-tick'
+      fullPath: '/api/blog-tick'
+      preLoaderRoute: typeof ApiBlogTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/audit': {
+      id: '/api/audit'
+      path: '/api/audit'
+      fullPath: '/api/audit'
+      preLoaderRoute: typeof ApiAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/assistant': {
+      id: '/api/assistant'
+      path: '/api/assistant'
+      fullPath: '/api/assistant'
+      preLoaderRoute: typeof ApiAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-status': {
+      id: '/api/ai-status'
+      path: '/api/ai-status'
+      fullPath: '/api/ai-status'
+      preLoaderRoute: typeof ApiAiStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/agents-tick': {
+      id: '/api/agents-tick'
+      path: '/api/agents-tick'
+      fullPath: '/api/agents-tick'
+      preLoaderRoute: typeof ApiAgentsTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/$category/': {
+      id: '/solutions/$category/'
+      path: '/solutions/$category'
+      fullPath: '/solutions/$category/'
+      preLoaderRoute: typeof SolutionsCategoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/messages/': {
+      id: '/community/messages/'
+      path: '/messages'
+      fullPath: '/community/messages/'
+      preLoaderRoute: typeof CommunityMessagesIndexRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/inbox/': {
+      id: '/community/inbox/'
+      path: '/inbox'
+      fullPath: '/community/inbox/'
+      preLoaderRoute: typeof CommunityInboxIndexRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/solutions/$category/$slug': {
+      id: '/solutions/$category/$slug'
+      path: '/solutions/$category/$slug'
+      fullPath: '/solutions/$category/$slug'
+      preLoaderRoute: typeof SolutionsCategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community/u/$username': {
+      id: '/community/u/$username'
+      path: '/u/$username'
+      fullPath: '/community/u/$username'
+      preLoaderRoute: typeof CommunityUUsernameRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/post/$id': {
+      id: '/community/post/$id'
+      path: '/post/$id'
+      fullPath: '/community/post/$id'
+      preLoaderRoute: typeof CommunityPostIdRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/messages/$id': {
+      id: '/community/messages/$id'
+      path: '/messages/$id'
+      fullPath: '/community/messages/$id'
+      preLoaderRoute: typeof CommunityMessagesIdRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/inbox/$id': {
+      id: '/community/inbox/$id'
+      path: '/inbox/$id'
+      fullPath: '/community/inbox/$id'
+      preLoaderRoute: typeof CommunityInboxIdRouteImport
+      parentRoute: typeof CommunityRoute
+    }
+    '/community/g/$slug': {
+      id: '/community/g/$slug'
+      path: '/g/$slug'
+      fullPath: '/community/g/$slug'
+      preLoaderRoute: typeof CommunityGSlugRouteImport
+      parentRoute: typeof CommunityRoute
+    }
   }
 }
+
+interface CommunityRouteChildren {
+  CommunityGroupsRoute: typeof CommunityGroupsRoute
+  CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
+  CommunityModerationRoute: typeof CommunityModerationRoute
+  CommunityNotificationsRoute: typeof CommunityNotificationsRoute
+  CommunitySavedRoute: typeof CommunitySavedRoute
+  CommunitySearchRoute: typeof CommunitySearchRoute
+  CommunitySettingsRoute: typeof CommunitySettingsRoute
+  CommunityIndexRoute: typeof CommunityIndexRoute
+  CommunityGSlugRoute: typeof CommunityGSlugRoute
+  CommunityInboxIdRoute: typeof CommunityInboxIdRoute
+  CommunityMessagesIdRoute: typeof CommunityMessagesIdRoute
+  CommunityPostIdRoute: typeof CommunityPostIdRoute
+  CommunityUUsernameRoute: typeof CommunityUUsernameRoute
+  CommunityInboxIndexRoute: typeof CommunityInboxIndexRoute
+  CommunityMessagesIndexRoute: typeof CommunityMessagesIndexRoute
+}
+
+const CommunityRouteChildren: CommunityRouteChildren = {
+  CommunityGroupsRoute: CommunityGroupsRoute,
+  CommunityGuidelinesRoute: CommunityGuidelinesRoute,
+  CommunityModerationRoute: CommunityModerationRoute,
+  CommunityNotificationsRoute: CommunityNotificationsRoute,
+  CommunitySavedRoute: CommunitySavedRoute,
+  CommunitySearchRoute: CommunitySearchRoute,
+  CommunitySettingsRoute: CommunitySettingsRoute,
+  CommunityIndexRoute: CommunityIndexRoute,
+  CommunityGSlugRoute: CommunityGSlugRoute,
+  CommunityInboxIdRoute: CommunityInboxIdRoute,
+  CommunityMessagesIdRoute: CommunityMessagesIdRoute,
+  CommunityPostIdRoute: CommunityPostIdRoute,
+  CommunityUUsernameRoute: CommunityUUsernameRoute,
+  CommunityInboxIndexRoute: CommunityInboxIndexRoute,
+  CommunityMessagesIndexRoute: CommunityMessagesIndexRoute,
+}
+
+const CommunityRouteWithChildren = CommunityRoute._addFileChildren(
+  CommunityRouteChildren,
+)
+
+interface EcommerceRouteChildren {
+  EcommerceCompetitorsRoute: typeof EcommerceCompetitorsRoute
+  EcommerceDiagnoseRoute: typeof EcommerceDiagnoseRoute
+  EcommerceGrowRoute: typeof EcommerceGrowRoute
+  EcommerceGuideRoute: typeof EcommerceGuideRoute
+  EcommerceIntegrationsRoute: typeof EcommerceIntegrationsRoute
+  EcommerceMarketingRoute: typeof EcommerceMarketingRoute
+  EcommercePlanRoute: typeof EcommercePlanRoute
+  EcommerceProfitRoute: typeof EcommerceProfitRoute
+  EcommerceResearchRoute: typeof EcommerceResearchRoute
+  EcommerceStartRoute: typeof EcommerceStartRoute
+  EcommerceWorkspaceRoute: typeof EcommerceWorkspaceRoute
+  EcommerceIndexRoute: typeof EcommerceIndexRoute
+}
+
+const EcommerceRouteChildren: EcommerceRouteChildren = {
+  EcommerceCompetitorsRoute: EcommerceCompetitorsRoute,
+  EcommerceDiagnoseRoute: EcommerceDiagnoseRoute,
+  EcommerceGrowRoute: EcommerceGrowRoute,
+  EcommerceGuideRoute: EcommerceGuideRoute,
+  EcommerceIntegrationsRoute: EcommerceIntegrationsRoute,
+  EcommerceMarketingRoute: EcommerceMarketingRoute,
+  EcommercePlanRoute: EcommercePlanRoute,
+  EcommerceProfitRoute: EcommerceProfitRoute,
+  EcommerceResearchRoute: EcommerceResearchRoute,
+  EcommerceStartRoute: EcommerceStartRoute,
+  EcommerceWorkspaceRoute: EcommerceWorkspaceRoute,
+  EcommerceIndexRoute: EcommerceIndexRoute,
+}
+
+const EcommerceRouteWithChildren = EcommerceRoute._addFileChildren(
+  EcommerceRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AccountRoute: AccountRoute,
   AffiliateRoute: AffiliateRoute,
+  AiReceptionistRoute: AiReceptionistRoute,
   AnalyserRoute: AnalyserRoute,
+  BookRoute: BookRoute,
   CasesRoute: CasesRoute,
+  CommunityRoute: CommunityRouteWithChildren,
+  ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
   DashboardRoute: DashboardRoute,
+  DeRoute: DeRoute,
+  EcommerceRoute: EcommerceRouteWithChildren,
   EmailGeneratorRoute: EmailGeneratorRoute,
   FaqRoute: FaqRoute,
-  FreeResourcesRoute: FreeResourcesRoute,
+  FrRoute: FrRoute,
+  GoalPlannerRoute: GoalPlannerRoute,
   GrowthQuizRoute: GrowthQuizRoute,
+  IndustriesRoute: IndustriesRoute,
   IntakeRoute: IntakeRoute,
+  LlmsFullDottxtRoute: LlmsFullDottxtRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
+  LoginRoute: LoginRoute,
+  MakeoverRoute: MakeoverRoute,
+  NewsletterRoute: NewsletterRoute,
   PortalRoute: PortalRoute,
-  PortfolioRoute: PortfolioRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  ProposalRoute: ProposalRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   RoiCalculatorRoute: RoiCalculatorRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SmartContractCheckRoute: SmartContractCheckRoute,
+  TermsRoute: TermsRoute,
   TestimonialsRoute: TestimonialsRoute,
+  ToolsRoute: ToolsRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   WatchRoute: WatchRoute,
+  WebsiteAuditRoute: WebsiteAuditRoute,
+  WhyEmmaforyouRoute: WhyEmmaforyouRoute,
+  ApiAgentsTickRoute: ApiAgentsTickRoute,
+  ApiAiStatusRoute: ApiAiStatusRoute,
+  ApiAssistantRoute: ApiAssistantRoute,
+  ApiAuditRoute: ApiAuditRoute,
+  ApiBlogTickRoute: ApiBlogTickRoute,
+  ApiCommunityAssistantRoute: ApiCommunityAssistantRoute,
+  ApiContractCheckRoute: ApiContractCheckRoute,
+  ApiDemoAiRoute: ApiDemoAiRoute,
+  ApiEcomAuditRoute: ApiEcomAuditRoute,
+  ApiEcomGuideRoute: ApiEcomGuideRoute,
+  ApiEcomResearchRoute: ApiEcomResearchRoute,
+  ApiEcomScanRoute: ApiEcomScanRoute,
+  ApiEmailSequenceRoute: ApiEmailSequenceRoute,
+  ApiGoalPlanRoute: ApiGoalPlanRoute,
+  ApiIndexnowRoute: ApiIndexnowRoute,
+  ApiInspirationTickRoute: ApiInspirationTickRoute,
+  ApiMakeoverRoute: ApiMakeoverRoute,
+  ApiProposalRoute: ApiProposalRoute,
   ApiPrototypeRoute: ApiPrototypeRoute,
+  ApiReceptionistRoute: ApiReceptionistRoute,
+  ApiTranslateRoute: ApiTranslateRoute,
   BlogSlugRoute: BlogSlugRoute,
+  ChecklistsSlugRoute: ChecklistsSlugRoute,
+  CompareSlugRoute: CompareSlugRoute,
+  DashboardAgentsRoute: DashboardAgentsRoute,
+  DashboardInspirationRoute: DashboardInspirationRoute,
   ExpertiseSlugRoute: ExpertiseSlugRoute,
+  FreeResourcesSlugRoute: FreeResourcesSlugRoute,
+  InspirationIdRoute: InspirationIdRoute,
   KnowledgeBaseSlugRoute: KnowledgeBaseSlugRoute,
   NicheSlugRoute: NicheSlugRoute,
+  PortfolioSlugRoute: PortfolioSlugRoute,
   ServicesSlugRoute: ServicesSlugRoute,
+  SolutionsAppPlannerRoute: SolutionsAppPlannerRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ChecklistsIndexRoute: ChecklistsIndexRoute,
+  CompareIndexRoute: CompareIndexRoute,
+  FreeResourcesIndexRoute: FreeResourcesIndexRoute,
+  InspirationIndexRoute: InspirationIndexRoute,
   KnowledgeBaseIndexRoute: KnowledgeBaseIndexRoute,
+  PortfolioIndexRoute: PortfolioIndexRoute,
+  ServicesIndexRoute: ServicesIndexRoute,
+  SolutionsIndexRoute: SolutionsIndexRoute,
+  SolutionsCategorySlugRoute: SolutionsCategorySlugRoute,
+  SolutionsCategoryIndexRoute: SolutionsCategoryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -144,7 +144,7 @@ function DownloadModal({ magnet, onClose }: { magnet: LeadMagnet; onClose: () =>
             <p className="font-display text-2xl font-bold">✅ All set!</p>
             <p className="text-sm text-muted-foreground">Your toolkit is ready. Open it to tick items off, copy templates and save it as a PDF.</p>
             <Link to="/free-resources/$slug" params={{ slug: magnet.slug }} className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white">Open the toolkit →</Link>
-            <p className="text-xs text-muted-foreground">Questions about it? <a href={wa} target="_blank" rel="noopener noreferrer" className="underline">Message us on WhatsApp</a>.</p>
+            <p className="text-xs text-muted-foreground">Questions about it? <a href="https://wa.me/message/HHGMMWMRJFYUC1" target="_blank" rel="noopener noreferrer" className="underline">Message us on WhatsApp</a>.</p>
           </div>
         )}
       </div>

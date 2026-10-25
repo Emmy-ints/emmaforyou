@@ -57,7 +57,7 @@ export default function Footer() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { ready, signedIn, summary } = useAccount();
   const showSignup = !["/newsletter", "/unsubscribe"].includes(pathname) && !/^\/(fr|de)(\/|$)/.test(pathname);
-  const showClosing = !/^\/(book|contact|intake|login|account|portal|dashboard)(\/|$)/.test(pathname);
+  const showClosing = !/^\/(book|contact|intake|login|account|portal|dashboard|community|unsubscribe)(\/|$)/.test(pathname);
   const account: L[] = ready && signedIn
     ? [{ to: "/account", label: "Your account" }, { to: "/portal", label: "Client portal" }, { to: "/community/settings", label: "Community profile" }, ...(summary?.admin ? [{ to: "/dashboard", label: "Owner dashboard" }] : [])]
     : [{ to: "/login", label: "Sign in" }, { to: "/login", label: "Create account", search: { mode: "signup" } }, { to: "/login", label: "Forgot password", search: { mode: "forgot" } }, { to: "/portal", label: "Client portal" }];

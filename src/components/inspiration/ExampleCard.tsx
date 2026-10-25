@@ -13,7 +13,7 @@ export default function ExampleCard({ ex, sourceName, saved, onToggleSave, showI
   const img = showImage && !imgFailed && ex.image_status !== "broken" ? safeHref(ex.image_url) : null;
   const tags = [...new Set([...ex.industries, ...ex.styles, ...ex.tags])].slice(0, 3);
   return (
-    <article className="group flex min-w-0 flex-col overflow-hidden rounded-[20px] border border-border bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-[var(--emma-violet)]">
+    <article data-tilt="3" className="group flex min-w-0 flex-col overflow-hidden rounded-[20px] border border-border bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-[var(--emma-violet)]">
       <Link to="/inspiration/$id" params={{ id: ex.id }} className="relative block aspect-[16/10] overflow-hidden bg-muted" aria-label={`${ex.title}: details`}>
         {img ? (
           <img src={img} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setImgFailed(true)} className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]" sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 100vw" />

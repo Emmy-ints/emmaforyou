@@ -65,7 +65,7 @@ function AboutPage() {
         {/* Origin Story */}
         <section className="section-padding">
           <div className="mx-auto max-w-3xl">
-            <div className="space-y-5 font-body text-base font-normal leading-relaxed text-muted-foreground">
+            <div className="ab-journey space-y-5 font-body text-base font-normal leading-relaxed text-muted-foreground" data-scroll>
               <p>
                 Emmanuel Akinloye Oluwaseun didn't start with a team or an office. He started with a burning question: <em className="font-semibold text-foreground">"Why are Nigerian businesses being left behind in the digital age?"</em>
               </p>
@@ -78,7 +78,7 @@ function AboutPage() {
               <p>
                 What began as freelance work became something bigger — <strong className="text-foreground">EmmaForYou</strong>, a full-service digital agency built to give every business owner, regardless of location or budget, access to world-class digital tools.
               </p>
-              <blockquote className="mt-8 rounded-2xl p-6" style={{ background: "var(--gradient-dark)" }}>
+              <blockquote className="ab-quote mt-8 rounded-[24px] p-6 md:p-8" style={{ background: "var(--gradient-dark)" }}>
                 <p className="font-display text-lg font-bold italic text-white">
                   "I've seen what happens when a small business gets the right digital system. They don't just survive — they dominate."
                 </p>
@@ -93,7 +93,7 @@ function AboutPage() {
         {/* Founder Card */}
         <section className="section-padding bg-muted/30">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mx-auto h-40 w-40 overflow-hidden rounded-full">
+            <div className="ab-founder mx-auto h-40 w-40 overflow-hidden rounded-full">
               <img
                 src="/images/emmanuel.webp" width={900} height={1350} decoding="async"
                 alt="Emmanuel Akinloye Oluwaseun"
@@ -109,7 +109,7 @@ function AboutPage() {
             <ul className="mx-auto mt-8 grid max-w-3xl gap-3 text-left sm:grid-cols-2 lg:grid-cols-3">
               {ROLES.map((r) => (
                 <li key={r.title}>
-                  <Link to={r.to} className="flex h-full items-start gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-[var(--emma-violet)]">
+                  <Link to={r.to} data-tilt="4" className="flex h-full items-start gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-[var(--emma-violet)]">
                     <span className="text-2xl" aria-hidden="true">{r.icon}</span>
                     <span>
                       <span className="block font-display text-sm font-semibold text-foreground">{r.title}</span>
@@ -130,7 +130,7 @@ function AboutPage() {
             </h2>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {VALUES.map((v, i) => (
-                <div key={i} className="gradient-border rounded-2xl p-6 text-center">
+                <div key={i} className="gradient-border rounded-2xl p-6 text-center" data-tilt="5">
                   <span className="text-3xl">{v.icon}</span>
                   <h3 className="mt-3 font-display text-lg font-bold tracking-tight text-foreground">{v.title}</h3>
                   <p className="mt-2 font-body text-sm font-normal text-muted-foreground">{v.desc}</p>
@@ -148,7 +148,7 @@ function AboutPage() {
             </h2>
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               {LOCATIONS.map((loc) => (
-                <div key={loc.city} className="gradient-border flex items-center gap-3 rounded-2xl bg-background px-6 py-4">
+                <div key={loc.city} className="gradient-border flex items-center gap-3 rounded-2xl bg-background px-6 py-4" data-tilt="5">
                   <span className="text-2xl">{loc.flag}</span>
                   <div className="text-left">
                     <p className="font-display text-sm font-bold text-foreground">{loc.city}</p>

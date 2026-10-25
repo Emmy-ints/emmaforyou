@@ -2017,3 +2017,19 @@ html:not([data-motion="reduced"]) .nav-drawer.is-open nav[aria-label="Site secti
   .lg, .lg-strong { -webkit-backdrop-filter: blur(8px) saturate(1.3); backdrop-filter: blur(8px) saturate(1.3); }
   .sv-card, .sw-all, .ts-picker { -webkit-backdrop-filter: none; backdrop-filter: none; background-color: var(--glass-3); }
 }
+
+/* ---------- About: the journey line ---------- */
+.ab-journey { position: relative; padding-left: 2rem; }
+.ab-journey::before { content: ""; position: absolute; left: 6px; top: .5rem; bottom: .5rem; width: 2px; border-radius: 2px; background: color-mix(in srgb, var(--foreground) 8%, transparent); }
+.ab-journey::after { content: ""; position: absolute; left: 6px; top: .5rem; width: 2px; height: calc((100% - 1rem) * min(1, var(--sp, 1) * 1.8)); border-radius: 2px; background: linear-gradient(180deg, var(--emma-cyan), var(--emma-violet)); box-shadow: 0 0 10px var(--emma-violet); }
+.ab-journey > p { position: relative; }
+.ab-journey > p::before { content: ""; position: absolute; left: calc(-2rem + 1px); top: .55em; width: 12px; height: 12px; border-radius: 99px; background: var(--background); border: 2px solid var(--emma-violet); box-shadow: 0 0 0 4px color-mix(in srgb, var(--emma-violet) 14%, transparent); }
+.ab-quote { position: relative; overflow: hidden; isolation: isolate; box-shadow: var(--elev-3); }
+.ab-quote::before { content: "“"; position: absolute; right: 1rem; top: -1.5rem; z-index: -1; font-family: 'Poppins', sans-serif; font-size: 9rem; line-height: 1; color: rgba(139,123,255,.25); }
+.ab-founder { position: relative; box-shadow: 0 0 0 6px color-mix(in srgb, var(--emma-violet) 14%, transparent), 0 0 0 14px color-mix(in srgb, var(--emma-cyan) 7%, transparent), var(--elev-3); }
+
+/* ---------- Feedback states: errors nudge in, confirmations glow in ---------- */
+@keyframes alert-in { 0% { opacity: 0; transform: translateX(0); } 30% { opacity: 1; transform: translateX(-4px); } 60% { transform: translateX(3px); } 100% { transform: none; } }
+@keyframes status-in { from { opacity: 0; transform: translateY(6px); box-shadow: 0 0 0 0 rgba(61,214,245,.4); } 60% { box-shadow: 0 0 0 6px rgba(61,214,245,0); } }
+html:not([data-motion="reduced"]) main :is(form, .lg, .lg-strong, [class*="bg-card"]) [role="alert"] { animation: alert-in .45s var(--ease-out-expo) both; }
+html:not([data-motion="reduced"]) main p[role="status"], html:not([data-motion="reduced"]) main div[role="status"]:not(.ecx-progress) { animation: status-in .6s var(--ease-out-expo) both; }

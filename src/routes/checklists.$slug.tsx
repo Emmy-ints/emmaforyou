@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import ToolShell from "../components/tools/ToolShell";
 import ChecklistView from "../components/tools/ChecklistView";
 import { CHECKLISTS, findChecklist, itemCount } from "@/lib/checklists";
@@ -36,7 +37,7 @@ function Page() {
     <ToolShell eyebrow={`Free checklist · ${itemCount(c)} checks`} title={c.title} intro={`${c.description} For: ${c.audience.toLowerCase()}.`} width="max-w-4xl">
       <ChecklistView c={c} />
       <section className="no-print mt-14" aria-labelledby="more-cl">
-        <h2 id="more-cl" className="font-display text-xl font-semibold">More free checklists</h2>
+        <h2 id="more-cl" className="font-display text-xl font-semibold"><KineticText text="More free checklists" base={30} /></h2>
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {others.map((o) => (
             <li key={o.slug}><Link to="/checklists/$slug" params={{ slug: o.slug }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 hover:border-[var(--emma-violet)]"><span className="text-2xl" aria-hidden="true">{o.icon}</span><span className="font-semibold">{o.title}</span></Link></li>

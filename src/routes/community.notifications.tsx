@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2, CheckCheck, Heart, MessageCircle, AtSign, UserPlus, Award, ShieldAlert, Megaphone } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -55,7 +56,7 @@ function NotificationsPage() {
 
   if (ready && !uid) return (
     <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center">
-      <h1 className="font-display text-xl font-bold">Notifications</h1>
+      <h1 className="font-display text-xl font-bold"><KineticText text="Notifications" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">Sign in to see replies, reactions and new followers.</p>
       <button type="button" onClick={() => openAuth(undefined, "signin")} className="btn-primary-gradient mt-4 rounded-full px-5 py-2.5 text-sm font-semibold text-white">Sign in</button>
     </div>
@@ -64,7 +65,7 @@ function NotificationsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-display text-2xl font-extrabold">Notifications</h1>
+        <h1 className="font-display text-2xl font-extrabold"><KineticText text="Notifications" base={60} /></h1>
         {unread && <button type="button" onClick={readAll} className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border px-4 text-sm font-semibold hover:bg-muted"><CheckCheck className="h-4 w-4" aria-hidden="true" />Mark all read</button>}
       </div>
       {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}

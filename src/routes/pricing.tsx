@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -33,18 +34,19 @@ function PricingPage() {
     <>
       <Navbar />
       <main>
-        <section className="section-padding pt-32 text-center">
-          <div className="mx-auto max-w-4xl">
+        <section className="pr section-padding relative overflow-hidden pt-32 text-center">
+          <div className="roi-x-grid" aria-hidden="true" />
+          <div className="relative mx-auto max-w-4xl">
             <h1 className="font-display text-4xl font-extrabold md:text-7xl">
               Transparent Pricing.<br/><span className="gradient-text">Real Results.</span>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
               No hidden fees. No long contracts. Upgrade, downgrade or cancel anytime.
             </p>
-            <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-border bg-card p-1.5">
-              <button onClick={() => setAnnual(false)} className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${!annual ? "bg-emma-charcoal text-white" : "text-muted-foreground"}`}>Monthly</button>
-              <button onClick={() => setAnnual(true)} className={`rounded-full px-5 py-2 text-sm font-semibold transition-all ${annual ? "bg-emma-charcoal text-white" : "text-muted-foreground"}`}>
-                Annual <span className="ml-1 rounded-full bg-emma-gold/30 px-2 py-0.5 text-[10px] font-bold text-emma-charcoal">Save 20%</span>
+            <div className="pr-toggle lg mt-8 inline-flex items-center gap-1 rounded-full p-1.5" role="group" aria-label="Billing period" data-annual={annual || undefined}>
+              <button type="button" aria-pressed={!annual} onClick={() => setAnnual(false)} className={`relative z-[1] rounded-full px-5 py-2 text-sm font-semibold transition-colors ${!annual ? "text-white" : "text-muted-foreground"}`}>Monthly</button>
+              <button type="button" aria-pressed={annual} onClick={() => setAnnual(true)} className={`relative z-[1] rounded-full px-5 py-2 text-sm font-semibold transition-colors ${annual ? "text-white" : "text-muted-foreground"}`}>
+                Annual <span className="ml-1 rounded-full bg-[#f5b544]/30 px-2 py-0.5 text-[10px] font-bold text-current">Save 20%</span>
               </button>
             </div>
           </div>
@@ -53,7 +55,7 @@ function PricingPage() {
             {TIERS.map((t, i) => (
               <motion.div key={t.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className={`relative flex flex-col rounded-3xl border-2 bg-card p-6 text-left ${t.popular ? "border-emma-blue shadow-2xl scale-[1.03]" : "border-border shadow-md"}`}>
+                data-tilt="3" className={`pr-tier relative flex flex-col rounded-[28px] p-6 text-left ${t.popular ? "is-popular lg-strong" : "lg"}`}>
                 {t.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white"
                     style={{ background: "var(--gradient-brand)" }}>Most Popular</div>
@@ -65,7 +67,7 @@ function PricingPage() {
                     <div className="font-display text-4xl font-extrabold">Custom</div>
                   ) : (
                     <>
-                      <span className="font-display text-4xl font-extrabold">${annual ? t.annual : t.monthly}</span>
+                      <span key={annual ? "a" : "m"} className="pr-price font-display text-4xl font-semibold tracking-tight">${annual ? t.annual : t.monthly}</span>
                       <span className="text-sm text-muted-foreground">/mo</span>
                       {annual && <p className="mt-1 text-xs text-emma-blue font-semibold">Billed annually · save ${(t.monthly - t.annual) * 12}/yr</p>}
                     </>
@@ -98,14 +100,13 @@ function PricingPage() {
 
         <section className="section-padding bg-muted/30">
           <div className="mx-auto max-w-3xl">
-            <h2 className="text-center font-display text-3xl font-extrabold md:text-5xl">Pricing FAQs</h2>
+            <h2 className="text-center font-display text-3xl font-extrabold md:text-5xl"><KineticText text="Pricing FAQs" base={30} /></h2>
             <div className="mt-10 space-y-3">
               {FAQS.map((f, i) => (
-                <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
-                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}
-                    className="flex w-full items-center justify-between gap-4 p-5 text-left">
-                    <span className="font-display text-base font-bold">{f.q}</span>
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
+                <div key={i} className={`fq-item lg ${openFaq === i ? "is-open" : ""}`}>
+                  <button onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i} className="fq-q">
+                    <span className="font-display text-base font-semibold">{f.q}</span>
+                    <span className="fq-icon" aria-hidden="true" />
                   </button>
                   <div className="acc-panel" data-open={openFaq === i} inert={openFaq !== i}><div><p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p></div></div>
                 </div>

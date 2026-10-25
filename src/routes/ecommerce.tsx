@@ -25,22 +25,24 @@ function EcomLayout() {
   return (
     <>
       <Navbar />
-      <main id="main-content" className="min-h-screen bg-background pb-20 pt-[68px] lg:pt-[72px]">
-        <div className="sticky top-[68px] z-30 border-b border-border bg-background/90 backdrop-blur-md lg:top-[72px]">
-          <nav aria-label="Ecommerce Intelligence" className="mx-auto max-w-7xl px-3 sm:px-5">
-            <ul className="flex gap-1 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <main id="main-content" className="ecx min-h-screen bg-background pb-20 pt-[68px] lg:pt-[72px]">
+        <div aria-hidden="true" className="ecx-ambient" />
+        <div className="ecx-rail sticky top-[68px] z-30 lg:top-[72px]">
+          <nav aria-label="Ecommerce Intelligence" className="mx-auto flex max-w-7xl items-center gap-3 px-3 sm:px-5">
+            <span className="ecx-badge hidden md:inline-flex" aria-hidden="true"><span className="sx-kicker-dot" />Ecommerce Intelligence</span>
+            <ul className="flex min-w-0 flex-1 gap-1 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {ECOM_NAV.map((n) => {
                 const active = n.to === "/ecommerce" ? pathname === "/ecommerce" : pathname.startsWith(n.to);
                 return (
                   <li key={n.to} className="shrink-0">
-                    <Link to={n.to} aria-current={active ? "page" : undefined} className={`inline-flex min-h-9 items-center rounded-full px-3.5 text-sm font-medium transition-colors ${active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>{n.label}</Link>
+                    <Link to={n.to} aria-current={active ? "page" : undefined} className="ecx-tab">{n.label}</Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
         </div>
-        <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-5 lg:px-8"><Outlet /></div>
+        <div className="relative mx-auto max-w-7xl px-4 pt-8 sm:px-5 lg:px-8"><Outlet /></div>
       </main>
       <Footer />
     </>

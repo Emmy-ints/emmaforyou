@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -44,7 +45,9 @@ function LoginPage() {
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(60%_60%_at_50%_0%,color-mix(in_srgb,var(--emma-violet)_16%,transparent),transparent_70%)]" />
         <div className="relative mx-auto w-full max-w-md">
           <div className="mb-6 flex justify-center"><Wordmark /></div>
-          <div className="rounded-3xl border border-border bg-card p-6 shadow-[0_30px_60px_-40px_rgba(11,13,36,0.45)] sm:p-8">
+          <div className="auth-stage relative">
+          <div className="auth-orb" aria-hidden="true"><div className="efy-orb-fallback" /></div>
+          <div className="auth-card lg-strong relative rounded-[30px] p-6 sm:p-8">
             {!ready ? (
               <div className="flex justify-center py-10" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading</span></div>
             ) : recovery ? (
@@ -52,7 +55,7 @@ function LoginPage() {
             ) : signedIn ? (
               <div className="text-center">
                 <CheckCircle2 className="mx-auto h-9 w-9 text-emerald-600" aria-hidden="true" />
-                <h1 className="mt-3 font-display text-2xl font-bold">You're signed in</h1>
+                <h1 className="mt-3 font-display text-2xl font-bold"><KineticText text="You're signed in" base={60} /></h1>
                 <p className="mt-1 text-sm text-muted-foreground">as <span className="font-medium text-foreground">{email}</span></p>
                 <div className="mt-6 grid gap-2">
                   <Link to="/account" className="btn-primary-gradient rounded-full px-5 py-3 text-sm font-semibold text-white">Go to your account</Link>
@@ -66,6 +69,7 @@ function LoginPage() {
                 <AccountAuthForm key={mode} initialMode={mode === "reset" ? "signin" : mode} intent={dest.startsWith("/portal") ? "portal" : dest.startsWith("/community") ? "community" : "account"} next={dest} idPrefix="login" onSignedIn={() => navigate({ to: dest as "/account" })} />
               </>
             )}
+          </div>
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">Need help signing in? <Link to="/contact" className="underline">Contact us</Link></p>
         </div>
@@ -92,14 +96,14 @@ function NewPassword({ onDone }: { onDone: () => void }) {
   }
   if (!signedIn) return (
     <div className="text-center">
-      <h1 className="font-display text-2xl font-bold">This reset link has expired</h1>
+      <h1 className="font-display text-2xl font-bold"><KineticText text="This reset link has expired" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">Reset links work once and for a limited time. Ask for a new one.</p>
       <Link to="/login" search={{ mode: "forgot" }} className="btn-primary-gradient mt-5 inline-flex rounded-full px-5 py-3 text-sm font-semibold text-white">Send a new link</Link>
     </div>
   );
   return (
     <form onSubmit={submit} className="space-y-3">
-      <h1 className="font-display text-2xl font-bold">Choose a new password</h1>
+      <h1 className="font-display text-2xl font-bold"><KineticText text="Choose a new password" base={60} /></h1>
       <p className="text-sm text-muted-foreground">It changes your password for the whole site: community, client portal and dashboard.</p>
       <div><label htmlFor="np1" className="text-sm font-medium">New password</label><input id="np1" type="password" autoComplete="new-password" className="input mt-1" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required /></div>
       <div><label htmlFor="np2" className="text-sm font-medium">Repeat new password</label><input id="np2" type="password" autoComplete="new-password" className="input mt-1" value={pw2} onChange={(e) => setPw2(e.target.value)} minLength={8} required /></div>

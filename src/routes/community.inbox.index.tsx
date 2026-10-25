@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Headset, Loader2 } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -17,7 +18,7 @@ function InboxPage() {
   const [list, setList] = useState<Conversation[] | null>(null);
   const [error, setError] = useState("");
   useEffect(() => { if (ready && uid && staff) staffInbox(uid).then(setList).catch((e) => { setError(friendly(e)); setList([]); }); }, [ready, uid, staff]);
-  if (ready && !staff) return <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center"><h1 className="font-display text-xl font-bold">Support inbox</h1><p className="mt-2 text-sm text-muted-foreground">This area is for the EmmaForYou team.</p><Link to="/community" className="mt-4 inline-flex rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">Back to the community</Link></div>;
+  if (ready && !staff) return <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center"><h1 className="font-display text-xl font-bold"><KineticText text="Support inbox" base={60} /></h1><p className="mt-2 text-sm text-muted-foreground">This area is for the EmmaForYou team.</p><Link to="/community" className="mt-4 inline-flex rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">Back to the community</Link></div>;
   const waiting = list?.filter((c) => c.human_requested_at && c.control === "ai").length ?? 0;
   return (
     <div className="mx-auto max-w-2xl">

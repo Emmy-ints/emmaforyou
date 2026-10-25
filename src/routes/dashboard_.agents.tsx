@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, Lock } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
@@ -44,10 +45,10 @@ function AgentsAdminPage() {
 
   if (checking || (session && isAdmin === null)) return <Shell><Loading /></Shell>;
   if (!session) return (
-    <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold">Agent Control Center</h1><p className="mb-5 text-sm text-muted-foreground">Sign in with an admin account.</p><AccountAuthForm intent="account" next="/dashboard" idPrefix="agents-auth" /></div></Shell>
+    <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold"><KineticText text="Agent Control Center" base={60} /></h1><p className="mb-5 text-sm text-muted-foreground">Sign in with an admin account.</p><AccountAuthForm intent="account" next="/dashboard" idPrefix="agents-auth" /></div></Shell>
   );
   if (!isAdmin) return (
-    <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold">Admins only</h1><p className="mt-2 text-sm text-muted-foreground">This account doesn't have the admin role.</p><Link to="/account" className="mt-4 inline-block text-sm font-semibold underline">Go to your account</Link></div></Shell>
+    <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold"><KineticText text="Admins only" base={60} /></h1><p className="mt-2 text-sm text-muted-foreground">This account doesn't have the admin role.</p><Link to="/account" className="mt-4 inline-block text-sm font-semibold underline">Go to your account</Link></div></Shell>
   );
   return <ControlCenter />;
 }
@@ -65,7 +66,7 @@ function ControlCenter() {
   return (
     <Shell>
       <header className="mb-4">
-        <h1 className="font-display text-2xl font-extrabold tracking-tight">Agent Control Center</h1>
+        <h1 className="font-display text-2xl font-extrabold tracking-tight"><KineticText text="Agent Control Center" base={60} /></h1>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">Your team of automated AI specialists in the Community: what they're doing, what's waiting for you, and every setting. Agents are always labelled as AI to members, and you can pause everything or take over any thread.</p>
       </header>
       <nav aria-label="Control center sections" className="sticky top-0 z-20 -mx-4 mb-4 overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
@@ -91,7 +92,7 @@ function ControlCenter() {
 
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <div className="border-b border-border"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6"><Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm font-semibold"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Owner dashboard</Link><Link to="/community" className="text-sm text-muted-foreground hover:text-foreground">Community</Link></div></div>
       <main id="main-content" className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</main>
       <style>{`

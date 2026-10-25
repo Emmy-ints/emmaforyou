@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { MapPin, Globe, Calendar, Loader2, MoreHorizontal, Flag, Ban, Pencil, BadgeCheck, Share2, MessageSquare } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -107,7 +108,7 @@ function ProfilePage() {
   if (p === undefined) return <div className="flex justify-center py-16" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading profile</span></div>;
   if (p === null) return (
     <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center">
-      <h1 className="font-display text-xl font-bold">Member not found</h1>
+      <h1 className="font-display text-xl font-bold"><KineticText text="Member not found" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">{error || (uid ? "This profile doesn't exist or isn't available." : "This profile may be visible to members only.")}</p>
       <div className="mt-4 flex flex-wrap justify-center gap-2">
         {!uid && <button type="button" onClick={() => openAuth("Sign in to see members-only profiles.", "signin")} className="btn-primary-gradient rounded-full px-5 py-2.5 text-sm font-semibold text-white">Sign in</button>}

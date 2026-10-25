@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2, Search, HelpCircle } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -37,7 +38,7 @@ function SearchPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="font-display text-2xl font-extrabold">Explore</h1>
+      <h1 className="font-display text-2xl font-extrabold"><KineticText text="Explore" base={60} /></h1>
       <form role="search" className="mt-3" onSubmit={(e) => { e.preventDefault(); navigate({ search: { q: text.trim() || undefined, type }, replace: true }); }}>
         <label htmlFor="community-search" className="sr-only">Search posts, questions and people</label>
         <div className="relative"><Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -24,14 +25,14 @@ function SavedPage() {
 
   if (ready && !uid) return (
     <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center">
-      <h1 className="font-display text-xl font-bold">Saved posts</h1>
+      <h1 className="font-display text-xl font-bold"><KineticText text="Saved posts" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">Sign in to see posts you've saved.</p>
       <button type="button" onClick={() => openAuth(undefined, "signin")} className="btn-primary-gradient mt-4 rounded-full px-5 py-2.5 text-sm font-semibold text-white">Sign in</button>
     </div>
   );
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="font-display text-2xl font-extrabold">Saved posts</h1>
+      <h1 className="font-display text-2xl font-extrabold"><KineticText text="Saved posts" base={60} /></h1>
       <p className="mt-1 text-sm text-muted-foreground">Only you can see what you've saved.</p>
       <div className="mt-4 space-y-4">
         {list === null ? <div className="flex justify-center py-10"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-label="Loading saved posts" /></div>

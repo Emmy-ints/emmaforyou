@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2, Lock, Users, BarChart3, ShieldCheck, LogOut, KeyRound, CheckCircle2, ArrowRight } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -23,7 +24,7 @@ function AccountPage() {
       <main id="main-content" className="mx-auto w-full max-w-3xl px-5 pb-20 pt-28 sm:pt-32">
         {!ready || !signedIn ? <div className="flex justify-center py-20" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading your account</span></div> : (
           <>
-            <h1 className="font-display text-3xl font-extrabold">Your account</h1>
+            <h1 className="font-display text-3xl font-semibold tracking-tight"><KineticText text="Your account" base={30} /></h1>
             <p className="mt-1 text-sm text-muted-foreground">Signed in as <span className="font-medium text-foreground">{email}</span>. This one account works across every EmmaForYou area.</p>
             <section aria-labelledby="areas-h" className="mt-8">
               <h2 id="areas-h" className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Your areas</h2>
@@ -56,7 +57,7 @@ function AccountPage() {
 function Area({ icon: Icon, title, text, to, cta }: { icon: typeof Users; title: string; text: string; to: string; cta: string }) {
   return (
     <li>
-      <Link to={to} className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition hover:border-[var(--emma-violet)]">
+      <Link to={to} className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] transition hover:border-[var(--emma-violet)]" data-tilt="3">
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--emma-violet)]/10 text-[var(--emma-violet)]"><Icon className="h-4 w-4" aria-hidden="true" /></span>
         <span className="mt-3 font-display text-base font-bold">{title}</span>
         <span className="mt-1 flex-1 text-sm text-muted-foreground">{text}</span>

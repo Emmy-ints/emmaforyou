@@ -72,7 +72,7 @@ export default function PostCard({ post, onChange, onRemoved, onEdit, full = fal
 
   const postLink = { to: "/community/post/$id" as const, params: { id: post.id } };
   return (
-    <article className="rounded-[20px] border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5" aria-labelledby={`post-${post.id}-by`}>
+    <article className="cmx-post rounded-[20px] border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5" aria-labelledby={`post-${post.id}-by`}>
       {post.is_pinned && <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-[var(--emma-violet)]"><Pin className="h-3.5 w-3.5" aria-hidden="true" />Pinned by the community team</p>}
       <header className="flex items-start gap-3">
         <Link to="/community/u/$username" params={{ username: post.author_username }} className="shrink-0" aria-hidden="true" tabIndex={-1}><Avatar name={post.author_name} src={post.author_avatar} size={44} /></Link>

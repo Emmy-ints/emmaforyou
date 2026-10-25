@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -44,7 +45,7 @@ function WatchPage() {
       <main className="pt-32 pb-24">
         <section className="mx-auto max-w-4xl px-5 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-6xl">How the EmmaForYou growth system works</h1>
+            <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-6xl"><KineticText text="How the EmmaForYou growth system works" base={60} /></h1>
             <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">Four steps we follow with every client: audit, foundation, traffic and scale. Below is a live demo of the kind of automation we build in step two.</p>
           </motion.div>
 

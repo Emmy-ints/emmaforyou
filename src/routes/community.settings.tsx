@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Upload, Trash2, Download, LogOut, Check } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -31,7 +32,7 @@ function SettingsPage() {
   if (!ready) return <div className="flex justify-center py-16" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading</span></div>;
   if (!uid) return (
     <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center">
-      <h1 className="font-display text-xl font-bold">Community settings</h1>
+      <h1 className="font-display text-xl font-bold"><KineticText text="Community settings" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">Sign in to manage your community profile.</p>
       <div className="mt-4 flex justify-center gap-2">
         <button type="button" onClick={() => openAuth(undefined, "signin")} className="btn-primary-gradient rounded-full px-5 py-2.5 text-sm font-semibold text-white">Sign in</button>

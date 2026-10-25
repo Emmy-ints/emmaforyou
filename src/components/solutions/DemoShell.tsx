@@ -51,7 +51,7 @@ export default function DemoShell({ solution }: { solution: Solution }) {
   const name = brand.trim() || DEFAULT.brand;
 
   return (
-    <div className="overflow-hidden rounded-[24px] border border-border bg-background shadow-[var(--shadow-card)]" style={{ ["--demo-accent" as string]: accent }}>
+    <div className="demo-shell overflow-hidden rounded-[24px] border border-border bg-background shadow-[var(--shadow-card)]" data-scroll style={{ ["--demo-accent" as string]: accent }}>
       <div className="flex flex-wrap items-center gap-3 border-b border-border bg-muted/50 px-4 py-3">
         <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><SlidersHorizontal className="h-4 w-4" />Customise</span>
         <label className="flex items-center gap-2 text-xs text-muted-foreground">Business name

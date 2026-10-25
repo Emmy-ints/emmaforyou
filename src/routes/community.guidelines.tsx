@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/community/guidelines")({
@@ -37,7 +38,7 @@ const SECTIONS: { h: string; items: string[] }[] = [
 function Guidelines() {
   return (
     <article className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-5 sm:p-8">
-      <h1 className="font-display text-2xl font-extrabold sm:text-3xl">Community guidelines</h1>
+      <h1 className="font-display text-2xl font-extrabold sm:text-3xl"><KineticText text="Community guidelines" base={60} /></h1>
       <p className="mt-2 text-sm text-muted-foreground">The EmmaForYou Community is a place for business owners, builders and learners to help each other with websites, apps, AI and automation. These rules keep it useful for everyone.</p>
       {SECTIONS.map((s) => (
         <section key={s.h} className="mt-6">

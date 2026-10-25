@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/knowledge-base/$slug")({
     return found;
   },
   notFoundComponent: () => (
-    <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Article not found</h1><Link to="/knowledge-base" className="mt-4 inline-block text-sm underline">Back to knowledge base</Link></div></div>
+    <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold"><KineticText text="Article not found" base={60} /></h1><Link to="/knowledge-base" className="mt-4 inline-block text-sm underline">Back to knowledge base</Link></div></div>
   ),
   head: ({ loaderData }) =>
     loaderData

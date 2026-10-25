@@ -13,6 +13,7 @@ import VoiceAsk from "../components/tools/VoiceAsk";
 import ConversionLayer from "../components/tools/ConversionLayer";
 import MotionRuntime from "../components/future/MotionRuntime";
 import SearchLauncher from "../components/future/SearchLauncher";
+import ScrollTop from "../components/future/ScrollTop";
 import StatusScreen from "../components/future/StatusScreen";
 
 function NotFoundComponent() {
@@ -83,6 +84,7 @@ function RootComponent() {
       <VoiceAsk />
       <ConversionLayer />
       <SearchLauncher />
+      <ScrollTop />
     </I18nProvider>
   );
 }

@@ -1,9 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Layers, Target } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import ProjectCard, { projectImage } from "../components/portfolio/ProjectCard";
+import ProjectCard, { projectImage, isStandInImage } from "../components/portfolio/ProjectCard";
 import { PROJECTS, featuredFor, findProject, projectSlug, socialFor } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
 import { pageHead, breadcrumbLd, creativeWorkLd, clip } from "@/lib/seo";
@@ -50,7 +51,7 @@ export const Route = createFileRoute("/portfolio/$slug")({
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="mx-auto max-w-3xl px-5 pb-24 pt-36 text-center">
-        <h1 className="font-display text-3xl font-semibold">That project isn't in the portfolio</h1>
+        <h1 className="font-display text-3xl font-semibold"><KineticText text="That project isn't in the portfolio" base={60} /></h1>
         <p className="mt-3 text-muted-foreground">It may have been renamed. Browse all client work instead.</p>
         <Link to="/portfolio" className="btn-gold mt-8 inline-flex rounded-full px-6 py-3 text-sm">See all projects</Link>
       </main>
@@ -79,15 +80,16 @@ function CaseStudyPage() {
     <div className="bg-background text-foreground">
       <Navbar />
       <main>
-        <section className="hero-ink relative overflow-hidden">
+        <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
+          <div className="hero-x-horizon" aria-hidden="true" />
           <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-32 md:px-8 lg:pt-40">
             <Link to="/portfolio" className="inline-flex items-center gap-1.5 text-sm text-[#a6abd0] hover:text-white"><ArrowLeft className="h-4 w-4" /> All client work</Link>
             <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] lg:items-end">
               <div>
                 <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />{featured?.niche ?? p.category}</motion.p>
-                <motion.h1 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05 }} className="hero-ink-title">{p.name}</motion.h1>
+                <h1 className="hero-ink-title"><KineticText text={p.name} /></h1>
                 <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.12 }} className="hero-ink-sub">{p.desc}</motion.p>
               </div>
               <motion.dl initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="svc-facts">
@@ -109,15 +111,16 @@ function CaseStudyPage() {
         </section>
 
         <section className="relative -mt-px bg-[#0b0d24] px-5 pb-20 md:px-8">
-          <motion.figure initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="cs-media mx-auto max-w-7xl">
-            <img src={projectImage(p)} alt={`${p.name} project`} className="h-full w-full object-cover" />
+          <motion.figure initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="cs-media csx-media mx-auto max-w-7xl" data-scroll>
+            <img src={projectImage(p)} alt={`${p.name} project`} className="csx-img h-full w-full object-cover" />
+            {isStandInImage(p) && <figcaption className="pc-standin">Illustrative photo — the client's own screenshots will replace it</figcaption>}
           </motion.figure>
         </section>
 
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-6xl gap-14 px-5 md:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
             <motion.div {...reveal}>
-              <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">The project</h2>
+              <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="The project" base={30} /></h2>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{p.desc}</p>
               {featured && <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{featured.desc}</p>}
 
@@ -157,7 +160,7 @@ function CaseStudyPage() {
         {study && (
           <section className="border-t border-border py-20 md:py-24" aria-labelledby="cs-story">
             <div className="mx-auto max-w-4xl space-y-12 px-5 md:px-8">
-              <h2 id="cs-story" className="font-display text-3xl font-semibold tracking-tight md:text-4xl">The full story</h2>
+              <h2 id="cs-story" className="font-display text-3xl font-semibold tracking-tight md:text-4xl"><KineticText text="The full story" base={30} /></h2>
               {study.challenge && (
                 <div><h3 className="font-display text-xl font-semibold">The challenge</h3><p className="mt-3 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{study.challenge}</p></div>
               )}
@@ -210,7 +213,7 @@ function CaseStudyPage() {
         <section className="py-20 md:py-24">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="flex items-end justify-between gap-4">
-              <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">More client work</h2>
+              <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="More client work" base={30} /></h2>
               <Link to="/portfolio" className="text-sm font-semibold text-[color:var(--emma-violet)] hover:underline underline-offset-4">All projects</Link>
             </div>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

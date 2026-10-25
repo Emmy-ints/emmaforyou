@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react
 import { Link } from "@tanstack/react-router";
 import { Loader2, Check, Save, LogIn } from "lucide-react";
 import { useAccount } from "@/lib/auth/use-account";
+import { KineticText } from "@/components/future/Kinetic";
 import { currentWorkspace, rememberWorkspace, saveItem, type Item, type ItemKind, type Workspace } from "@/lib/ecom/workspace";
 
 /* ------------------------------------------------------------------ workspace store */
@@ -29,18 +30,18 @@ export function useWorkspace(): { ready: boolean; signedIn: boolean; uid: string
 /* ------------------------------------------------------------------ building blocks */
 export function PageIntro({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
   return (
-    <div className="mb-6">
-      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[var(--emma-violet)]">{eyebrow}</p>
-      <h1 className="mt-1 font-display text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
-      {children && <div className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">{children}</div>}
+    <div className="ecx-intro mb-6">
+      <p className="sx-kicker"><span className="sx-kicker-dot" aria-hidden="true" />{eyebrow}</p>
+      <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-4xl"><KineticText text={title} base={40} /></h1>
+      {children && <div className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-[0.95rem]">{children}</div>}
     </div>
   );
 }
 
 export function Card({ title, children, className = "", actions }: { title?: ReactNode; children: ReactNode; className?: string; actions?: ReactNode }) {
   return (
-    <section className={`rounded-2xl border border-border bg-card p-4 sm:p-5 ${className}`}>
-      {(title || actions) && <div className="mb-3 flex flex-wrap items-center justify-between gap-2">{title && <h2 className="font-display text-base font-bold">{title}</h2>}{actions}</div>}
+    <section className={`ecx-card lg rounded-[22px] p-4 sm:p-5 ${className}`}>
+      {(title || actions) && <div className="mb-3 flex flex-wrap items-center justify-between gap-2">{title && <h2 className="font-display text-base font-semibold">{title}</h2>}{actions}</div>}
       {children}
     </section>
   );
@@ -87,9 +88,13 @@ export function Progress({ label, steps }: { label: string; steps?: string[] }) 
   const [i, setI] = useState(0);
   useEffect(() => { if (!steps?.length) return; const t = window.setInterval(() => setI((x) => Math.min(x + 1, steps.length - 1)), 4000); return () => window.clearInterval(t); }, [steps]);
   return (
-    <div role="status" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm">
-      <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[var(--emma-violet)]" aria-hidden="true" />
-      <span><span className="font-semibold">{label}</span>{steps?.length ? <span className="block text-muted-foreground">{steps[i]}</span> : null}</span>
+    <div role="status" className="ecx-progress lg rounded-[20px] p-4 text-sm">
+      <div className="flex items-center gap-3">
+        <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[var(--emma-violet)]" aria-hidden="true" />
+        <span><span className="font-semibold">{label}</span>{steps?.length ? <span key={i} className="ecx-step block text-muted-foreground">{steps[i]}</span> : null}</span>
+      </div>
+      <span className="ecx-scan" aria-hidden="true" />
+      {steps && steps.length > 1 && <ol className="ecx-dots" aria-hidden="true">{steps.map((st, n) => <li key={st} data-on={n <= i || undefined} />)}</ol>}
     </div>
   );
 }
@@ -124,7 +129,7 @@ export function ScoreRing({ value, label, size = 76 }: { value: number; label: s
     <figure className="flex flex-col items-center gap-1">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`${label}: ${pct} out of 100`}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeOpacity="0.12" strokeWidth="8" />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(pct / 100) * c} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+        <circle className="ecx-ring" cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(pct / 100) * c} ${c}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} style={{ ["--c" as string]: c, filter: `drop-shadow(0 0 6px ${color}88)` }} />
         <text x="50%" y="52%" dominantBaseline="middle" textAnchor="middle" className="fill-current font-display text-[17px] font-bold">{pct}</text>
       </svg>
       <figcaption className="text-xs font-medium text-muted-foreground">{label}</figcaption>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import type { ReactNode } from "react";
 import { Check, Minus, Upload, Clock } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -32,7 +33,7 @@ function Integrations() {
         <div className="flex flex-wrap items-start gap-3">
           <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--emma-violet)]/10 text-[var(--emma-violet)]"><Upload className="h-4 w-4" aria-hidden="true" /></span>
           <div className="min-w-0 flex-1">
-            <h2 className="font-display text-base font-bold">Available now: CSV import and manual entry</h2>
+            <h2 className="font-display text-base font-bold"><KineticText text="Available now: CSV import and manual entry" base={30} /></h2>
             <p className="mt-1 text-sm text-muted-foreground">Export orders from Shopify (Orders → Export), WooCommerce (Analytics or Orders → Export) or any platform with an order number and total column, then upload it in the <Link to="/ecommerce/diagnose" className="font-semibold text-foreground underline">sales diagnosis</Link> or <Link to="/ecommerce/profit" className="font-semibold text-foreground underline">profit analyzer</Link>. Files are read in your browser; only the summary is saved if you choose to save it.</p>
           </div>
         </div>

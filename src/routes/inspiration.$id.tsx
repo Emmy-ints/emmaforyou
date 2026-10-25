@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Bookmark, BookmarkCheck, ExternalLink, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -105,7 +106,7 @@ function Page() {
             </div>
             {related.length > 0 && (
               <section className="mt-16" aria-labelledby="insp-related">
-                <h2 id="insp-related" className="font-display text-2xl font-semibold tracking-tight">Related examples</h2>
+                <h2 id="insp-related" className="font-display text-2xl font-semibold tracking-tight"><KineticText text="Related examples" base={30} /></h2>
                 <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">{related.map((r) => <li key={r.id} className="min-w-0"><ExampleCard ex={r} sourceName={name(r.source_id)} saved={saves.isSaved(r.id)} onToggleSave={saves.toggle} /></li>)}</ul>
               </section>
             )}

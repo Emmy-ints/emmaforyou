@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { pageHead, breadcrumbLd, founderLd } from "@/lib/seo";
@@ -100,7 +101,7 @@ function AboutPage() {
                 loading="lazy"
               />
             </div>
-            <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground">Emmanuel Akinloye Oluwaseun</h2>
+            <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground"><KineticText text="Emmanuel Akinloye Oluwaseun" base={30} /></h2>
             <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
             <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
               Developer (web, apps, Web3, Solidity and smart contracts), marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach, and a passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.
@@ -161,7 +162,7 @@ function AboutPage() {
 
         {/* CTA */}
         <section className="section-padding text-center" style={{ background: "var(--gradient-gold)" }}>
-          <h2 className="font-display text-3xl font-extrabold tracking-tight text-emma-charcoal md:text-4xl">Ready to Grow?</h2>
+          <h2 className="font-display text-3xl font-extrabold tracking-tight text-emma-charcoal md:text-4xl"><KineticText text="Ready to Grow?" base={30} /></h2>
           <p className="mx-auto mt-3 max-w-lg font-body text-base font-normal text-emma-charcoal/70">Let's build something incredible for your business.</p>
           <a
             href={WHATSAPP_URL}

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Check, Copy, Download, RotateCcw } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/free-resources/$slug")({
     });
   },
   notFoundComponent: () => (
-    <div className="min-h-screen bg-background"><Navbar /><main className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold">That resource doesn't exist</h1><p className="mt-3 text-muted-foreground">It may have moved.</p><Link to="/free-resources" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">See all free toolkits →</Link></main><Footer /></div>
+    <div className="min-h-screen bg-background"><Navbar /><main className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold"><KineticText text="That resource doesn't exist" base={60} /></h1><p className="mt-3 text-muted-foreground">It may have moved.</p><Link to="/free-resources" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">See all free toolkits →</Link></main><Footer /></div>
   ),
   component: ResourcePage,
 });
@@ -102,7 +103,7 @@ function ResourcePage() {
         )}
 
         <section className="mt-8 rounded-2xl border border-border bg-card p-5">
-          <h2 className="font-display text-lg font-bold">How to use this</h2>
+          <h2 className="font-display text-lg font-bold"><KineticText text="How to use this" base={30} /></h2>
           <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-muted-foreground">
             {content.howToUse.map((h) => <li key={h}>{h}</li>)}
           </ol>
@@ -140,7 +141,7 @@ function ResourcePage() {
         ))}
 
         <section className="mt-12 rounded-3xl border border-border bg-card p-6 text-center print:hidden">
-          <h2 className="font-display text-xl font-bold">Want help putting this in place?</h2>
+          <h2 className="font-display text-xl font-bold"><KineticText text="Want help putting this in place?" base={30} /></h2>
           <p className="mt-2 text-sm text-muted-foreground">We can set up the website, automations or campaigns for you, or review what you've got.</p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <Link to="/book" className="btn-primary-gradient rounded-full px-5 py-2.5 text-sm font-semibold text-white">Book a free strategy call</Link>

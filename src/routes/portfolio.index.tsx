@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useMemo, useState } from "react";
 import { LayoutGroup, motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Megaphone, PlayCircle, Sparkles, Zap } from "lucide-react";
@@ -50,12 +51,13 @@ function PortfolioPage() {
       <Navbar />
       <main>
         {/* Hero */}
-        <section className="hero-ink relative overflow-hidden">
+        <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
+          <div className="hero-x-horizon" aria-hidden="true" />
           <div className="relative mx-auto max-w-7xl px-5 pb-16 pt-32 md:px-8 lg:pt-40">
             <motion.p {...enter(0)} className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />Selected client work</motion.p>
-            <motion.h1 {...enter(0.06)} className="hero-ink-title max-w-[18ch]">Real businesses. Real projects. Built and grown by EmmaForYou.</motion.h1>
+            <h1 className="hero-ink-title max-w-[18ch]"><KineticText text="Real businesses. Real projects. Built and grown by EmmaForYou." shine={["EmmaForYou"]} /></h1>
             <motion.p {...enter(0.12)} className="hero-ink-sub">
               Websites, online stores, automation, social media and ads for {PROJECTS.length} businesses across fashion, real estate, hospitality, health, education and coaching.
             </motion.p>
@@ -72,16 +74,17 @@ function PortfolioPage() {
               const p = findProject(projectSlug(f.client));
               return (
                 <motion.article key={f.client} {...reveal} className={`pf-feature ${i % 2 ? "is-flipped" : ""}`}>
-                  <Link to="/portfolio/$slug" params={{ slug: projectSlug(f.client) }} className="pf-feature-media group" aria-label={`${f.client} case study`}>
-                    <img src={f.img} alt={`${f.client} project`} loading="lazy" className="transition-transform duration-700 group-hover:scale-[1.03]" />
+                  <Link to="/portfolio/$slug" params={{ slug: projectSlug(f.client) }} className="pf-feature-media pfx-media group" data-scroll data-tilt="3" aria-label={`${f.client} case study`}>
+                    <img src={f.img} alt={`${f.client} project`} loading="lazy" className="pfx-img" />
+                    <span className="pc-glare" aria-hidden="true" />
                     <span className="pf-feature-badge">{f.niche}</span>
                   </Link>
                   <div>
                     <ul className="flex flex-wrap gap-2">{f.tags.map((t) => <li key={t} className="pf-tag">{t}</li>)}</ul>
-                    <h2 className="mt-5 font-display text-3xl font-semibold tracking-tight md:text-4xl">{f.client}</h2>
+                    <h2 className="mt-5 font-display text-3xl font-semibold tracking-tight md:text-4xl"><KineticText text={f.client} base={30} /></h2>
                     {p && <p className="mt-1 text-sm text-muted-foreground">{p.url}</p>}
                     <div className="mt-6 flex items-baseline gap-3">
-                      <span className="pf-metric">{f.metric}</span>
+                      <span className="pf-metric pfx-metric">{f.metric}</span>
                       <span className="text-sm font-medium text-muted-foreground">{f.metricLabel}</span>
                     </div>
                     <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">{f.desc}</p>
@@ -100,7 +103,7 @@ function PortfolioPage() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">All projects</h2>
+                <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl"><KineticText text="All projects" base={30} /></h2>
                 <p className="mt-3 text-muted-foreground">Hover or tap a project for details. Open any project for the full story.</p>
               </div>
               <LayoutGroup>
@@ -124,7 +127,7 @@ function PortfolioPage() {
         <section className="py-24 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <motion.div {...reveal} className="max-w-2xl">
-              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">Social media transformations</h2>
+              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl"><KineticText text="Social media transformations" base={30} /></h2>
               <p className="mt-3 text-muted-foreground">Where each account started, and where we took it.</p>
             </motion.div>
             <div className="mt-10 grid gap-4 md:grid-cols-2">
@@ -153,7 +156,7 @@ function PortfolioPage() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <motion.div {...reveal} className="max-w-2xl">
               <p className="hero-kicker"><Megaphone className="h-4 w-4 text-[#3dd6f5]" /> Paid social & search</p>
-              <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-white md:text-5xl">Ad creatives that convert</h2>
+              <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-white md:text-5xl"><KineticText text="Ad creatives that convert" base={30} /></h2>
             </motion.div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {ADS.map((ad) => (
@@ -178,7 +181,7 @@ function PortfolioPage() {
         <section className="py-24 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <motion.div {...reveal} className="max-w-2xl">
-              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">AI systems we've built</h2>
+              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl"><KineticText text="AI systems we've built" base={30} /></h2>
               <p className="mt-3 text-muted-foreground">The automations behind many of the projects above.</p>
             </motion.div>
             <ol className="mt-10 grid gap-3">
@@ -200,7 +203,7 @@ function PortfolioPage() {
         {videos.length > 0 && (
           <section className="bg-secondary py-24">
             <div className="mx-auto max-w-7xl px-5 md:px-8">
-              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">Watch the transformations</h2>
+              <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl"><KineticText text="Watch the transformations" base={30} /></h2>
               <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {videos.map((v) => (
                   <a key={v.title} href={v.url} target="_blank" rel="noopener noreferrer" className="pf-auto">
@@ -219,7 +222,7 @@ function PortfolioPage() {
           <div className="hero-ink-glow" aria-hidden="true" />
           <div className="relative mx-auto flex max-w-5xl flex-col items-center px-5 py-24 text-center md:py-32">
             <Sparkles className="h-6 w-6 text-[#3dd6f5]" />
-            <h2 className="mt-5 font-display text-3xl font-semibold tracking-tight text-white md:text-5xl">Want results like these for your business?</h2>
+            <h2 className="mt-5 font-display text-3xl font-semibold tracking-tight text-white md:text-5xl"><KineticText text="Want results like these for your business?" base={30} /></h2>
             <p className="mt-4 max-w-xl text-[#b3b8dc]">Tell us what you're building. You'll get a clear plan and a fixed quote.</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/intake" className="btn-gold inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[15px]">Start a project <ArrowUpRight className="h-4 w-4" /></Link>

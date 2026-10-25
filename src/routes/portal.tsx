@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,7 +53,7 @@ function Portal() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20" aria-busy="true">
         <h1 className="sr-only">Client Portal</h1>
@@ -67,13 +68,13 @@ function Portal() {
 function AuthScreen() {
   // The shared EmmaForYou sign-in: the same account and session as the community and dashboard.
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20">
         <div className="w-full max-w-md px-5">
           <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
             <div className="mb-5 text-center">
-              <h1 className="font-display text-3xl font-extrabold">Client Portal</h1>
+              <h1 className="font-display text-3xl font-extrabold"><KineticText text="Client Portal" base={60} /></h1>
               <p className="mt-2 text-sm text-muted-foreground">Track your project, approve work, pay invoices and message the team. Already in the community? Use the same email and password.</p>
             </div>
             <AccountAuthForm intent="portal" next="/portal" idPrefix="portal-auth" />
@@ -213,12 +214,12 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
     setAccount(data as ClientAcc | null); setActivating(false);
   }
   if (accountChecked && !account) return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="flex min-h-[80vh] items-center justify-center pt-32 pb-20">
         <div className="w-full max-w-md px-5">
           <form onSubmit={activatePortal} className="space-y-3 rounded-3xl border border-border bg-card p-8 shadow-sm">
-            <h1 className="font-display text-2xl font-extrabold">Open your client portal</h1>
+            <h1 className="font-display text-2xl font-extrabold"><KineticText text="Open your client portal" base={60} /></h1>
             <p className="text-sm text-muted-foreground">You're signed in as <strong className="text-foreground">{email}</strong>. Your portal uses this same account: no new password needed.</p>
             <div><label htmlFor="act-name" className="text-sm font-medium">Your name</label><input id="act-name" className="input mt-1" value={actName} onChange={(e) => setActName(e.target.value)} maxLength={80} autoComplete="name" /></div>
             <div><label htmlFor="act-biz" className="text-sm font-medium">Business name</label><input id="act-biz" className="input mt-1" value={actBiz} onChange={(e) => setActBiz(e.target.value)} maxLength={120} autoComplete="organization" /></div>
@@ -235,7 +236,7 @@ function PortalDashboard({ userId, email }: { userId: string; email: string }) {
   const initials = account?.avatar_initials || email.slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="pt-32 pb-24">
         <section className="mx-auto max-w-6xl px-5">
@@ -579,11 +580,11 @@ function NewPassword({ onDone }: { onDone: () => void }) {
     onDone();
   }
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="flex min-h-[80vh] items-center justify-center px-5 pt-32 pb-20">
         <form onSubmit={save} className="w-full max-w-md space-y-3 rounded-3xl border border-border bg-card p-8">
-          <h1 className="font-display text-2xl font-semibold">Choose a new password</h1>
+          <h1 className="font-display text-2xl font-semibold"><KineticText text="Choose a new password" base={60} /></h1>
           <input type="password" className="input" aria-label="New password" placeholder="New password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" minLength={8} required />
           {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
           <button disabled={busy} className="btn-primary-gradient w-full rounded-full px-6 py-3 font-semibold text-white disabled:opacity-60">{busy ? "Saving…" : "Save and continue"}</button>

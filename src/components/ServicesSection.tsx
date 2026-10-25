@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import SectionHead from "./future/SectionHead";
 
-type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app";
+export type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app";
 
 const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: string; tags: string[] }[] = [
   { kind: "ai", slug: "ai-automation", id: "service-ai", name: "AI Automation", desc: "Automate follow-ups, bookings, and lead nurturing with intelligent AI systems that work 24/7.", tags: ["WhatsApp & chat agents", "Bookings", "Follow-up"] },
@@ -49,7 +49,8 @@ export default function ServicesSection() {
   );
 }
 
-function Scene({ kind }: { kind: Kind }) {
+/** The small live scene for each service (also used in the service page heroes). */
+export function Scene({ kind }: { kind: Kind }) {
   switch (kind) {
     case "ai":
       return (

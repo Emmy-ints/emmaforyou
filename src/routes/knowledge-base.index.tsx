@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -49,7 +50,7 @@ function KbIndex() {
 
           {/* Featured */}
           <div className="mt-14">
-            <h2 className="font-display text-xs font-bold uppercase tracking-widest text-muted-foreground">Featured this week</h2>
+            <h2 className="font-display text-xs font-bold uppercase tracking-widest text-muted-foreground"><KineticText text="Featured this week" base={30} /></h2>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
               {featured.map((a) => (
                 <Link key={a.slug} to="/knowledge-base/$slug" params={{ slug: a.slug }} className="group rounded-2xl border border-border bg-card p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">

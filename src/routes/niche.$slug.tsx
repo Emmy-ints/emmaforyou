@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/niche/$slug")({
     return { niche };
   },
   notFoundComponent: () => (
-    <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold">Niche not found</h1><Link to="/" className="mt-4 inline-block text-sm underline">Go home</Link></div></div>
+    <div className="min-h-screen bg-background"><Navbar /><div className="pt-40 text-center"><h1 className="font-display text-3xl font-bold"><KineticText text="Niche not found" base={60} /></h1><Link to="/" className="mt-4 inline-block text-sm underline">Go home</Link></div></div>
   ),
   head: ({ loaderData }) =>
     loaderData
@@ -55,7 +56,7 @@ function NichePage() {
 
         {/* Pain points */}
         <section className="mx-auto mt-24 max-w-5xl px-5">
-          <h2 className="text-center font-display text-3xl font-bold md:text-4xl">Sound familiar?</h2>
+          <h2 className="text-center font-display text-3xl font-bold md:text-4xl"><KineticText text="Sound familiar?" base={30} /></h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {niche.problems.map((p: string) => (
               <div key={p} className="rounded-2xl border border-border bg-card p-6 text-center">

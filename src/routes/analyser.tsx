@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import GrowthAssessment from "../components/assessment/GrowthAssessment";
@@ -20,7 +21,7 @@ function AnalyserPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="mx-auto max-w-4xl px-5 pb-24 pt-32">
-        <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">Business growth assessment</h1>
+        <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl"><KineticText text="Business growth assessment" base={60} /></h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
           Eight short questions about how customers find you, buy from you and hear back from you. You'll get an explained score and a prioritised plan straight away.
         </p>

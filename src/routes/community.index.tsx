@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HelpCircle, BarChart3, FolderKanban, GraduationCap, Loader2, RefreshCw, X, PenSquare } from "lucide-react";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
@@ -110,7 +111,7 @@ function FeedPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="font-display text-2xl font-extrabold sm:text-3xl">Community</h1>
+      <h1 className="font-display text-2xl font-extrabold sm:text-3xl"><KineticText text="Community" base={60} /></h1>
       <p className="mt-1 text-sm text-muted-foreground">Questions, projects and ideas about websites, apps, AI and automation.</p>
 
       {/* Start a post */}

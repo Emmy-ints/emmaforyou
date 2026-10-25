@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { pageHead, breadcrumbLd, absoluteUrl } from "@/lib/seo";
@@ -58,7 +59,7 @@ function PostPage() {
         <div className="flex justify-center py-16" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading post</span></div>
       ) : post === null ? (
         <div className="rounded-2xl border border-border bg-card p-8 text-center">
-          <h1 className="font-display text-xl font-bold">Post not available</h1>
+          <h1 className="font-display text-xl font-bold"><KineticText text="Post not available" base={60} /></h1>
           <p className="mt-2 text-sm text-muted-foreground">{error || (uid ? "This post was removed, or it isn't visible to you." : "It may be for members only, or it was removed.")}</p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {!uid && <button type="button" onClick={() => openAuth("Sign in to see members-only posts.", "signin")} className="btn-primary-gradient rounded-full px-5 py-2.5 text-sm font-semibold text-white">Sign in</button>}

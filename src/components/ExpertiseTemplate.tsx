@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { ArrowRight, Check, ChevronDown, Clock, Layers, MessageCircle, Target, Wrench } from "lucide-react";
+import { ArrowRight, Check, Clock, Layers, MessageCircle, Target, Wrench } from "lucide-react";
 import emmanuelImg from "@/assets/emmanuel-portrait.webp";
 import type { ServiceItem } from "@/lib/services-data";
 import { extraFor, SERVICE_QA, SERVICE_WORK_MATCH } from "@/lib/service-extras";
@@ -12,6 +12,20 @@ import { WorkflowViz, DashboardDemo } from "./service/ServiceDemos";
 import ServiceInquiryForm from "./service/ServiceInquiryForm";
 import TransformationSlider from "./home/TransformationSlider";
 import { buildWa } from "@/lib/leads";
+import { KineticText } from "./future/Kinetic";
+import SectionHead from "./future/SectionHead";
+import { Scene, type Kind } from "./ServicesSection";
+
+/* Every service and expertise page lives in one of the seven service "worlds" (colour + live scene). */
+const KIND: Record<string, Kind> = {
+  "ai-automation": "ai", "sales-conversion": "ai", "digital-strategy": "ai", "business-consulting": "ai", "accountability-coaching": "ai",
+  "website-design": "web", "website-landing-pages": "web", wordpress: "web", "ui-ux-design": "web", "funnel-building": "web", copywriting: "web",
+  "email-marketing": "email", "crm-systems": "email",
+  "social-media": "social", "social-media-automation": "social",
+  "ad-marketing": "ads", "paid-ads": "ads", "lead-generation": "ads", seo: "ads", analytics: "ads", "conversion-rate-optimisation": "ads", "marketing-promotion": "ads",
+  ecommerce: "ecom", "shopify-ecommerce": "ecom",
+  "app-development": "app", "web3-development": "app", "smart-contract-development": "app", "blockchain-crypto": "app",
+};
 
 const reveal = {
   initial: { opacity: 0, y: 18 },
@@ -39,13 +53,16 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
   const work = relatedWork(data.slug);
   const related = relatedServices(data.slug);
   const wa = buildWa(`Hi Emmanuel! I'm interested in ${data.name}.`);
+  const kind = KIND[data.slug] ?? "ai";
 
   return (
-    <article>
+    <main id="main-content">
+    <article className={`svx sv-${kind}`}>
       {/* Hero */}
-      <section className="hero-ink relative overflow-hidden">
+      <section className="hero-ink svx-hero relative overflow-hidden" data-scroll>
         <div className="hero-ink-grid" aria-hidden="true" />
         <div className="hero-ink-glow" aria-hidden="true" />
+        <div className="svx-hero-light" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-32 md:px-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.9fr)] lg:items-end lg:pb-24 lg:pt-40">
           <div>
             <nav aria-label="Breadcrumb" className="text-sm text-[#a6abd0]">
@@ -55,9 +72,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
               <span className="mx-2 opacity-50">/</span>
               <span className="text-white">{data.name}</span>
             </nav>
-            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} className="svc-title">
-              {data.hero.headline}
-            </motion.h1>
+            <h1 className="svc-title"><KineticText text={data.hero.headline} base={80} /></h1>
             <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} className="hero-ink-sub">
               {data.short} {x.audience}
             </motion.p>
@@ -70,19 +85,23 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
               </a>
             </motion.div>
           </div>
-          <motion.dl initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="svc-facts">
-            <Fact icon={<Clock />} label="Typical timeline" value={x.timeline} />
-            <Fact icon={<Layers />} label="How we work together" value={x.engagement} />
-            <Fact icon={<Target />} label="Next step" value="A free call, then a clear plan and fixed quote" />
-          </motion.dl>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }} className="svx-side">
+            <div className="svx-scene sv-scene" aria-hidden="true"><Scene kind={kind} /></div>
+            <dl className="svc-facts">
+              <Fact icon={<Clock />} label="Typical timeline" value={x.timeline} />
+              <Fact icon={<Layers />} label="How we work together" value={x.engagement} />
+              <Fact icon={<Target />} label="Next step" value="A free call, then a clear plan and fixed quote" />
+            </dl>
+          </motion.div>
         </div>
       </section>
 
       {/* Problem */}
       <Block title="The problem this solves" lead={`What usually goes wrong before businesses come to us for ${data.name}.`}>
         <div className="grid gap-4 md:grid-cols-2">
-          {data.pains.map((p) => (
-            <motion.div key={p.title} {...reveal} className="svc-pain">
+          {data.pains.map((p, i) => (
+            <motion.div key={p.title} {...reveal} className="svc-pain" data-tilt="3">
+              <span className="svx-n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               <h3 className="font-display text-lg font-semibold">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
             </motion.div>
@@ -130,9 +149,9 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
 
       {/* Process */}
       <Block tone="alt" title="How the work happens" lead="A clear process, so you always know what's next.">
-        <ol className="svc-timeline">
+        <ol className="svc-timeline svx-path" data-scroll>
           {data.process.map((p, i) => (
-            <motion.li key={p.title} {...reveal} className="svc-step">
+            <motion.li key={p.title} {...reveal} className="svc-step" style={{ ["--i" as string]: i }}>
               <span className="svc-step-n">{i + 1}</span>
               <div>
                 <h3 className="font-display text-lg font-semibold">{p.title}</h3>
@@ -150,10 +169,11 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         <Block title="What happens after we set this up" lead="Results from businesses we've built this for.">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {data.results.map((r) => (
-              <motion.div key={r.business} {...reveal} className="svc-scenario">
+              <motion.div key={r.business} {...reveal} className="svc-scenario" data-tilt="3">
                 <p className="flex items-center gap-2 text-sm font-semibold"><span className="text-xl" aria-hidden="true">{r.flag}</span>{r.business}</p>
-                <p className="mt-4 text-sm"><span className="text-muted-foreground">Before · </span>{r.before}</p>
-                <p className="mt-2 text-sm font-medium"><span className="text-[color:var(--emma-violet)]">After · </span>{r.after}</p>
+                <p className="svx-before mt-4 text-sm"><span className="text-muted-foreground">Before · </span>{r.before}</p>
+                <span className="svx-arrow" aria-hidden="true" />
+                <p className="svx-after text-sm font-medium"><span className="text-[color:var(--hue)]">After · </span>{r.after}</p>
               </motion.div>
             ))}
           </div>
@@ -206,7 +226,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
 
       {/* FAQ */}
       <Block title="Questions people ask">
-        <div className="mx-auto max-w-3xl divide-y divide-border rounded-2xl border border-border bg-card">
+        <div className="mx-auto max-w-3xl space-y-3">
           {data.faqs.map((f) => <FaqItem key={f.q} q={f.q} a={f.a} />)}
         </div>
       </Block>
@@ -214,7 +234,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
       {/* About Emmanuel (original bio) */}
       <Block tone="alt">
         <div className="grid gap-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
-          <img src={emmanuelImg} alt="Emmanuel Akinloye Oluwaseun, founder of EmmaForYou" className="aspect-[4/5] w-full max-w-[300px] rounded-[22px] object-cover shadow-[var(--shadow-card-hover)]" loading="lazy" />
+          <div className="svx-portrait" data-tilt="4"><img src={emmanuelImg} alt="Emmanuel Akinloye Oluwaseun, founder of EmmaForYou" className="aspect-[4/5] w-full object-cover" loading="lazy" /></div>
           <div>
             <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">Why Emmanuel Akinloye Oluwaseun?</h2>
             <div className="mt-5 max-w-2xl space-y-4 leading-relaxed text-muted-foreground">
@@ -234,9 +254,10 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {related.map((r) => (
             <li key={r.to}>
-              <Link to={r.to} className="flex h-full flex-col rounded-[18px] border border-border bg-card p-5 transition-colors hover:border-[color:var(--emma-violet)]">
+              <Link to={r.to} className="svx-related lg" data-tilt="4">
                 <span className="font-display font-semibold">{r.label}</span>
                 <span className="mt-1 text-sm text-muted-foreground">{r.short}</span>
+                <ArrowRight className="svx-related-arrow h-4 w-4" aria-hidden="true" />
               </Link>
             </li>
           ))}
@@ -244,11 +265,12 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
       </Block>
 
       {/* Inquiry */}
-      <section id="inquiry" className="band-ink relative overflow-hidden bg-[#0b0d24] text-white">
+      <section id="inquiry" className="band-ink svx-inquiry relative overflow-hidden bg-[#0b0d24] text-white">
         <div className="hero-ink-glow" aria-hidden="true" />
+        <div className="ms-aurora" aria-hidden="true"><span /><span /><span /></div>
         <div className="relative mx-auto grid max-w-6xl gap-12 px-5 py-24 md:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
-            <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">Tell us about your {data.name} project</h2>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl"><KineticText text={`Tell us about your ${data.name} project`} /></h2>
             <p className="mt-4 text-[#b3b8dc]">A few quick answers help us come back with a useful plan, not a generic pitch. Free, and no obligation.</p>
             <ul className="mt-8 space-y-3 text-sm text-[#c9ccec]">
               <li className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-[#3dd6f5]" /> Reply within one working day</li>
@@ -260,6 +282,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         </div>
       </section>
     </article>
+    </main>
   );
 }
 
@@ -277,14 +300,9 @@ function Fact({ icon, label, value }: { icon: React.ReactNode; label: string; va
 
 function Block({ title, lead, tone, children }: { title?: string; lead?: string; tone?: "alt"; children: React.ReactNode }) {
   return (
-    <section className={`py-20 md:py-28 ${tone === "alt" ? "bg-secondary" : "bg-background"}`}>
+    <section className={`svx-block py-20 md:py-28 ${tone === "alt" ? "svx-alt" : ""}`}>
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        {title && (
-          <motion.div {...reveal} className="mb-10 max-w-2xl">
-            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>
-            {lead && <p className="mt-3 text-muted-foreground">{lead}</p>}
-          </motion.div>
-        )}
+        {title && <SectionHead title={title} sub={lead} className="mb-10 max-w-2xl" />}
         {children}
       </div>
     </section>
@@ -294,10 +312,10 @@ function Block({ title, lead, tone, children }: { title?: string; lead?: string;
 function FaqItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div>
-      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left">
+    <div className={`fq-item lg ${open ? "is-open" : ""}`}>
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="fq-q">
         <span className="font-medium">{q}</span>
-        <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+        <span className="fq-icon" aria-hidden="true" />
       </button>
       <div className="acc-panel" data-open={open} inert={!open}>
         <div><p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{a}</p></div>

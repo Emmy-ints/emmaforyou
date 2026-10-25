@@ -1,5 +1,6 @@
 // @ts-nocheck -- generated DB/router types lag behind; runtime verified
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Bookmark, Loader2, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -106,7 +107,7 @@ function Page() {
       <main id="main-content" className="mx-auto max-w-7xl px-4 pb-24 pt-28 sm:px-5 md:pt-32">
         <header className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">Inspiration library</p>
-          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">Real designs to learn from</h1>
+          <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl"><KineticText text="Real designs to learn from" base={60} /></h1>
           <p className="mt-4 text-lg text-muted-foreground">Websites, landing pages, Shopify stores, emails and product interfaces collected from the design galleries people already trust. Search, filter, save what you like and open the original. Every card credits where it was found.</p>
         </header>
 
@@ -164,7 +165,7 @@ function Page() {
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">From inspiration to launch</p>
-              <h2 id="insp-next" className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">Found a look you love? Let's build yours.</h2>
+              <h2 id="insp-next" className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl"><KineticText text="Found a look you love? Let's build yours." base={30} /></h2>
               <p className="mt-3 text-muted-foreground">Save the sites, stores and emails that feel right, then bring them to a free strategy call. We'll turn what you like about them into a design that fits your brand, your customers and your goals.</p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link to="/book" className="btn-primary-gradient inline-flex min-h-11 items-center rounded-full px-6 text-sm font-semibold text-white">Book a free strategy call</Link>
@@ -195,7 +196,7 @@ function Page() {
         <div className="fixed inset-0 z-[150] lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
           <button type="button" aria-label="Close filters" className="absolute inset-0 bg-black/50" onClick={() => setFiltersOpen(false)} />
           <div className="absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-background p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-            <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-lg font-semibold">Filters</h2><button type="button" onClick={() => setFiltersOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-border" aria-label="Close"><X className="h-4 w-4" aria-hidden="true" /></button></div>
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-display text-lg font-semibold"><KineticText text="Filters" base={30} /></h2><button type="button" onClick={() => setFiltersOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-border" aria-label="Close"><X className="h-4 w-4" aria-hidden="true" /></button></div>
             {filterPanel}
             <div className="sticky bottom-0 mt-6 flex gap-2 bg-background pt-3"><button type="button" onClick={clearAll} className="min-h-11 flex-1 rounded-full border border-border text-sm font-semibold">Clear all</button><button type="button" onClick={() => setFiltersOpen(false)} className="btn-primary-gradient min-h-11 flex-1 rounded-full text-sm font-semibold text-white">Show {count?.toLocaleString() ?? ""} results</button></div>
           </div>

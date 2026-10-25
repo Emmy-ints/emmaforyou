@@ -66,7 +66,8 @@ export default function AssistantDemo(props: EngineProps) {
   const [qual, setQual] = useState<string[]>([]);
   const [handoffs, setHandoffs] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ block: "nearest" }); }, [msgs]);
+  // Scroll only the chat window (scrollIntoView would also scroll the page and make it jump on load).
+  useEffect(() => { const box = endRef.current?.parentElement; if (box) box.scrollTop = box.scrollHeight; }, [msgs]);
 
   const answer = (q: string): Msg => {
     if (preset === "sales" && qual.length < QUAL.length && (qual.length > 0 || /cost|price|budget|start|need|want|business/i.test(q))) {

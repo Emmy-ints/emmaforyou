@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getBlogPost } from "@/lib/blog-server";
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/blog/$slug")({
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-40 text-center">
-        <h1 className="font-display text-3xl font-bold">Article not found</h1>
+        <h1 className="font-display text-3xl font-bold"><KineticText text="Article not found" base={60} /></h1>
         <Link to="/blog" className="mt-4 inline-block text-sm underline">Back to blog</Link>
       </div>
     </div>
@@ -155,7 +156,7 @@ function BlogArticle() {
 
           {post.sources && post.sources.length > 0 && (
             <section aria-labelledby="sources-h" className="mt-12 rounded-2xl border border-border bg-card p-5 md:p-6">
-              <h2 id="sources-h" className="font-display text-lg font-bold">Sources</h2>
+              <h2 id="sources-h" className="font-display text-lg font-bold"><KineticText text="Sources" base={30} /></h2>
               <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm">
                 {post.sources.map((s) => (
                   <li key={s.url}>

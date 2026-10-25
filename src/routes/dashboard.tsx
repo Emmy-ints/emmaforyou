@@ -1,5 +1,7 @@
+import { KineticText } from "@/components/future/Kinetic";
+import { prefersReduced } from "@/lib/motion";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Download, LogOut, MessageCircle, RefreshCw, Mail, Lock } from "lucide-react";
@@ -103,7 +105,7 @@ function DashboardPage() {
       <Centered>
         <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-sm">
           <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
-          <h1 className="mt-4 font-display text-2xl font-extrabold">Almost there</h1>
+          <h1 className="mt-4 font-display text-2xl font-extrabold"><KineticText text="Almost there" base={60} /></h1>
           <p className="mt-2 text-sm text-muted-foreground">
             You're signed in as <strong className="text-foreground">{session.user.email}</strong>, but this account doesn't have
             dashboard access yet. Once it's been given the admin role, refresh this page.
@@ -120,7 +122,7 @@ function DashboardPage() {
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="flex min-h-screen items-center justify-center bg-background px-5 text-foreground">{children}</div>;
+  return <main id="main-content" className="dash-x flex min-h-screen items-center justify-center bg-background px-5 text-foreground">{children}</main>;
 }
 
 function SignIn() {
@@ -130,7 +132,7 @@ function SignIn() {
       <div className="w-full max-w-sm">
         <Link to="/" aria-label="EmmaForYou, home" className="mb-8 flex justify-center"><Wordmark /></Link>
         <div className="rounded-3xl border border-border bg-card p-7 shadow-sm">
-          <h1 className="mb-1 font-display text-xl font-bold">Owner dashboard</h1>
+          <h1 className="mb-1 font-display text-xl font-bold"><KineticText text="Owner dashboard" base={60} /></h1>
           <p className="mb-5 text-sm text-muted-foreground">Sign in with your EmmaForYou account. Only accounts with the admin role can open the dashboard.</p>
           <AccountAuthForm intent="account" next="/dashboard" idPrefix="dash-auth" />
         </div>
@@ -269,11 +271,12 @@ function Dashboard({ email }: { email: string }) {
   const stats = useMemo(() => summarise(events, days), [events, days]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+    <div className="dash-x min-h-screen bg-background text-foreground">
+      <header className="dash-top sticky top-0 z-40">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3">
           <Link to="/" className="font-display text-lg font-extrabold">
             EmmaForYou<span className="text-emma-gold">.</span> <span className="ml-1 text-sm font-medium text-muted-foreground">Dashboard</span>
+            <span className="dash-live" aria-hidden="true" />
           </Link>
           <div className="flex items-center gap-2">
             <span className="hidden text-xs text-muted-foreground md:inline">{email}</span>
@@ -288,7 +291,7 @@ function Dashboard({ email }: { email: string }) {
         {/* Filters: one row above everything */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl font-extrabold md:text-3xl">How the site is performing</h1>
+            <h1 className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="How the site is performing" base={30} /></h1>
             <p className="mt-1 text-sm text-muted-foreground">Visits, actions and leads from your own database. Your own visits to this page aren't counted.</p>
           </div>
           <div className="flex items-center gap-2">
@@ -478,11 +481,26 @@ function Dashboard({ email }: { email: string }) {
 
 function Kpi({ label, value, hint }: { label: string; value: number | string; hint?: string }) {
   return (
-    <div className="dash-card !p-4" title={hint}>
+    <div className="dash-card dash-kpi !p-4" title={hint}>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-2xl font-extrabold tabular-nums md:text-3xl">{typeof value === "number" ? value.toLocaleString() : value}</p>
+      <p className="mt-1 font-display text-2xl font-semibold tabular-nums md:text-3xl">{typeof value === "number" ? <CountTo value={value} /> : value}</p>
     </div>
   );
+}
+
+/** Counts from the previous figure to the new one when data loads or the range changes (instant with reduced motion). */
+function CountTo({ value }: { value: number }) {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  useEffect(() => {
+    const start = from.current; from.current = value;
+    if (start === value || prefersReduced()) { setShown(value); return; }
+    let raf = 0; const t0 = performance.now();
+    const step = (t: number) => { const p = Math.min(1, (t - t0) / 700); setShown(Math.round(start + (value - start) * (1 - Math.pow(1 - p, 3)))); if (p < 1) raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{shown.toLocaleString()}</>;
 }
 
 function BarList({ rows, keepOrder }: { rows: { label: string; value: number }[]; keepOrder?: boolean }) {
@@ -498,7 +516,7 @@ function BarList({ rows, keepOrder }: { rows: { label: string; value: number }[]
             <span className="tabular-nums text-muted-foreground">{r.value.toLocaleString()}</span>
           </div>
           <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${(r.value / max) * 100}%`, background: "var(--emma-blue)" }} />
+            <div className="dash-bar h-full rounded-full transition-[width] duration-500" style={{ width: `${(r.value / max) * 100}%` }} />
           </div>
         </li>
       ))}

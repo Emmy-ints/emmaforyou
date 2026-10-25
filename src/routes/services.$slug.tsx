@@ -1,4 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ExpertiseTemplate from "@/components/ExpertiseTemplate";
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/services/$slug")({
     <>
       <Navbar />
       <main className="min-h-screen pt-32 px-5 max-w-3xl mx-auto text-center">
-        <h1 className="font-display text-3xl font-bold">Service not found</h1>
+        <h1 className="font-display text-3xl font-bold"><KineticText text="Service not found" base={60} /></h1>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           {SERVICES.map(s => <Link key={s.slug} to="/services/$slug" params={{ slug: s.slug }} className="rounded-full border border-border bg-card px-4 py-2 text-sm">{s.icon} {s.name}</Link>)}
         </div>

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { ArrowRight, Rocket, TrendingUp, Search, Stethoscope, Calculator, Users, Megaphone, ListChecks, MessageSquare, FolderOpen, Plug, ShieldCheck } from "lucide-react";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
@@ -37,7 +38,7 @@ function Hub() {
       <section className="relative overflow-hidden rounded-3xl border border-border bg-[#0b0d24] px-5 py-10 text-white sm:px-10 sm:py-14">
         <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(109,91,255,0.45),transparent)]" />
         <p className="relative text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[#9b8cff]">EmmaForYou Ecommerce Intelligence</p>
-        <h1 className="relative mt-3 max-w-3xl font-display text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl">Make better decisions about what to sell and why it sells.</h1>
+        <h1 className="relative mt-3 max-w-3xl font-display text-3xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl"><KineticText text="Make better decisions about what to sell and why it sells." base={60} /></h1>
         <p className="relative mt-4 max-w-2xl text-[0.98rem] leading-relaxed text-[#b8bce0]">Practical tools for people starting out and stores that want more sales. We show what we observed, what you told us and what's still a hypothesis, and never promise results.</p>
         <div className="relative mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-3xl">
           <Link to="/ecommerce/start" className="group rounded-2xl border border-white/12 bg-white/[0.06] p-5 transition hover:border-[#9b8cff]/60 hover:bg-white/[0.09]">
@@ -65,7 +66,7 @@ function Hub() {
         </section>
       )}
 
-      <h2 className="mt-10 font-display text-xl font-bold">All tools</h2>
+      <h2 className="mt-10 font-display text-xl font-bold"><KineticText text="All tools" base={30} /></h2>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TOOLS.map(({ to, icon: Icon, title, text }) => (
           <li key={to}><Link to={to} className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-[var(--emma-violet)]">
@@ -78,9 +79,9 @@ function Hub() {
       </ul>
 
       <section className="mt-10 grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-3">
-        <div><h2 className="font-display text-base font-bold">What these tools can see</h2><p className="mt-1 text-sm text-muted-foreground">Public store pages, competitors' public product data, our tracked industry news, and any numbers or exports you provide.</p></div>
-        <div><h2 className="font-display text-base font-bold">What they can't</h2><p className="mt-1 text-sm text-muted-foreground">Your private traffic, orders or ad spend unless you enter or upload them. No connected-store integrations are live yet; see Integrations.</p></div>
-        <div><h2 className="font-display text-base font-bold">Want it done for you?</h2><p className="mt-1 text-sm text-muted-foreground">Our team builds stores, product pages and automations. <Link to="/services/$slug" params={{ slug: "ecommerce" }} className="font-semibold text-foreground underline">Ecommerce services</Link> or <Link to="/book" className="font-semibold text-foreground underline">book a call</Link>.</p></div>
+        <div><h2 className="font-display text-base font-bold"><KineticText text="What these tools can see" base={30} /></h2><p className="mt-1 text-sm text-muted-foreground">Public store pages, competitors' public product data, our tracked industry news, and any numbers or exports you provide.</p></div>
+        <div><h2 className="font-display text-base font-bold"><KineticText text="What they can't" base={30} /></h2><p className="mt-1 text-sm text-muted-foreground">Your private traffic, orders or ad spend unless you enter or upload them. No connected-store integrations are live yet; see Integrations.</p></div>
+        <div><h2 className="font-display text-base font-bold"><KineticText text="Want it done for you?" base={30} /></h2><p className="mt-1 text-sm text-muted-foreground">Our team builds stores, product pages and automations. <Link to="/services/$slug" params={{ slug: "ecommerce" }} className="font-semibold text-foreground underline">Ecommerce services</Link> or <Link to="/book" className="font-semibold text-foreground underline">book a call</Link>.</p></div>
       </section>
       <p className="mt-6 text-sm text-muted-foreground">Questions? Ask in the <Link to="/community" className="font-semibold text-foreground underline">Community</Link>.</p>
     </div>

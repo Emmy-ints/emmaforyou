@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Loader2, Lock, Users, Check, X, Shield, Trash2 } from "lucide-react";
 import { pageHead } from "@/lib/seo";
@@ -58,7 +59,7 @@ function GroupPage() {
   }
 
   if (g === undefined) return <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Loading group" /></div>;
-  if (g === null) return <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center"><h1 className="font-display text-xl font-bold">Group not found</h1><Link to="/community/groups" className="mt-4 inline-flex rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">All groups</Link></div>;
+  if (g === null) return <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center"><h1 className="font-display text-xl font-bold"><KineticText text="Group not found" base={60} /></h1><Link to="/community/groups" className="mt-4 inline-flex rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">All groups</Link></div>;
 
   return (
     <div className="mx-auto max-w-2xl">

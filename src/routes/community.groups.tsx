@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
 import { Loader2, Lock, Plus, Search, Users } from "lucide-react";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
@@ -38,7 +39,7 @@ function GroupsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-display text-2xl font-extrabold">Groups</h1>
+        <h1 className="font-display text-2xl font-extrabold"><KineticText text="Groups" base={60} /></h1>
         <button type="button" onClick={startCreate} className="btn-primary-gradient inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold text-white"><Plus className="h-4 w-4" aria-hidden="true" />Create a group</button>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">Smaller spaces for people working on the same thing. Public groups are open to everyone; private groups need approval.</p>

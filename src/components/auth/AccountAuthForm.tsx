@@ -96,16 +96,16 @@ export default function AccountAuthForm({ initialMode = "signin", intent = "acco
   return (
     <div>
       {mode !== "forgot" && (
-        <div role="group" aria-label="Sign in or create an account" className="mb-4 grid grid-cols-2 rounded-full border border-border bg-muted/50 p-1 text-sm font-semibold">
+        <div role="group" aria-label="Sign in or create an account" data-mode={mode} className="auth-seg mb-4 grid grid-cols-2 rounded-full border border-border bg-muted/50 p-1 text-sm font-semibold">
           {(["signin", "signup"] as const).map((m) => (
             <button key={m} type="button" aria-pressed={mode === m} onClick={() => switchTo(m)}
-              className={`whitespace-nowrap rounded-full px-2 py-2 text-[13px] transition min-[360px]:text-sm ${mode === m ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+              className={`relative z-[1] whitespace-nowrap rounded-full px-2 py-2 text-[13px] transition-colors min-[360px]:text-sm ${mode === m ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
               {m === "signin" ? "Sign in" : "Create account"}
             </button>
           ))}
         </div>
       )}
-      <form onSubmit={submit} className="space-y-3" noValidate>
+      <form key={mode} onSubmit={submit} className="auth-form space-y-3" noValidate>
         {mode === "signup" && (
           <div><label htmlFor={id("name")} className="text-sm font-medium">Your name</label><input id={id("name")} className={field} autoComplete="name" required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} /></div>
         )}

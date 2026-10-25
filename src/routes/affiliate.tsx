@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -86,7 +87,7 @@ function AffiliatePage() {
           <div className="mt-10 rounded-3xl border border-border bg-card p-8">
             {!code ? (
               <form onSubmit={submit} className="grid gap-3">
-                <h2 className="font-display text-2xl font-bold">Get your unique referral link</h2>
+                <h2 className="font-display text-2xl font-bold"><KineticText text="Get your unique referral link" base={30} /></h2>
                 <input className="input" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
                 <input className="input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 <input className="input" placeholder="WhatsApp number" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} required />

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { CheckCircle2, XCircle } from "lucide-react";
 import ToolShell from "../components/tools/ToolShell";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
@@ -58,7 +59,7 @@ function Page() {
     >
       <div className="space-y-16">
         <section aria-labelledby="w-problem">
-          <h2 id="w-problem" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">The problem we see every week</h2>
+          <h2 id="w-problem" className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="The problem we see every week" base={30} /></h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {PROBLEMS.map((p) => (
               <div key={p.title} className="rounded-[20px] border border-border bg-card p-5"><h3 className="font-semibold">{p.title}</h3><p className="mt-1.5 text-sm text-muted-foreground">{p.body}</p></div>
@@ -67,7 +68,7 @@ function Page() {
         </section>
 
         <section aria-labelledby="w-diff">
-          <h2 id="w-diff" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">What we do differently</h2>
+          <h2 id="w-diff" className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="What we do differently" base={30} /></h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {DIFFERENT.map((d) => (
               <div key={d.title} className="rounded-[20px] border border-border bg-card p-5 shadow-[var(--shadow-card)]"><CheckCircle2 className="h-5 w-5 text-[var(--emma-violet)]" /><h3 className="mt-3 font-semibold">{d.title}</h3><p className="mt-1.5 text-sm text-muted-foreground">{d.body}</p></div>
@@ -77,7 +78,7 @@ function Page() {
 
         <section aria-labelledby="w-work">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <h2 id="w-work" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">Real client work</h2>
+            <h2 id="w-work" className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="Real client work" base={30} /></h2>
             <Link to="/portfolio" className="text-sm font-semibold text-[var(--emma-violet)]">See all projects →</Link>
           </div>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -96,17 +97,17 @@ function Page() {
 
         <section aria-labelledby="w-fit" className="grid gap-6 md:grid-cols-2">
           <div className="rounded-[20px] border border-border bg-card p-6">
-            <h2 id="w-fit" className="font-display text-xl font-semibold">We're a great fit if…</h2>
+            <h2 id="w-fit" className="font-display text-xl font-semibold"><KineticText text="We're a great fit if…" base={30} /></h2>
             <ul className="mt-4 space-y-2.5 text-sm">{FIT.map((f) => <li key={f} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />{f}</li>)}</ul>
           </div>
           <div className="rounded-[20px] border border-border bg-card p-6">
-            <h2 className="font-display text-xl font-semibold">We're probably not right if…</h2>
+            <h2 className="font-display text-xl font-semibold"><KineticText text="We're probably not right if…" base={30} /></h2>
             <ul className="mt-4 space-y-2.5 text-sm">{NOT_FIT.map((f) => <li key={f} className="flex gap-2"><XCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />{f}</li>)}</ul>
           </div>
         </section>
 
         <section aria-labelledby="w-steps">
-          <h2 id="w-steps" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">How working together works</h2>
+          <h2 id="w-steps" className="font-display text-2xl font-semibold tracking-tight md:text-3xl"><KineticText text="How working together works" base={30} /></h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-4">
             {STEPS.map((s, i) => (
               <li key={s.title} className="rounded-[20px] border border-border bg-card p-5"><span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--emma-violet)] text-sm font-semibold text-white">{i + 1}</span><h3 className="mt-3 font-semibold">{s.title}</h3><p className="mt-1.5 text-sm text-muted-foreground">{s.body}</p></li>

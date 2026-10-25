@@ -1,5 +1,6 @@
 // @ts-nocheck -- generated DB/router types lag behind; runtime verified
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ExternalLink, Lock, Play, RotateCcw, Save, Trash2 } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
@@ -34,8 +35,8 @@ function AdminPage() {
     supabase.from("user_roles").select("role").eq("user_id", session.user.id).then(({ data }) => setIsAdmin(Boolean(data?.some((r) => r.role === "admin"))));
   }, [session]);
   if (checking || (session && isAdmin === null)) return <Shell><Loading /></Shell>;
-  if (!session) return <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold">Inspiration Library admin</h1><p className="mb-5 text-sm text-muted-foreground">Sign in with an admin account.</p><AccountAuthForm intent="account" next="/dashboard/inspiration" idPrefix="insp-auth" /></div></Shell>;
-  if (!isAdmin) return <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold">Admins only</h1></div></Shell>;
+  if (!session) return <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold"><KineticText text="Inspiration Library admin" base={60} /></h1><p className="mb-5 text-sm text-muted-foreground">Sign in with an admin account.</p><AccountAuthForm intent="account" next="/dashboard/inspiration" idPrefix="insp-auth" /></div></Shell>;
+  if (!isAdmin) return <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold"><KineticText text="Admins only" base={60} /></h1></div></Shell>;
   return <Admin />;
 }
 
@@ -46,7 +47,7 @@ function Admin() {
   return (
     <Shell>
       <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="font-display text-2xl font-extrabold tracking-tight">Inspiration Library</h1><p className="mt-1 max-w-3xl text-sm text-muted-foreground">Sources, imports and examples behind <Link to="/inspiration" className="font-semibold text-[var(--emma-violet)]">/inspiration</Link>. Crawling runs on the server every 10 minutes within each site's robots.txt rules and your per-source limits.</p></div>
+        <div><h1 className="font-display text-2xl font-extrabold tracking-tight"><KineticText text="Inspiration Library" base={60} /></h1><p className="mt-1 max-w-3xl text-sm text-muted-foreground">Sources, imports and examples behind <Link to="/inspiration" className="font-semibold text-[var(--emma-violet)]">/inspiration</Link>. Crawling runs on the server every 10 minutes within each site's robots.txt rules and your per-source limits.</p></div>
       </header>
       <nav aria-label="Sections" className="sticky top-0 z-20 -mx-4 mb-4 overflow-x-auto border-b border-border bg-background/95 px-4 backdrop-blur sm:-mx-6 sm:px-6">
         <ul className="flex gap-1 py-2">{TABS.map(([id, l]) => <li key={id}><button type="button" onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined} className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium ${tab === id ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>{l}</button></li>)}</ul>
@@ -333,7 +334,7 @@ function SettingsTab() {
 
 function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dash-x min-h-screen bg-background text-foreground">
       <div className="border-b border-border"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6"><Link to="/dashboard" className="inline-flex items-center gap-1.5 text-sm font-semibold"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Owner dashboard</Link><Link to="/inspiration" className="text-sm text-muted-foreground hover:text-foreground">View the library</Link></div></div>
       <main id="main-content" className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</main>
       <style>{`

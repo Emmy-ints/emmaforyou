@@ -67,7 +67,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1320px] px-3 pb-24 pt-24 sm:px-4 md:pb-12 lg:px-6">
+    <div className="cmx mx-auto w-full max-w-[1320px] px-3 pb-24 pt-24 sm:px-4 md:pb-12 lg:px-6">
       <div className={`grid gap-5 md:grid-cols-[72px_minmax(0,1fr)] ${collapsed ? "lg:grid-cols-[72px_minmax(0,1fr)]" : "lg:grid-cols-[232px_minmax(0,1fr)]"} ${collapsed ? "xl:grid-cols-[72px_minmax(0,1fr)_300px]" : "xl:grid-cols-[232px_minmax(0,1fr)_300px]"}`}>
         {/* Left: community navigation (icons only on tablets, or when collapsed) */}
         <aside aria-label="Community" className="hidden md:block">
@@ -76,7 +76,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
               {items.map((it) => {
                 const Icon = it.icon;
                 const label = it.badge ? `${it.label}, ${it.badge} unread` : it.label;
-                const cls = `group relative flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors ${it.active ? "bg-[var(--emma-violet)]/10 text-[var(--emma-violet)]" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`;
+                const cls = `cmx-nav group relative flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors ${it.active ? "is-active text-[var(--emma-violet)]" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`;
                 const inner = (
                   <>
                     <span className="relative inline-flex"><Icon className="h-5 w-5 shrink-0" aria-hidden="true" />{it.badge ? <span aria-hidden="true" className="absolute -right-1.5 -top-1.5 min-w-4 rounded-full bg-red-600 px-1 text-center text-[10px] font-bold leading-4 text-white">{it.badge > 99 ? "99+" : it.badge}</span> : null}</span>
@@ -132,7 +132,7 @@ export default function CommunityShell({ children }: { children: ReactNode }) {
       </div>
 
       {/* Mobile bottom navigation */}
-      <nav aria-label="Community" className="fixed inset-x-0 bottom-0 z-[65] border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <nav aria-label="Community" className="cmx-bottom fixed inset-x-0 bottom-0 z-[65] pb-[env(safe-area-inset-bottom)] md:hidden">
         <ul className="mx-auto grid max-w-md grid-cols-5">
           <BottomItem to="/community" label="Home" icon={Home} active={is("/community", true)} />
           <BottomItem to="/community/search" label="Explore" icon={Search} active={is("/community/search")} />
@@ -168,7 +168,7 @@ function BottomItem({ to, params, label, aria, icon: Icon, active, badge }: { to
     <li>
       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
       <Link to={to as any} params={params as any} aria-current={active ? "page" : undefined} aria-label={badge ? `${aria ?? label}, ${badge} unread` : aria ?? label}
-        className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? "text-[var(--emma-violet)]" : "text-muted-foreground"}`}>
+        className={`cmx-bottom-item flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium ${active ? "is-active text-[var(--emma-violet)]" : "text-muted-foreground"}`}>
         <span className="relative inline-flex"><Icon className="h-5 w-5" aria-hidden="true" />{badge ? <span aria-hidden="true" className="absolute -right-2 -top-1.5 min-w-4 rounded-full bg-red-600 px-1 text-center text-[10px] font-bold leading-4 text-white">{badge > 99 ? "99+" : badge}</span> : null}</span>
         {label}
       </Link>
@@ -208,7 +208,7 @@ export function DiscoverPanel() {
       </form>
 
       {ready && !uid && (
-        <section className="rounded-2xl border border-border bg-card p-4">
+        <section className="cmx-panel lg rounded-[20px] p-4">
           <h2 className="font-display text-base font-bold">Join the community</h2>
           <p className="mt-1 text-sm text-muted-foreground">Ask questions, share projects and learn from builders and business owners.</p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -218,14 +218,14 @@ export function DiscoverPanel() {
         </section>
       )}
       {ready && uid && !profile && (
-        <section className="rounded-2xl border border-[var(--emma-violet)]/40 bg-card p-4">
+        <section className="cmx-panel lg rounded-[20px] border-[var(--emma-violet)]/40 p-4">
           <h2 className="font-display text-base font-bold">Finish your profile</h2>
           <p className="mt-1 text-sm text-muted-foreground">Pick a username so you can post, comment and follow people.</p>
           <Link to="/community/settings" search={{ setup: true }} className="btn-primary-gradient mt-3 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white">Set up profile</Link>
         </section>
       )}
 
-      <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="trending-h">
+      <section className="cmx-panel lg rounded-[20px] p-4" aria-labelledby="trending-h">
         <h2 id="trending-h" className="font-display text-base font-bold">Trending this week</h2>
         {tags === null ? <SkeletonLines /> : tags.length === 0 ? <p className="mt-2 text-sm text-muted-foreground">No tags used this week yet.</p> : (
           <ul className="mt-2 flex flex-wrap gap-1.5">
@@ -234,7 +234,7 @@ export function DiscoverPanel() {
         )}
       </section>
 
-      <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="people-h">
+      <section className="cmx-panel lg rounded-[20px] p-4" aria-labelledby="people-h">
         <h2 id="people-h" className="font-display text-base font-bold">People to follow</h2>
         {people === null ? <SkeletonLines /> : people.length === 0 ? <p className="mt-2 text-sm text-muted-foreground">No suggestions right now.</p> : (
           <ul className="mt-2 space-y-3">
@@ -253,7 +253,7 @@ export function DiscoverPanel() {
       </section>
 
       {blog.length > 0 && (
-        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="blog-h">
+        <section className="cmx-panel lg rounded-[20px] p-4" aria-labelledby="blog-h">
           <h2 id="blog-h" className="font-display text-base font-bold">Latest from the blog</h2>
           <ul className="mt-2 space-y-2.5">
             {blog.map((b) => <li key={b.slug}><Link to="/blog/$slug" params={{ slug: b.slug }} className="block text-sm font-medium leading-snug hover:underline">{b.title}</Link><span className="text-xs text-muted-foreground">{b.category}</span></li>)}
@@ -262,7 +262,7 @@ export function DiscoverPanel() {
         </section>
       )}
 
-      <section className="rounded-2xl border border-border bg-card p-4">
+      <section className="cmx-panel lg rounded-[20px] p-4">
         <h2 className="flex items-center gap-1.5 font-display text-base font-bold"><Sparkles className="h-4 w-4 text-[var(--emma-violet)]" aria-hidden="true" />Need it built?</h2>
         <p className="mt-1 text-sm text-muted-foreground">Browse ready-to-use websites, apps, AI and automation solutions.</p>
         <Link to="/solutions" className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-[var(--emma-violet)] hover:underline">Explore solutions <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
@@ -273,5 +273,5 @@ export function DiscoverPanel() {
 }
 
 function SkeletonLines() {
-  return <div className="mt-2 space-y-2" aria-hidden="true">{[0, 1, 2].map((i) => <div key={i} className="h-4 animate-pulse rounded bg-muted" style={{ width: `${85 - i * 15}%` }} />)}</div>;
+  return <div className="mt-2 space-y-2" aria-hidden="true">{[0, 1, 2].map((i) => <div key={i} className="efy-skel h-4 rounded" style={{ width: `${85 - i * 15}%` }} />)}</div>;
 }

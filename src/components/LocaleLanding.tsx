@@ -3,6 +3,8 @@ import { ArrowRight, CheckCircle2, MessageCircle } from "lucide-react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import NewsletterSignup from "./NewsletterSignup";
+import FutureOrb from "./future/FutureOrb";
+import { KineticText } from "./future/Kinetic";
 import { TESTIMONIALS } from "./TestimonialsPreview";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
 import { TIERS } from "@/lib/pricing-data";
@@ -37,16 +39,18 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
     <div lang={code}>
       <Navbar />
       <main>
-        <section className="hero-ink relative overflow-hidden">
+        <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
-          <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-32 md:pt-40">
+          <div className="hero-x-horizon" aria-hidden="true" />
+          <FutureOrb className="-right-44 top-10 z-0 w-[320px] opacity-40 sm:w-[440px] sm:opacity-60 lg:-right-16 lg:top-20 lg:w-[560px] lg:opacity-90" />
+          <div className="hero-par-copy relative z-10 mx-auto max-w-6xl px-5 pb-20 pt-32 md:pt-40">
             <p className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />{c.eyebrow}</p>
-            <h1 className="hero-ink-title max-w-4xl">{c.h1}</h1>
+            <h1 className="hero-ink-title max-w-4xl"><KineticText text={c.h1} /></h1>
             <p className="hero-ink-sub max-w-3xl">{c.intro}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/book" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-white">{c.ctaBook}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 font-semibold text-foreground"><MessageCircle className="h-4 w-4" aria-hidden="true" />{c.ctaWhatsApp}</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hero-ghost-btn"><MessageCircle className="h-4 w-4" aria-hidden="true" />{c.ctaWhatsApp}</a>
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
               {c.trust.map((t) => <li key={t} className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[var(--emma-violet)]" aria-hidden="true" />{t}</li>)}
@@ -55,11 +59,11 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
         </section>
 
         <section className="mx-auto max-w-6xl px-5 py-20" aria-labelledby="loc-services">
-          <h2 id="loc-services" className="font-display text-3xl font-semibold tracking-tight">{c.servicesTitle}</h2>
+          <h2 id="loc-services" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.servicesTitle} base={40} /></h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">{c.servicesIntro}</p>
           <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {c.services.map((s) => (
-              <li key={s.slug} className="flex flex-col rounded-[20px] border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+              <li key={s.slug} className="flex flex-col rounded-[20px] border border-border bg-card p-5 shadow-[var(--shadow-card)]" data-tilt="3">
                 <h3 className="font-display text-lg font-semibold">{s.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{s.text}</p>
                 <Link to="/services/$slug" params={{ slug: s.slug }} hrefLang="en" className="mt-auto pt-4 text-sm font-semibold text-[var(--emma-violet)]">{s.name} →</Link>
@@ -71,19 +75,19 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
 
         <section className="bg-muted/50" aria-labelledby="loc-process">
           <div className="mx-auto max-w-6xl px-5 py-20">
-            <h2 id="loc-process" className="font-display text-3xl font-semibold tracking-tight">{c.processTitle}</h2>
-            <ol className="mt-8 grid gap-4 md:grid-cols-4">
-              {c.process.map((p) => <li key={p.title} className="rounded-[20px] border border-border bg-card p-5"><h3 className="font-display font-semibold">{p.title}</h3><p className="mt-2 text-sm text-muted-foreground">{p.text}</p></li>)}
+            <h2 id="loc-process" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.processTitle} base={40} /></h2>
+            <ol className="loc-path mt-8 grid gap-4 md:grid-cols-4">
+              {c.process.map((p, i) => <li key={p.title} className="lg rounded-[20px] p-5" style={{ ["--i" as string]: i }}><span className="ix-node mb-4" aria-hidden="true">{i + 1}</span><h3 className="font-display font-semibold">{p.title}</h3><p className="mt-2 text-sm text-muted-foreground">{p.text}</p></li>)}
             </ol>
           </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-5 py-20" aria-labelledby="loc-work">
-          <h2 id="loc-work" className="font-display text-3xl font-semibold tracking-tight">{c.workTitle}</h2>
+          <h2 id="loc-work" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.workTitle} base={40} /></h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">{c.workIntro}</p>
           <ul className="mt-8 grid gap-4 md:grid-cols-3">
             {work.map(({ p, label }) => (
-              <li key={p!.name} className="overflow-hidden rounded-[20px] border border-border bg-card shadow-[var(--shadow-card)]">
+              <li key={p!.name} className="overflow-hidden rounded-[20px] border border-border bg-card shadow-[var(--shadow-card)]" data-tilt="3">
                 <img src={p!.img} alt="" loading="lazy" className="h-40 w-full object-cover" />
                 <div className="p-5">
                   <p className="text-xs text-muted-foreground">{label}</p>
@@ -105,7 +109,7 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
 
         <section className="bg-muted/50" aria-labelledby="loc-pricing">
           <div className="mx-auto max-w-6xl px-5 py-20">
-            <h2 id="loc-pricing" className="font-display text-3xl font-semibold tracking-tight">{c.pricingTitle}</h2>
+            <h2 id="loc-pricing" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.pricingTitle} base={40} /></h2>
             <p className="mt-3 max-w-2xl text-muted-foreground">{c.pricingIntro}</p>
             <ul className="mt-8 grid gap-4 md:grid-cols-4">
               {TIERS.map((t) => (
@@ -121,17 +125,17 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
         </section>
 
         <section className="mx-auto max-w-6xl px-5 py-20" aria-labelledby="loc-tools">
-          <h2 id="loc-tools" className="font-display text-3xl font-semibold tracking-tight">{c.toolsTitle}</h2>
+          <h2 id="loc-tools" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.toolsTitle} base={40} /></h2>
           <ul className="mt-8 grid gap-4 md:grid-cols-3">
-            {c.tools.map((t) => <li key={t.to}><Link to={t.to} className="block h-full rounded-[20px] border border-border bg-card p-5 hover:border-[var(--emma-violet)]"><h3 className="font-display font-semibold">{t.name}</h3><p className="mt-2 text-sm text-muted-foreground">{t.text}</p></Link></li>)}
+            {c.tools.map((t) => <li key={t.to}><Link to={t.to} className="block h-full rounded-[20px] border border-border bg-card p-5 shadow-[var(--shadow-card)] hover:border-[var(--emma-violet)]" data-tilt="4"><h3 className="font-display font-semibold">{t.name}</h3><p className="mt-2 text-sm text-muted-foreground">{t.text}</p></Link></li>)}
           </ul>
         </section>
 
         <section className="mx-auto max-w-3xl px-5 pb-20" aria-labelledby="loc-faq">
-          <h2 id="loc-faq" className="font-display text-3xl font-semibold tracking-tight">{c.faqTitle}</h2>
-          <div className="mt-6 divide-y divide-border rounded-[20px] border border-border bg-card">
+          <h2 id="loc-faq" className="font-display text-3xl font-semibold tracking-tight"><KineticText text={c.faqTitle} base={40} /></h2>
+          <div className="mt-6 space-y-3">
             {c.faqs.map((f) => (
-              <details key={f.q} className="group p-5"><summary className="cursor-pointer list-none font-semibold">{f.q}</summary><p className="mt-3 text-muted-foreground">{f.a}</p></details>
+              <details key={f.q} className="fq-details lg group rounded-[20px] p-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{f.q}<span className="fq-icon" aria-hidden="true" /></summary><p className="mt-3 text-muted-foreground">{f.a}</p></details>
             ))}
           </div>
         </section>
@@ -140,13 +144,14 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
           <NewsletterSignup source={`locale:${code}`} language={code} variant="band" />
         </section>
 
-        <section className="band-ink" aria-labelledby="loc-final">
-          <div className="mx-auto max-w-4xl px-5 py-20 text-center">
+        <section className="band-ink ms relative overflow-hidden" aria-labelledby="loc-final">
+          <div className="ms-aurora" aria-hidden="true"><span /><span /><span /></div>
+          <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">
             <h2 id="loc-final" className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-4xl">{c.finalTitle}</h2>
             <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">{c.finalText}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/book" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-white">{c.ctaBook}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 font-semibold text-foreground"><MessageCircle className="h-4 w-4" aria-hidden="true" />{c.ctaWhatsApp}</a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hero-ghost-btn"><MessageCircle className="h-4 w-4" aria-hidden="true" />{c.ctaWhatsApp}</a>
             </div>
           </div>
         </section>

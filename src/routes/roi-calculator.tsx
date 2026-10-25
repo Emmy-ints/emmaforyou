@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import RoiCalculator from "../components/roi/RoiCalculator";
@@ -21,7 +22,7 @@ function RoiPage() {
       <Navbar />
       <main className="mx-auto max-w-6xl px-5 pb-24 pt-32">
         <div className="max-w-3xl">
-          <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">ROI calculator</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl"><KineticText text="ROI calculator" base={60} /></h1>
           <p className="mt-4 text-lg text-muted-foreground">
             See what answering every enquiry quickly, following up automatically and attracting more of the right customers could be worth to your business. Your inputs, visible assumptions, shown maths.
           </p>

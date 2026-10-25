@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { LayoutGroup, motion } from "framer-motion";
 import {
@@ -8,6 +8,7 @@ import {
   Rocket, Search, Store, Stethoscope, Users, Megaphone, MessageSquare, FolderOpen, Plug, Layers, Scale, Sparkles, MessagesSquare,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
+import SectionHead from "../future/SectionHead";
 
 type Group = "try" | "ecommerce" | "learn" | "work" | "proof";
 
@@ -97,47 +98,76 @@ const INDUSTRIES: { slug: string; label: string }[] = [
 
 export default function ToolsHub() {
   const [group, setGroup] = useState<Group>("try");
+  const [q, setQ] = useState("");
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const active = GROUPS.find((g) => g.id === group)!;
-  const tools = TOOLS.filter((t) => t.group === group);
+  const query = q.trim().toLowerCase();
+  const tools = query
+    ? TOOLS.filter((t) => `${t.name} ${t.does} ${t.get} ${t.meta}`.toLowerCase().includes(query))
+    : TOOLS.filter((t) => t.group === group);
+
+  // Tabs follow the ARIA pattern: arrow keys / Home / End move between categories.
+  const onTabKey = (e: React.KeyboardEvent, i: number) => {
+    const n = GROUPS.length;
+    const to = e.key === "ArrowRight" ? (i + 1) % n : e.key === "ArrowLeft" ? (i - 1 + n) % n : e.key === "Home" ? 0 : e.key === "End" ? n - 1 : -1;
+    if (to < 0) return;
+    e.preventDefault(); setQ(""); setGroup(GROUPS[to].id); tabs.current[to]?.focus();
+  };
 
   return (
-    <section id="tools" className="band-ink relative overflow-hidden bg-[#0b0d24] py-24 text-white md:py-32">
+    <section id="tools" className="band-ink th relative overflow-hidden bg-[#0b0d24] py-24 text-white md:py-32">
       <div className="hero-ink-grid" aria-hidden="true" />
       <div className="hero-ink-glow" aria-hidden="true" />
+      <div className="th-constellation" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <span key={i} style={{ ["--i" as string]: i, left: `${(i * 37) % 100}%`, top: `${(i * 53 + 11) % 100}%` }} />)}</div>
       <div className="relative mx-auto max-w-7xl px-5 md:px-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-3xl">
-          <p className="hero-kicker"><span className="hero-kicker-dot" aria-hidden="true" />Everything on this site, in one place</p>
-          <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight text-white md:text-5xl">Free tools & features</h2>
-          <p className="mt-4 text-base text-[#b3b8dc] md:text-lg">
-            {TOOLS.length} tools and resources to understand, plan and grow your business. Each one tells you what it does and what you'll get — pick one and start.
-          </p>
-        </motion.div>
+        <SectionHead
+          tone="ink"
+          kicker="Everything on this site, in one place"
+          title="Free tools & features"
+          shine={["tools"]}
+          sub={<>{TOOLS.length} tools and resources to understand, plan and grow your business. Each one tells you what it does and what you'll get — pick one and start.</>}
+          className="max-w-3xl"
+        />
 
-        <LayoutGroup>
-          <div className="th-tabs mt-10" role="tablist" aria-label="Tool categories">
-            {GROUPS.map((g) => (
-              <button key={g.id} role="tab" aria-selected={group === g.id} onClick={() => setGroup(g.id)} className="th-tab">
-                {group === g.id && <motion.span layoutId="th-pill" className="th-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-                <span className="relative">{g.label}</span>
-                <span className="relative th-count">{TOOLS.filter((t) => t.group === g.id).length}</span>
-              </button>
-            ))}
-          </div>
-        </LayoutGroup>
-        <p className="mt-4 text-sm text-[#a6abd0]">{active.intro}</p>
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <LayoutGroup>
+            <div className="th-tabs" role="tablist" aria-label="Tool categories">
+              {GROUPS.map((g, i) => {
+                const sel = !query && group === g.id;
+                return (
+                  <button key={g.id} ref={(el) => { tabs.current[i] = el; }} id={`th-tab-${g.id}`} role="tab" aria-selected={sel} aria-controls="th-panel" tabIndex={group === g.id ? 0 : -1}
+                    onClick={() => { setQ(""); setGroup(g.id); }} onKeyDown={(e) => onTabKey(e, i)} className="th-tab">
+                    {sel && <motion.span layoutId="th-pill" className="th-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
+                    <span className="relative">{g.label}</span>
+                    <span className="relative th-count">{TOOLS.filter((t) => t.group === g.id).length}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
+          <label className="th-search">
+            <Search className="h-4 w-4 shrink-0 text-[#8f94bf]" aria-hidden="true" />
+            <span className="sr-only">Find a tool</span>
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a tool…" maxLength={60} />
+          </label>
+        </div>
+        <p className="mt-4 text-sm text-[#a6abd0]" aria-live="polite">
+          {query ? `${tools.length} ${tools.length === 1 ? "match" : "matches"} for “${q.trim()}”` : active.intro}
+        </p>
 
-        {/* Keyed by tab: switching swaps cards instantly, then animates the new ones in. */}
-        <div key={group} className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="tabpanel" aria-label={active.label}>
+        {/* Keyed by tab/query: switching swaps cards instantly, then animates the new ones in. */}
+        <div key={query ? `q-${query}` : group} id="th-panel" className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="tabpanel" aria-labelledby={query ? undefined : `th-tab-${group}`} aria-label={query ? "Search results" : undefined}>
           {tools.map((t, i) => (
             <motion.div
               key={t.name}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.4, delay: Math.min(i, 9) * 0.04, ease: [0.16, 1, 0.3, 1] }}
             >
               <ToolCard t={t} />
             </motion.div>
           ))}
+          {!tools.length && <p className="col-span-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-[#c9ccec]">No tool matches that. Try “audit”, “email”, “store” or “quote”, or <button type="button" onClick={() => setQ("")} className="font-semibold text-white underline underline-offset-4">show all</button>.</p>}
         </div>
 
         <div className="mt-14 border-t border-white/10 pt-8">
@@ -169,11 +199,11 @@ function ToolCard({ t }: { t: Tool }) {
       <span className="th-cta">{t.cta} <ArrowRight className="h-4 w-4" /></span>
     </>
   );
-  if ("hash" in t.href) return <a href={`#${t.href.hash}`} className="th-card" data-track={`tool_${t.href.hash}`}>{body}</a>;
+  if ("hash" in t.href) return <a href={`#${t.href.hash}`} className="th-card" data-tilt="4" data-track={`tool_${t.href.hash}`}>{body}</a>;
   if ("event" in t.href) {
     const name = t.href.event;
-    return <button type="button" onClick={() => window.dispatchEvent(new Event(name))} className="th-card w-full text-left">{body}</button>;
+    return <button type="button" onClick={() => window.dispatchEvent(new Event(name))} className="th-card w-full text-left" data-tilt="4">{body}</button>;
   }
-  if ("external" in t.href) return <a href={t.href.external} target="_blank" rel="noopener noreferrer" className="th-card">{body}</a>;
-  return <Link to={t.href.to} className="th-card" data-track={`tool_${t.href.to.slice(1)}`}>{body}</Link>;
+  if ("external" in t.href) return <a href={t.href.external} target="_blank" rel="noopener noreferrer" className="th-card" data-tilt="4">{body}</a>;
+  return <Link to={t.href.to} className="th-card" data-tilt="4" data-track={`tool_${t.href.to.slice(1)}`}>{body}</Link>;
 }

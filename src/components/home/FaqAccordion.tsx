@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import SectionHead from "../future/SectionHead";
 import { Link } from "@tanstack/react-router";
 
 const FAQS = [
@@ -13,28 +13,24 @@ const FAQS = [
   { q: "Is my business too small or too new for EmmaForYou?", a: "Almost never. We've helped one-person businesses go from zero to first 100 customers, and we've helped established companies scale to seven figures. The key is commitment, not size." },
 ];
 
+/** FAQ as glass panels: the open answer glows, the plus turns into a cross, heights animate smoothly. */
 export default function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section id="faq" className="section-padding">
+    <section id="faq" className="fq section-padding" aria-labelledby="fq-h">
       <div className="mx-auto max-w-3xl">
-        <motion.div className="text-center"
-          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <h2 className="font-display text-3xl font-extrabold md:text-5xl">
-            Frequently Asked <span className="gradient-text">Questions</span>
-          </h2>
-          <p className="mt-4 text-base text-muted-foreground">Quick answers — full library on our FAQ page.</p>
-        </motion.div>
+        <SectionHead id="fq-h" align="center" title="Frequently Asked Questions" shine={["Questions"]} sub="Quick answers — full library on our FAQ page." />
 
         <div className="mt-10 space-y-3">
           {FAQS.map((f, i) => (
-            <div key={i} className="overflow-hidden rounded-2xl border border-border bg-card">
-              <button onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i} aria-controls={`home-faq-${i}`}
-                className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-muted/30">
-                <span className="font-display text-base font-bold">{f.q}</span>
-                <span className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-emma-blue/10 text-emma-blue transition-transform ${open === i ? "rotate-45" : ""}`}>+</span>
-              </button>
-              <div id={`home-faq-${i}`} className="acc-panel" data-open={open === i} inert={open !== i}>
+            <div key={i} className={`fq-item lg ${open === i ? "is-open" : ""}`}>
+              <h3>
+                <button id={`home-faq-q-${i}`} onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i} aria-controls={`home-faq-${i}`} className="fq-q">
+                  <span className="font-display text-base font-semibold">{f.q}</span>
+                  <span className="fq-icon" aria-hidden="true" />
+                </button>
+              </h3>
+              <div id={`home-faq-${i}`} role="region" aria-labelledby={`home-faq-q-${i}`} className="acc-panel" data-open={open === i} inert={open !== i}>
                 <div><p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p></div>
               </div>
             </div>
@@ -42,9 +38,7 @@ export default function FaqAccordion() {
         </div>
 
         <div className="mt-10 text-center">
-          <Link to="/faq" className="inline-flex rounded-full border-2 border-border px-6 py-3 text-sm font-semibold transition-colors hover:border-emma-blue hover:text-emma-blue">
-            See All FAQs →
-          </Link>
+          <Link to="/faq" className="nav-ghost h-auto px-6 py-3">See All FAQs →</Link>
         </div>
       </div>
     </section>

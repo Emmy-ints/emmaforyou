@@ -1,36 +1,38 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, BadgeCheck } from "lucide-react";
 import ProjectCard from "../portfolio/ProjectCard";
 import ClientWall from "../portfolio/ClientWall";
+import SectionHead from "../future/SectionHead";
 import { FEATURED, PROJECTS, findProject, projectSlug } from "@/lib/portfolio-data";
 
-/** Homepage showcase of real client projects. */
+/**
+ * Homepage showcase of real client projects (the owner's records in portfolio-data, unchanged):
+ * a cinematic bento with the lead project large, the next two stacked beside it, then three more.
+ * Photos drift inside their frames as the page scrolls; stock photos are labelled on the card.
+ */
 export default function SelectedWork() {
   const featured = FEATURED.map((f) => findProject(projectSlug(f.client))).filter((p): p is (typeof PROJECTS)[number] => Boolean(p));
   const rest = PROJECTS.filter((p) => !featured.includes(p)).slice(0, 3);
 
   return (
-    <section id="work" className="py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">Selected client work</h2>
-            <p className="mt-4 text-base text-muted-foreground md:text-lg">
-              Websites, stores, automation and campaigns we've delivered for {PROJECTS.length} businesses — from a Lagos fashion house to a Maryland real estate team and a clinic in Halle.
-            </p>
-          </div>
-          <Link to="/portfolio" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold transition-colors hover:border-[color:var(--emma-violet)] hover:text-[color:var(--emma-violet)]">
-            View all work <ArrowRight className="h-4 w-4" />
+    <section id="work" className="sw relative overflow-hidden py-24 md:py-32">
+      <div className="sw-light" aria-hidden="true" />
+      <div className="relative mx-auto max-w-7xl px-5 md:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHead
+            kicker={<><BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />Real client projects</>}
+            title="Selected client work"
+            sub={<>Websites, stores, automation and campaigns we've delivered for {PROJECTS.length} businesses — from a Lagos fashion house to a Maryland real estate team and a clinic in Halle.</>}
+          />
+          <Link to="/portfolio" className="sw-all" data-magnetic>
+            View all work <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-        </motion.div>
+        </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {featured.map((p, i) => <ProjectCard key={p.name} p={p} index={i} />)}
-        </div>
-        <div className="mt-5 grid gap-5 md:grid-cols-3">
-          {rest.map((p, i) => <ProjectCard key={p.name} p={p} index={i + 3} />)}
-        </div>
+        <ul className="grid sw-bento mt-12">
+          {featured.map((p, i) => <li key={p.name} className={i === 0 ? "sw-lead" : ""}><ProjectCard p={p} index={i} size={i === 0 ? "lg" : "md"} /></li>)}
+          {rest.map((p, i) => <li key={p.name}><ProjectCard p={p} index={i + 3} /></li>)}
+        </ul>
 
         <div className="mt-16">
           <p className="mb-4 text-sm text-muted-foreground">Clients we've worked with</p>

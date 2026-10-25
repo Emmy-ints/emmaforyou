@@ -16,6 +16,7 @@ import {
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import BusinessIntakeForm from "../intake/BusinessIntakeForm";
+import SectionHead from "../future/SectionHead";
 import { useI18n } from "@/lib/i18n";
 import { homeExperienceCopy } from "@/lib/home-experience-copy";
 import { cleanGeneratedHtml, previewDocument } from "@/lib/prototype";
@@ -154,21 +155,16 @@ export default function PrototypeBuilder() {
     <section id="prototype" className="prototype-section relative overflow-hidden px-5 py-20 md:px-8 md:py-28">
       <div className="prototype-glow" aria-hidden="true" />
       <div className="relative mx-auto max-w-6xl">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="eyebrow">
-            <Sparkles className="h-3.5 w-3.5" /> {c.eyebrow}
-          </span>
-          <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">{c.title}</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">{c.subtitle}</p>
-          <ol className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+        <SectionHead align="center" className="max-w-3xl" kicker={<><Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> {c.eyebrow}</>} title={c.title} sub={c.subtitle}>
+          <ol className="pb-steps mt-8">
             {[c.step1, c.step2, c.step3].map((step, i) => (
-              <li key={step} className="flex items-center gap-2">
+              <li key={step} style={{ ["--i" as string]: i }}>
                 <span className="step-dot">{i + 1}</span>
                 {step}
               </li>
             ))}
           </ol>
-        </div>
+        </SectionHead>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
           {/* Prompt column */}
@@ -234,7 +230,8 @@ export default function PrototypeBuilder() {
           </div>
 
           {/* Preview column */}
-          <div ref={previewRef} className="prototype-browser scroll-mt-28">
+          <div ref={previewRef} className="prototype-browser scroll-mt-28" data-scroll data-busy={busy || undefined}>
+            <span className="pb-beam" aria-hidden="true" />
             <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-2.5">
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />

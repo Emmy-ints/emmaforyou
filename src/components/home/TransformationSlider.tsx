@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { ArrowLeftRight, CalendarCheck, MessageCircle, Sparkles, Star } from "lucide-react";
+import SectionHead from "../future/SectionHead";
 import { track } from "@/lib/analytics";
 
 /**
@@ -73,25 +73,19 @@ export default function TransformationSlider() {
   return (
     <section id="transformation" className="section-padding relative overflow-hidden bg-background">
       <div className="mx-auto max-w-6xl">
-        <motion.div className="mx-auto max-w-3xl text-center" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
-          <span className="eyebrow"><ArrowLeftRight className="h-3.5 w-3.5" /> Before → After</span>
-          <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
-            See what we'd do for <span className="gradient-text">your business</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">
-            Pick your industry and drag the handle. Same business, completely different first impression — and a website that actually takes orders, bookings and enquiries.
-          </p>
-        </motion.div>
+        <SectionHead align="center" className="max-w-3xl" kicker={<><ArrowLeftRight className="h-3.5 w-3.5" aria-hidden="true" /> Before → After</>}
+          title="See what we'd do for your business" shine={["your", "business"]}
+          sub="Pick your industry and drag the handle. Same business, completely different first impression — and a website that actually takes orders, bookings and enquiries." />
 
         {/* Industry picker */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Choose your industry">
+        <div className="ts-picker mt-10" role="tablist" aria-label="Choose your industry">
           {NICHES.map((n) => (
             <button
               key={n.id}
               role="tab"
               aria-selected={n.id === niche.id}
               onClick={() => { setNiche(n); setPos(50); track("cta_click", { name: "transformation_niche", niche: n.id }); }}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${n.id === niche.id ? "border-transparent bg-foreground text-background shadow-lg" : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground"}`}
+              className="ts-pick"
             >
               {n.label}
             </button>
@@ -101,12 +95,13 @@ export default function TransformationSlider() {
         {/* Compare frame */}
         <div
           ref={frame}
+          data-scroll
+          style={{ touchAction: "pan-y", ["--pos" as string]: pos }}
           className="ts-frame relative mx-auto mt-8 aspect-[16/11] w-full max-w-5xl select-none overflow-hidden rounded-[22px] border border-border bg-card shadow-2xl sm:aspect-[16/9]"
           onPointerDown={(e) => { dragging.current = true; firstTouch(); (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); moveTo(e.clientX); }}
           onPointerMove={(e) => { if (dragging.current) moveTo(e.clientX); }}
           onPointerUp={() => { dragging.current = false; }}
           onPointerCancel={() => { dragging.current = false; }}
-          style={{ touchAction: "pan-y" }}
         >
           {/* AFTER (full) */}
           <AfterSite n={niche} />

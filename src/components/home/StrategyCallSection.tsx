@@ -1,8 +1,10 @@
-import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
+import { Check, PhoneCall } from "lucide-react";
+import SectionHead from "../future/SectionHead";
 
 const WA = "https://wa.me/message/HHGMMWMRJFYUC1?text=Hi%20EmmaForYou!%20I%27d%20like%20to%20book%20my%20free%2030-minute%20strategy%20call.";
 
+/** Strategy call as a glass "session ticket": the offer on the left, what you get drawn in on the right. */
 export default function StrategyCallSection() {
   const benefits = [
     "Full digital audit of your business",
@@ -11,46 +13,34 @@ export default function StrategyCallSection() {
     "Honest advice — no pressure to buy",
   ];
   return (
-    <section id="strategy-call" className="section-padding">
-      <motion.div className="mx-auto max-w-4xl rounded-3xl border border-border bg-card p-8 md:p-14 shadow-xl"
-        initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}>
-        <div className="grid items-center gap-10 md:grid-cols-2">
+    <section id="strategy-call" className="sc section-padding" aria-labelledby="sc-h">
+      <div className="sc-ticket lg-strong mx-auto max-w-5xl" data-tilt="2">
+        <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emma-blue/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emma-blue">
-              📞 Free Call
-            </span>
-            <h2 className="mt-4 font-display text-3xl font-extrabold md:text-4xl">
-              Book a Free 30-Minute<br/><span className="gradient-text">Strategy Call</span>
-            </h2>
-            <p className="mt-4 text-base text-muted-foreground">
-              Get on a call with Emmanuel or a senior strategist. We'll review your business, identify your top 3 growth opportunities, and outline a custom plan — for free.
-            </p>
+            <SectionHead id="sc-h" kicker={<><PhoneCall className="h-3.5 w-3.5" aria-hidden="true" />Free call</>} title="Book a Free 30-Minute Strategy Call" shine={["Strategy", "Call"]}
+              sub="Get on a call with Emmanuel or a senior strategist. We'll review your business, identify your top 3 growth opportunities, and outline a custom plan — for free." />
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to="/book" className="btn-gold inline-flex rounded-full px-6 py-3 text-sm font-semibold">
-                Pick a time →
-              </Link>
-              <a href={WA} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-full border border-border px-6 py-3 text-sm font-semibold hover:bg-muted">
-                Or ask on WhatsApp
-              </a>
+              <Link to="/book" className="btn-gold inline-flex rounded-full px-6 py-3 text-sm font-semibold">Pick a time →</Link>
+              <a href={WA} target="_blank" rel="noopener noreferrer" className="nav-ghost h-auto px-6 py-3">Or ask on WhatsApp</a>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              <span className="inline-block h-2 w-2 rounded-full bg-green-500 align-middle" /> Times shown in your own timezone — Lagos · UK · USA and beyond
+              <span className="sc-live" aria-hidden="true" /> Times shown in your own timezone — Lagos · UK · USA and beyond
             </p>
           </div>
-          <div className="rounded-2xl bg-muted/40 p-6">
-            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">What you'll get:</p>
+          <div className="sc-stub">
+            <span className="sc-perf" aria-hidden="true" />
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">What you'll get</p>
             <ul className="mt-4 space-y-3">
-              {benefits.map((b) => (
-                <li key={b} className="flex items-start gap-3 text-sm">
-                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emma-blue text-[10px] text-white">✓</span>
-                  {b}
+              {benefits.map((b, i) => (
+                <li key={b} className="sc-benefit" style={{ ["--i" as string]: i }}>
+                  <span className="sc-check"><Check className="h-3 w-3" aria-hidden="true" /></span>{b}
                 </li>
               ))}
             </ul>
             <p className="mt-5 text-xs text-muted-foreground">30 minutes · 100% free · No commitment · WhatsApp or Zoom</p>
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

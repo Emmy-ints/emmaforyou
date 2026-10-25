@@ -3,7 +3,7 @@ import { Fragment, useState, useEffect, useCallback, useRef, useId, type ReactNo
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   ArrowRight, ArrowUpRight, ChevronDown, X, Globe2, LayoutGrid, Bot, Workflow, Smartphone, Building2,
-  BookOpen, Users, Wrench, Sparkles, Lock, BarChart3, MessageCircle, CalendarDays,
+  BookOpen, Users, Wrench, Sparkles, Lock, BarChart3, MessageCircle, CalendarDays, Search,
 } from "lucide-react";
 import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
@@ -281,6 +281,9 @@ export default function Navbar() {
 
           {/* Right: utilities + conversion (desktop) */}
           <div className="ml-auto hidden items-center gap-1.5 xl:flex">
+            <button type="button" onClick={() => window.dispatchEvent(new Event("efy-open-search"))} className="nav-search" aria-label="Search the site" aria-keyshortcuts="Control+K Meta+K /">
+              <Search className="h-4 w-4" aria-hidden="true" /><span className="hidden 2xl:inline">Search</span><kbd className="nav-kbd" aria-hidden="true">⌘K</kbd>
+            </button>
             <LanguageSelector />
             <DarkModeToggle />
             <span className="mx-1.5 h-5 w-px bg-border" aria-hidden="true" />
@@ -294,6 +297,7 @@ export default function Navbar() {
           {/* Right: compact bar (phones and tablets) */}
           <div className="ml-auto flex items-center gap-1.5 xl:hidden">
             <div className="hidden items-center gap-1.5 md:flex"><LanguageSelector /><DarkModeToggle /></div>
+            <button type="button" onClick={() => window.dispatchEvent(new Event("efy-open-search"))} className="nav-chip flex h-10 w-10 items-center justify-center rounded-full text-foreground" aria-label="Search the site"><Search className="h-[18px] w-[18px]" aria-hidden="true" /></button>
             <Link to="/book" className="nav-cta nav-cta-sm hidden min-[480px]:inline-flex">Book a call</Link>
             <button ref={triggerRef} type="button" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen} aria-controls={`${uid}-drawer`} className="nav-burger">
               <span /><span /><span />

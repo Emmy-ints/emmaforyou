@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { prefersReduced } from "@/lib/motion";
 
 const RESULTS = [
   "🇳🇬 Fashion store in Lagos: +312% website traffic",
@@ -11,26 +12,41 @@ const RESULTS = [
   "🇬🇭 Fashion brand in Accra: first 1,000 Instagram followers",
   "🇳🇬 Restaurant in Port Harcourt: fully booked every weekend",
 ];
+const MS = 4000;
 
+/**
+ * Signal strip under the hero: one client result at a time, sliding through a mask, with a timer
+ * line that fills while it's shown (the line's animation is the clock, so pausing it pauses the strip). Pauses on hover/focus and with the pause button (WCAG 2.2.2);
+ * reduced-motion visitors get manual previous/next only.
+ */
 export default function ResultsTicker() {
   const [i, setI] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % RESULTS.length), 4000);
-    return () => clearInterval(t);
-  }, []);
+  const [paused, setPaused] = useState(false);
+  const [hold, setHold] = useState(false);
+  const [auto, setAuto] = useState(true);
+  useEffect(() => { if (prefersReduced()) setAuto(false); }, []);
+  const running = auto && !paused && !hold;
+  const step = (d: number) => setI((x) => (x + d + RESULTS.length) % RESULTS.length);
+  const [where, what] = RESULTS[i].split(":");
+
   return (
-    <div className="border-y border-border" style={{ background: "var(--gradient-dark)" }}>
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-center px-5 text-center">
-        <AnimatePresence mode="wait">
-          <motion.span key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4 }}
-            className="text-sm font-medium text-white/90 md:text-base">
-            <span className="mr-2 text-xs uppercase tracking-wider text-white/50">Client results</span>
-            <span className="gradient-text-gold font-bold">{RESULTS[i].split(":")[1]?.trim()}</span>
-            <span className="ml-2 text-white/60">— {RESULTS[i].split(":")[0]}</span>
-          </motion.span>
-        </AnimatePresence>
+    <div className="rt" onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)} onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-3 px-5 md:gap-5 md:px-8">
+        <span className="rt-label"><span className="rt-live" aria-hidden="true" />Client results</span>
+        <div className="rt-window" aria-live={running ? "off" : "polite"}>
+          <p key={i} className="rt-item">
+            <span className="rt-what">{what?.trim()}</span>
+            <span className="rt-where">— {where}</span>
+          </p>
+        </div>
+        <div className="rt-controls">
+          <span className="rt-count" aria-hidden="true">{String(i + 1).padStart(2, "0")}<span>/{String(RESULTS.length).padStart(2, "0")}</span></span>
+          <button type="button" onClick={() => step(-1)} aria-label="Previous result"><ChevronLeft className="h-4 w-4" aria-hidden="true" /></button>
+          {auto && <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? "Play results" : "Pause results"} aria-pressed={paused}>{paused ? <Play className="h-3.5 w-3.5" aria-hidden="true" /> : <Pause className="h-3.5 w-3.5" aria-hidden="true" />}</button>}
+          <button type="button" onClick={() => step(1)} aria-label="Next result"><ChevronRight className="h-4 w-4" aria-hidden="true" /></button>
+        </div>
       </div>
+      {auto && <span key={`bar-${i}`} className="rt-timer" data-paused={!running || undefined} style={{ ["--rt-ms" as string]: `${MS}ms` }} onAnimationEnd={() => step(1)} aria-hidden="true" />}
     </div>
   );
 }

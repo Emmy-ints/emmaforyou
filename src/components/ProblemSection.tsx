@@ -1,73 +1,58 @@
-import { motion } from "framer-motion";
+import { MessageCircleOff, Globe2, CalendarX2 } from "lucide-react";
+import { ScrubWords } from "./future/Kinetic";
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 
 const PAIN_POINTS = [
-  { emoji: "🔴", title: "Slow replies = lost sales", desc: "Every minute you take to respond, your competitor is closing that deal." },
-  { emoji: "🔴", title: "No website = no credibility", desc: "Customers Google you before buying. No website means no trust." },
-  { emoji: "🔴", title: "Inconsistent social media = forgotten brand", desc: "Out of sight, out of mind. Inconsistent posting kills your reach." },
+  { icon: MessageCircleOff, title: "Slow replies = lost sales", desc: "Every minute you take to respond, your competitor is closing that deal." },
+  { icon: Globe2, title: "No website = no credibility", desc: "Customers Google you before buying. No website means no trust." },
+  { icon: CalendarX2, title: "Inconsistent social media = forgotten brand", desc: "Out of sight, out of mind. Inconsistent posting kills your reach." },
 ];
 
+/**
+ * "Signal loss": the statement lights up word by word as it scrolls past, while a customer signal
+ * line runs from a strong pulse to a flat line underneath; each pain point is a point where the
+ * signal drops. Static (fully lit, full line) with reduced motion.
+ */
 export default function ProblemSection() {
   return (
-    <section className="section-padding">
-      <div className="mx-auto max-w-5xl">
-        <motion.div
-          className="rounded-3xl p-8 md:p-14"
-          style={{ background: "var(--gradient-dark)", transformStyle: "preserve-3d", perspective: 1000 }}
-          initial={{ opacity: 0, rotateX: 8, y: 60 }}
-          whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <motion.p
-            className="text-center font-display text-2xl font-extrabold leading-tight text-white md:text-4xl"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            "Every day you don't have a system —{" "}
-            <span style={{ color: "oklch(0.7 0.2 25)" }}>you're losing customers</span>{" "}
-            to businesses that do."
-          </motion.p>
+    <section className="ps section-padding" aria-labelledby="ps-h">
+      <div className="ps-panel mx-auto max-w-6xl" data-scroll>
+        <div className="hero-ink-grid" aria-hidden="true" />
+        <p className="ps-kicker"><span className="ps-dot" aria-hidden="true" />The cost of standing still</p>
+        <h2 id="ps-h" className="ps-quote">
+          <ScrubWords text={"“Every day you don't have a system — you're losing customers to businesses that do.”"} accent={["losing", "customers"]} />
+        </h2>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {PAIN_POINTS.map((p, i) => (
-              <motion.div
-                key={i}
-                className="rounded-2xl border border-white/10 p-6"
-                style={{ background: "oklch(0.18 0.03 280 / 0.8)" }}
-                initial={{ opacity: 0, y: 40, rotateY: -10 }}
-                whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ scale: 1.04, rotateY: 5, z: 20 }}
-              >
-                <span className="text-2xl">{p.emoji}</span>
-                <h3 className="mt-3 font-display text-lg font-bold text-white">{p.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/60">{p.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+        <svg className="ps-signal" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="ps-grad" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stopColor="#3dd6f5" /><stop offset=".45" stopColor="#8b7bff" /><stop offset=".75" stopColor="#ff6b6b" /><stop offset="1" stopColor="#ff6b6b" stopOpacity=".3" />
+            </linearGradient>
+          </defs>
+          <path className="ps-signal-base" d="M0 60 H1200" />
+          <path className="ps-signal-line" pathLength={1} d="M0 60 H90 L110 60 L125 12 L142 104 L158 34 L172 60 H300 L318 60 L330 22 L344 96 L356 44 L368 60 H520 L534 60 L544 36 L554 84 L562 52 L570 60 H720 L728 60 L734 50 L740 70 L746 58 L752 60 H1200" />
+        </svg>
 
-          <motion.div
-            className="mt-10 text-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-gold inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm"
-            >
-              Fix This Now →
-            </a>
-          </motion.div>
-        </motion.div>
+        <ol className="ps-grid">
+          {PAIN_POINTS.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <li key={p.title} className="ps-card" data-tilt="5" style={{ ["--i" as string]: i }}>
+                <span className="ps-icon"><Icon className="h-5 w-5" aria-hidden="true" /></span>
+                <span className="ps-drop" aria-hidden="true">Drop-off 0{i + 1}</span>
+                <h3 className="mt-4 font-display text-lg font-semibold text-white">{p.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/65">{p.desc}</p>
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="mt-10 text-center">
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
+            Fix This Now →
+          </a>
+        </div>
       </div>
     </section>
   );

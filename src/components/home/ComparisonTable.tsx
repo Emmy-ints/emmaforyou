@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { Check, Minus } from "lucide-react";
+import SectionHead from "../future/SectionHead";
 
 const ROWS = [
   { feature: "Personalised strategy", us: "✓", agency: "Sometimes", freelancer: "✗" },
@@ -11,59 +12,60 @@ const ROWS = [
   { feature: "Money-back guarantee", us: "✓", agency: "✗", freelancer: "✗" },
 ];
 
+function Cell({ v, us }: { v: string; us?: boolean }) {
+  if (v === "✓") return <span className={`ct-yes ${us ? "is-us" : ""}`}><Check className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Yes</span></span>;
+  if (v === "✗") return <span className="ct-no"><Minus className="h-4 w-4" aria-hidden="true" /><span className="sr-only">No</span></span>;
+  return <span className="ct-text">{v}</span>;
+}
+
+/**
+ * Comparison as a lit instrument: the EmmaForYou column is a glass beam that slides into place, rows
+ * draw in one after another. On phones the table becomes one card per feature (no sideways scroll).
+ */
 export default function ComparisonTable() {
   return (
-    <section className="section-padding bg-muted/30">
+    <section className="ct section-padding" aria-labelledby="ct-h">
       <div className="mx-auto max-w-5xl">
-        <motion.div className="text-center"
-          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          <h2 className="font-display text-3xl font-extrabold md:text-5xl">
-            Why <span className="gradient-text">EmmaForYou</span> vs. The Alternatives
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            We're not the cheapest. We're not the biggest. We're the team that actually delivers.
-          </p>
-        </motion.div>
+        <SectionHead id="ct-h" align="center" className="max-w-3xl" kicker="How we compare" title="Why EmmaForYou vs. The Alternatives" shine={["EmmaForYou"]}
+          sub="We're not the cheapest. We're not the biggest. We're the team that actually delivers." />
 
-        <div className="mt-12 overflow-x-auto rounded-3xl border border-border bg-card shadow-lg">
-          <table className="w-full min-w-[640px] text-sm">
+        <div className="ct-wrap lg mt-12 hidden md:block" data-scroll>
+          <span className="ct-beam" aria-hidden="true" />
+          <table className="ct-table">
+            <caption className="sr-only">EmmaForYou compared with a big agency and a freelancer</caption>
             <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="px-5 py-4 text-left font-display font-bold">Feature</th>
-                <th className="relative px-5 py-4 text-center">
-                  <div className="absolute inset-0" style={{
-                    background: "linear-gradient(180deg, oklch(0.45 0.22 265 / 0.08), oklch(0.5 0.22 340 / 0.08))",
-                    borderRadius: "0",
-                  }} />
-                  <div className="relative">
-                    <span className="font-display font-extrabold gradient-text">EmmaForYou</span>
-                    <div className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold text-white"
-                      style={{ background: "var(--gradient-gold)", color: "var(--emma-charcoal)" }}>RECOMMENDED</div>
-                  </div>
-                </th>
-                <th className="px-5 py-4 text-center font-display font-bold text-muted-foreground">Big Agency</th>
-                <th className="px-5 py-4 text-center font-display font-bold text-muted-foreground">Freelancer</th>
+              <tr>
+                <th scope="col" className="text-left">Feature</th>
+                <th scope="col" className="ct-us-h"><span className="font-display font-semibold">EmmaForYou</span><span className="ct-badge">Recommended</span></th>
+                <th scope="col">Big Agency</th>
+                <th scope="col">Freelancer</th>
               </tr>
             </thead>
             <tbody>
               {ROWS.map((row, i) => (
-                <motion.tr key={row.feature} className="border-b border-border last:border-0"
-                  initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.4 }}>
-                  <td className="px-5 py-4 font-medium">{row.feature}</td>
-                  <td className="relative px-5 py-4 text-center">
-                    <div className="absolute inset-0" style={{
-                      background: "linear-gradient(180deg, oklch(0.45 0.22 265 / 0.05), oklch(0.5 0.22 340 / 0.05))",
-                    }} />
-                    <span className="relative font-bold text-emma-blue">{row.us}</span>
-                  </td>
-                  <td className="px-5 py-4 text-center text-muted-foreground">{row.agency}</td>
-                  <td className="px-5 py-4 text-center text-muted-foreground">{row.freelancer}</td>
-                </motion.tr>
+                <tr key={row.feature} style={{ ["--i" as string]: i }}>
+                  <th scope="row" className="text-left font-medium">{row.feature}</th>
+                  <td className="ct-us"><Cell v={row.us} us /></td>
+                  <td><Cell v={row.agency} /></td>
+                  <td><Cell v={row.freelancer} /></td>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        <ul className="grid ct-cards mt-10 gap-3 md:hidden" aria-label="EmmaForYou compared with a big agency and a freelancer">
+          {ROWS.map((row) => (
+            <li key={row.feature} className="ct-card lg">
+              <p className="font-display text-[0.98rem] font-semibold">{row.feature}</p>
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="ct-card-us"><dt>EmmaForYou</dt><dd><Cell v={row.us} us /></dd></div>
+                <div><dt>Big agency</dt><dd><Cell v={row.agency} /></dd></div>
+                <div><dt>Freelancer</dt><dd><Cell v={row.freelancer} /></dd></div>
+              </dl>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

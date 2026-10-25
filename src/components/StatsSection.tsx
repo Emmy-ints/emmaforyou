@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { prefersReduced } from "@/lib/motion";
 
 const STATS = [
   { value: 500, suffix: "+", label: "Testimonials" },
@@ -9,65 +9,50 @@ const STATS = [
   { value: 1, suffix: "", label: "Mission" },
 ];
 
-function CountUp({ target, suffix }: { target: number; suffix: string }) {
-  const [count, setCount] = useState(0);
+function CountUp({ target, suffix, onStart }: { target: number; suffix: string; onStart?: () => void }) {
+  const [count, setCount] = useState(target);
   const ref = useRef<HTMLSpanElement>(null);
   const started = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const duration = 1500;
-          const start = performance.now();
-          const step = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(eased * target));
-            if (progress < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }
-      },
-      { threshold: 0.5 }
-    );
+    if (!el || prefersReduced()) return;
+    // Below the fold: start from zero and count up once it's seen. Already visible: keep the final number.
+    if (el.getBoundingClientRect().top > window.innerHeight) setCount(0);
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || started.current) return;
+      started.current = true; onStart?.();
+      const duration = 1500, start = performance.now();
+      const step = (now: number) => {
+        const p = Math.min((now - start) / duration, 1);
+        setCount(Math.round((1 - Math.pow(1 - p, 3)) * target));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, { threshold: 0.5 });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [target]);
+  }, [target, onStart]);
 
-  return (
-    <span ref={ref}>
-      {count}{suffix}
-    </span>
-  );
+  return <span ref={ref} className="tabular-nums">{count}{suffix}</span>;
 }
 
+/** Figures as instrument dials: each ring draws round while its number counts up. */
 export default function StatsSection() {
   return (
-    <section className="section-padding" style={{ background: "var(--gradient-dark)" }}>
-      <div className="mx-auto max-w-6xl">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
-          {STATS.map((stat, i) => (
-            <motion.div
-              key={i}
-              className="text-center"
-              initial={{ opacity: 0, y: 40, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ scale: 1.1, y: -8 }}
-            >
-              <div className="font-display text-4xl font-extrabold text-white md:text-5xl">
-                <CountUp target={stat.value} suffix={stat.suffix} />
-              </div>
-              <p className="mt-2 text-sm font-medium text-white/60">{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+    <section className="st band-ink section-padding" aria-label="EmmaForYou in numbers">
+      <div className="hero-ink-grid" aria-hidden="true" />
+      <ul className="relative mx-auto grid max-w-6xl grid-cols-2 gap-8 md:grid-cols-5">
+        {STATS.map((stat, i) => (
+          <li key={stat.label} className="st-item" style={{ ["--i" as string]: i }}>
+            <span className="st-dial" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><circle className="st-track" cx="60" cy="60" r="52" /><circle className="st-arc" cx="60" cy="60" r="52" pathLength={1} /></svg>
+            </span>
+            <span className="st-num font-display"><CountUp target={stat.value} suffix={stat.suffix} /></span>
+            <span className="st-label">{stat.label}</span>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import SectionHead from "./future/SectionHead";
 
 export const TESTIMONIALS = [
   { name: "Chioma Okafor", biz: "Fashion Store", loc: "Lagos, Nigeria", text: "EmmaForYou transformed our Instagram from 200 to 3,000 followers in 6 weeks. Sales doubled.", rating: 5 },
@@ -30,86 +30,58 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-function TestimonialCard({ t }: { t: typeof TESTIMONIALS[0] }) {
+function TestimonialCard({ t, ghost }: { t: typeof TESTIMONIALS[0]; ghost?: boolean }) {
   const initial = t.name[0];
   const hue = t.name.charCodeAt(0) * 15 % 360;
 
   return (
-    <div className="gradient-border flex min-w-[280px] flex-col gap-3 rounded-2xl p-5 md:min-w-[320px]">
+    <figure className="tp-card" aria-hidden={ghost || undefined}>
       <div className="flex items-center gap-3">
-        <div
-          className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-          style={{ background: `oklch(0.6 0.15 ${hue})` }}
-        >
-          {initial}
-        </div>
-        <div>
+        <div className="tp-avatar" style={{ background: `oklch(0.6 0.15 ${hue})` }} aria-hidden="true">{initial}</div>
+        <figcaption>
           <p className="text-sm font-semibold text-foreground">{t.name}</p>
           <p className="text-xs text-muted-foreground">{t.biz} · {t.loc}</p>
-        </div>
+        </figcaption>
       </div>
       <StarRating rating={t.rating} />
-      <p className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
-    </div>
+      <blockquote className="text-sm leading-relaxed text-muted-foreground">"{t.text}"</blockquote>
+    </figure>
   );
 }
 
+/** One rail; the second copy that makes the loop seamless is hidden from assistive tech. */
 function MarqueeRow({ items, reverse }: { items: typeof TESTIMONIALS; reverse?: boolean }) {
-  const doubled = [...items, ...items];
   return (
-    <div className="overflow-hidden">
-      <div className={`flex gap-5 ${reverse ? "animate-marquee-reverse" : "animate-marquee"}`} style={{ width: "max-content" }}>
-        {doubled.map((t, i) => (
-          <TestimonialCard key={i} t={t} />
-        ))}
+    <div className={`tp-rail ${reverse ? "tp-rev" : ""}`}>
+      <div className="tp-track">
+        {items.map((t) => <TestimonialCard key={t.name} t={t} />)}
+        {items.map((t) => <TestimonialCard key={`dup-${t.name}`} t={t} ghost />)}
       </div>
     </div>
   );
 }
 
+/**
+ * Two rails of reviews at different depths (the back rail is smaller and softer, moving the other
+ * way), fading out at the edges. Hover or focus pauses them; with reduced motion they become
+ * swipeable rows with scroll snapping.
+ */
 export default function TestimonialsPreview() {
   return (
-    <section className="section-padding overflow-hidden bg-muted/50">
-      <motion.div
-        className="mx-auto max-w-7xl text-center"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <span className="inline-block rounded-full bg-background px-4 py-1.5 text-xs font-medium text-muted-foreground">
-          Testimonials
-        </span>
-        <h2 className="mt-4 font-display text-3xl font-extrabold text-foreground md:text-5xl">
-          <span className="gradient-text">500+ Businesses.</span> Real Results.
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground">
-          Don't take our word for it — hear from businesses we've helped transform.
-        </p>
-      </motion.div>
+    <section className="tp section-padding overflow-hidden" aria-labelledby="tp-h">
+      <SectionHead id="tp-h" align="center" className="max-w-3xl px-0" kicker="Testimonials" title="500+ Businesses. Real Results." shine={["Real", "Results"]}
+        sub="Don't take our word for it — hear from businesses we've helped transform." />
 
-      <motion.div
-        className="mt-12 flex flex-col gap-5"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
+      <div className="tp-stage mt-12" data-no-reveal>
         <MarqueeRow items={ROW1} />
         <MarqueeRow items={ROW2} reverse />
-      </motion.div>
+      </div>
 
-      <motion.div
-        className="mt-10 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
+      <div className="mt-10 text-center">
         <a href="/testimonials" className="btn-primary-gradient inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm">
           See All 500+ Testimonials →
         </a>
-      </motion.div>
+      </div>
     </section>
   );
 }

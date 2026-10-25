@@ -12,26 +12,21 @@ import PageTranslator from "../components/tools/PageTranslator";
 import VoiceAsk from "../components/tools/VoiceAsk";
 import ConversionLayer from "../components/tools/ConversionLayer";
 import MotionRuntime from "../components/future/MotionRuntime";
+import SearchLauncher from "../components/future/SearchLauncher";
+import StatusScreen from "../components/future/StatusScreen";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-display text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 font-display text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="btn-primary-gradient inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
-    </div>
+    <StatusScreen
+      code="404"
+      title="This page drifted out of orbit."
+      body="The page you're looking for doesn't exist or has moved. Search the site, or head somewhere useful."
+      actions={<>
+        <Link to="/" className="btn-primary-gradient inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium">Go home</Link>
+        <button type="button" onClick={() => window.dispatchEvent(new Event("efy-open-search"))} className="hero-ghost-btn">Search the site</button>
+        <Link to="/services" className="hero-ghost-btn">Our services</Link>
+      </>}
+    />
   );
 }
 
@@ -87,6 +82,7 @@ function RootComponent() {
       <PageTranslator />
       <VoiceAsk />
       <ConversionLayer />
+      <SearchLauncher />
     </I18nProvider>
   );
 }

@@ -7,20 +7,31 @@ export function projectImage(p: Project): string {
   return featuredFor(p.name)?.img ?? p.img;
 }
 
-/** A client project with a large image; details slide up on hover/focus and on touch devices are always visible. */
-export default function ProjectCard({ p, index = 0, size = "md" }: { p: Project; index?: number; size?: "md" | "lg" }) {
+/** True when the card shows a stock photo standing in for the client's own screenshots (see portfolio-data). */
+export const isStandInImage = (p: Project) => !featuredFor(p.name);
+
+/**
+ * A client project with a large image; details slide up on hover/focus and on touch devices are always
+ * visible. The card tilts gently towards the pointer, the photo drifts with scroll inside its frame,
+ * and stock photos standing in for the client's own screenshots are labelled as such.
+ */
+export default function ProjectCard({ p, index = 0, size = "md", className = "" }: { p: Project; index?: number; size?: "md" | "lg"; className?: string }) {
+  const standIn = isStandInImage(p);
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: Math.min(index, 6) * 0.05, ease: [0.16, 1, 0.3, 1] }}
-      className={`pc group ${size === "lg" ? "pc-lg" : ""}`}
+      className={`pc group ${size === "lg" ? "pc-lg" : ""} ${className}`}
+      data-tilt="3"
     >
       <Link to="/portfolio/$slug" params={{ slug: projectSlug(p.name) }} className="pc-link" aria-label={`${p.name} case study`}>
-        <div className="pc-media">
+        <div className="pc-media" data-scroll>
           <img src={projectImage(p)} alt="" loading="lazy" decoding="async" className="pc-img" />
           <div className="pc-shade" />
+          <span className="pc-glare" aria-hidden="true" />
           <span className="pc-cat">{p.category}</span>
+          {standIn && <span className="pc-standin" title="Stock photo shown until the client's own screenshots are added">Illustrative photo</span>}
           <span className="pc-outcome">{p.outcome}</span>
         </div>
         <div className="pc-body">

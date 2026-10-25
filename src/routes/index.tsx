@@ -63,13 +63,14 @@ function HomePage() {
       <Navbar />
       <main>
         {/* Hero: midnight band with a working demo of the product */}
-        <section className="hero-ink relative overflow-hidden">
+        <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
+          <div className="hero-x-horizon" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />
           {/* Signature liquid-glass orb (live WebGL, CSS fallback) floating behind the product demo */}
           <FutureOrb className="-right-40 -top-6 z-0 w-[300px] opacity-40 sm:-right-36 sm:top-16 sm:w-[460px] sm:opacity-60 lg:-right-10 lg:top-16 lg:w-[600px] lg:opacity-100" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-32 md:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-14 lg:pb-28 lg:pt-40">
-            <div className="hero-ink-copy relative z-10">
+            <div className="hero-ink-copy hero-par-copy relative z-10">
               <motion.p
                 className="hero-kicker"
                 initial={{ opacity: 0, y: 12 }}
@@ -117,7 +118,7 @@ function HomePage() {
               </motion.ul>
             </div>
             <motion.div
-              className="relative z-10"
+              className="hero-par-demo relative z-10"
               initial={{ opacity: 0, y: 30, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -125,6 +126,7 @@ function HomePage() {
               <GrowthOS />
             </motion.div>
           </div>
+          <a href="#work" className="hero-x-cue" aria-label="Scroll to selected work"><span aria-hidden="true" /></a>
         </section>
 
         <ResultsTicker />

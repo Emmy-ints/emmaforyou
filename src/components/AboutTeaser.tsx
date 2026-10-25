@@ -1,65 +1,58 @@
-import { motion } from "framer-motion";
+import SectionHead from "./future/SectionHead";
 
+/* Countries named in the story below; positions are a stylised map, not to scale. */
+const ROUTES = [
+  { name: "United States", x: 70, y: 52 }, { name: "Colombia", x: 92, y: 98 },
+  { name: "Spain", x: 168, y: 50 }, { name: "France", x: 178, y: 36 }, { name: "Germany", x: 196, y: 28 },
+];
+const LAGOS = { x: 186, y: 96 };
+
+/**
+ * Founder story: the portrait opens through a widening mask and drifts inside its frame as you
+ * scroll; a glass nameplate floats over it. Beside the story, flight paths draw out from Lagos to
+ * the countries the story names — "from Lagos to the world".
+ */
 export default function AboutTeaser() {
   return (
-    <section className="section-padding bg-background">
+    <section className="ab section-padding" aria-labelledby="ab-h">
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
-        <motion.div
-          className="flex items-center justify-center"
-          initial={{ opacity: 0, x: -60, rotateY: 15 }}
-          whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          style={{ perspective: 1000 }}
-        >
-          <motion.div
-            className="relative h-80 w-80 overflow-hidden rounded-3xl md:h-96 md:w-96"
-            whileHover={{ scale: 1.04, rotateY: -6, rotateX: 4 }}
-            transition={{ duration: 0.4 }}
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            <img
-              src="/images/emmanuel.webp" width={900} height={1350} decoding="async"
-              alt="Emmanuel Akinloye Oluwaseun — Founder & CEO, EmmaForYou"
-              className="h-full w-full object-cover object-top"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 rounded-3xl" style={{ background: "linear-gradient(to top, var(--emma-charcoal) 0%, transparent 50%)" }} />
-            <div className="absolute bottom-4 left-4 right-4 text-left">
-              <p className="font-display text-lg font-bold text-white">Emmanuel Akinloye Oluwaseun</p>
-              <p className="font-body text-sm font-normal text-white/60">Founder & CEO, EmmaForYou</p>
+        <div className="flex items-center justify-center">
+          <div className="ab-portrait" data-scroll data-tilt="4">
+            <img src="/images/emmanuel.webp" width={900} height={1350} decoding="async" loading="lazy"
+              alt="Emmanuel Akinloye Oluwaseun — Founder & CEO, EmmaForYou" className="ab-img" />
+            <div className="ab-shade" aria-hidden="true" />
+            <div className="ab-plate lg">
+              <p className="font-display text-lg font-semibold text-white">Emmanuel Akinloye Oluwaseun</p>
+              <p className="text-sm text-white/70">Founder & CEO, EmmaForYou</p>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <span className="inline-block rounded-full bg-muted px-4 py-1.5 font-body text-xs font-medium text-muted-foreground">
-            Our Story
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
-            From a Laptop in Nigeria to{" "}
-            <span className="gradient-text">3 Continents</span>
-          </h2>
-          <p className="mt-5 font-body text-base font-normal leading-relaxed text-muted-foreground">
+        <div>
+          <SectionHead id="ab-h" kicker="Our story" title="From a Laptop in Nigeria to 3 Continents" shine={["3", "Continents"]} />
+          <p className="mt-5 text-base leading-relaxed text-muted-foreground">
             EmmaForYou started as one person's dream in Nigeria, Emmanuel Akinloye Oluwaseun, with a laptop, a vision, and an unshakeable belief that African businesses deserve world-class digital tools.
           </p>
-          <p className="mt-3 font-body text-base font-normal leading-relaxed text-muted-foreground">
+          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
             Today, we serve clients across Nigeria, Columbia, United States, Germany, France and Spain. From freelancer to agency, this is just the beginning.
           </p>
-          <motion.a
-            href="/about"
-            className="btn-primary-gradient mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 font-body text-sm font-medium"
-            whileHover={{ scale: 1.06, y: -3 }}
-            whileTap={{ scale: 0.97 }}
-          >
+          <figure className="ab-map mt-6" data-scroll aria-label="Flight paths from Lagos to the United States, Colombia, Spain, France and Germany">
+            <svg viewBox="0 0 260 130" aria-hidden="true">
+              {ROUTES.map((r, i) => {
+                const mx = (LAGOS.x + r.x) / 2, my = Math.min(LAGOS.y, r.y) - 26;
+                return <path key={r.name} className="ab-route" pathLength={1} d={`M${LAGOS.x} ${LAGOS.y} Q${mx} ${my} ${r.x} ${r.y}`} style={{ ["--i" as string]: i }} />;
+              })}
+              {ROUTES.map((r, i) => <circle key={r.name} className="ab-city" cx={r.x} cy={r.y} r="2.6" style={{ ["--i" as string]: i }} />)}
+              <circle className="ab-lagos-ring" cx={LAGOS.x} cy={LAGOS.y} r="9" />
+              <circle className="ab-lagos" cx={LAGOS.x} cy={LAGOS.y} r="4" />
+              <text x={LAGOS.x + 10} y={LAGOS.y + 4} className="ab-label">Lagos</text>
+            </svg>
+            <figcaption className="text-xs text-muted-foreground">Helping businesses grow — from Lagos to the world.</figcaption>
+          </figure>
+          <a href="/about" className="btn-primary-gradient mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium">
             Our Full Story →
-          </motion.a>
-        </motion.div>
+          </a>
+        </div>
       </div>
     </section>
   );

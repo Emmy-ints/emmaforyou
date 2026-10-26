@@ -84,8 +84,8 @@ Not built (honest list): immersive 3D world, innovation lab, automated AI repair
 Partner badges (Meta, Google, Shopify, Stripe, Microsoft, WhatsApp), "500+" testimonials/reviews/businesses, "100+ case studies" (table is empty), "Featured Digital Agency", "Operating since 2019", the 12 named homepage testimonials, and the countdown spots have no evidence in the code or database — listed in the Claims register for the owner. The results strip says "Clinic in Abuja: 86 new Google reviews", but the portfolio records 86 reviews for Wellness Clinic Halle (Germany); London, Cape Town, Accra and Port Harcourt results have no project record. Founder name verified as "Emmanuel Oluwaseun Akinloye" everywhere; only `/images/emmanuel.webp` is used.
 
 ### Blocked / not done
-- Server-side (SSR) application of SEO overrides and HTTP 301 redirects: needs a hosting/loader change; overrides and redirects apply in the browser.
-- Full database backups/restore of business data: depends on the Lovable Cloud plan; not visible or testable from here.
+- ~~Server-side (SSR) application of SEO overrides and HTTP 301 redirects~~ — done in c674e5e (root `beforeLoad` + `pageHead`), verified live.
+- Full database backups: Lovable Cloud keeps one backup per day for ~14 days (15 listed on 26 Oct, oldest 12 Oct) plus an on-demand full export; see "Backups and recovery" below.
 - Lovable MCP free-plan database action limit slowed migrations and DB tests.
 
 
@@ -106,3 +106,48 @@ Partner badges (Meta, Google, Shopify, Stripe, Microsoft, WhatsApp), "500+" test
 | Role enforcement (DB, rolled back) | 56/56 (rerun on final DB) |
 | Live control room | All 13 sections render; AI live test OK (OpenAI, 2.4 s); DB 375 ms; 9 real enquiries listed (not modified); service/claim/announcement save draft → discard; all 8 Lab templates created → tests pass → publish enabled → deleted (nothing published); design preset preview + readability 5.08:1; checkpoint created and restored into drafts (auto pre-restore checkpoint) |
 | Server HTML (live) | /, /login, /account, /blog, /book, /contact, /lab, /explore, /pricing, service + tool + portfolio pages: 200, one h1, public pages indexable with canonical, private noindex; unknown path 404; sitemap 397 URLs without /dashboard; robots disallows /dashboard |
+
+## Blocker resolution pass (26 Oct 2026, commits fec490a → 47a972f)
+
+### Deployment mismatch (27b8b17)
+- What was seen: Lovable listed 27b8b17 as the latest commit and two publishes were made, but the served admin HTML had no loading-state h1 for ~25 min. At 21:55 UTC it was live on every sample (24/24, deployment `97fe7189`).
+- Why it couldn't be pinned down then: `/api/site-config-status` reported a hand-written label that 27b8b17 didn't change, so the live server couldn't say which build it was running.
+- Measured on this pass: `deploy_project` returns `pending` with a deployment id; the `x-deployment-id` response header switched to it within ~75 s, but an instance still answered with the previous build's code ~6 min after publishing; 40/40 requests were on the new build after that. Most likely cause for 27b8b17: a publish made before that commit's build finished (`get_project` shows the synced commit, `list_edits` shows whether it's built), plus staged rollout; this can't be proven after the fact.
+- Fix: `vite.config.ts` stamps `builtAt` + `commit` into `/api/site-config-status`. Deploy procedure: wait for `list_edits` = completed → `deploy_project` → poll until both the header shows the returned deployment id and the endpoint shows the new commit on repeated samples.
+
+### Responsive checks (real Chrome, live site, same-origin iframes at true widths)
+| Pass | Result |
+|---|---|
+| Light: 11 routes × 360/390/768/1024/1440 | 55/55: no horizontal overflow, one h1, no page errors |
+| Dark: 11 routes × 390/768/1440 (after the theme fix) | 33/33 dark, no overflow, one h1 |
+| Reduced motion (site switch): 11 routes × 390/1440 | 22/22; `data-motion="reduced"`, /explore opens in simple view, no canvas, no looping animations |
+| Mobile menu 390/768 | Opens, 20 controls, focus moves inside, Escape closes and returns focus to the button |
+| Desktop menus 1440 | 6 menus; open + Escape |
+| Forms (/contact, /book, /login) | Every field labelled, none wider than the screen, empty required forms don't validate |
+
+Fixed from these checks: saved dark theme ignored on /explore and dashboards (inline theme script), homepage demo kept auto-advancing with the site's reduced-motion switch and could only be paused by hover (shared `useReduceMotion`, pause button, focus pause; WorkflowViz stops when a step is chosen), form text 15.2px on phones (iOS zoom; now ≥16px), skip-link target missing on most pages, /explore controls and panel under the mobile quick-actions bar, POST-only API paths returned an empty 200 page on GET (now 405).
+
+### Backups and recovery (seen in the Lovable project, nothing restored or exported)
+| Layer | What exists | Covers |
+|---|---|---|
+| Configuration checkpoints (`site_backups`) | Control room → Backups; restore goes into drafts after an automatic checkpoint | Design, site settings, redirects, lab items only |
+| Database backups (Lovable Cloud) | Daily, ~14 days kept (15 listed: 12–26 Oct 2026, ~02:15 UTC); More → Database → Manage → Backups; no point-in-time recovery | All tables incl. leads, bookings, accounts (auth) |
+| Database export | More → Database → Manage → Settings → Export data (pg_restore archive, once per 24 h, emailed) | Full database incl. password hashes; not storage files, secrets, auth provider settings |
+| Files / media | No backup in Lovable Cloud | Storage buckets (currently 0 objects in 4 buckets) |
+
+A Lovable backup restore replaces the live database, can't be undone and loses everything after the backup, so it was not tested; there is no restore-to-new-project option.
+
+### Final regression on the deployed build (deployment `80d86508`, commit 47a972f, built 2026-10-26)
+| Check | Result |
+|---|---|
+| Live build identity | `/api/site-config-status` → commit `47a972f`; `x-deployment-id` = the id `deploy_project` returned; first seen 11 s after publishing |
+| Admin loading headings | `/dashboard/site`, `/dashboard/agents`, `/dashboard/inspiration`: one h1 in server HTML |
+| Server-rendered SEO (reversible) | Test title published for /lab: `<title>`, og:title, twitter:title in raw server HTML 14/14 within ~80 s (60 s cache per instance); rolled back via History → Undo; raw HTML back to the original title |
+| HTTP redirect (reversible) | `/efy-redirect-check?probe=n` → `/pricing?probe=n` 10/10 as a server 3xx (`opaqueredirect` with `redirect: manual`); configured 301 (exact code not readable from the browser); disabled + deleted, path now 404 |
+| AI translation (real provider) | `/api/translate` Yorùbá, uncached string: 200 in 4.9 s, 0 incomplete, numbers kept; test cache row removed |
+| AI repair | No session 401, forged session 401, off-site route 400, staff session 200 with an OpenAI proposal in 7.3 s; no secrets in responses; nothing saved or applied (0 repairs) |
+| Roles (DB, rolled back) | 56/56 |
+| Activity log | Draft, publish, redirect save/live/disable/delete and rollback all recorded with the actor |
+| Service links | All 29 links from /services return 200 |
+| Local suites | v4 50/50, v3 33/33, journeys 17/17, demo 10/10, explore 12/12, Lab 33/33, SEO 12/12, layout sweep 832 loads (only harness-only /blog) |
+| Leftovers | 0 settings, 0 redirects, 0 lab items, 0 repairs, 0 role-test users, default design |

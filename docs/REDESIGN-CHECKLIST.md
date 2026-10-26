@@ -87,3 +87,20 @@ Partner badges (Meta, Google, Shopify, Stripe, Microsoft, WhatsApp), "500+" test
 - Server-side (SSR) application of SEO overrides and HTTP 301 redirects: needs a hosting/loader change; overrides and redirects apply in the browser.
 - Full database backups/restore of business data: depends on the Lovable Cloud plan; not visible or testable from here.
 - Lovable MCP free-plan database action limit slowed migrations and DB tests.
+
+
+## Final verification pass (26 Oct 2026, commits c674e5e + follow-up)
+
+| Check (live site unless noted) | Evidence |
+|---|---|
+| v4 build live | /explore served the new code; all 9 areas open; 30 linked service pages return 200 |
+| /explore controls | Real Escape closes a panel, arrow keys turn, drag + wheel zoom change the transform, simple view shows 9 cards / 30 links, exit → /services |
+| Yorùbá (real provider) | Homepage fully translated with no failed batches; headings as whole phrases (h1 "Iṣòwò Rẹ Yẹ Kí A Rí I, Kí A Tẹ̀lé E…"); `<html lang="yo">`; reload uses cache (0 requests) |
+| Second language (French, real provider) | Service page: max 1 translate request in flight (no overlap); hit the 40/hour visitor cap → page stayed usable with "79 phrases stay in English" note. Cap raised to 150/hour |
+| AI repair (real provider) | `/api/site-repair` → 200 from OpenAI with validated before/after; 401 without session, 400 for an off-site route; no secrets in the response. Not applied (would publish an unapproved title) |
+| Fresh live audit | 405 pages: 0 high / 0 medium / 0 low; 9 info = stand-in portfolio photos (owner action) |
+| HTTP redirect (reversible test record) | `/efy-redirect-check?probe=1` → `/pricing?probe=1`, navigation redirectCount 1, `fetch` redirect:manual = opaqueredirect (server-side 3xx, not JS). Configured 301; the exact 3xx code isn't readable from browser APIs. Test redirect then disabled + deleted |
+| Redirect validation (live UI) | Protected path and self-redirect refused by the database |
+| Server-rendered SEO (reversible test) | Published a title override for /lab: raw server HTML `<title>` and og:title changed (12/12 samples once rollout finished); rolled back via History → Undo; DB confirms no live override |
+| Activity log | Draft, publish, rollback and redirect save/live/disable/delete all logged with actor and time |
+| Role enforcement (DB, rolled back) | 56/56 |

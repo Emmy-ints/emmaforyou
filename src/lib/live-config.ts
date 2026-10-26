@@ -12,6 +12,8 @@ export interface LiveConfig { settings: Record<string, any>; redirects: LiveRedi
 
 const TTL = 60_000;
 let cache: LiveConfig | null = null;
+/** What this worker/tab last did, for the control room's health check (no data, just timing). */
+export const liveStatus = { instance: Math.random().toString(36).slice(2, 8), loads: 0, failures: 0, lastError: "" as string, loadedAt: 0 };
 let inflight: Promise<LiveConfig> | null = null;
 
 function timeout<T>(p: Promise<T>, ms: number): Promise<T> {
@@ -21,8 +23,11 @@ function timeout<T>(p: Promise<T>, ms: number): Promise<T> {
 async function load(): Promise<LiveConfig> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
-  const [s, r] = await timeout(Promise.all([db.rpc("site_live_settings"), db.rpc("site_live_redirects")]), 1500);
-  const next: LiveConfig = { settings: s.error || !s.data ? cache?.settings ?? {} : s.data, redirects: r.error || !Array.isArray(r.data) ? cache?.redirects ?? [] : r.data, at: Date.now() };
+  const [s, r] = await timeout(Promise.all([db.rpc("site_live_settings"), db.rpc("site_live_redirects")]), 4000);
+  // A failed read never counts as fresh: keep serving the last good copy and try again on the next request.
+  if (s.error || !s.data || r.error || !Array.isArray(r.data)) throw new Error((s.error ?? r.error)?.message ?? "empty response");
+  const next: LiveConfig = { settings: s.data, redirects: r.data, at: Date.now() };
+  liveStatus.loads++; liveStatus.loadedAt = next.at; liveStatus.lastError = "";
   const seo: Record<string, { title?: string; description?: string; noindex?: boolean }> = {};
   for (const [k, v] of Object.entries(next.settings)) if (k.startsWith("seo:/") && v && typeof v === "object") seo[k.slice(4)] = v;
   setSeoOverrides(seo);
@@ -31,7 +36,7 @@ async function load(): Promise<LiveConfig> {
 
 export async function liveConfig(): Promise<LiveConfig> {
   if (cache && Date.now() - cache.at < TTL) return cache;
-  if (!inflight) inflight = load().then((c) => (cache = c), () => (cache = cache ? { ...cache, at: Date.now() - TTL + 10_000 } : { settings: {}, redirects: [], at: Date.now() - TTL + 10_000 })).finally(() => { inflight = null; });
+  if (!inflight) inflight = load().then((c) => (cache = c), (e) => { liveStatus.failures++; liveStatus.lastError = String(e?.message ?? e).slice(0, 120); return cache ?? { settings: {}, redirects: [], at: 0 }; }).finally(() => { inflight = null; });
   return inflight;
 }
 

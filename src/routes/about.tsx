@@ -48,7 +48,7 @@ function AboutPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         {/* Hero */}
         <section className="relative flex min-h-[60vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
           <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">

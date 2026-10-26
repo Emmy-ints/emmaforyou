@@ -57,7 +57,7 @@ function BlogArticle() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-28 pb-24">
+      <main id="main-content" className="pt-28 pb-24">
         {/* Hero */}
         <section
           className="relative flex min-h-[55vh] items-end overflow-hidden"

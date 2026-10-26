@@ -33,7 +33,7 @@ function PricingPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="pr section-padding relative overflow-hidden pt-32 text-center">
           <div className="roi-x-grid" aria-hidden="true" />
           <div className="relative mx-auto max-w-4xl">

@@ -64,7 +64,7 @@ function HomePage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         {/* Hero: midnight band with a working demo of the product */}
         <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />

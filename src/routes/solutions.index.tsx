@@ -39,7 +39,7 @@ function Page() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />

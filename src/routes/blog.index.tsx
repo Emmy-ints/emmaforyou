@@ -22,7 +22,7 @@ function BlogPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="section-padding pt-32">
           <div className="mx-auto max-w-7xl">
             <div className="text-center">

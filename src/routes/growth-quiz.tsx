@@ -59,7 +59,7 @@ function QuizPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <section className="mx-auto max-w-3xl px-5">
           {step === -1 && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">

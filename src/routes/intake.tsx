@@ -19,7 +19,7 @@ function IntakePage() {
   return (
     <>
       <Navbar />
-      <main className="pt-28 pb-20">
+      <main id="main-content" className="pt-28 pb-20">
         <div className="mx-auto max-w-7xl px-5">
           <div className="mb-10 text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-emma-blue">

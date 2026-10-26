@@ -27,7 +27,7 @@ export const Route = createFileRoute("/free-resources/$slug")({
     });
   },
   notFoundComponent: () => (
-    <div className="min-h-screen bg-background"><Navbar /><main className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold"><KineticText text="That resource doesn't exist" base={60} /></h1><p className="mt-3 text-muted-foreground">It may have moved.</p><Link to="/free-resources" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">See all free toolkits →</Link></main><Footer /></div>
+    <div className="min-h-screen bg-background"><Navbar /><main id="main-content" className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold"><KineticText text="That resource doesn't exist" base={60} /></h1><p className="mt-3 text-muted-foreground">It may have moved.</p><Link to="/free-resources" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">See all free toolkits →</Link></main><Footer /></div>
   ),
   component: ResourcePage,
 });
@@ -73,7 +73,7 @@ function ResourcePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="print:hidden"><Navbar /></div>
-      <main id="main" className="mx-auto max-w-3xl px-5 pb-24 pt-32 print:pt-0">
+      <main id="main-content" className="mx-auto max-w-3xl px-5 pb-24 pt-32 print:pt-0">
         <nav aria-label="Breadcrumb" className="text-xs text-muted-foreground print:hidden">
           <Link to="/free-resources" className="hover:text-foreground">Free resources</Link> <span aria-hidden="true">/</span> <span>{magnet.title}</span>
         </nav>

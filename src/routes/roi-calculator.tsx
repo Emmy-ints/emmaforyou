@@ -20,7 +20,7 @@ function RoiPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-5 pb-24 pt-32">
+      <main id="main-content" className="mx-auto max-w-6xl px-5 pb-24 pt-32">
         <div className="max-w-3xl">
           <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl"><KineticText text="ROI calculator" base={60} /></h1>
           <p className="mt-4 text-lg text-muted-foreground">

@@ -38,7 +38,7 @@ function FaqPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="section-padding pt-32">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="font-display text-4xl font-extrabold md:text-6xl">Frequently Asked <span className="gradient-text">Questions</span></h1>

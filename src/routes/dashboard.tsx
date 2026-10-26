@@ -288,7 +288,7 @@ function Dashboard({ email }: { email: string }) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-5 py-8">
+      <main id="main-content" className="mx-auto max-w-7xl px-5 py-8">
         {/* Filters: one row above everything */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

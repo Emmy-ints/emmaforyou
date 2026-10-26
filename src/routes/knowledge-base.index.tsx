@@ -37,7 +37,7 @@ function KbIndex() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <section className="mx-auto max-w-6xl px-5">
           <div className="text-center">
             <span className="inline-block rounded-full glass px-4 py-1.5 text-xs font-medium text-muted-foreground">Knowledge Base · 48 articles</span>

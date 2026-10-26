@@ -42,7 +42,7 @@ function WatchPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <section className="mx-auto max-w-4xl px-5 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-6xl"><KineticText text="How the EmmaForYou growth system works" base={60} /></h1>

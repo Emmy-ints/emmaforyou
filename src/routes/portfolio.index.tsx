@@ -52,7 +52,7 @@ function PortfolioPage() {
   return (
     <div className="bg-background text-foreground">
       <Navbar />
-      <main>
+      <main id="main-content">
         {/* Hero */}
         <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />

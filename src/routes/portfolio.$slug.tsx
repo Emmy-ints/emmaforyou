@@ -53,7 +53,7 @@ export const Route = createFileRoute("/portfolio/$slug")({
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="mx-auto max-w-3xl px-5 pb-24 pt-36 text-center">
+      <main id="main-content" className="mx-auto max-w-3xl px-5 pb-24 pt-36 text-center">
         <h1 className="font-display text-3xl font-semibold"><KineticText text="That project isn't in the portfolio" base={60} /></h1>
         <p className="mt-3 text-muted-foreground">It may have been renamed. Browse all client work instead.</p>
         <Link to="/portfolio" className="btn-gold mt-8 inline-flex rounded-full px-6 py-3 text-sm">See all projects</Link>
@@ -83,7 +83,7 @@ function CaseStudyPage() {
   return (
     <div className="bg-background text-foreground">
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />

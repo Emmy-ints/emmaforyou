@@ -116,7 +116,7 @@ function CasesPage() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="flex min-h-[40vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
           <div className="mx-auto max-w-4xl px-5 py-16 text-center">
             <h1 className="font-display text-4xl font-extrabold text-white md:text-6xl">

@@ -73,7 +73,7 @@ function EmailGen() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <section className="mx-auto max-w-5xl px-5">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
             <span className="inline-block rounded-full glass px-4 py-1.5 text-xs font-medium text-muted-foreground">Email Sequence Generator · Free</span>

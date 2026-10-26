@@ -39,7 +39,7 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
   return (
     <div lang={code}>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="hero-ink hero-x relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />

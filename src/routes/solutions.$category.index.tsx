@@ -33,7 +33,7 @@ export const Route = createFileRoute("/solutions/$category/")({
     });
   },
   notFoundComponent: () => (
-    <div className="min-h-screen bg-background"><Navbar /><main className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold"><KineticText text="Category not found" base={60} /></h1><Link to="/solutions" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">Browse all solutions →</Link></main><Footer /></div>
+    <div className="min-h-screen bg-background"><Navbar /><main id="main-content" className="mx-auto max-w-3xl px-5 pb-24 pt-36"><h1 className="font-display text-3xl font-semibold"><KineticText text="Category not found" base={60} /></h1><Link to="/solutions" className="mt-6 inline-block font-semibold text-[var(--emma-violet)]">Browse all solutions →</Link></main><Footer /></div>
   ),
 });
 
@@ -47,7 +47,7 @@ function Page() {
   return (
     <div className="min-h-screen bg-background text-foreground" style={{ ["--hue" as string]: hueForCategory(c.slug) }}>
       <Navbar />
-      <main>
+      <main id="main-content">
         <section className="hero-ink hero-x sol-hero relative overflow-hidden" data-scroll>
           <div className="hero-ink-grid" aria-hidden="true" />
           <div className="hero-ink-glow" aria-hidden="true" />

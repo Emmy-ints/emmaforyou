@@ -54,7 +54,7 @@ function ArticlePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-32 pb-24">
+      <main id="main-content" className="pt-32 pb-24">
         <article className="mx-auto max-w-3xl px-5">
           <Link to="/knowledge-base" className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">← Knowledge base</Link>
           <div className="mt-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">

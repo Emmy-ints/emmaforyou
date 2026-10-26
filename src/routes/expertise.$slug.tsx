@@ -36,7 +36,7 @@ export const Route = createFileRoute("/expertise/$slug")({
   notFoundComponent: () => (
     <>
       <Navbar />
-      <main className="min-h-screen pt-32 px-5 max-w-3xl mx-auto text-center">
+      <main id="main-content" className="min-h-screen pt-32 px-5 max-w-3xl mx-auto text-center">
         <h1 className="font-display text-3xl font-bold"><KineticText text="Expertise area not found" base={60} /></h1>
         <p className="mt-2 text-muted-foreground">Browse all our expertise areas:</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">

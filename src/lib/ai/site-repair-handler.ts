@@ -3,7 +3,7 @@ import { SITE_URL } from "../seo";
 import { adminDb, aiText, checkLimits, checkOrigin, refundLimit } from "./guard";
 
 const STAFF = ["admin", "editor", "developer"];
-const strip = (s: string) => s.replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
+const strip = (s: string) => s.replace(/<[^>]*>/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&#x27;|&apos;/gi, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x2F;/gi, "/").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
 
 /**
  * Staff-only: propose a page title and meta description for an audit finding. The server reads the

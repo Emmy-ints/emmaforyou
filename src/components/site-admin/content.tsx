@@ -42,7 +42,7 @@ function PagesSeo() {
   return (
     <Card title={`Pages & SEO (${all.length} public pages)`}>
       <PendingBar rows={rows.data ?? []} onDone={rows.reload} scope="SEO" />
-      <p className="mb-3 text-sm text-muted-foreground">Every public route from the site's page index. Open a page to see its live title and description and set an override. Overrides apply in visitors' browsers as soon as they're published; to change what search engines read in the server HTML, copy the code change shown under the editor.</p>
+      <p className="mb-3 text-sm text-muted-foreground">Every public route from the site's page index. Open a page to see its live title and description and set an override. Published overrides are rendered into the server HTML that search engines read (within about a minute), and noindex pages leave the sitemap.</p>
       <div className="flex flex-wrap gap-2">
         <div className="min-w-[220px] flex-1"><SearchBox value={q} onChange={setQ} placeholder="Search pages by title or address" /></div>
         <select className="input mb-3 w-auto" value={kind} onChange={(e) => setKind(e.target.value)} aria-label="Page type"><option value="all">All types</option>{kinds.map((k) => <option key={k}>{k}</option>)}</select>
@@ -98,7 +98,7 @@ function SeoEditor({ path, k, row, onDone }: { path: string; k: string; row?: Se
         <Field label={`Description override (${desc.length}/170)`}><textarea className="input min-h-[70px] w-full" maxLength={170} value={desc} onChange={(e) => setDesc(e.target.value)} /></Field>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={noindex} onChange={(e) => setNoindex(e.target.checked)} />Hide from search engines (noindex)</label>
         <SettingActions k={k} row={row} value={value} onDone={onDone} />
-        {(title || desc) && <CodeNote>To make it permanent in the server HTML: in this page's route file, set <code>pageHead({"{"} title: {JSON.stringify(title || live?.title || "")}, description: {JSON.stringify(desc || live?.description || "")}, path: "{path}" {"}"})</code> — a code change and deploy.</CodeNote>}
+        {(title || desc) && <CodeNote>After publishing, re-open this page here: the "Live (server HTML)" column should show your override within about a minute.</CodeNote>}
       </div>
     </div>
   );

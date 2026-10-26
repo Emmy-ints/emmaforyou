@@ -110,7 +110,7 @@ export function RepairPanel({ f, repairs, onDone }: { f: Finding; repairs: Row[]
           </>}
           {kind === "redirect" && <div className="flex flex-wrap items-center gap-2"><code>{f.data?.target}</code> → <input className="input h-8 w-64 text-sm" value={to} onChange={(e) => setTo(e.target.value)} placeholder="/existing-page" aria-label="Redirect to" />{!to && <span className="text-xs text-muted-foreground">No close match found; type a page.</span>}</div>}
           <Btn small tone="primary" onClick={propose} disabled={busy}>Save proposal for review</Btn>
-          <p className="text-[11px] text-muted-foreground">Applying publishes the change with a checkpoint you can roll back. Metadata fixes apply in visitors' browsers; the code change for the server HTML is listed under Content → Pages & SEO.</p>
+          <p className="text-[11px] text-muted-foreground">Applying publishes the change with a checkpoint you can roll back. Metadata fixes are rendered into the server HTML within about a minute; use Re-check to confirm.</p>
         </div>
       ) : <p className="text-xs text-muted-foreground">Your role can view proposals but not create them.</p>}
       {msg && <p role="status" className="mt-1 text-xs text-emerald-700 dark:text-emerald-300">{msg}</p>}

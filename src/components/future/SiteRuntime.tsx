@@ -12,18 +12,17 @@ function setMeta(name: string, content: string | null) {
 
 /**
  * Applies the owner's published site settings that affect every page:
- * - SEO overrides for the current path (title, description, noindex). These update the page in the
- *   browser right away; the server-rendered HTML keeps the code's values until the code is updated
- *   (the control room offers the code change for that).
+ * - Draft SEO overrides while a staff member previews drafts (published ones are server-rendered).
  * - The announcement bar.
  * - The bar shown to staff who are previewing their draft settings.
  */
 export default function SiteRuntime() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const settings = useSettings();
-  const seo = settings[`seo:${path.replace(/\/$/, "") || "/"}`];
   const announce = useSetting("announce");
   const [previewing, setPreviewing] = useState(false);
+  // Published SEO overrides are server-rendered by pageHead(); this only shows staff their drafts.
+  const seo = previewing ? settings[`seo:${path.replace(/\/$/, "") || "/"}`] : undefined;
   useEffect(() => { setPreviewing(isPreviewingSettings()); }, []);
 
   useEffect(() => {

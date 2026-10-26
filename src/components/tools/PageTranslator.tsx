@@ -106,7 +106,10 @@ export default function PageTranslator() {
     const cache = caches.current.get(code) ?? loadCache(code);
     caches.current.set(code, cache);
     const result = new Map<string, string>();
-    const unique = Array.from(new Set([...found.map((n) => (n.nodeValue || "").trim().slice(0, 1500)), ...units.map(phraseText)])).filter((s) => {
+    // Translate in reading order (headings included where they appear), so the top of the page changes first.
+    const ordered: { node: Node; text: string }[] = [...found.map((n) => ({ node: n as Node, text: (n.nodeValue || "").trim().slice(0, 1500) })), ...units.map((el) => ({ node: el as Node, text: phraseText(el) }))]
+      .sort((a, b) => (a.node === b.node ? 0 : a.node.compareDocumentPosition(b.node) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+    const unique = Array.from(new Set(ordered.map((x) => x.text))).filter((s) => {
       const hit = cache.get(s); if (hit) { result.set(s, hit); return false; } return true;
     });
     const apply = () => {

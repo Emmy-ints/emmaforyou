@@ -1,4 +1,5 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState, redirect } from "@tanstack/react-router";
+import { isKnownRoute, liveConfig } from "../lib/live-config";
 import { useEffect } from "react";
 import { I18nProvider } from "../lib/i18n";
 import { installClickTracking, track } from "../lib/analytics";
@@ -20,6 +21,19 @@ import DesignTokens from "../components/future/DesignTokens";
 import NotFoundComponent from "../components/future/NotFound";
 
 export const Route = createRootRoute({
+  // Runs on the server for every page request (and on client navigations): loads the owner's
+  // published settings (so pageHead() server-renders SEO overrides) and answers live redirects
+  // with a real HTTP 301/302. Redirects never apply to an address that has its own route.
+  beforeLoad: async ({ location }) => {
+    if (location.pathname.startsWith("/api/")) return;
+    let cfg; try { cfg = await liveConfig(); } catch { return; }
+    const path = location.pathname.replace(/\/$/, "") || "/";
+    const hit = cfg.redirects.find((r) => r.from_path === path);
+    if (hit && /^\/[^/]/.test(hit.to_path) && !(await isKnownRoute(path))) {
+      const search = hit.to_path.includes("?") ? "" : location.searchStr ?? "";
+      throw redirect({ href: hit.to_path + search, statusCode: hit.code === 302 ? 302 : 301 });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },

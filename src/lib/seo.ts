@@ -108,8 +108,15 @@ export function describe(excerpt: string, markdownBody = ""): string {
   return clip(text, 158);
 }
 
-/** Build a TanStack Router head object for a page. */
-export function pageHead(p: PageHeadInput) {
+/** Owner SEO overrides from the control room (published only), keyed by path. Filled by live-config. */
+let SEO_OVERRIDES: Record<string, { title?: string; description?: string; noindex?: boolean }> = {};
+export function setSeoOverrides(map: typeof SEO_OVERRIDES) { SEO_OVERRIDES = map; }
+export function seoOverrideFor(path: string) { return SEO_OVERRIDES[path.replace(/\/$/, "") || "/"]; }
+
+/** Build a TanStack Router head object for a page. Published owner overrides win and are server-rendered. */
+export function pageHead(input: PageHeadInput) {
+  const o = seoOverrideFor(input.path);
+  const p: PageHeadInput = o ? { ...input, title: o.title || input.title, description: o.description || input.description, noindex: input.noindex || !!o.noindex } : input;
   const url = absoluteUrl(p.path);
   const image = absoluteUrl(p.image || DEFAULT_OG_IMAGE);
   const meta: Record<string, string>[] = [

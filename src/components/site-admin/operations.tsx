@@ -163,7 +163,7 @@ export function RedirectsTab() {
   return (
     <div className="space-y-4">
       <Card title={edit ? "Edit redirect" : "New redirect"}>
-        <p className="mb-3 text-sm text-muted-foreground">Send an old or mistyped address to a page that exists. Redirects only apply to addresses that would otherwise show "page not found", so they can never hide a working page. The database refuses loops, duplicates, chains longer than 5 and protected paths (home, dashboard, sign-in, API).</p>
+        <p className="mb-3 text-sm text-muted-foreground">Send an old or mistyped address to a page that exists. Redirects only apply to addresses that don't have their own page, so they can never hide a working page. The database refuses loops, duplicates, chains longer than 5 and protected paths (home, dashboard, sign-in, API).</p>
         <div className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
           <input className="input" placeholder="From: /old-page" value={from} onChange={(e) => { setFrom(e.target.value); setCheck(null); }} aria-label="From path" />
           <input className="input" placeholder="To: /services/website-design" value={to} onChange={(e) => { setTo(e.target.value); setCheck(null); }} aria-label="To path" list="redirect-routes" />
@@ -193,7 +193,7 @@ export function RedirectsTab() {
                 <Btn small tone="danger" onClick={() => remove(r)}><Trash2 className="h-3 w-3" aria-hidden="true" /></Btn></span>
             </li>))}</ul>
         )}
-        <p className="mt-2 text-xs text-muted-foreground">How it works: the "page not found" screen checks the live redirects and forwards the visitor in the browser. Search engines that run JavaScript follow it; a true server-side 301 would need a code change in the hosting layer.</p>
+        <p className="mt-2 text-xs text-muted-foreground">How it works: the server answers a live redirect with a real HTTP 301 (or 302) before the page renders, so search engines see it too. It never applies to an address that has its own page; the "page not found" screen also checks redirects as a fallback.</p>
       </Card>
     </div>
   );

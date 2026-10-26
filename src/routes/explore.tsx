@@ -38,7 +38,8 @@ function ExplorePage() {
   useEffect(() => { if (focus) panel.current?.focus(); }, [focus]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement)?.closest("input, textarea, select")) return;
+      const tgt = e.target as Element | null;
+      if (tgt && typeof tgt.closest === "function" && tgt.closest("input, textarea, select")) return;
       if (e.key === "Escape") setFocus(null);
       if (simple) return;
       if (e.key === "ArrowLeft") setRz((x) => x - 15);

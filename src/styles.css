@@ -837,6 +837,10 @@ html, body { overflow-x: clip; }
 .gos-dot { width: 9px; height: 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); }
 .gos-title { flex: 1; font-size: 0.78rem; font-weight: 600; color: #c9ccec; }
 .gos-badge { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: #9ea3c9; padding: 0.2rem 0.55rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.09); }
+.gos-pause { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; flex: none; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12); color: #c9ccec; background: transparent; }
+.gos-pause:hover { background: rgba(255, 255, 255, 0.08); }
+.gos-pause:focus-visible { outline: 2px solid var(--emma-cyan, #3dd6f5); outline-offset: 2px; }
+.gos-pause svg { width: 0.8rem; height: 0.8rem; }
 .gos-live { width: 6px; height: 6px; border-radius: 999px; background: var(--emma-cyan); box-shadow: 0 0 10px var(--emma-cyan); animation: gos-pulse 1.8s ease-in-out infinite; }
 @keyframes gos-pulse { 50% { opacity: 0.35; } }
 .gos-body { display: grid; grid-template-columns: 52px minmax(0, 1fr) 200px; min-height: 420px; }

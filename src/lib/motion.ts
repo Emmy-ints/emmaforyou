@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 /**
  * Website-wide animation intensity. One design language, three strengths:
  *  - cinematic: homepage and locale landings (signature 3D, kinetic type, pinned story)
@@ -41,4 +43,22 @@ export function lowPower(): boolean {
   if (typeof window === "undefined") return true;
   const n = navigator as Navigator & { deviceMemory?: number };
   return (n.hardwareConcurrency ?? 8) < 4 || (n.deviceMemory ?? 8) < 3;
+}
+
+/**
+ * React hook: true when motion should be reduced, by the system setting, Save-Data or the site's
+ * own motion switch. Use this instead of framer-motion's useReducedMotion, which only sees the
+ * system setting. False on the server and first render, then follows changes live.
+ */
+export function useReduceMotion(): boolean {
+  const [r, setR] = useState(false);
+  useEffect(() => {
+    const sync = () => setR(prefersReduced());
+    sync();
+    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    window.addEventListener("efy-motion", sync);
+    mq?.addEventListener?.("change", sync);
+    return () => { window.removeEventListener("efy-motion", sync); mq?.removeEventListener?.("change", sync); };
+  }, []);
+  return r;
 }

@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReduceMotion } from "@/lib/motion";
 import type { WorkflowNode } from "@/lib/service-extras";
 
 /** A step-by-step automation flow; the active step advances on its own and on click. */
 export function WorkflowViz({ nodes }: { nodes: WorkflowNode[] }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [focusIn, setFocusIn] = useState(false);
+  // Choosing a step takes over from the autoplay for good (works for touch and keyboard).
+  const [chosen, setChosen] = useState(false);
+  const paused = hover || focusIn || chosen;
 
   useEffect(() => {
     if (reduce || paused) return;
@@ -15,11 +20,11 @@ export function WorkflowViz({ nodes }: { nodes: WorkflowNode[] }) {
   }, [nodes.length, reduce, paused]);
 
   return (
-    <div className="wf band-ink" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+    <div className="wf band-ink" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} onFocus={() => setFocusIn(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusIn(false); }}>
       <ol className="wf-row">
         {nodes.map((n, i) => (
           <li key={n.label} className="wf-item">
-            <button type="button" onClick={() => setActive(i)} aria-pressed={i === active} className={`wf-node ${i === active ? "is-active" : ""} ${i < active ? "is-done" : ""}`}>
+            <button type="button" onClick={() => { setActive(i); setChosen(true); }} aria-pressed={i === active} className={`wf-node ${i === active ? "is-active" : ""} ${i < active ? "is-done" : ""}`}>
               <span className="wf-num">{i + 1}</span>
               <span className="wf-label">{n.label}</span>
               <span className="wf-detail">{n.detail}</span>
@@ -38,7 +43,7 @@ export function WorkflowViz({ nodes }: { nodes: WorkflowNode[] }) {
 
 /** Sample campaign dashboard, labelled as sample data. */
 export function DashboardDemo({ title }: { title: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduceMotion();
   const weeks = [18, 24, 22, 31, 38, 35, 46, 52];
   const max = Math.max(...weeks);
   return (

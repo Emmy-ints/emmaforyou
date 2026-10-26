@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Bot, CalendarCheck, CheckCircle2, Inbox, LayoutGrid, LineChart, MessageCircle, Settings2, Star, Users, Zap } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bot, CalendarCheck, CheckCircle2, Inbox, LayoutGrid, LineChart, MessageCircle, Pause, Play, Settings2, Star, Users, Zap } from "lucide-react";
+import { useReduceMotion } from "@/lib/motion";
 
 /**
  * Hero product interface: a scripted, clearly-labelled demo of the systems EmmaForYou builds.
@@ -66,11 +67,17 @@ const ICONS: Record<StepKind, typeof MessageCircle> = {
 const STEP_MS = 1700;
 
 export default function GrowthOS() {
-  const reduce = useReducedMotion();
+  // System setting, Save-Data or the site's own motion switch.
+  const reduce = useReduceMotion();
   const [scenarioIndex, setScenarioIndex] = useState(0);
   const [shown, setShown] = useState(reduce ? 5 : 1);
-  const [paused, setPaused] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [focusIn, setFocusIn] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const paused = hover || focusIn || userPaused;
   const scenario = SCENARIOS[scenarioIndex];
+  // With reduced motion the demo stands still on the complete flow.
+  useEffect(() => { if (reduce) setShown(scenario.steps.length); }, [reduce, scenario]);
 
   useEffect(() => {
     if (reduce || paused) return;
@@ -89,8 +96,10 @@ export default function GrowthOS() {
   return (
     <div
       className="gos"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setFocusIn(true)}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusIn(false); }}
       role="region"
       aria-label="Demo of an EmmaForYou automation workspace using sample data"
     >
@@ -103,6 +112,11 @@ export default function GrowthOS() {
         </div>
         <span className="gos-title">EmmaForYou Growth OS</span>
         <span className="gos-badge"><span className="gos-live" />Live demo · sample data</span>
+        {!reduce && (
+          <button type="button" className="gos-pause" onClick={() => setUserPaused((p) => !p)} aria-pressed={userPaused} aria-label={userPaused ? "Play the demo" : "Pause the demo"}>
+            {userPaused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+          </button>
+        )}
       </div>
 
       <div className="gos-body">

@@ -22,7 +22,7 @@ function AccountPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main id="main-content" className="mx-auto w-full max-w-3xl px-5 pb-20 pt-28 sm:pt-32">
-        {!ready || !signedIn ? <div className="flex justify-center py-20" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading your account</span></div> : (
+        {!ready || !signedIn ? <div className="flex justify-center py-20" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><h1 className="sr-only">Your account</h1><span className="sr-only">Loading your account</span></div> : (
           <>
             <h1 className="font-display text-3xl font-semibold tracking-tight"><KineticText text="Your account" base={30} /></h1>
             <p className="mt-1 text-sm text-muted-foreground">Signed in as <span className="font-medium text-foreground">{email}</span>. This one account works across every EmmaForYou area.</p>

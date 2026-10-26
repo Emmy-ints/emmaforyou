@@ -3,6 +3,8 @@ import { ArrowRight, BadgeCheck } from "lucide-react";
 import ProjectCard from "../portfolio/ProjectCard";
 import ClientWall from "../portfolio/ClientWall";
 import SectionHead from "../future/SectionHead";
+import { useSettings } from "@/lib/site-settings";
+import { liveProjects } from "@/lib/portfolio-live";
 import { FEATURED, PROJECTS, findProject, projectSlug } from "@/lib/portfolio-data";
 
 /**
@@ -12,7 +14,8 @@ import { FEATURED, PROJECTS, findProject, projectSlug } from "@/lib/portfolio-da
  */
 export default function SelectedWork() {
   const featured = FEATURED.map((f) => findProject(projectSlug(f.client))).filter((p): p is (typeof PROJECTS)[number] => Boolean(p));
-  const rest = PROJECTS.filter((p) => !featured.includes(p)).slice(0, 3);
+  const settings = useSettings();
+  const rest = liveProjects(settings).filter((p) => !featured.includes(p)).slice(0, 3);
 
   return (
     <section id="work" className="sw relative overflow-hidden py-24 md:py-32">

@@ -34,12 +34,25 @@ export function requestTranslation(lang: AiLang | null) {
   window.dispatchEvent(new CustomEvent("efy-translate", { detail: lang }));
 }
 
+/** Headings animated word by word are translated as one phrase, not word by word. */
+const PHRASE = ".kt, .scrub";
+function phrases(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll<HTMLElement>(PHRASE)).filter((el) => !el.closest("[data-no-translate]") && !el.parentElement?.closest(PHRASE) && /\p{L}/u.test(el.textContent || ""));
+}
+/** Show a translated phrase without touching the React-owned word spans (they're hidden by CSS). */
+function setPhrase(el: HTMLElement, text: string | null) {
+  let tr = el.querySelector<HTMLElement>(":scope > .tr-phrase");
+  if (text === null) { tr?.remove(); el.removeAttribute("data-tr"); return; }
+  if (!tr) { tr = document.createElement("span"); tr.className = "tr-phrase"; el.appendChild(tr); }
+  tr.textContent = text; el.setAttribute("data-tr", "");
+}
+
 function collect(root: HTMLElement, tracked: WeakMap<Text, Tracked>): Text[] {
   const out: Text[] = [];
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const p = node.parentElement;
-      if (!p || SKIP.has(p.tagName) || p.closest("[data-no-translate],[contenteditable='true'],svg")) return NodeFilter.FILTER_REJECT;
+      if (!p || SKIP.has(p.tagName) || p.closest("[data-no-translate],[contenteditable='true'],svg," + PHRASE)) return NodeFilter.FILTER_REJECT;
       const v = node.nodeValue || "";
       if (v.trim().length < 2 || !/\p{L}/u.test(v)) return NodeFilter.FILTER_REJECT;
       const t = tracked.get(node as Text);
@@ -58,32 +71,42 @@ export default function PageTranslator() {
   const tracked = useRef(new WeakMap<Text, Tracked>());
   const nodes = useRef<Text[]>([]);
   const runId = useRef(0);
-  const failed = useRef(false); // stop automatic retries after an error (e.g. limit reached)
+  const failed = useRef(false);
+  const busy = useRef(false); // a run is in progress: don't start a second, overlapping one // stop automatic retries after an error (e.g. limit reached)
   const caches = useRef(new Map<string, Map<string, string>>());
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [hidden, setHidden] = useState(false);
 
   const restore = useCallback(() => {
     runId.current++;
+    busy.current = false;
     for (const n of nodes.current) {
       const t = tracked.current.get(n);
       if (t && n.nodeValue === t.translated) n.nodeValue = t.orig;
     }
     nodes.current = [];
     tracked.current = new WeakMap();
+    phrases(document.body).forEach((el) => setPhrase(el, null));
     document.documentElement.lang = "en";
     setProgress(null);
   }, []);
 
   const translate = useCallback(async (code: AiLang) => {
     const id = ++runId.current;
+    busy.current = true;
+    try { await run(code, id); } finally { if (id === runId.current) busy.current = false; }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const run = async (code: AiLang, id: number) => {
     setError("");
     const found = collect(document.body, tracked.current);
-    if (!found.length) return;
+    const units = phrases(document.body).filter((el) => !el.hasAttribute("data-tr"));
+    const phraseText = (el: HTMLElement) => Array.from(el.childNodes).filter((c) => !(c instanceof HTMLElement && c.classList.contains("tr-phrase"))).map((c) => c.textContent).join("").replace(/\s+/g, " ").trim().slice(0, 1500);
+    if (!found.length && !units.length) return;
     const cache = caches.current.get(code) ?? loadCache(code);
     caches.current.set(code, cache);
     const result = new Map<string, string>();
-    const unique = Array.from(new Set(found.map((n) => (n.nodeValue || "").trim().slice(0, 1500)))).filter((s) => {
+    const unique = Array.from(new Set([...found.map((n) => (n.nodeValue || "").trim().slice(0, 1500)), ...units.map(phraseText)])).filter((s) => {
       const hit = cache.get(s); if (hit) { result.set(s, hit); return false; } return true;
     });
     const apply = () => {
@@ -99,6 +122,8 @@ export default function PageTranslator() {
         n.nodeValue = translated;
         nodes.current.push(n);
       }
+      for (const el of units) { const tr = result.get(phraseText(el)); if (tr && el.isConnected) setPhrase(el, tr); }
+      if (result.size) document.documentElement.lang = code;
     };
     if (result.size) apply();
     if (!unique.length) { document.documentElement.lang = code; return; }
@@ -107,33 +132,36 @@ export default function PageTranslator() {
     let size = 0;
     for (const s of unique) {
       const text = s.slice(0, 1500);
-      if (cur.length >= 60 || size + text.length > 5000) { batches.push(cur); cur = []; size = 0; }
+      if (cur.length >= 25 || size + text.length > 2500) { batches.push(cur); cur = []; size = 0; }
       cur.push(text);
       size += text.length;
     }
     if (cur.length) batches.push(cur);
     setProgress(0);
+    let missed = 0; let lastError = "";
     for (let b = 0; b < batches.length; b++) {
       if (id !== runId.current) return;
       try {
         const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang: code, texts: batches[b] }) });
         const data = await res.json().catch(() => ({}));
+        if (res.status === 429 || res.status === 503) { lastError = data.message || "Translation is paused right now."; missed += batches.slice(b).reduce((n, x) => n + x.length, 0); break; }
         if (!res.ok) throw new Error(data.message || "Translation is unavailable right now.");
-        batches[b].forEach((s, i) => { const tr = data.translations?.[i]; if (typeof tr === "string" && tr.trim()) { result.set(s, tr); cache.set(s, tr); } });
+        batches[b].forEach((s, i) => { const tr = data.translations?.[i]; if (typeof tr === "string" && tr.trim()) { result.set(s, tr); cache.set(s, tr); } else missed++; });
         saveCache(code, cache);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Translation stopped.");
-        failed.current = true;
-        break;
+        // One bad batch shouldn't leave the rest of the page in English: note it and carry on.
+        lastError = e instanceof Error ? e.message : "Translation stopped.";
+        missed += batches[b].length;
       }
       if (id !== runId.current) return;
       // Apply as each batch arrives so the page changes progressively.
       apply();
       setProgress(Math.round(((b + 1) / batches.length) * 100));
     }
-    document.documentElement.lang = code;
+    if (result.size) document.documentElement.lang = code;
+    if (missed) { failed.current = true; setError(`${missed} phrase${missed === 1 ? "" : "s"} couldn't be translated and stay in English.${lastError ? ` (${lastError})` : ""}`); }
     if (id === runId.current) setProgress(null);
-  }, []);
+  };
 
   // Start/stop requests from the language menu.
   useEffect(() => {
@@ -156,7 +184,7 @@ export default function PageTranslator() {
   // New page or new content (chat replies, results): translate what's new.
   useEffect(() => {
     if (!lang) return;
-    const t = window.setTimeout(() => { if (!failed.current) translate(lang); }, 700);
+    const t = window.setTimeout(() => { if (!failed.current && !busy.current) translate(lang); }, 700);
     return () => window.clearTimeout(t);
   }, [pathname, lang, translate]);
   useEffect(() => {
@@ -164,7 +192,7 @@ export default function PageTranslator() {
     let timer = 0;
     const obs = new MutationObserver(() => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => { if (progress === null && !failed.current) translate(lang); }, 1500);
+      timer = window.setTimeout(() => { if (!busy.current && !failed.current) translate(lang); }, 1500);
     });
     obs.observe(document.body, { childList: true, subtree: true, characterData: true });
     return () => { obs.disconnect(); window.clearTimeout(timer); };

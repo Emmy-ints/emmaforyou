@@ -1,3 +1,4 @@
+import { useSettings } from "./site-settings";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "fr" | "es" | "de";
@@ -11,7 +12,7 @@ export const LANGUAGES: Record<Lang, { label: string; name: string; flag: string
 
 type Dict = Record<string, string>;
 
-const TRANSLATIONS: Record<Lang, Dict> = {
+export const TRANSLATIONS: Record<Lang, Dict> = {
   en: {
     nav_home: "Home",
     nav_about: "About",
@@ -166,7 +167,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("efy-lang", on);
   }, []);
 
-  const t = (key: string) => TRANSLATIONS[lang][key] ?? TRANSLATIONS.en[key] ?? key;
+  const overrides = useSettings();
+  // Owner edits from the control room (Translations) win over the built-in text.
+  const t = (key: string) => overrides[`i18n:${lang}:${key}`]?.text ?? TRANSLATIONS[lang][key] ?? overrides[`i18n:en:${key}`]?.text ?? TRANSLATIONS.en[key] ?? key;
 
   return <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>;
 }

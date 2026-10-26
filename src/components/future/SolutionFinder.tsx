@@ -6,6 +6,8 @@ import FounderCard from "./FounderCard";
 import { LeadCapture } from "../tools/LeadCapture";
 import { BUDGETS, GOALS, findSolutions, familyHue, type GoalId } from "@/lib/solution-finder";
 import { NICHES } from "@/lib/niches";
+import { useSettings } from "@/lib/site-settings";
+import { catalog, withOverrides } from "@/lib/service-catalog";
 import { buildWa } from "@/lib/leads";
 import { track } from "@/lib/analytics";
 
@@ -22,7 +24,9 @@ export default function SolutionFinder({ id = "solution-finder", compact = false
   const [text, setText] = useState("");
   const [shown, setShown] = useState(false);
   const [copied, setCopied] = useState(false);
-  const result = useMemo(() => findSolutions({ business, goals, budget, text }), [business, goals, budget, text]);
+  const settings = useSettings();
+  const items = useMemo(() => withOverrides(catalog(), settings), [settings]);
+  const result = useMemo(() => findSolutions({ business, goals, budget, text }, items), [business, goals, budget, text, items]);
   const ready = goals.length > 0 || text.trim().length >= 12;
   const toggle = (g: GoalId) => setGoals((cur) => (cur.includes(g) ? cur.filter((x) => x !== g) : [...cur, g]));
 

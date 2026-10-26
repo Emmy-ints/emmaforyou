@@ -49,7 +49,7 @@ function LoginPage() {
           <div className="auth-orb" aria-hidden="true"><div className="efy-orb-fallback" /></div>
           <div className="auth-card lg-strong relative rounded-[30px] p-6 sm:p-8">
             {!ready ? (
-              <div className="flex justify-center py-10" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><span className="sr-only">Loading</span></div>
+              <div className="flex justify-center py-10" role="status"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" /><h1 className="sr-only">Sign in to EmmaForYou</h1><span className="sr-only">Loading</span></div>
             ) : recovery ? (
               <NewPassword onDone={() => { setRecovery(false); navigate({ to: dest as "/account" }); }} />
             ) : signedIn ? (

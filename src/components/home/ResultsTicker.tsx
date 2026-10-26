@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { prefersReduced } from "@/lib/motion";
+import { ClaimGate, ClaimTag } from "../future/ClaimTag";
 
 const RESULTS = [
   "🇳🇬 Fashion store in Lagos: +312% website traffic",
@@ -20,6 +21,10 @@ const MS = 4000;
  * reduced-motion visitors get manual previous/next only.
  */
 export default function ResultsTicker() {
+  return <ClaimGate id="results-ticker"><Ticker /></ClaimGate>;
+}
+
+function Ticker() {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [hold, setHold] = useState(false);
@@ -32,7 +37,7 @@ export default function ResultsTicker() {
   return (
     <div className="rt" onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)} onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
       <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-3 px-5 md:gap-5 md:px-8">
-        <span className="rt-label"><span className="rt-live" aria-hidden="true" />Client results</span>
+        <span className="rt-label"><span className="rt-live" aria-hidden="true" />Client results <ClaimTag id="results-ticker" /></span>
         <div className="rt-window" aria-live={running ? "off" : "polite"}>
           <p key={i} className="rt-item">
             <span className="rt-what">{what?.trim()}</span>

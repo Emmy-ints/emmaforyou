@@ -8,19 +8,25 @@ import { pageHead } from "@/lib/seo";
 import AccountAuthForm from "@/components/auth/AccountAuthForm";
 import { KineticText } from "@/components/future/Kinetic";
 import { Btn, Card, check, db, downloadCsv, Empty, ErrorText, label, Loading, Pill, Stat, useLoad, when } from "@/components/agents-admin/shared";
-import { DEFAULTS, PRESETS, PREVIEW_KEY, applyTokens, resolve, type Tokens } from "@/lib/design-tokens";
+import { DEFAULTS, FONTS, PRESETS, PREVIEW_KEY, applyTokens, contrast, diffTokens, resolve, type Tokens } from "@/lib/design-tokens";
 import { runAudit, type AuditRun, type Finding } from "@/lib/site-audit";
 import { catalog, FAMILIES } from "@/lib/service-catalog";
 import { pageIndex } from "@/lib/page-index";
+import { RepairPanel, FIXABLE } from "@/components/site-admin/repair";
+import { PermsContext } from "@/components/site-admin/settings";
+import ContentTab from "@/components/site-admin/content";
+import LabTab from "@/components/site-admin/lab-admin";
+import { BackupsTab, EnquiriesTab, FeaturesTab, RedirectsTab, TranslationsTab } from "@/components/site-admin/operations";
 
 /**
  * Website control room. Every action is checked again in the database (site_can / RLS), so the
  * tabs a person sees are a convenience, not the security boundary. Secrets never reach this page:
  * the AI check reports provider and model names only.
  */
-const TABS = [["overview", "Overview"], ["audit", "Pages & audit"], ["services", "Services"], ["design", "Design lab"], ["team", "Team & roles"], ["log", "Activity log"], ["systems", "AI & integrations"]] as const;
+const TABS = [["overview", "Overview"], ["audit", "Audit & repair"], ["content", "Content"], ["enquiries", "Enquiries"], ["translations", "Translations"], ["design", "Design lab"], ["features", "Features"], ["redirects", "Redirects"], ["lab", "Innovation Lab"], ["team", "Team & roles"], ["log", "Activity log"], ["backups", "Backups"], ["systems", "AI & integrations"]] as const;
 type Tab = (typeof TABS)[number][0];
-const NEEDS: Record<Tab, string | null> = { overview: null, audit: "audit.read", services: null, design: "design.draft", team: "roles.manage", log: "log.read", systems: null };
+const NEEDS: Record<Tab, string[] | null> = { overview: null, audit: ["audit.read"], content: ["content.draft"], enquiries: ["enquiries.read"], translations: ["translations.edit"], design: ["design.draft"], features: ["flags.draft"], redirects: ["redirects.draft"], lab: ["lab.use"], team: ["roles.manage"], log: ["log.read"], backups: ["backup.create"], systems: null };
+const roleName = (p: string[]) => (p.includes("roles.manage") ? "Admin" : p.includes("translations.edit") ? "Marketing" : p.includes("flags.draft") ? "Developer" : p.includes("content.draft") ? "Editor" : p.includes("analytics.read") ? "Analyst" : "Auditor");
 
 export const Route = createFileRoute("/dashboard_/site")({
   validateSearch: (s: Record<string, unknown>): { tab?: Tab } => (TABS.some(([t]) => t === s.tab) ? { tab: s.tab as Tab } : {}),
@@ -62,11 +68,12 @@ function Room({ perms, email }: { perms: string[]; email: string }) {
   const { tab = "overview" } = Route.useSearch();
   const navigate = useNavigate();
   const can = (p: string | null) => !p || perms.includes(p);
-  const tabs = TABS.filter(([id]) => can(NEEDS[id]));
+  const tabs = TABS.filter(([id]) => !NEEDS[id] || NEEDS[id]!.some((p) => perms.includes(p)));
   const current = tabs.some(([id]) => id === tab) ? tab : "overview";
   const setTab = (t: Tab) => navigate({ to: "/dashboard/site", search: t === "overview" ? {} : { tab: t }, replace: true });
-  const role = perms.includes("roles.manage") ? "Admin" : perms.includes("audit.run") ? "Editor" : "Auditor";
+  const role = roleName(perms);
   return (
+    <PermsContext.Provider value={perms}>
     <Shell>
       <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="font-display text-2xl font-extrabold tracking-tight"><KineticText text="Website control room" base={60} /></h1>
@@ -78,12 +85,19 @@ function Room({ perms, email }: { perms: string[]; email: string }) {
       </nav>
       {current === "overview" && <Overview perms={perms} go={setTab} />}
       {current === "audit" && <AuditTab canRun={can("audit.run")} />}
-      {current === "services" && <ServicesTab />}
+      {current === "content" && <ContentTab />}
+      {current === "enquiries" && <EnquiriesTab />}
+      {current === "translations" && <TranslationsTab />}
       {current === "design" && <DesignTab canPublish={can("design.publish")} />}
+      {current === "features" && <FeaturesTab />}
+      {current === "redirects" && <RedirectsTab />}
+      {current === "lab" && <LabTab />}
       {current === "team" && <TeamTab />}
       {current === "log" && <LogTab />}
+      {current === "backups" && <BackupsTab />}
       {current === "systems" && <SystemsTab />}
     </Shell>
+    </PermsContext.Provider>
   );
 }
 
@@ -145,6 +159,10 @@ function AuditTab({ canRun }: { canRun: boolean }) {
   const triage = useLoad<Row[]>(async () => check(await db.from("site_audit_triage").select("*").limit(5000)));
   const reports = useLoad<Row[]>(async () => check(await db.from("site_audit_reports").select("id,created_at,routes_checked,summary,findings").order("created_at", { ascending: false }).limit(10)));
   const tmap = useMemo(() => new Map((triage.data ?? []).map((t) => [t.key, t])), [triage.data]);
+  const repairs = useLoad<Row[]>(async () => check(await db.from("site_repairs").select("*").order("created_at", { ascending: false }).limit(1000)));
+  const rmap = useMemo(() => { const m = new Map<string, Row[]>(); for (const r of repairs.data ?? []) m.set(r.finding_key, [...(m.get(r.finding_key) ?? []), r]); return m; }, [repairs.data]);
+  const [openFix, setOpenFix] = useState<string | null>(null);
+  const [recheck, setRecheck] = useState<Record<string, string>>({});
   const findings: Finding[] = run?.findings ?? (reports.data?.[0]?.findings ?? []);
   const source = run ? "this run" : reports.data?.[0] ? `saved report from ${when(reports.data[0].created_at)}` : "";
 
@@ -160,11 +178,21 @@ function AuditTab({ canRun }: { canRun: boolean }) {
     } catch (e) { setErr(e instanceof Error ? e.message : "The audit stopped."); }
     finally { setProgress(null); }
   }
-  async function setTriage(f: Finding, st: string, assignee?: string) {
+  async function setTriage(f: Finding, st: string, assignee?: string, reason?: string) {
     setErr("");
     const { data: u } = await supabase.auth.getUser();
-    const r = await db.from("site_audit_triage").upsert({ key: f.key, status: st, assignee: assignee ?? null, updated_at: new Date().toISOString(), updated_by: u.user?.id });
+    const r = await db.from("site_audit_triage").upsert({ key: f.key, status: st, assignee: assignee ?? null, reason: reason ?? null, updated_at: new Date().toISOString(), updated_by: u.user?.id });
     if (r.error) setErr(r.error.message); else triage.reload();
+  }
+  // Re-check one finding's page now (does the problem still show in the live HTML?).
+  async function verify(f: Finding) {
+    setRecheck((x) => ({ ...x, [f.key]: "Checking…" }));
+    try {
+      const r = await runAudit({ routes: f.type === "dup-title" ? (f.data?.routes ?? [f.route]) : [f.route], skipExtras: true });
+      const still = r.findings.some((g) => g.type === f.type && g.route === f.route);
+      setRecheck((x) => ({ ...x, [f.key]: still ? "Still present on the live page" : "Not found on the live page any more" }));
+      if (!still && canRun) setTriage(f, "fixed", undefined, "Confirmed by re-check");
+    } catch (e) { setRecheck((x) => ({ ...x, [f.key]: e instanceof Error ? e.message : "Re-check failed" })); }
   }
   const shown = findings.filter((f) => (sev === "all" || f.severity === sev) && (status === "all" || (tmap.get(f.key)?.status ?? "open") === status) && (!q || `${f.route} ${f.title} ${f.evidence}`.toLowerCase().includes(q.toLowerCase())));
   const counts = (s: string) => findings.filter((f) => f.severity === s).length;
@@ -196,18 +224,25 @@ function AuditTab({ canRun }: { canRun: boolean }) {
                       <div className="min-w-0"><p className="font-medium"><Pill tone={SEV_TONE[f.severity]}>{label(f.severity)}</Pill> {f.title}</p>
                         <p className="mt-1 text-xs text-muted-foreground"><a href={f.route} target="_blank" rel="noopener noreferrer" className="font-mono underline">{f.route}</a> · Evidence: <span className="break-all">{f.evidence}</span></p>
                         <p className="mt-1 text-xs">Suggested fix: {f.fix}</p>
-                        {t && <p className="mt-1 text-xs text-muted-foreground">{label(t.status)}{t.assignee ? ` to ${t.assignee}` : ""} · {when(t.updated_at)}</p>}</div>
-                      {canRun && <div className="flex flex-wrap gap-1">
-                        <Btn small onClick={() => window.open(f.route, "_blank", "noopener")}>Review</Btn>
-                        <Btn small onClick={() => setTriage(f, "fixed")}>Mark fixed</Btn>
-                        <Btn small onClick={() => { const who = window.prompt("Assign to (name or email)"); if (who) setTriage(f, "assigned", who.slice(0, 120)); }}>Assign</Btn>
-                        <Btn small onClick={() => setTriage(f, t?.status === "ignored" ? "open" : "ignored")}>{t?.status === "ignored" ? "Reopen" : "Ignore"}</Btn>
-                      </div>}
+                        {t && <p className="mt-1 text-xs text-muted-foreground">{label(t.status)}{t.assignee ? ` to ${t.assignee}` : ""}{t.reason ? ` · ${t.reason}` : ""}{t.note ? ` · ${t.note}` : ""} · {when(t.updated_at)}</p>}
+                        {recheck[f.key] && <p className="mt-1 text-xs font-medium">{recheck[f.key]}</p>}
+                        {(rmap.get(f.key)?.length ?? 0) > 0 && <p className="mt-1 text-xs"><Pill tone="info">{rmap.get(f.key)!.length} fix proposal{rmap.get(f.key)!.length > 1 ? "s" : ""}</Pill></p>}</div>
+                      <div className="flex flex-wrap gap-1">
+                        <Btn small onClick={() => setOpenFix(openFix === f.key ? null : f.key)}>{FIXABLE[f.type] === "manual" ? "How to fix" : "Fix…"}</Btn>
+                        <Btn small onClick={() => window.open(f.route, "_blank", "noopener")}>Review page</Btn>
+                        {canRun && <Btn small onClick={() => verify(f)}>Re-check</Btn>}
+                        {canRun && t?.status !== "fixed" && <Btn small onClick={() => { const n = window.prompt("What was done? (recorded with the finding)", ""); if (n !== null) setTriage(f, "fixed", undefined, n.slice(0, 500) || "Marked fixed"); }}>Mark fixed</Btn>}
+                        {canRun && <Btn small onClick={() => { const who = window.prompt("Assign to (name or email)"); if (who) setTriage(f, "assigned", who.slice(0, 120)); }}>Assign</Btn>}
+                        {canRun && (t && t.status !== "open"
+                          ? <Btn small onClick={() => setTriage(f, "open", undefined, "Reopened")}>Reopen</Btn>
+                          : <Btn small onClick={() => { const why = window.prompt("Why ignore this finding? (required)", ""); if (why && why.trim()) setTriage(f, "ignored", undefined, why.trim().slice(0, 500)); }}>Ignore…</Btn>)}
+                      </div>
                     </div>
+                    {openFix === f.key && <RepairPanel f={f} repairs={rmap.get(f.key) ?? []} onDone={() => { repairs.reload(); triage.reload(); }} />}
                   </li>); })}
               </ul>
             )}
-            <p className="mt-3 text-xs text-muted-foreground">"Mark fixed" records your decision; the next audit confirms whether the problem has really gone. Fixes are made in the code, so nothing here edits the site automatically.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Supported fixes (page titles and descriptions, redirects for broken links) are proposed, reviewed as a before/after comparison, applied with a checkpoint and can be rolled back. Everything else shows what needs a code change. "Re-check" loads the live page again to confirm.</p>
           </Card>
         </>
       )}
@@ -224,27 +259,10 @@ function AuditTab({ canRun }: { canRun: boolean }) {
   );
 }
 
-function ServicesTab() {
-  const items = catalog();
-  return (
-    <div className="space-y-4">
-      <Card title={`Service catalogue (${items.length})`}>
-        <p className="mb-3 text-sm text-muted-foreground">What the homepage explorer, solution finder and search show. It's built from the service, expertise and solution pages in the code, so every entry links to a real page.</p>
-        <div className="grid gap-3 md:grid-cols-3">
-          {FAMILIES.map((f) => { const list = items.filter((i) => i.family === f.id); return (
-            <div key={f.id} className="rounded-xl border border-border p-3"><p className="font-semibold">{f.name} <span className="text-xs text-muted-foreground">({list.length})</span></p>
-              {list.length ? <ul className="mt-2 space-y-1 text-sm">{list.map((i) => <li key={i.id}><a href={i.href} target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">{i.name}</a></li>)}</ul> : <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">No page in this family yet.</p>}
-            </div>); })}
-        </div>
-      </Card>
-      <Card title="Not offered as a page"><p className="text-sm text-muted-foreground">Wix, Squarespace and BigCommerce don't appear in your existing service data, so the site doesn't claim them. Add a page for any platform you actually deliver and it will show up here automatically.</p></Card>
-    </div>
-  );
-}
-
 const SLIDERS: { key: keyof typeof DEFAULTS; label: string; min: number; max: number; step: number }[] = [
   { key: "glass", label: "Glass strength", min: 0, max: 1, step: 0.05 }, { key: "radius", label: "Corner radius (px)", min: 0, max: 40, step: 1 },
   { key: "motion", label: "Motion intensity", min: 0, max: 1.5, step: 0.05 }, { key: "grain", label: "Film grain", min: 0, max: 0.12, step: 0.005 }, { key: "atmosphere", label: "Background atmosphere", min: 0, max: 2, step: 0.05 },
+  { key: "shadow", label: "Shadow depth", min: 0, max: 2, step: 0.05 }, { key: "tintk", label: "Page tint strength", min: 0, max: 0.12, step: 0.005 },
 ];
 
 function DesignTab({ canPublish }: { canPublish: boolean }) {
@@ -280,10 +298,20 @@ function DesignTab({ canPublish }: { canPublish: boolean }) {
         </Card>
         <Card title="Fine-tune">
           <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-medium">Heading font<select className="input mt-1 w-full" value={r.font} onChange={(e) => set({ font: e.target.value as Tokens["font"] })}>{FONTS.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}</select></label>
+            <label className="text-sm font-medium">Page tint<span className="mt-1 flex items-center gap-2"><input type="color" value={r.tint} onChange={(e) => set({ tint: e.target.value })} className="h-9 w-12 cursor-pointer rounded border border-border bg-transparent" /><code className="text-xs">{r.tint}</code></span></label>
             {(["accent", "accent2"] as const).map((k) => <label key={k} className="text-sm font-medium">{k === "accent" ? "Primary accent" : "Secondary accent"}<span className="mt-1 flex items-center gap-2"><input type="color" value={r[k]} onChange={(e) => set({ [k]: e.target.value })} className="h-9 w-12 cursor-pointer rounded border border-border bg-transparent" /><code className="text-xs">{r[k]}</code></span></label>)}
             {SLIDERS.map((s) => <label key={s.key} className="text-sm font-medium">{s.label} <span className="tabular-nums text-muted-foreground">{Number(r[s.key]).toFixed(s.step < 1 ? (s.step < 0.01 ? 3 : 2) : 0)}</span><input type="range" min={s.min} max={s.max} step={s.step} value={Number(r[s.key])} onChange={(e) => set({ [s.key]: Number(e.target.value) })} className="mt-1 w-full" /></label>)}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">Values are checked in the database: only these settings, colour codes and bounded numbers are accepted, so nothing here can inject code. Some older gradients use fixed colours and won't follow the accent yet.</p>
+          <p className="mt-3 text-xs text-muted-foreground">Values are checked in the database: only these settings, colour codes and bounded numbers are accepted, so nothing here can inject code. Brand gradients, buttons, links, glass, corners, shadows, headings and the page tint all follow these tokens; category colours (one per service family) stay fixed on purpose.</p>
+        </Card>
+        <Card title="Readability check">
+          {(() => { const c = contrast(r.accent); const okW = c.onWhite >= 4.5, okD = c.onDark >= 3; return (
+            <ul className="space-y-1 text-sm">
+              <li><Pill tone={okW ? "good" : c.onWhite >= 3 ? "warn" : "bad"}>{c.onWhite.toFixed(2)}:1</Pill> White text on the primary accent (buttons) {okW ? "meets" : c.onWhite >= 3 ? "only meets the large-text level of" : "fails"} WCAG AA</li>
+              <li><Pill tone={okD ? "good" : "bad"}>{c.onDark.toFixed(2)}:1</Pill> Primary accent on the dark bands {okD ? "is readable" : "is too dark to read"}</li>
+            </ul>); })()}
+          <p className="mt-2 text-xs text-muted-foreground">The default theme stays one click away ("EmmaForYou (default)" or Reset to live), and every publish keeps the previous design as a version.</p>
         </Card>
       </div>
       <div className="space-y-4">
@@ -294,6 +322,11 @@ function DesignTab({ canPublish }: { canPublish: boolean }) {
             <p className="mt-1 text-sm text-muted-foreground">This whole page is showing the draft right now.</p>
             <div className="mt-4 flex gap-2"><span className="btn-primary-gradient rounded-full px-4 py-2 text-sm font-semibold text-white">Primary action</span><span className="nav-ghost">Secondary</span></div>
           </div>
+        </Card>
+        <Card title="Compare with live">
+          {(() => { const d = diffTokens(row.data?.published ?? {}, t ?? {}); return !d.length ? <p className="text-sm text-muted-foreground">The draft matches the live design.</p> : (
+            <table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted-foreground"><th className="py-1">Setting</th><th>Live</th><th>Draft</th></tr></thead>
+              <tbody>{d.map((x) => <tr key={x.key} className="border-t border-border"><td className="py-1">{label(x.key)}</td><td className="font-mono text-xs">{String(x.from)}</td><td className="font-mono text-xs font-semibold">{String(x.to)}</td></tr>)}</tbody></table>); })()}
         </Card>
         <Card title="Save and publish">
           <ErrorText message={err || row.error} />
@@ -310,13 +343,22 @@ function DesignTab({ canPublish }: { canPublish: boolean }) {
         </Card>
         <Card title="Versions">
           {versions.loading ? <Loading /> : !versions.data?.length ? <Empty>No versions yet. Each publish saves one.</Empty> : (
-            <ul className="divide-y divide-border text-sm">{versions.data.map((v) => <li key={v.id} className="flex items-center justify-between gap-2 py-2"><span className="min-w-0"><span className="font-semibold">v{v.id}</span> · {PRESETS.find((p) => p.id === (v.tokens?.preset ?? "emmaforyou"))?.name ?? "Custom"} · {when(v.created_at)}{v.note ? <span className="block truncate text-xs text-muted-foreground">{v.note}</span> : null}</span><Btn small onClick={() => restore(v)} disabled={busy}>Restore</Btn></li>)}</ul>
+            <ul className="divide-y divide-border text-sm">{versions.data.map((v) => <li key={v.id} className="flex items-center justify-between gap-2 py-2"><span className="min-w-0"><span className="font-semibold">v{v.id}</span> · {PRESETS.find((p) => p.id === (v.tokens?.preset ?? "emmaforyou"))?.name ?? "Custom"} · {when(v.created_at)}{v.note ? <span className="block truncate text-xs text-muted-foreground">{v.note}</span> : null}</span><span className="flex gap-1"><Btn small onClick={() => setT(v.tokens ?? {})} disabled={busy} title="Load into the editor to compare">Compare</Btn><Btn small onClick={() => restore(v)} disabled={busy}>Restore</Btn></span></li>)}</ul>
           )}
         </Card>
       </div>
     </div>
   );
 }
+
+const ROLE_INFO = [
+  { id: "admin", name: "Admin (owner)", can: "Everything, including publishing, restores, roles and enquiry status.", cant: "Nothing is held back." },
+  { id: "editor", name: "Editor", can: "Run audits, propose fixes, draft content, design, redirects and lab items, upload media, read enquiries.", cant: "Publish, change roles, restore, edit translations or feature switches." },
+  { id: "marketing", name: "Marketing", can: "Draft content and SEO, edit translations, read enquiries and analytics, draft redirects, use the lab, upload media.", cant: "Publish, design, feature switches, run audits." },
+  { id: "developer", name: "Developer", can: "Run audits, propose fixes, draft design and feature switches, draft redirects, use the lab, see integrations.", cant: "Publish, read enquiries, edit content or translations." },
+  { id: "analyst", name: "Analyst", can: "Read analytics, enquiries, audits and the activity log.", cant: "Change anything." },
+  { id: "auditor", name: "Auditor", can: "Read audits and the activity log.", cant: "Change anything or see enquiries." },
+];
 
 function TeamTab() {
   const staff = useLoad<Row[]>(async () => check(await db.rpc("site_staff")));
@@ -331,16 +373,14 @@ function TeamTab() {
     <div className="space-y-4">
       <Card title="Roles">
         <ul className="grid gap-2 text-sm sm:grid-cols-3">
-          <li className="rounded-xl border border-border p-3"><p className="font-semibold">Admin</p><p className="text-xs text-muted-foreground">Everything: publish designs, manage roles, delete reports.</p></li>
-          <li className="rounded-xl border border-border p-3"><p className="font-semibold">Editor</p><p className="text-xs text-muted-foreground">Run audits, triage findings, save design drafts. Can't publish or change roles.</p></li>
-          <li className="rounded-xl border border-border p-3"><p className="font-semibold">Auditor</p><p className="text-xs text-muted-foreground">Read audits and the activity log only.</p></li>
+          {ROLE_INFO.map((r) => <li key={r.id} className="rounded-xl border border-border p-3"><p className="font-semibold">{r.name}</p><p className="text-xs text-muted-foreground">{r.can}</p><p className="mt-1 text-[11px] text-muted-foreground">Can't: {r.cant}</p></li>)}
         </ul>
-        <p className="mt-3 text-xs text-muted-foreground">Enforced in the database on every request. Marketing, developer and analyst roles aren't separate yet; use editor or auditor for now.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Enforced in the database (site_can and row-level security) on every request, not just hidden in this page. Publishing anything to visitors, restores and role changes stay with admins.</p>
       </Card>
       <Card title="Grant a role">
         <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); if (email.includes("@")) change(email, role, true); }}>
           <input className="input flex-1" type="email" required placeholder="Their account email" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Account email" />
-          <select className="input w-auto" value={role} onChange={(e) => setRole(e.target.value)} aria-label="Role"><option value="editor">Editor</option><option value="auditor">Auditor</option></select>
+          <select className="input w-auto" value={role} onChange={(e) => setRole(e.target.value)} aria-label="Role">{ROLE_INFO.filter((r) => r.id !== "admin").map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select>
           <Btn type="submit" tone="primary">Grant</Btn>
         </form>
         <p className="mt-2 text-xs text-muted-foreground">They need an existing account with a verified email. Admin rights can only be granted directly in the database.</p>

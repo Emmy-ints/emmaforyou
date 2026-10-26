@@ -1,3 +1,4 @@
+import { Flag } from "@/components/future/Flag";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
@@ -134,28 +135,28 @@ function HomePage() {
         <ResultsTicker />
         <GrowthStory />
         <SelectedWork />
-        <ToolsHub />
+        <Flag id="home-tools"><ToolsHub /></Flag>
         <SocialProofBar />
-        <PrototypeBuilder />
+        <Flag id="home-prototype"><PrototypeBuilder /></Flag>
         <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
-        <ServiceExplorer />
-        <SolutionFinder />
+        <Flag id="home-explorer"><ServiceExplorer /></Flag>
+        <Flag id="home-finder"><SolutionFinder /></Flag>
         <NicheShowcase />
         <AnalyserTeaser />
         <RoiSection />
         <ComparisonTable />
-        <StatsSection />
-        <TestimonialsPreview />
-        <TrustBadges />
+        <Flag id="home-stats"><StatsSection /></Flag>
+        <Flag id="home-testimonials"><TestimonialsPreview /></Flag>
+        <Flag id="home-trust"><TrustBadges /></Flag>
         <AboutTeaser />
         <MissionSection />
-        <CountdownUrgency />
+        <Flag id="home-countdown"><CountdownUrgency /></Flag>
         <IntakeSection />
         <StrategyCallSection />
         <FaqAccordion />
-        <WaitlistSection />
+        <Flag id="home-waitlist"><WaitlistSection /></Flag>
       </main>
       <Footer />
       <FloatingWhatsApp />

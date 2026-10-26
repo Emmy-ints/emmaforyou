@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import ProjectVisual from "./ProjectVisual";
+import { useSettings } from "@/lib/site-settings";
+import { liveImage, liveStandIn } from "@/lib/portfolio-live";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { featuredFor, projectSlug, type Project } from "@/lib/portfolio-data";
@@ -18,7 +20,8 @@ export const isStandInImage = (p: Project) => !featuredFor(p.name);
  * and stock photos standing in for the client's own screenshots are labelled as such.
  */
 export default function ProjectCard({ p, index = 0, size = "md", className = "" }: { p: Project; index?: number; size?: "md" | "lg"; className?: string }) {
-  const standIn = isStandInImage(p);
+  const settings = useSettings();
+  const standIn = liveStandIn(p, settings);
   const [state, setState] = useState<"loading" | "ok" | "broken">("loading");
   return (
     <motion.article
@@ -31,7 +34,7 @@ export default function ProjectCard({ p, index = 0, size = "md", className = "" 
       <Link to="/portfolio/$slug" params={{ slug: projectSlug(p.name) }} className="pc-link" aria-label={`${p.name} case study`}>
         <div className="pc-media" data-scroll>
           {state === "broken" ? <ProjectVisual p={p} className="pc-img" /> : (
-            <img src={projectImage(p)} alt="" loading="lazy" decoding="async" className="pc-img" data-state={state}
+            <img src={liveImage(p, settings)} alt="" loading="lazy" decoding="async" className="pc-img" data-state={state}
               ref={(el) => { if (el?.complete && state === "loading") setState(el.naturalWidth > 0 ? "ok" : "broken"); }}
               onLoad={() => setState("ok")} onError={() => setState("broken")} />
           )}

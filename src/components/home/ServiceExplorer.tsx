@@ -2,7 +2,8 @@ import { useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, RotateCcw, Search } from "lucide-react";
 import SectionHead from "../future/SectionHead";
-import { FAMILIES, catalog, type FamilyId } from "@/lib/service-catalog";
+import { FAMILIES, catalog, withOverrides, type FamilyId } from "@/lib/service-catalog";
+import { useFlag, useSettings } from "@/lib/site-settings";
 import { prefersReduced } from "@/lib/motion";
 
 const STEP = 360 / FAMILIES.length;
@@ -15,7 +16,9 @@ const STEP = 360 / FAMILIES.length;
  * becomes a flat set of buttons; everything is reachable by keyboard.
  */
 export default function ServiceExplorer() {
-  const items = useMemo(() => catalog(), []);
+  const settings = useSettings();
+  const showWorld = useFlag("explore-world");
+  const items = useMemo(() => withOverrides(catalog(), settings), [settings]);
   const [family, setFamily] = useState<FamilyId>("web");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<string | null>(null);
@@ -45,6 +48,7 @@ export default function ServiceExplorer() {
           title="Explore every service on one map" shine={["every", "service"]}
           sub="Websites, ecommerce, UI/UX, AI agents, automation, apps, marketing, Web3 and strategy. Turn the map, pick an area, or search for exactly what you need." />
 
+        {showWorld && <p className="mt-4 text-center"><Link to="/explore" className="nav-ghost h-auto px-5 py-2 text-sm">Prefer to wander? Enter the 3D service world <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></p>}
         <div className="sex-grid mt-12">
           <div className="sex-stage lg-strong">
             <div className={`sex-viewport ${dragging ? "is-dragging" : ""}`}

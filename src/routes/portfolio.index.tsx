@@ -7,6 +7,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProjectCard from "../components/portfolio/ProjectCard";
 import ClientWall from "../components/portfolio/ClientWall";
+import { useSettings } from "@/lib/site-settings";
+import { liveProjects } from "@/lib/portfolio-live";
 import { ADS, AUTOMATIONS, FEATURED, PROJECTS, SOCIAL_BEFORE_AFTER, VIDEOS, findProject, projectSlug } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
@@ -43,7 +45,8 @@ const reveal = {
 function PortfolioPage() {
   const categories = useMemo(() => ["All", ...Array.from(new Set(PROJECTS.map((p) => p.category)))], []);
   const [filter, setFilter] = useState("All");
-  const shown = PROJECTS.filter((p) => filter === "All" || p.category === filter);
+  const settings = useSettings();
+  const shown = liveProjects(settings).filter((p) => filter === "All" || p.category === filter);
   const videos = VIDEOS.filter((v) => v.url);
 
   return (

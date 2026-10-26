@@ -81,8 +81,8 @@ export interface FinderResult {
   plan: { name: string; price: string } | null; tools: { to: string; label: string }[]; brief: string;
 }
 
-export function findSolutions(input: FinderInput): FinderResult {
-  const all = catalog();
+export function findSolutions(input: FinderInput, items?: CatalogItem[]): FinderResult {
+  const all = items ?? catalog();
   const byId = new Map(all.map((i) => [i.id, i]));
   const score = new Map<string, { s: number; why: Set<string> }>();
   const add = (id: string, s: number, why: string) => {

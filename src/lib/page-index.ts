@@ -44,6 +44,8 @@ const STATIC: PageEntry[] = [
   { kind: "Page", title: "Watch how it works", href: "/watch", keywords: "video" },
   { kind: "Page", title: "Newsletter", href: "/newsletter", keywords: "email subscribe" },
   { kind: "Page", title: "All free tools", href: "/tools" },
+  { kind: "Page", title: "Service world (3D map)", href: "/explore", keywords: "3d immersive map world explore districts" },
+  { kind: "Page", title: "EmmaForYou Lab (beta tools)", href: "/lab", keywords: "lab beta new tools experiments" },
   { kind: "Tool", title: "Ecommerce Intelligence", href: "/ecommerce", keywords: "store shop online" },
   { kind: "Tool", title: "Ecommerce launch roadmap", href: "/ecommerce/start", keywords: "start store" },
   { kind: "Tool", title: "Product research & validation", href: "/ecommerce/research" },

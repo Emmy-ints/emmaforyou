@@ -1,3 +1,4 @@
+import { useSettings } from "@/lib/site-settings";
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { LayoutGroup, motion } from "framer-motion";
@@ -24,7 +25,7 @@ interface Tool {
   href: { hash: string } | { to: string } | { external: string } | { event: string };
 }
 
-const TOOLS: Tool[] = [
+export const TOOLS: Tool[] = [
   // Try it now
   { group: "try", icon: Bot, name: "AI receptionist demo", does: "Chat with, or talk out loud to, an AI receptionist for a sample salon, clinic or restaurant. Ask prices, then book an appointment.", get: "A feel for how your customers would get instant replies and bookings 24/7.", meta: "Live demo · voice", cta: "Talk to it", href: { to: "/ai-receptionist" } },
   { group: "try", icon: Globe, name: "AI website audit", does: "Enter your website address. We check speed on a phone (Google Lighthouse), SEO, contact buttons, trust and more.", get: "A score out of 100, a phone screenshot, the top 5 fixes and a downloadable PDF report.", meta: "Free · ~1 minute", cta: "Audit my website", href: { to: "/website-audit" } },
@@ -102,9 +103,11 @@ export default function ToolsHub() {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const active = GROUPS.find((g) => g.id === group)!;
   const query = q.trim().toLowerCase();
+  const settings = useSettings();
+  const ALL = TOOLS.filter((t) => !("to" in t.href && settings[`tool:${t.href.to}`]?.hidden));
   const tools = query
-    ? TOOLS.filter((t) => `${t.name} ${t.does} ${t.get} ${t.meta}`.toLowerCase().includes(query))
-    : TOOLS.filter((t) => t.group === group);
+    ? ALL.filter((t) => `${t.name} ${t.does} ${t.get} ${t.meta}`.toLowerCase().includes(query))
+    : ALL.filter((t) => t.group === group);
 
   // Tabs follow the ARIA pattern: arrow keys / Home / End move between categories.
   const onTabKey = (e: React.KeyboardEvent, i: number) => {
@@ -139,7 +142,7 @@ export default function ToolsHub() {
                     onClick={() => { setQ(""); setGroup(g.id); }} onKeyDown={(e) => onTabKey(e, i)} className="th-tab">
                     {sel && <motion.span layoutId="th-pill" className="th-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
                     <span className="relative">{g.label}</span>
-                    <span className="relative th-count">{TOOLS.filter((t) => t.group === g.id).length}</span>
+                    <span className="relative th-count">{ALL.filter((t) => t.group === g.id).length}</span>
                   </button>
                 );
               })}
@@ -186,12 +189,13 @@ export default function ToolsHub() {
 }
 
 function ToolCard({ t }: { t: Tool }) {
+  const settings = useSettings();
   const Icon = t.icon;
   const body = (
     <>
       <div className="flex items-start justify-between gap-3">
         <span className="th-icon"><Icon /></span>
-        <span className="th-meta">{t.meta}</span>
+        <span className="th-meta">{t.meta}{"to" in t.href && settings[`tool:${t.href.to}`]?.status && settings[`tool:${t.href.to}`].status !== "live" ? ` · ${settings[`tool:${t.href.to}`].status === "beta" ? "Beta" : "Prototype"}` : ""}</span>
       </div>
       <h3 className="mt-5 font-display text-lg font-semibold text-white">{t.name}</h3>
       <p className="mt-2 text-sm leading-relaxed text-[#c9ccec]"><span className="text-[#8f94bf]">What it does: </span>{t.does}</p>

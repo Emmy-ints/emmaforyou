@@ -1,4 +1,5 @@
 // @ts-nocheck -- generated DB/router types lag behind; runtime verified
+import { useSettings } from "@/lib/site-settings";
 import { Fragment, useState, useEffect, useCallback, useRef, useId, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
@@ -91,12 +92,17 @@ const SECTION_PATHS: Record<MenuKey, string[]> = {
 
 /* ------------------------------------------------------------------ component */
 
+/** Menu entries the owner can hide from the control room (Navigation). */
+export const NAV_MENUS = { Resources: LEARN, Tools: TOOLS, Company: COMPANY };
+
 export default function Navbar() {
   const { t } = useI18n();
   const account = useAccount();
   const signedIn = account.ready && account.signedIn;
   const accountItems = ACCOUNT.filter((a) => !a.adminOnly || !signedIn || account.summary?.admin);
   const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const navSettings = useSettings();
+  const vis = (i: { to: string }) => !navSettings[`nav:${i.to}`]?.hidden;
   const onInkHero = pathname === "/" || pathname.startsWith("/services/") || pathname.startsWith("/expertise/") || pathname.startsWith("/portfolio") || /^\/(fr|de)$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -352,18 +358,18 @@ export default function Navbar() {
             <div className="grid grid-cols-[1fr_1.35fr] gap-2 p-1">
               <div className="p-2">
                 {Heading({ children: <>Learn</> })}
-                {LEARN.map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}
+                {LEARN.filter(vis).map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}
               </div>
               <div className="rounded-xl bg-muted/50 p-2">
                 <div className="flex items-center justify-between pr-2">{Heading({ children: <>Free tools</> })}<Link to="/tools" onClick={close} className="nav-feature-link text-xs">All tools <ArrowRight className="h-3 w-3" aria-hidden="true" /></Link></div>
-                <div className="grid grid-cols-2">{TOOLS.map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}</div>
+                <div className="grid grid-cols-2">{TOOLS.filter(vis).map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}</div>
               </div>
             </div>
           </> })}
 
           {Panel({ k: "company", width: "w-[720px] max-w-[calc(100vw-32px)]", children: <>
             <div className="grid grid-cols-[1fr_230px] gap-2">
-              <div className="grid grid-cols-2 p-1">{COMPANY.map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}</div>
+              <div className="grid grid-cols-2 p-1">{COMPANY.filter(vis).map((i) => <Fragment key={i.to}>{MenuLink({ item: i })}</Fragment>)}</div>
               <aside className="nav-feature">
                 <p className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-[var(--emma-violet)]">Talk to us</p>
                 <p className="mt-2 font-display text-[0.98rem] font-semibold leading-snug text-foreground">A free 30-minute strategy call, or a quick WhatsApp chat.</p>
@@ -442,13 +448,13 @@ export default function Navbar() {
             {MobileTop({ to: "/community", label: "Community", badge: "Ask & share" })}
             {MobileTop({ to: "/blog", label: "Blog" })}
             {MobileGroup({ k: "resources", label: "Resources & tools", children: <>
-              {LEARN.filter((i) => i.to !== "/community" && i.to !== "/blog").map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
+              {LEARN.filter((i) => vis(i) && i.to !== "/community" && i.to !== "/blog").map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
               <p className="nav-menu-heading mt-2 px-3"><Wrench className="mr-1 inline h-3 w-3" aria-hidden="true" />Free tools</p>
               {MobileLink({ to: "/tools", label: "All free tools" })}
-              {TOOLS.map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
+              {TOOLS.filter(vis).map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
             </> })}
             {MobileGroup({ k: "company", label: "Company", children: <>
-              {COMPANY.map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
+              {COMPANY.filter(vis).map((i) => <Fragment key={i.to}>{MobileLink({ to: i.to, label: i.name })}</Fragment>)}
             </> })}
             {MobileTop({ to: "/pricing", label: "Pricing" })}
           </nav>

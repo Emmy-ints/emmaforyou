@@ -5,10 +5,10 @@
  * evidence it was based on; nothing is guessed. Results can be saved to `site_audit_reports`.
  */
 import { pageIndex } from "./page-index";
-import { PROJECTS, featuredFor, projectSlug } from "./portfolio-data";
+import { FEATURED, PROJECTS, featuredFor, projectSlug } from "./portfolio-data";
 
 export type Severity = "high" | "medium" | "low" | "info";
-export interface Finding { key: string; type: string; severity: Severity; route: string; title: string; evidence: string; fix: string; confirmed: boolean }
+export interface Finding { key: string; type: string; severity: Severity; route: string; title: string; evidence: string; fix: string; confirmed: boolean; data?: { title?: string; description?: string; target?: string; src?: string; routes?: string[] } }
 export interface PageResult { route: string; status: number; ms: number; title: string; description: string; h1: number; canonical: string; noindex: boolean; images: string[]; links: string[]; error?: string }
 export interface AuditRun { pages: PageResult[]; findings: Finding[]; images: { src: string; ok: boolean; pages: string[] }[]; startedAt: string; finishedAt: string }
 
@@ -47,7 +47,7 @@ async function pool<T, R>(items: T[], n: number, fn: (t: T) => Promise<R>, onDon
   return out;
 }
 
-export async function runAudit(opts: { routes?: string[]; onProgress?: (done: number, total: number, phase: string) => void; signal?: { cancelled: boolean } } = {}): Promise<AuditRun> {
+export async function runAudit(opts: { routes?: string[]; onProgress?: (done: number, total: number, phase: string) => void; signal?: { cancelled: boolean }; /** Re-check only these pages (and their links): no catalogue image or asset checks. */ skipExtras?: boolean } = {}): Promise<AuditRun> {
   const startedAt = new Date().toISOString();
   const routes = opts.routes ?? [...new Set(pageIndex().map((p) => p.href).filter((h) => h.startsWith("/")))];
   let done = 0; const total = routes.length;
@@ -62,6 +62,9 @@ export async function runAudit(opts: { routes?: string[]; onProgress?: (done: nu
 
   const imgPages = new Map<string, string[]>();
   for (const p of pages) for (const src of p.images) imgPages.set(src, [...(imgPages.get(src) ?? []), p.route]);
+  // Images that render only in the browser (lazy sections) never appear in server HTML; check the known sources too.
+  const known: [string, string][] = [["/images/emmanuel.webp", "/about"], ...FEATURED.map((f) => [f.img, "/"] as [string, string]), ...PROJECTS.map((p) => [p.img, `/portfolio/${projectSlug(p.name)}`] as [string, string])];
+  if (!opts.skipExtras) for (const [src, route] of known) if (src && !src.startsWith("data:")) imgPages.set(src, [...new Set([...(imgPages.get(src) ?? []), route])]);
   const srcs = [...imgPages.keys()];
   done = 0;
   const imgOk = await pool(srcs, 6, checkImage, () => opts.onProgress?.(++done, srcs.length, "Images"));
@@ -73,18 +76,18 @@ export async function runAudit(opts: { routes?: string[]; onProgress?: (done: nu
   for (const p of pages) {
     if (p.status === -1) continue;
     if (p.status === 0 || p.status >= 400) { add({ type: "route", severity: "high", route: p.route, title: `Page returns ${p.status || "no response"}`, evidence: p.error ?? `HTTP ${p.status}`, fix: "Check the route and its loader; restore the page or add a redirect.", confirmed: true }); continue; }
-    if (!p.title) add({ type: "title", severity: "medium", route: p.route, title: "Missing page title", evidence: "<title> is empty", fix: "Set a title in the route's head().", confirmed: true });
+    if (!p.title) add({ type: "title", severity: "medium", route: p.route, title: "Missing page title", evidence: "<title> is empty", fix: "Set a title in the route's head().", confirmed: true, data: { title: p.title, description: p.description } });
     else titles.set(p.title, [...(titles.get(p.title) ?? []), p.route]);
-    if (!p.description) add({ type: "description", severity: "low", route: p.route, title: "Missing meta description", evidence: 'No <meta name="description">', fix: "Add a description in pageHead().", confirmed: true });
+    if (!p.description) add({ type: "description", severity: "low", route: p.route, title: "Missing meta description", evidence: 'No <meta name="description">', fix: "Add a description in pageHead().", confirmed: true, data: { title: p.title, description: p.description } });
     if (p.h1 !== 1) add({ type: "h1", severity: "medium", route: p.route, title: p.h1 === 0 ? "No main heading (h1)" : `${p.h1} main headings (h1)`, evidence: `${p.h1} <h1> elements in the server HTML`, fix: "Each page should have exactly one h1.", confirmed: true });
-    if (p.noindex && !/^\/(inspiration\/|community\/|dashboard|portal|account|login|unsubscribe)/.test(p.route)) add({ type: "noindex", severity: "info", route: p.route, title: "Page is hidden from search engines", evidence: "robots meta contains noindex", fix: "Confirm this is intended.", confirmed: true });
+    if (p.noindex && !/^\/(inspiration\/|community\/|dashboard|portal|account|login|unsubscribe|ecommerce\/workspace)/.test(p.route)) add({ type: "noindex", severity: "info", route: p.route, title: "Page is hidden from search engines", evidence: "robots meta contains noindex", fix: "Confirm this is intended.", confirmed: true });
     if (p.ms > 4000) add({ type: "slow", severity: "low", route: p.route, title: `Slow server response (${(p.ms / 1000).toFixed(1)} s)`, evidence: `${p.ms} ms to first full HTML from your browser`, fix: "Check the route's loader and any server calls.", confirmed: true });
-    for (const l of p.links) { const st = statusOf.get(l); if (st !== undefined && (st === 0 || st >= 400)) add({ type: "link", severity: "high", route: p.route, title: `Broken internal link to ${l}`, evidence: `${l} returned ${st || "no response"}`, fix: "Point the link at an existing route.", confirmed: true }); }
+    for (const l of p.links) { const st = statusOf.get(l); if (st !== undefined && (st === 0 || st >= 400)) add({ type: "link", severity: "high", route: p.route, title: `Broken internal link to ${l}`, evidence: `${l} returned ${st || "no response"}`, fix: "Point the link at an existing route, or redirect the old address.", confirmed: true, data: { target: l } }); }
   }
-  for (const [t, rs] of titles) if (rs.length > 1) add({ type: "dup-title", severity: "low", route: rs[0], title: `${rs.length} pages share the same title`, evidence: `"${t.slice(0, 80)}" on ${rs.slice(0, 4).join(", ")}${rs.length > 4 ? "…" : ""}`, fix: "Give each page a distinct title.", confirmed: true });
-  for (const im of images) if (!im.ok) add({ type: "image", severity: "high", route: im.pages[0], title: "Image fails to load", evidence: `${im.src.slice(0, 160)} (on ${im.pages.length} page${im.pages.length > 1 ? "s" : ""})`, fix: "Replace the file or URL; cards now fall back to a labelled preview meanwhile.", confirmed: true });
+  for (const [t, rs] of titles) if (rs.length > 1) add({ type: "dup-title", severity: "low", route: rs[0], title: `${rs.length} pages share the same title`, evidence: `"${t.slice(0, 80)}" on ${rs.slice(0, 4).join(", ")}${rs.length > 4 ? "…" : ""}`, fix: "Give each page a distinct title.", confirmed: true, data: { title: t, routes: rs } });
+  for (const im of images) if (!im.ok) add({ type: "image", severity: "high", route: im.pages[0], title: "Image fails to load", evidence: `${im.src.slice(0, 160)} (on ${im.pages.length} page${im.pages.length > 1 ? "s" : ""})`, fix: "Replace the file or URL; cards now fall back to a labelled preview meanwhile.", confirmed: true, data: { src: im.src, routes: im.pages } });
   // Asset completeness (from the owner's portfolio records, not from the scan).
-  for (const p of PROJECTS) if (!featuredFor(p.name)) add({ type: "asset", severity: "info", route: `/portfolio/${projectSlug(p.name)}`, title: `${p.name}: stock photo instead of a real screenshot`, evidence: "portfolio-data marks PROJECTS images as stand-ins", fix: "Add the client's own screenshot to portfolio-data.", confirmed: true });
+  if (!opts.skipExtras) for (const p of PROJECTS) if (!featuredFor(p.name)) add({ type: "asset", severity: "info", route: `/portfolio/${projectSlug(p.name)}`, title: `${p.name}: stock photo instead of a real screenshot`, evidence: "portfolio-data marks PROJECTS images as stand-ins", fix: "Add the client's own screenshot to portfolio-data.", confirmed: true });
 
   const order: Record<Severity, number> = { high: 0, medium: 1, low: 2, info: 3 };
   findings.sort((a, b) => order[a.severity] - order[b.severity]);

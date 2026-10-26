@@ -10,6 +10,8 @@ import { ORG_DESCRIPTION, VERIFICATION_META, founderLd, organizationLd, websiteL
 import appCss from "../styles.css?url";
 import PageTranslator from "../components/tools/PageTranslator";
 import VoiceAsk from "../components/tools/VoiceAsk";
+import SiteRuntime from "../components/future/SiteRuntime";
+import { Flag } from "../components/future/Flag";
 import ConversionLayer from "../components/tools/ConversionLayer";
 import MotionRuntime from "../components/future/MotionRuntime";
 import SearchLauncher from "../components/future/SearchLauncher";
@@ -66,9 +68,10 @@ function RootComponent() {
       <AnalyticsTracker />
       <MotionRuntime />
       <DesignTokens />
+      <SiteRuntime />
       <Outlet />
       <PageTranslator />
-      <VoiceAsk />
+      <Flag id="ask-emma"><VoiceAsk /></Flag>
       <ConversionLayer />
       <SearchLauncher />
       <ScrollTop />

@@ -1,3 +1,4 @@
+import { ClaimGate, ClaimTag } from "./future/ClaimTag";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -245,7 +246,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
               <p>What makes his approach different is access — clients chat with Emmanuel directly on WhatsApp. No account managers. No layers. Just real conversations and real results.</p>
               <blockquote className="border-l-2 border-[color:var(--emma-violet)] pl-4 italic text-foreground">"Every business is one well-built system away from doubling. We just build that system."</blockquote>
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">500+ Businesses Helped · 3 Continents · 6+ Years Experience · Nigeria · USA · Europe · Africa</p>
+            <ClaimGate id="expertise-line"><p className="mt-6 text-sm text-muted-foreground">500+ Businesses Helped · 3 Continents · 6+ Years Experience · Nigeria · USA · Europe · Africa <ClaimTag id="expertise-line" /></p></ClaimGate>
           </div>
         </div>
       </Block>

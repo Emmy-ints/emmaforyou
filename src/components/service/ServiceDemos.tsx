@@ -67,7 +67,7 @@ export function DashboardDemo({ title }: { title: string }) {
           <div key={i} className="flex flex-1 flex-col items-center gap-1.5" title={`Week ${i + 1}: ${w} enquiries`}>
             <motion.div
               className="w-full rounded-t-[5px]"
-              style={{ background: i === weeks.length - 1 ? "linear-gradient(180deg,#3dd6f5,#6d5bff)" : "rgba(139,123,255,0.55)" }}
+              style={{ background: i === weeks.length - 1 ? "linear-gradient(180deg,var(--emma-cyan),var(--emma-violet))" : "rgba(139,123,255,0.55)" }}
               initial={reduce ? false : { height: 0 }}
               whileInView={{ height: `${(w / max) * 100}%` }}
               viewport={{ once: true }}

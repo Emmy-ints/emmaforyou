@@ -2,12 +2,28 @@ import { TIERS } from "../pricing-data";
 import { clip } from "../seo";
 import { ENGINE_TITLES } from "./engine-titles";
 import type { Solution } from "./types";
+import { ALL_SOLUTIONS } from "./index";
+
+const SUFFIX: Record<string, string> = { websites: "Website", "business-apps": "App", "ai-solutions": "AI", automations: "Automation", "device-apps": "App" };
+let DUP: Set<string> | null = null;
+/** Names used by more than one solution area (e.g. "Client Portal" as a website and as an app). */
+function duplicated(): Set<string> {
+  if (DUP) return DUP;
+  const seen = new Map<string, number>();
+  for (const x of ALL_SOLUTIONS) { const k = x.name.toLowerCase(); seen.set(k, (seen.get(k) ?? 0) + 1); }
+  DUP = new Set([...seen].filter(([, n]) => n > 1).map(([k]) => k));
+  return DUP;
+}
 
 const starter = TIERS.find((t) => t.name === "Starter");
 
 export function solutionSeoTitle(s: Solution): string {
-  const base = s.name.replace(/\s*\([^)]*\)/, "");
-  const opts = [`${s.name}: Features & Live Demo`, `${base}: Features & Live Demo`, `${base} — Live Demo`, base];
+  let base = s.name.replace(/\s*\([^)]*\)/, "");
+  // Two areas can share a name; keep titles unique by naming the kind of build.
+  const suf = SUFFIX[s.category];
+  if (suf && duplicated().has(s.name.toLowerCase()) && !new RegExp(`\\b${suf}\\b`, "i").test(base)) base = `${base} ${suf}`;
+  const named = base === s.name.replace(/\s*\([^)]*\)/, "") ? s.name : base;
+  const opts = [`${named}: Features & Live Demo`, `${base}: Features & Live Demo`, `${base} — Live Demo`, base];
   return opts.find((t) => t.length <= 60) ?? base.slice(0, 60);
 }
 

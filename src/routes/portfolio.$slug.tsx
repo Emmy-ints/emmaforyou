@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, Layers, Target } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import ProjectCard, { projectImage, isStandInImage } from "../components/portfolio/ProjectCard";
+import ProjectCard from "../components/portfolio/ProjectCard";
+import { useSettings } from "@/lib/site-settings";
+import { liveImage, liveStandIn } from "@/lib/portfolio-live";
 import { SafeProjectImage } from "../components/portfolio/ProjectVisual";
 import { PROJECTS, featuredFor, findProject, projectSlug, socialFor } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
@@ -70,6 +72,7 @@ const reveal = {
 
 function CaseStudyPage() {
   const { project: p, study } = Route.useLoaderData();
+  const settings = useSettings();
   const featured = featuredFor(p.name);
   const social = socialFor(p.name);
   const service = SERVICE_FOR_CATEGORY[p.category] ?? SERVICE_FOR_CATEGORY.Websites;
@@ -113,8 +116,8 @@ function CaseStudyPage() {
 
         <section className="relative -mt-px bg-[#0b0d24] px-5 pb-20 md:px-8">
           <motion.figure initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="cs-media csx-media mx-auto max-w-7xl" data-scroll>
-            <SafeProjectImage p={p} src={projectImage(p)} alt={`${p.name} project`} className="csx-img h-full w-full object-cover" />
-            {isStandInImage(p) && <figcaption className="pc-standin">Illustrative photo — the client's own screenshots will replace it</figcaption>}
+            <SafeProjectImage p={p} src={liveImage(p, settings)} alt={`${p.name} project`} className="csx-img h-full w-full object-cover" />
+            {liveStandIn(p, settings) && <figcaption className="pc-standin">Illustrative photo — the client's own screenshots will replace it</figcaption>}
           </motion.figure>
         </section>
 

@@ -61,3 +61,13 @@ export function catalog(): CatalogItem[] {
 }
 
 export const itemsIn = (f: FamilyId) => catalog().filter((i) => i.family === f);
+
+/** Apply the owner's published overrides (hide, rename, reorder, feature) on top of the code catalogue. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function withOverrides(items: CatalogItem[], settings: Record<string, any>): (CatalogItem & { featured?: boolean })[] {
+  return items
+    .map((it, i) => { const o = settings[`service:${it.id}`]; return { it: o ? { ...it, name: o.name || it.name, short: o.short || it.short, featured: !!o.featured } : it, hidden: !!o?.hidden, order: typeof o?.order === "number" ? o.order : 500 + i }; })
+    .filter((x) => !x.hidden)
+    .sort((a, b) => a.order - b.order)
+    .map((x) => x.it);
+}

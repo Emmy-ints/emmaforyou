@@ -95,7 +95,7 @@ export default function ServiceInquiryForm({ serviceName, serviceSlug, questions
         <textarea className="roi-dark-input min-h-[90px] sm:col-span-2" placeholder="Anything else we should know? (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} aria-label="Anything else" />
       </div>
       <label className="mt-3 flex items-start gap-2.5 text-xs text-[#a6abd0]">
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 accent-[#6d5bff]" />
+        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 accent-[var(--emma-violet)]" />
         It's OK to contact me on WhatsApp or email about this enquiry.
       </label>
       {error && <p role="alert" className="mt-3 text-sm text-[#ffb4b4]">{error}</p>}

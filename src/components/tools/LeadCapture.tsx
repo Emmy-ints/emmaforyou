@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as unknown as { from: (t: string) => any };
 
-export type ToolName = "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "App planner" | "Solution enquiry";
+export type ToolName = "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "App planner" | "Solution enquiry" | "Lab enquiry";
 
 /** Small "talk to a human" form used at the end of a tool. Saves to tool_requests (owner emailed). */
 export function LeadCapture({ tool, title, lead, button, summary, compact = false }: { tool: ToolName; title: string; lead: string; button: string; summary: string; compact?: boolean }) {

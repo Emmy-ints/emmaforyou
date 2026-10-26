@@ -1,4 +1,5 @@
 import SectionHead from "./future/SectionHead";
+import { ClaimGate, ClaimTag } from "./future/ClaimTag";
 
 export const TESTIMONIALS = [
   { name: "Chioma Okafor", biz: "Fashion Store", loc: "Lagos, Nigeria", text: "EmmaForYou transformed our Instagram from 200 to 3,000 followers in 6 weeks. Sales doubled.", rating: 5 },
@@ -67,10 +68,15 @@ function MarqueeRow({ items, reverse }: { items: typeof TESTIMONIALS; reverse?: 
  * swipeable rows with scroll snapping.
  */
 export default function TestimonialsPreview() {
+  return <ClaimGate id="home-testimonials"><TestimonialsBody /></ClaimGate>;
+}
+
+function TestimonialsBody() {
   return (
     <section className="tp section-padding overflow-hidden" aria-labelledby="tp-h">
       <SectionHead id="tp-h" align="center" className="max-w-3xl px-0" kicker="Testimonials" title="500+ Businesses. Real Results." shine={["Real", "Results"]}
         sub="Don't take our word for it — hear from businesses we've helped transform." />
+      <p className="mt-3 text-center"><ClaimTag id="home-testimonials" /></p>
 
       <div className="tp-stage mt-12" data-no-reveal>
         <MarqueeRow items={ROW1} />

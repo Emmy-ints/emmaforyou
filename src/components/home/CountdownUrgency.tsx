@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useSetting } from "@/lib/site-settings";
+import { ClaimTag } from "../future/ClaimTag";
+import { useClaim } from "@/lib/claims";
 
 function useCountdown() {
   const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0 });
@@ -20,9 +23,9 @@ function useCountdown() {
   return t;
 }
 
-/** Update these each month: how many onboarding spots you offer and how many are filled. */
-const MONTHLY_SPOTS = 20;
-const SPOTS_TAKEN = 12;
+/** Defaults; the owner sets the real monthly figures in the control room (Content → Claims → countdown). */
+const DEFAULT_SPOTS = 20;
+const DEFAULT_TAKEN = 12;
 
 const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1?text=" + encodeURIComponent("Hi EmmaForYou! I'd like to book a spot for this month's onboarding.");
 
@@ -32,13 +35,18 @@ const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1?text=" + encodeURICom
  */
 export default function CountdownUrgency() {
   const t = useCountdown();
+  const cfg = useSetting("countdown");
+  const claim = useClaim("countdown");
+  const MONTHLY_SPOTS = typeof cfg?.spots === "number" ? cfg.spots : DEFAULT_SPOTS;
+  const SPOTS_TAKEN = Math.min(MONTHLY_SPOTS, typeof cfg?.taken === "number" ? cfg.taken : DEFAULT_TAKEN);
   const pct = (SPOTS_TAKEN / MONTHLY_SPOTS) * 100;
+  if (cfg?.on === false || claim.display === "hide") return null;
 
   return (
     <section className="cd band-ink section-padding" aria-labelledby="cd-h">
       <div className="hero-ink-grid" aria-hidden="true" />
       <div className="relative mx-auto max-w-5xl text-center text-white">
-        <span className="cd-chip">⚡ Limited Onboarding Spots</span>
+        <span className="cd-chip">⚡ Limited Onboarding Spots</span> <ClaimTag id="countdown" />
         <h2 id="cd-h" className="mt-6 font-display text-3xl font-semibold tracking-tight md:text-5xl">
           Only <span className="gradient-text-gold">{MONTHLY_SPOTS - SPOTS_TAKEN} Spots Left</span> This Month
         </h2>

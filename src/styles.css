@@ -2258,6 +2258,11 @@ html[data-design] :is(.lg, .lg-strong, .dash-card, .sv-card, .pr-tier, .sex-stag
 .xw-item:hover { border-color: var(--hue); }
 .xw-simple { max-width: 72rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 .xw-simple .text-muted-foreground { color: rgb(238 240 255 / .65); }
+/* Phones: the site's quick-actions bar (72px + safe area, md:hidden) is fixed at the bottom; keep the map's controls and the district panel above it. */
+@media (max-width: 767px) {
+  .xw-stage { height: calc(100dvh - 62px - 72px - env(safe-area-inset-bottom)); min-height: 420px; }
+  .xw-panel { bottom: calc(.75rem + 72px + env(safe-area-inset-bottom)); max-height: 52vh; }
+}
 .xw-grid { display: grid; gap: 1rem; margin-top: 1rem; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
 .xw-card { border-radius: 20px; padding: 1.1rem; border: 1px solid color-mix(in srgb, var(--hue) 40%, transparent); background: rgb(255 255 255 / .04); }
 .xw-link { display: inline-flex; align-items: center; gap: .3rem; font-size: .88rem; color: #fff; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--hue) 60%, transparent); text-underline-offset: 3px; }

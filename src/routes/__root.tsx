@@ -60,12 +60,17 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundComponent,
 });
 
+/** Same rule as DarkModeToggle: saved choice ("efyTheme") first, then the system preference. */
+const THEME_BOOT = `try{var t=localStorage.getItem("efyTheme");if(t!=="dark"&&t!=="light")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const docLang = /^\/fr(\/|$)/.test(pathname) ? "fr" : /^\/de(\/|$)/.test(pathname) ? "de" : "en";
   return (
-    <html lang={docLang}>
+    <html lang={docLang} suppressHydrationWarning>
       <head>
+        {/* Apply the visitor's saved theme before first paint on every page, including pages without the navbar toggle (/explore, dashboards). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
         <HeadContent />
       </head>
       <body>

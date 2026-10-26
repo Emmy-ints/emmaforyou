@@ -58,7 +58,7 @@ function Gate() {
     if (!session) { setPerms(null); return; }
     db.rpc("site_permissions").then(({ data }) => setPerms(Array.isArray(data) ? data : []));
   }, [session]);
-  if (checking || (session && perms === null)) return <Shell><Loading /></Shell>;
+  if (checking || (session && perms === null)) return <Shell><h1 className="sr-only">Website control room</h1><Loading /></Shell>;
   if (!session) return <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold"><KineticText text="Website control room" base={60} /></h1><p className="mb-5 text-sm text-muted-foreground">Sign in with a staff account.</p><AccountAuthForm intent="account" next="/dashboard/site" idPrefix="site-auth" /></div></Shell>;
   if (!perms!.length) return <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold"><KineticText text="Staff only" base={60} /></h1><p className="mt-2 text-sm text-muted-foreground">This account has no website role. An admin can grant editor or auditor access.</p></div></Shell>;
   return <Room perms={perms!} email={session.user.email ?? ""} />;

@@ -103,4 +103,6 @@ Partner badges (Meta, Google, Shopify, Stripe, Microsoft, WhatsApp), "500+" test
 | Redirect validation (live UI) | Protected path and self-redirect refused by the database |
 | Server-rendered SEO (reversible test) | Published a title override for /lab: raw server HTML `<title>` and og:title changed (12/12 samples once rollout finished); rolled back via History → Undo; DB confirms no live override |
 | Activity log | Draft, publish, rollback and redirect save/live/disable/delete all logged with actor and time |
-| Role enforcement (DB, rolled back) | 56/56 |
+| Role enforcement (DB, rolled back) | 56/56 (rerun on final DB) |
+| Live control room | All 13 sections render; AI live test OK (OpenAI, 2.4 s); DB 375 ms; 9 real enquiries listed (not modified); service/claim/announcement save draft → discard; all 8 Lab templates created → tests pass → publish enabled → deleted (nothing published); design preset preview + readability 5.08:1; checkpoint created and restored into drafts (auto pre-restore checkpoint) |
+| Server HTML (live) | /, /login, /account, /blog, /book, /contact, /lab, /explore, /pricing, service + tool + portfolio pages: 200, one h1, public pages indexable with canonical, private noindex; unknown path 404; sitemap 397 URLs without /dashboard; robots disallows /dashboard |

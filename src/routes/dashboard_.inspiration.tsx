@@ -34,7 +34,7 @@ function AdminPage() {
     // Display gate only: the database refuses every admin read/write for non-admins.
     supabase.from("user_roles").select("role").eq("user_id", session.user.id).then(({ data }) => setIsAdmin(Boolean(data?.some((r) => r.role === "admin"))));
   }, [session]);
-  if (checking || (session && isAdmin === null)) return <Shell><Loading /></Shell>;
+  if (checking || (session && isAdmin === null)) return <Shell><h1 className="sr-only">Admin</h1><Loading /></Shell>;
   if (!session) return <Shell><div className="mx-auto mt-10 max-w-sm rounded-3xl border border-border bg-card p-7"><h1 className="mb-1 font-display text-xl font-bold"><KineticText text="Inspiration Library admin" base={60} /></h1><p className="mb-5 text-sm text-muted-foreground">Sign in with an admin account.</p><AccountAuthForm intent="account" next="/dashboard/inspiration" idPrefix="insp-auth" /></div></Shell>;
   if (!isAdmin) return <Shell><div className="mx-auto mt-10 max-w-md rounded-3xl border border-border bg-card p-8 text-center"><Lock className="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" /><h1 className="mt-4 font-display text-2xl font-extrabold"><KineticText text="Admins only" base={60} /></h1></div></Shell>;
   return <Admin />;

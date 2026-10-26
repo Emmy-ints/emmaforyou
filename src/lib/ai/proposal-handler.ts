@@ -20,7 +20,7 @@ export const handleProposal = createServerOnlyFn(async (request: Request) => {
   if (!limit.ok) return limit.response;
 
   const plans = TIERS.map((t) => `- ${t.name}: ${"custom" in t && t.custom ? "custom quote" : `$${t.monthly}/month`} — for ${t.audience}. Includes: ${t.features.join("; ")}`).join("\n");
-  const instructions = `You are Emmanuel Akinloye Oluwaseun, founder of EmmaForYou (AI automation and digital growth agency), drafting a first proposal for a prospective client. Write in clear, confident, plain English for a busy business owner.
+  const instructions = `You are Emmanuel Oluwaseun Akinloye, founder of EmmaForYou (AI automation and digital growth agency), drafting a first proposal for a prospective client. Write in clear, confident, plain English for a busy business owner.
 
 Published monthly plans (the ONLY prices that exist; never state any other price, discount or figure):
 ${plans}

@@ -19,10 +19,10 @@ export default function AboutTeaser() {
         <div className="flex items-center justify-center">
           <div className="ab-portrait" data-scroll data-tilt="4">
             <img src="/images/emmanuel.webp" width={900} height={1350} decoding="async" loading="lazy"
-              alt="Emmanuel Akinloye Oluwaseun — Founder & CEO, EmmaForYou" className="ab-img" />
+              alt="Emmanuel Oluwaseun Akinloye — Founder & CEO, EmmaForYou" className="ab-img" />
             <div className="ab-shade" aria-hidden="true" />
             <div className="ab-plate lg">
-              <p className="font-display text-lg font-semibold text-white">Emmanuel Akinloye Oluwaseun</p>
+              <p className="font-display text-lg font-semibold text-white">Emmanuel Oluwaseun Akinloye</p>
               <p className="text-sm text-white/70">Founder & CEO, EmmaForYou</p>
             </div>
           </div>
@@ -31,7 +31,7 @@ export default function AboutTeaser() {
         <div>
           <SectionHead id="ab-h" kicker="Our story" title="From a Laptop in Nigeria to 3 Continents" shine={["3", "Continents"]} />
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-            EmmaForYou started as one person's dream in Nigeria, Emmanuel Akinloye Oluwaseun, with a laptop, a vision, and an unshakeable belief that African businesses deserve world-class digital tools.
+            EmmaForYou started as one person's dream in Nigeria, Emmanuel Oluwaseun Akinloye, with a laptop, a vision, and an unshakeable belief that African businesses deserve world-class digital tools.
           </p>
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">
             Today, we serve clients across Nigeria, Columbia, United States, Germany, France and Spain. From freelancer to agency, this is just the beginning.

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/compare/$slug")({
       type: "article",
       jsonLd: [
         breadcrumbLd([{ name: "Home", path: "/" }, { name: "Comparisons", path: "/compare" }, { name: c.title, path }]),
-        articleLd({ headline: c.title, description: c.description, path, authorName: "Emmanuel Akinloye Oluwaseun", section: c.category }),
+        articleLd({ headline: c.title, description: c.description, path, authorName: "Emmanuel Oluwaseun Akinloye", section: c.category }),
       ],
     });
   },

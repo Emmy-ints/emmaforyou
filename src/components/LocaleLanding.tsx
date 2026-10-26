@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import NewsletterSignup from "./NewsletterSignup";
 import FutureOrb from "./future/FutureOrb";
+import { SafeProjectImage } from "./portfolio/ProjectVisual";
 import { KineticText } from "./future/Kinetic";
 import { TESTIMONIALS } from "./TestimonialsPreview";
 import { PROJECTS, projectSlug } from "@/lib/portfolio-data";
@@ -88,7 +89,7 @@ export default function LocaleLanding({ code }: { code: LocaleCode }) {
           <ul className="mt-8 grid gap-4 md:grid-cols-3">
             {work.map(({ p, label }) => (
               <li key={p!.name} className="overflow-hidden rounded-[20px] border border-border bg-card shadow-[var(--shadow-card)]" data-tilt="3">
-                <img src={p!.img} alt="" loading="lazy" className="h-40 w-full object-cover" />
+                <SafeProjectImage p={p!} src={p!.img} alt="" className="h-40 w-full object-cover" />
                 <div className="p-5">
                   <p className="text-xs text-muted-foreground">{label}</p>
                   <h3 className="mt-1 font-display text-lg font-semibold">{p!.name}</h3>

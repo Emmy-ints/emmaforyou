@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import SectionHead from "./future/SectionHead";
+import { catalog } from "@/lib/service-catalog";
 
-export type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app";
+export type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app" | "ux" | "web3";
 
-const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: string; tags: string[] }[] = [
+const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: string; tags: string[]; to?: string }[] = [
   { kind: "ai", slug: "ai-automation", id: "service-ai", name: "AI Automation", desc: "Automate follow-ups, bookings, and lead nurturing with intelligent AI systems that work 24/7.", tags: ["WhatsApp & chat agents", "Bookings", "Follow-up"] },
   { kind: "web", slug: "website-design", id: "service-web", name: "Website Design & Dev", desc: "Stunning, conversion-optimized websites that build credibility and capture leads on autopilot.", tags: ["Design", "Development", "SEO-ready"] },
   { kind: "email", slug: "email-marketing", id: "service-email", name: "Email Marketing", desc: "High-converting email sequences that nurture leads, recover abandoned carts, and drive repeat sales.", tags: ["Sequences", "Newsletters"] },
@@ -12,6 +13,8 @@ const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: stri
   { kind: "ads", slug: "ad-marketing", id: "service-ads", name: "Ad Marketing", desc: "Targeted ad campaigns on Google, Facebook, and Instagram that deliver measurable ROI.", tags: ["Meta", "Google"] },
   { kind: "ecom", slug: "ecommerce", id: "service-ecommerce", name: "Ecommerce Growth", desc: "End-to-end ecommerce solutions from Shopify setup to conversion optimization and scaling.", tags: ["Shopify", "Conversion"] },
   { kind: "app", slug: "app-development", id: "service-app", name: "App Development", desc: "Custom mobile and web applications that streamline operations and delight your customers.", tags: ["Mobile", "Web apps", "Dashboards"] },
+  { kind: "ux", slug: "ui-ux-design", id: "service-uiux", name: "UI/UX Design", desc: "Interfaces people understand at first glance: research, wireframes, prototypes and design systems for websites and apps.", tags: ["Research", "Prototypes", "Design systems"], to: "/expertise/ui-ux-design" },
+  { kind: "web3", slug: "web3-development", id: "service-web3", name: "Web3 & Blockchain", desc: "dApps, wallet connections, Solidity smart contracts and crypto projects with a Web2-quality experience.", tags: ["dApps", "Solidity", "Wallets"], to: "/expertise/web3-development" },
 ];
 
 /**
@@ -33,7 +36,7 @@ export default function ServicesSection() {
               <div className="sv-scene" aria-hidden="true"><Scene kind={s.kind} /></div>
               <div className="sv-body">
                 <h3 className="font-display text-lg font-semibold text-foreground md:text-xl">
-                  <Link to="/services/$slug" params={{ slug: s.slug }} className="sv-link">{s.name}</Link>
+                  {s.to ? <Link to={s.to} className="sv-link">{s.name}</Link> : <Link to="/services/$slug" params={{ slug: s.slug }} className="sv-link">{s.name}</Link>}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
                 <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={`${s.name} includes`}>
@@ -44,6 +47,9 @@ export default function ServicesSection() {
             </li>
           ))}
         </ul>
+        <div className="mt-8 text-center">
+          <a href="#service-explorer" className="nav-ghost h-auto px-6 py-3">See all {catalog().length} services, expertise areas and solutions <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
     </section>
   );
@@ -95,6 +101,19 @@ export function Scene({ kind }: { kind: Kind }) {
         <div className="svc">
           {[0, 1, 2].map((i) => <span key={i} className="svc-item" style={{ ["--i" as string]: i }} />)}
           <span className="svc-bag"><svg viewBox="0 0 48 48"><path d="M10 16 h28 l-3 26 h-22 z" /><path d="M18 16 a6 6 0 0 1 12 0" /></svg></span>
+        </div>
+      );
+    case "ux":
+      return (
+        <div className="svu">
+          <span className="svu-frame"><i /><i /><i /><b /></span>
+          <span className="svu-cursor" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3l7 17 2.5-7.5L21 10z" /></svg></span>
+        </div>
+      );
+    case "web3":
+      return (
+        <div className="svb">
+          {[0, 1, 2, 3].map((i) => <span key={i} className="svb-block" style={{ ["--i" as string]: i }}><i /></span>)}
         </div>
       );
     case "app":

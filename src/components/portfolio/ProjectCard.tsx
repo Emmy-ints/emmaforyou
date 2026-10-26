@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import ProjectVisual from "./ProjectVisual";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { featuredFor, projectSlug, type Project } from "@/lib/portfolio-data";
@@ -17,6 +19,7 @@ export const isStandInImage = (p: Project) => !featuredFor(p.name);
  */
 export default function ProjectCard({ p, index = 0, size = "md", className = "" }: { p: Project; index?: number; size?: "md" | "lg"; className?: string }) {
   const standIn = isStandInImage(p);
+  const [state, setState] = useState<"loading" | "ok" | "broken">("loading");
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -27,11 +30,15 @@ export default function ProjectCard({ p, index = 0, size = "md", className = "" 
     >
       <Link to="/portfolio/$slug" params={{ slug: projectSlug(p.name) }} className="pc-link" aria-label={`${p.name} case study`}>
         <div className="pc-media" data-scroll>
-          <img src={projectImage(p)} alt="" loading="lazy" decoding="async" className="pc-img" />
+          {state === "broken" ? <ProjectVisual p={p} className="pc-img" /> : (
+            <img src={projectImage(p)} alt="" loading="lazy" decoding="async" className="pc-img" data-state={state}
+              ref={(el) => { if (el?.complete && state === "loading") setState(el.naturalWidth > 0 ? "ok" : "broken"); }}
+              onLoad={() => setState("ok")} onError={() => setState("broken")} />
+          )}
           <div className="pc-shade" />
           <span className="pc-glare" aria-hidden="true" />
           <span className="pc-cat">{p.category}</span>
-          {standIn && <span className="pc-standin" title="Stock photo shown until the client's own screenshots are added">Illustrative photo</span>}
+          {standIn && state !== "broken" && <span className="pc-standin" title="Stock photo shown until the client's own screenshots are added">Illustrative photo</span>}
           <span className="pc-outcome">{p.outcome}</span>
         </div>
         <div className="pc-body">

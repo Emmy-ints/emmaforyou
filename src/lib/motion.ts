@@ -16,8 +16,19 @@ export function levelForPath(pathname: string): Exclude<MotionLevel, "reduced"> 
   return "expressive";
 }
 
+const PREF_KEY = "efy_motion";
+/** The visitor's own choice from the motion switch ("reduced"), stored in this browser. */
+export function motionPreference(): "reduced" | "full" | null {
+  try { const v = localStorage.getItem(PREF_KEY); return v === "reduced" || v === "full" ? v : null; } catch { return null; }
+}
+export function setMotionPreference(v: "reduced" | "full") {
+  try { localStorage.setItem(PREF_KEY, v); } catch { /* storage blocked */ }
+  window.dispatchEvent(new CustomEvent("efy-motion", { detail: v }));
+}
+
 export function prefersReduced(): boolean {
   if (typeof window === "undefined") return false;
+  if (motionPreference() === "reduced") return true;
   try {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return true;
     const c = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;

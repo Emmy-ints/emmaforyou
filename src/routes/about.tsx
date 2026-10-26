@@ -25,8 +25,8 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
   head: () =>
     pageHead({
-      title: "About EmmaForYou — Founder Emmanuel Akinloye Oluwaseun",
-      description: "From a laptop in Nigeria to 3 continents: the story of founder Emmanuel Akinloye Oluwaseun and how EmmaForYou helps businesses grow.",
+      title: "About EmmaForYou — Founder Emmanuel Oluwaseun Akinloye",
+      description: "From a laptop in Nigeria to 3 continents: the story of founder Emmanuel Oluwaseun Akinloye and how EmmaForYou helps businesses grow.",
       path: "/about",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "About", path: "/about" }]), founderLd()],
     }),
@@ -67,7 +67,7 @@ function AboutPage() {
           <div className="mx-auto max-w-3xl">
             <div className="ab-journey space-y-5 font-body text-base font-normal leading-relaxed text-muted-foreground" data-scroll>
               <p>
-                Emmanuel Akinloye Oluwaseun didn't start with a team or an office. He started with a burning question: <em className="font-semibold text-foreground">"Why are Nigerian businesses being left behind in the digital age?"</em>
+                Emmanuel Oluwaseun Akinloye didn't start with a team or an office. He started with a burning question: <em className="font-semibold text-foreground">"Why are Nigerian businesses being left behind in the digital age?"</em>
               </p>
               <p>
                 From a small room in Nigeria, armed with nothing but a laptop and relentless drive, Emmanuel began helping local businesses get online. A fashion store here. A clinic there. Word spread fast.
@@ -83,7 +83,7 @@ function AboutPage() {
                   "I've seen what happens when a small business gets the right digital system. They don't just survive — they dominate."
                 </p>
                 <cite className="mt-3 block font-body text-sm font-medium text-white/60 not-italic">
-                  — Emmanuel Akinloye Oluwaseun, Founder
+                  — Emmanuel Oluwaseun Akinloye, Founder
                 </cite>
               </blockquote>
             </div>
@@ -96,12 +96,12 @@ function AboutPage() {
             <div className="ab-founder mx-auto h-40 w-40 overflow-hidden rounded-full">
               <img
                 src="/images/emmanuel.webp" width={900} height={1350} decoding="async"
-                alt="Emmanuel Akinloye Oluwaseun"
+                alt="Emmanuel Oluwaseun Akinloye"
                 className="h-full w-full object-cover object-top"
                 loading="lazy"
               />
             </div>
-            <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground"><KineticText text="Emmanuel Akinloye Oluwaseun" base={30} /></h2>
+            <h2 className="mt-5 font-display text-2xl font-bold tracking-tight text-foreground"><KineticText text="Emmanuel Oluwaseun Akinloye" base={30} /></h2>
             <p className="font-body text-sm font-normal text-muted-foreground">Founder & CEO, EmmaForYou</p>
             <p className="mx-auto mt-4 max-w-xl font-body text-sm font-normal leading-relaxed text-muted-foreground">
               Developer (web, apps, Web3, Solidity and smart contracts), marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach, and a passionate advocate for African business growth. With experience serving clients across 5 countries and 50+ business niches.

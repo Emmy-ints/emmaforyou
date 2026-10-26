@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CalendarCheck, MessageCircle, Sparkles } from "lucide-react";
 import ToolShell from "../components/tools/ToolShell";
+import FounderCard from "../components/future/FounderCard";
 import ContactForm from "../components/tools/ContactForm";
 import { pageHead, breadcrumbLd, WHATSAPP_URL, ORG_ID, absoluteUrl } from "@/lib/seo";
 
@@ -32,6 +33,7 @@ function Page() {
     >
       <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div className="space-y-3">
+          <div className="lg-strong rounded-[22px] p-5"><FounderCard line="Every message reaches me, not a call centre. Tell me what you're working on and I'll reply personally." /></div>
           <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 rounded-[20px] border border-border bg-card p-5 hover:border-[var(--emma-violet)]">
             <MessageCircle className="h-6 w-6 shrink-0 text-[#25d366]" /><span><span className="block font-semibold">WhatsApp</span><span className="block text-sm text-muted-foreground">Message Emmanuel directly. Best for quick questions and projects.</span></span>
           </a>

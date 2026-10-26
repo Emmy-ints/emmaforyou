@@ -141,7 +141,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null;
+    let stored: Lang | null = null;
+    try { stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null; } catch { /* storage blocked */ }
     if (stored && stored in LANGUAGES) setLangState(stored);
   }, []);
 
@@ -155,8 +156,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLang = (l: Lang) => {
     setLangState(l);
-    if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, l);
+    if (typeof window !== "undefined") { try { window.localStorage.setItem(STORAGE_KEY, l); } catch { /* storage blocked */ } }
   };
+
+  // Other parts of the site (the translation notice's "Show English") can switch the interface language.
+  useEffect(() => {
+    const on = (e: Event) => { const l = (e as CustomEvent<string>).detail as Lang; if (l in LANGUAGES) { setLangState(l); try { localStorage.setItem(STORAGE_KEY, l); } catch { /* storage blocked */ } } };
+    window.addEventListener("efy-lang", on);
+    return () => window.removeEventListener("efy-lang", on);
+  }, []);
 
   const t = (key: string) => TRANSLATIONS[lang][key] ?? TRANSLATIONS.en[key] ?? key;
 

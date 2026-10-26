@@ -37,8 +37,9 @@ export default function VoiceAsk() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, mod]);
+  // Other tools (e.g. the solution finder) can open Ask with a question already filled in.
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    const onOpen = (e: Event) => { setOpen(true); const q = (e as CustomEvent<unknown>).detail; if (typeof q === "string" && q.trim()) window.setTimeout(() => setInput(q.slice(0, 780)), 80); };
     window.addEventListener("efy-open-ask", onOpen);
     return () => window.removeEventListener("efy-open-ask", onOpen);
   }, []);

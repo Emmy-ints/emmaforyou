@@ -60,6 +60,8 @@ function shader(gl: WebGLRenderingContext, type: number, src: string) {
 export default function FutureOrb({ className = "", label }: { className?: string; label?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"css" | "gl">("css");
+  const [pref, setPref] = useState(0);
+  useEffect(() => { const on = () => { setMode("css"); setPref((n) => n + 1); }; window.addEventListener("efy-motion", on); return () => window.removeEventListener("efy-motion", on); }, []);
 
   useEffect(() => {
     const el = host.current;
@@ -128,7 +130,7 @@ export default function FutureOrb({ className = "", label }: { className?: strin
     const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
     const handle = idle ? idle(boot, { timeout: 1200 }) : window.setTimeout(boot, 300);
     return () => { cancelled = true; if (!idle) window.clearTimeout(handle as number); cleanup(); };
-  }, []);
+  }, [pref]);
 
   return (
     <div ref={host} className={`efy-orb ${className}`} role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : true} data-mode={mode}>

@@ -18,6 +18,8 @@ import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
 import GrowthStory from "../components/home/GrowthStory";
+import ServiceExplorer from "../components/home/ServiceExplorer";
+import SolutionFinder from "../components/future/SolutionFinder";
 import FutureOrb from "../components/future/FutureOrb";
 import { KineticText } from "../components/future/Kinetic";
 import SelectedWork from "../components/home/SelectedWork";
@@ -138,6 +140,8 @@ function HomePage() {
         <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
+        <ServiceExplorer />
+        <SolutionFinder />
         <NicheShowcase />
         <AnalyserTeaser />
         <RoiSection />

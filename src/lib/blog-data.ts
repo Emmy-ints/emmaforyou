@@ -20,7 +20,7 @@ export interface BlogPost {
   publishedAt?: string;
 }
 
-const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou", initials: "EA" };
+const EMMA = { name: "Emmanuel Oluwaseun Akinloye", role: "Founder, EmmaForYou", initials: "EA" };
 const TEMI = { name: "Temi Adebayo", role: "Head of Growth", initials: "TA" };
 const MARK = { name: "Mark Schneider", role: "Automation Lead", initials: "MS" };
 

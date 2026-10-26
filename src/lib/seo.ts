@@ -15,7 +15,7 @@ export const WHATSAPP_URL = "https://wa.me/message/HHGMMWMRJFYUC1";
 export const DEFAULT_OG_IMAGE = "/og/emmaforyou-og.png";
 
 export const FOUNDER = {
-  name: "Emmanuel Akinloye Oluwaseun",
+  name: "Emmanuel Oluwaseun Akinloye",
   jobTitle: "Founder & CEO",
   image: "/images/emmanuel.jpg",
   /** What Emmanuel does, in his own words (owner-confirmed). */
@@ -24,7 +24,7 @@ export const FOUNDER = {
 
 /** One-sentence entity description, used verbatim wherever the business is described. */
 export const ORG_DESCRIPTION =
-  "EmmaForYou is an AI automation and digital growth agency founded by Emmanuel Akinloye Oluwaseun. It builds AI chat and booking automation, websites and apps, ecommerce stores, UI/UX design, conversion optimisation, email, social media, paid advertising and promotion, Web3 and smart contract development, plus business consulting and accountability coaching, for small and growing businesses in Nigeria, the USA, Europe and Africa.";
+  "EmmaForYou is an AI automation and digital growth agency founded by Emmanuel Oluwaseun Akinloye. It builds AI chat and booking automation, websites and apps, ecommerce stores, UI/UX design, conversion optimisation, email, social media, paid advertising and promotion, Web3 and smart contract development, plus business consulting and accountability coaching, for small and growing businesses in Nigeria, the USA, Europe and Africa.";
 
 export const SERVICES_OFFERED = [
   "AI automation and chatbots",

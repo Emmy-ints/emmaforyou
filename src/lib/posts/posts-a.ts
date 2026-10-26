@@ -1,6 +1,6 @@
 import type { BlogPost } from "../blog-data";
 
-const EMMA = { name: "Emmanuel Akinloye Oluwaseun", role: "Founder, EmmaForYou", initials: "EA" };
+const EMMA = { name: "Emmanuel Oluwaseun Akinloye", role: "Founder, EmmaForYou", initials: "EA" };
 
 export const POSTS_A: BlogPost[] = [
   {

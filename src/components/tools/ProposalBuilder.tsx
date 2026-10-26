@@ -109,7 +109,7 @@ function ProposalDocument({ doc, req, onEdit }: { doc: ProposalDoc; req: Proposa
       <header className="hero-ink px-6 py-8 md:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--emma-violet)]">Proposal · {date}</p>
         <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">{doc.title}</h2>
-        <p className="mt-2 text-sm text-white/70">Prepared for {req.contactName}, {req.business} · by Emmanuel Akinloye Oluwaseun, EmmaForYou</p>
+        <p className="mt-2 text-sm text-white/70">Prepared for {req.contactName}, {req.business} · by Emmanuel Oluwaseun Akinloye, EmmaForYou</p>
       </header>
       <div className="space-y-9 px-6 py-8 md:px-10">
         {!aiWritten && <p className="no-print rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground"><strong className="text-foreground">Standard draft.</strong> Our AI writer is unavailable right now, so this proposal was built from our published plans and your answers using fixed rules. It's accurate to what you selected; we'll tailor it on a free call.</p>}

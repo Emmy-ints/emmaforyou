@@ -6,6 +6,27 @@ import { track } from "@/lib/analytics";
 
 const SKIP = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "INPUT", "CODE", "PRE", "SVG", "IFRAME", "OPTION", "KBD"]);
 const KEY = "efy_ai_lang";
+const CACHE_PREFIX = "efy_tr_cache_";
+const CACHE_MAX = 2500;
+
+/** Saved translations per language, so moving between pages and reloading reuse earlier results. */
+function loadCache(code: string): Map<string, string> {
+  try { const raw = localStorage.getItem(CACHE_PREFIX + code); if (raw) return new Map(JSON.parse(raw) as [string, string][]); } catch { /* storage blocked or corrupt */ }
+  return new Map();
+}
+function saveCache(code: string, cache: Map<string, string>) {
+  try {
+    const entries = Array.from(cache.entries());
+    localStorage.setItem(CACHE_PREFIX + code, JSON.stringify(entries.slice(Math.max(0, entries.length - CACHE_MAX))));
+  } catch { /* quota exceeded: keep the in-memory cache only */ }
+}
+/** The visitor's chosen page language (persists across pages, reloads and new tabs). */
+export function savedPageLanguage(): AiLang | null {
+  try {
+    const v = (localStorage.getItem(KEY) ?? sessionStorage.getItem(KEY)) as AiLang | null;
+    return v && AI_LANGUAGES.some((l) => l.code === v) ? v : null;
+  } catch { return null; }
+}
 type Tracked = { orig: string; translated: string };
 
 /** Event other components dispatch to start (lang) or stop (null) AI translation of the page. */
@@ -38,7 +59,9 @@ export default function PageTranslator() {
   const nodes = useRef<Text[]>([]);
   const runId = useRef(0);
   const failed = useRef(false); // stop automatic retries after an error (e.g. limit reached)
+  const caches = useRef(new Map<string, Map<string, string>>());
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [hidden, setHidden] = useState(false);
 
   const restore = useCallback(() => {
     runId.current++;
@@ -57,33 +80,13 @@ export default function PageTranslator() {
     setError("");
     const found = collect(document.body, tracked.current);
     if (!found.length) return;
-    const unique = Array.from(new Set(found.map((n) => (n.nodeValue || "").trim())));
-    const batches: string[][] = [];
-    let cur: string[] = [];
-    let size = 0;
-    for (const s of unique) {
-      const text = s.slice(0, 1500);
-      if (cur.length >= 60 || size + text.length > 5000) { batches.push(cur); cur = []; size = 0; }
-      cur.push(text);
-      size += text.length;
-    }
-    if (cur.length) batches.push(cur);
+    const cache = caches.current.get(code) ?? loadCache(code);
+    caches.current.set(code, cache);
     const result = new Map<string, string>();
-    setProgress(0);
-    for (let b = 0; b < batches.length; b++) {
-      if (id !== runId.current) return;
-      try {
-        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang: code, texts: batches[b] }) });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.message || "Translation is unavailable right now.");
-        batches[b].forEach((s, i) => result.set(s, data.translations[i]));
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Translation stopped.");
-        failed.current = true;
-        break;
-      }
-      if (id !== runId.current) return;
-      // Apply as each batch arrives so the page changes progressively.
+    const unique = Array.from(new Set(found.map((n) => (n.nodeValue || "").trim().slice(0, 1500)))).filter((s) => {
+      const hit = cache.get(s); if (hit) { result.set(s, hit); return false; } return true;
+    });
+    const apply = () => {
       for (const n of found) {
         const v = n.nodeValue || "";
         const core = v.trim().slice(0, 1500);
@@ -96,6 +99,36 @@ export default function PageTranslator() {
         n.nodeValue = translated;
         nodes.current.push(n);
       }
+    };
+    if (result.size) apply();
+    if (!unique.length) { document.documentElement.lang = code; return; }
+    const batches: string[][] = [];
+    let cur: string[] = [];
+    let size = 0;
+    for (const s of unique) {
+      const text = s.slice(0, 1500);
+      if (cur.length >= 60 || size + text.length > 5000) { batches.push(cur); cur = []; size = 0; }
+      cur.push(text);
+      size += text.length;
+    }
+    if (cur.length) batches.push(cur);
+    setProgress(0);
+    for (let b = 0; b < batches.length; b++) {
+      if (id !== runId.current) return;
+      try {
+        const res = await fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lang: code, texts: batches[b] }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || "Translation is unavailable right now.");
+        batches[b].forEach((s, i) => { const tr = data.translations?.[i]; if (typeof tr === "string" && tr.trim()) { result.set(s, tr); cache.set(s, tr); } });
+        saveCache(code, cache);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Translation stopped.");
+        failed.current = true;
+        break;
+      }
+      if (id !== runId.current) return;
+      // Apply as each batch arrives so the page changes progressively.
+      apply();
       setProgress(Math.round(((b + 1) / batches.length) * 100));
     }
     document.documentElement.lang = code;
@@ -109,13 +142,13 @@ export default function PageTranslator() {
       restore();
       failed.current = false;
       setLang(code);
-      try { code ? sessionStorage.setItem(KEY, code) : sessionStorage.removeItem(KEY); } catch { /* storage blocked */ }
+      try { sessionStorage.removeItem(KEY); code ? localStorage.setItem(KEY, code) : localStorage.removeItem(KEY); } catch { /* storage blocked */ }
       if (code) { track("page_translated", { lang: code }); window.setTimeout(() => translate(code), 30); }
     };
     window.addEventListener("efy-translate", on);
     try {
-      const saved = sessionStorage.getItem(KEY) as AiLang | null;
-      if (saved && AI_LANGUAGES.some((l) => l.code === saved)) { setLang(saved); window.setTimeout(() => translate(saved), 800); }
+      const saved = savedPageLanguage();
+      if (saved) { setLang(saved); window.setTimeout(() => translate(saved), 500); }
     } catch { /* storage blocked */ }
     return () => window.removeEventListener("efy-translate", on);
   }, [restore, translate]);
@@ -137,14 +170,14 @@ export default function PageTranslator() {
     return () => { obs.disconnect(); window.clearTimeout(timer); };
   }, [lang, translate, progress]);
 
-  if (!lang) return null;
+  if (!lang || (hidden && progress === null && !error)) return null;
   const name = AI_LANGUAGES.find((l) => l.code === lang)?.name;
   return (
     <div data-no-translate className="fixed bottom-24 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/95 px-4 py-2 text-xs text-foreground shadow-[var(--shadow-card-hover)] backdrop-blur" role="status">
       {progress !== null ? <Loader2 className="h-4 w-4 animate-spin text-[var(--emma-violet)]" /> : <Globe className="h-4 w-4 text-[var(--emma-violet)]" />}
       <span>{error ? error : progress !== null ? `Translating to ${name}… ${progress}%` : `Translated to ${name} by AI`}</span>
-      <button onClick={() => requestTranslation(null)} className="font-semibold text-[var(--emma-violet)]">Show original</button>
-      <button onClick={() => requestTranslation(null)} aria-label="Close translation" className="text-muted-foreground"><X className="h-3.5 w-3.5" /></button>
+      <button onClick={() => { requestTranslation(null); window.dispatchEvent(new CustomEvent("efy-lang", { detail: "en" })); }} className="font-semibold text-[var(--emma-violet)]">Show English</button>
+      <button onClick={() => setHidden(true)} aria-label="Hide this notice (the page stays translated)" className="text-muted-foreground"><X className="h-3.5 w-3.5" /></button>
     </div>
   );
 }

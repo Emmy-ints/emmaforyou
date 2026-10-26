@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ToolShell from "../components/tools/ToolShell";
+import FounderCard from "../components/future/FounderCard";
+import SolutionFinder from "../components/future/SolutionFinder";
 import CalendlyBooking from "../components/tools/CalendlyBooking";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
 
@@ -14,7 +16,7 @@ export const Route = createFileRoute("/book")({
   head: () =>
     pageHead({
       title: "Book a Free Strategy Call with EmmaForYou",
-      description: "Pick a time for a free 30-minute strategy call with founder Emmanuel Akinloye Oluwaseun. Times shown in your timezone, with email confirmation and reminders.",
+      description: "Pick a time for a free 30-minute strategy call with founder Emmanuel Oluwaseun Akinloye. Times shown in your timezone, with email confirmation and reminders.",
       path: "/book",
       jsonLd: [breadcrumbLd([{ name: "Home", path: "/" }, { name: "Book a call", path: "/book" }])],
     }),
@@ -29,7 +31,16 @@ function Page() {
       answers={ANSWERS}
       width="max-w-5xl"
     >
-      <CalendlyBooking />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <CalendlyBooking />
+        <aside className="lg-strong rounded-[26px] p-5">
+          <FounderCard line="You'll speak with me directly. I'll look at your business before the call and come with ideas, not a sales script." />
+          <ul className="mt-5 space-y-2 border-t border-border pt-4 text-sm text-muted-foreground">
+            <li>✓ 30 minutes, free, no obligation</li><li>✓ WhatsApp or Zoom</li><li>✓ A clear next step either way</li>
+          </ul>
+        </aside>
+      </div>
+      <div className="mt-14"><SolutionFinder id="book-finder" compact /></div>
     </ToolShell>
   );
 }

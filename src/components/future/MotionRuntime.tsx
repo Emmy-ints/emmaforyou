@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { levelForPath, prefersReduced } from "@/lib/motion";
 
@@ -22,6 +22,9 @@ const NO_REVEAL = "[data-no-reveal], [role='dialog'], .hero-ink, .story, form";
  */
 export default function MotionRuntime() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Re-run everything when the visitor flips the motion switch.
+  const [pref, setPref] = useState(0);
+  useEffect(() => { const on = () => setPref((n) => n + 1); window.addEventListener("efy-motion", on); return () => window.removeEventListener("efy-motion", on); }, []);
 
   // Level, reveals, kinetic headings and scroll progress, per route.
   useEffect(() => {
@@ -113,8 +116,9 @@ export default function MotionRuntime() {
       if (frame) cancelAnimationFrame(frame);
       for (const el of marked) { el.removeAttribute("data-rv"); el.style.removeProperty("--rv-delay"); }
       document.querySelectorAll<HTMLElement>(".kt[data-kt]").forEach((el) => { el.dataset.kt = "go"; });
+      document.querySelectorAll<HTMLElement>("[data-scroll]").forEach((el) => { el.style.removeProperty("--sp"); el.style.removeProperty("--sv"); });
     };
-  }, [pathname]);
+  }, [pathname, pref]);
 
   // Short entrance animation between pages, only where the browser can't run a view transition.
   useEffect(() => {
@@ -173,7 +177,7 @@ export default function MotionRuntime() {
     document.addEventListener("pointerleave", onLeave);
     window.addEventListener("blur", onLeave);
     return () => { document.removeEventListener("pointermove", onMove); document.removeEventListener("pointerleave", onLeave); window.removeEventListener("blur", onLeave); if (frame) cancelAnimationFrame(frame); onLeave(); };
-  }, []);
+  }, [pref]);
 
   return <div className="efy-grain" aria-hidden="true" />;
 }

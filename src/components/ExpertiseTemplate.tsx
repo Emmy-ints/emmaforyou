@@ -14,17 +14,18 @@ import TransformationSlider from "./home/TransformationSlider";
 import { buildWa } from "@/lib/leads";
 import { KineticText } from "./future/Kinetic";
 import SectionHead from "./future/SectionHead";
+import FounderCard from "./future/FounderCard";
 import { Scene, type Kind } from "./ServicesSection";
 
 /* Every service and expertise page lives in one of the seven service "worlds" (colour + live scene). */
 const KIND: Record<string, Kind> = {
   "ai-automation": "ai", "sales-conversion": "ai", "digital-strategy": "ai", "business-consulting": "ai", "accountability-coaching": "ai",
-  "website-design": "web", "website-landing-pages": "web", wordpress: "web", "ui-ux-design": "web", "funnel-building": "web", copywriting: "web",
+  "website-design": "web", "website-landing-pages": "web", wordpress: "web", "ui-ux-design": "ux", "funnel-building": "web", copywriting: "web",
   "email-marketing": "email", "crm-systems": "email",
   "social-media": "social", "social-media-automation": "social",
   "ad-marketing": "ads", "paid-ads": "ads", "lead-generation": "ads", seo: "ads", analytics: "ads", "conversion-rate-optimisation": "ads", "marketing-promotion": "ads",
   ecommerce: "ecom", "shopify-ecommerce": "ecom",
-  "app-development": "app", "web3-development": "app", "smart-contract-development": "app", "blockchain-crypto": "app",
+  "app-development": "app", "web3-development": "web3", "smart-contract-development": "web3", "blockchain-crypto": "web3",
 };
 
 const reveal = {
@@ -234,9 +235,9 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
       {/* About Emmanuel (original bio) */}
       <Block tone="alt">
         <div className="grid gap-10 lg:grid-cols-[300px_minmax(0,1fr)] lg:items-start">
-          <div className="svx-portrait" data-tilt="4"><img src={emmanuelImg} alt="Emmanuel Akinloye Oluwaseun, founder of EmmaForYou" className="aspect-[4/5] w-full object-cover" loading="lazy" /></div>
+          <div className="svx-portrait" data-tilt="4"><img src={emmanuelImg} alt="Emmanuel Oluwaseun Akinloye, founder of EmmaForYou" className="aspect-[4/5] w-full object-cover" loading="lazy" /></div>
           <div>
-            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">Why Emmanuel Akinloye Oluwaseun?</h2>
+            <h2 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">Why Emmanuel Oluwaseun Akinloye?</h2>
             <div className="mt-5 max-w-2xl space-y-4 leading-relaxed text-muted-foreground">
               <p>Emmanuel is a developer (including Web3, Solidity and smart contracts), marketer and promoter, UI/UX designer, conversion rate optimisation expert, business consultant and accountability coach. He started building digital systems for businesses in Lagos before scaling his work across Europe and the United States. After 6+ years and 500+ projects, he's learnt one thing — businesses don't need more tools, they need the RIGHT system, configured for THEIR customer.</p>
               <p>He's worked with fashion brands, clinics, restaurants, real-estate teams, coaches, ecommerce stores and over 50 niches in total. Every implementation is hands-on, customised, and outcome-focused.</p>
@@ -272,6 +273,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
           <div>
             <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl"><KineticText text={`Tell us about your ${data.name} project`} /></h2>
             <p className="mt-4 text-[#b3b8dc]">A few quick answers help us come back with a useful plan, not a generic pitch. Free, and no obligation.</p>
+            <div className="svx-founder mt-8"><FounderCard size="sm" line={`I'll read your ${data.name.toLowerCase()} brief myself and reply with a plan and a fixed quote.`} /></div>
             <ul className="mt-8 space-y-3 text-sm text-[#c9ccec]">
               <li className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-[#3dd6f5]" /> Reply within one working day</li>
               <li className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-[#3dd6f5]" /> A clear plan and fixed quote</li>

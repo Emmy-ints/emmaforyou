@@ -279,6 +279,7 @@ function Dashboard({ email }: { email: string }) {
             <span className="dash-live" aria-hidden="true" />
           </Link>
           <div className="flex items-center gap-2">
+            <Link to="/dashboard/site" className="nav-ghost text-xs">Control room</Link>
             <span className="hidden text-xs text-muted-foreground md:inline">{email}</span>
             <button onClick={() => supabase.auth.signOut()} className="dash-icon-btn" aria-label="Sign out" title="Sign out">
               <LogOut className="h-4 w-4" />

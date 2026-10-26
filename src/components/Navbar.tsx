@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import LanguageSelector from "./LanguageSelector";
 import DarkModeToggle from "./DarkModeToggle";
+import MotionToggle from "./future/MotionToggle";
 import Wordmark from "./brand/Wordmark";
 import { useI18n } from "@/lib/i18n";
 import { signOutEverywhere, useAccount } from "@/lib/auth/use-account";
@@ -286,6 +287,7 @@ export default function Navbar() {
             </button>
             <LanguageSelector />
             <DarkModeToggle />
+            <MotionToggle />
             <span className="mx-1.5 h-5 w-px bg-border" aria-hidden="true" />
             {Trigger({ k: "account", label: signedIn ? "Account" : "Log in" })}
             <Link to="/book" className="nav-cta group ml-1.5" aria-label="Book a consultation">
@@ -477,7 +479,7 @@ export default function Navbar() {
 
           <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-3.5 py-3">
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Display</span>
-            <div className="flex items-center gap-2"><LanguageSelector /><DarkModeToggle /></div>
+            <div className="flex items-center gap-2"><LanguageSelector /><DarkModeToggle /><MotionToggle /></div>
           </div>
         </div>
       </div>

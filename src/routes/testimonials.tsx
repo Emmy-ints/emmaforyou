@@ -172,7 +172,10 @@ function TestimonialsPage() {
         </section>
 
         <section className="section-padding">
-          <h2 className="sr-only">Client testimonials</h2>
+          <h2 className="sr-only">Sample testimonials</h2>
+          <div role="note" className="mx-auto mb-8 max-w-3xl rounded-2xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-foreground">
+            <strong>About the reviews below:</strong> these are sample reviews written for this page to show the kinds of results clients look for. They are not individually verified. Verified reviews from real clients appear in the section above as clients publish them from their portal.
+          </div>
           <div className="mx-auto max-w-7xl columns-1 gap-5 sm:columns-2 lg:columns-3">
             {visible.map((t, i) => {
               const hue = t.name.charCodeAt(0) * 15 % 360;
@@ -199,7 +202,7 @@ function TestimonialsPage() {
                       ))}
                     </div>
                     <span className="text-xs text-muted-foreground">{t.date}</span>
-                    {t.verified && <span className="rounded-full bg-emma-blue/10 px-2 py-0.5 text-[10px] font-medium text-emma-blue">Verified</span>}
+                    <span className="rounded-full bg-amber-500/12 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300">Sample</span>
                   </div>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
                 </div>

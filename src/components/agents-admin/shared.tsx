@@ -51,9 +51,10 @@ export function Card({ title, actions, children, className = "" }: { title?: Rea
 
 export function Stat({ label, value, warn = false, hint }: { label: string; value: ReactNode; warn?: boolean; hint?: string }) {
   return (
-    <div className="rounded-xl border border-border p-3" title={hint}>
+    <div className="rounded-xl border border-border p-3">
       <p className="text-[11px] text-muted-foreground">{label}</p>
       <p className={`mt-1 font-display text-lg font-bold tabular-nums ${warn ? "text-amber-600" : ""}`}>{value}</p>
+      {hint && <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{hint}</p>}
     </div>
   );
 }

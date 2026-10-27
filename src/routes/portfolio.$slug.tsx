@@ -36,13 +36,16 @@ export const Route = createFileRoute("/portfolio/$slug")({
     const p = loaderData.project;
     const f = featuredFor(p.name);
     const path = `/portfolio/${projectSlug(p.name)}`;
-    const image = f?.img ?? p.img;
+    // Only the client's own screenshot may represent the project in search results and shares;
+    // stock stand-ins (no featured entry) are illustrative, so they're left out of og:image and
+    // the structured data (the page itself labels them).
+    const image = f?.img;
     return pageHead({
       title: `${p.name} — ${p.category} Case Study | EmmaForYou`,
       description: clip(loaderData.study?.challenge ? `${p.name}: ${loaderData.study.challenge} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.` : `${p.desc} Outcome: ${f ? `${f.metric} ${f.metricLabel}` : p.outcome}.`),
       path,
       image,
-      imageAlt: `${p.name} project`,
+      imageAlt: image ? `${p.name} project` : undefined,
       type: "article",
       jsonLd: [
         breadcrumbLd([{ name: "Home", path: "/" }, { name: "Portfolio", path: "/portfolio" }, { name: p.name, path }]),

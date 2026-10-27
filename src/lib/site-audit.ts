@@ -6,30 +6,22 @@
  */
 import { pageIndex } from "./page-index";
 import { FEATURED, PROJECTS, featuredFor, projectSlug } from "./portfolio-data";
+import { fetchAndInspect, type PageRecord } from "./search/inspect";
+import { searchChecks, sitemapPathsFromXml, type SearchMetrics } from "./search/checks";
 
 export type Severity = "high" | "medium" | "low" | "info";
 export interface Finding { key: string; type: string; severity: Severity; route: string; title: string; evidence: string; fix: string; confirmed: boolean; data?: { title?: string; description?: string; target?: string; src?: string; routes?: string[] } }
 export interface PageResult { route: string; status: number; ms: number; title: string; description: string; h1: number; canonical: string; noindex: boolean; images: string[]; links: string[]; error?: string }
-export interface AuditRun { pages: PageResult[]; findings: Finding[]; images: { src: string; ok: boolean; pages: string[] }[]; startedAt: string; finishedAt: string }
+export interface AuditRun { pages: PageResult[]; findings: Finding[]; images: { src: string; ok: boolean; pages: string[] }[]; startedAt: string; finishedAt: string; search?: SearchMetrics; sitemapError?: string }
 
 const SKIP_LINK = /^\/(api|dashboard|portal|account|login|community\/(settings|messages|notifications|saved|moderation|inbox))/;
 
+const records = new Map<string, PageRecord>();
 async function fetchPage(route: string): Promise<PageResult> {
-  const t0 = performance.now();
-  try {
-    const res = await fetch(route, { credentials: "omit", redirect: "follow", headers: { Accept: "text/html" } });
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    const meta = (n: string) => doc.querySelector(`meta[name="${n}"]`)?.getAttribute("content")?.trim() ?? "";
-    const images = Array.from(doc.querySelectorAll("img[src]")).map((i) => i.getAttribute("src")!).filter((s) => !s.startsWith("data:"));
-    const links = Array.from(doc.querySelectorAll("a[href]")).map((a) => a.getAttribute("href")!).filter((h) => h.startsWith("/") && !h.startsWith("//")).map((h) => h.split("#")[0].split("?")[0] || "/");
-    return {
-      route, status: res.status, ms: Math.round(performance.now() - t0), title: doc.title.trim(), description: meta("description"), h1: doc.querySelectorAll("h1").length,
-      canonical: doc.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? "", noindex: /noindex/i.test(meta("robots")), images: [...new Set(images)], links: [...new Set(links)],
-    };
-  } catch (e) {
-    return { route, status: 0, ms: Math.round(performance.now() - t0), title: "", description: "", h1: 0, canonical: "", noindex: false, images: [], links: [], error: e instanceof Error ? e.message : "Request failed" };
-  }
+  // One request per page: the search inspector reads the same server HTML (see search/inspect.ts).
+  const r = await fetchAndInspect(route, window.location.origin, (html) => new DOMParser().parseFromString(html, "text/html"));
+  records.set(route, r);
+  return { route, status: r.status, ms: r.ms, title: r.title, description: r.description, h1: r.h1.length, canonical: r.canonical, noindex: r.noindex, images: r.images, links: r.links, error: r.error };
 }
 
 function checkImage(src: string): Promise<boolean> {
@@ -49,7 +41,13 @@ async function pool<T, R>(items: T[], n: number, fn: (t: T) => Promise<R>, onDon
 
 export async function runAudit(opts: { routes?: string[]; onProgress?: (done: number, total: number, phase: string) => void; signal?: { cancelled: boolean }; /** Re-check only these pages (and their links): no catalogue image or asset checks. */ skipExtras?: boolean } = {}): Promise<AuditRun> {
   const startedAt = new Date().toISOString();
-  const routes = opts.routes ?? [...new Set(pageIndex().map((p) => p.href).filter((h) => h.startsWith("/")))];
+  records.clear();
+  let sitemap: string[] = []; let sitemapError: string | undefined;
+  if (!opts.routes) {
+    try { const res = await fetch("/sitemap.xml", { credentials: "omit", cache: "no-store" }); sitemap = res.ok ? sitemapPathsFromXml(await res.text(), window.location.origin) : []; if (!res.ok) sitemapError = `sitemap.xml returned ${res.status}`; }
+    catch (e) { sitemapError = e instanceof Error ? e.message : "sitemap.xml unreachable"; }
+  }
+  const routes = opts.routes ?? [...new Set([...pageIndex().map((p) => p.href.split("#")[0].split("?")[0]).filter((h) => h.startsWith("/")), ...sitemap])];
   let done = 0; const total = routes.length;
   const pages = await pool(routes, 4, (r) => (opts.signal?.cancelled ? Promise.resolve({ route: r, status: -1, ms: 0, title: "", description: "", h1: 0, canonical: "", noindex: false, images: [], links: [] } as PageResult) : fetchPage(r)), () => opts.onProgress?.(++done, total, "Pages"));
 
@@ -89,7 +87,19 @@ export async function runAudit(opts: { routes?: string[]; onProgress?: (done: nu
   // Asset completeness (from the owner's portfolio records, not from the scan).
   if (!opts.skipExtras) for (const p of PROJECTS) if (!featuredFor(p.name)) add({ type: "asset", severity: "info", route: `/portfolio/${projectSlug(p.name)}`, title: `${p.name}: stock photo instead of a real screenshot`, evidence: "portfolio-data marks PROJECTS images as stand-ins", fix: "Add the client's own screenshot to portfolio-data.", confirmed: true });
 
+  // Search checks: canonicals, sitemap validity, structured data, hreflang, link graph.
+  let search: SearchMetrics | undefined;
+  if (!opts.skipExtras && !opts.routes) {
+    const sc = searchChecks([...records.values()], { origin: window.location.origin, sitemap });
+    findings.push(...sc.findings); search = sc.metrics;
+    if (sitemapError) add({ type: "sitemap", severity: "high", route: "/sitemap.xml", title: "Sitemap couldn't be read", evidence: sitemapError, fix: "Check the /sitemap.xml route.", confirmed: true });
+  } else if (opts.routes) {
+    // Re-checks of single findings: run the search checks on just these pages (no sitemap/graph claims).
+    const sc = searchChecks([...records.values()], { origin: window.location.origin, sitemap: [] });
+    findings.push(...sc.findings.filter((f) => !["orphan", "sitemap", "sitemap-missing"].includes(f.type)));
+  }
+
   const order: Record<Severity, number> = { high: 0, medium: 1, low: 2, info: 3 };
   findings.sort((a, b) => order[a.severity] - order[b.severity]);
-  return { pages: [...pages, ...extraPages], findings, images, startedAt, finishedAt: new Date().toISOString() };
+  return { pages: [...pages, ...extraPages], findings, images, startedAt, finishedAt: new Date().toISOString(), search, sitemapError };
 }

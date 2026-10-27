@@ -17,15 +17,16 @@ import { PermsContext } from "@/components/site-admin/settings";
 import ContentTab from "@/components/site-admin/content";
 import LabTab from "@/components/site-admin/lab-admin";
 import { BackupsTab, EnquiriesTab, FeaturesTab, RedirectsTab, TranslationsTab } from "@/components/site-admin/operations";
+import SearchTab from "@/components/site-admin/search";
 
 /**
  * Website control room. Every action is checked again in the database (site_can / RLS), so the
  * tabs a person sees are a convenience, not the security boundary. Secrets never reach this page:
  * the AI check reports provider and model names only.
  */
-const TABS = [["overview", "Overview"], ["audit", "Audit & repair"], ["content", "Content"], ["enquiries", "Enquiries"], ["translations", "Translations"], ["design", "Design lab"], ["features", "Features"], ["redirects", "Redirects"], ["lab", "Innovation Lab"], ["team", "Team & roles"], ["log", "Activity log"], ["backups", "Backups"], ["systems", "AI & integrations"]] as const;
+const TABS = [["overview", "Overview"], ["audit", "Audit & repair"], ["search", "Search & releases"], ["content", "Content"], ["enquiries", "Enquiries"], ["translations", "Translations"], ["design", "Design lab"], ["features", "Features"], ["redirects", "Redirects"], ["lab", "Innovation Lab"], ["team", "Team & roles"], ["log", "Activity log"], ["backups", "Backups"], ["systems", "AI & integrations"]] as const;
 type Tab = (typeof TABS)[number][0];
-const NEEDS: Record<Tab, string[] | null> = { overview: null, audit: ["audit.read"], content: ["content.draft"], enquiries: ["enquiries.read"], translations: ["translations.edit"], design: ["design.draft"], features: ["flags.draft"], redirects: ["redirects.draft"], lab: ["lab.use"], team: ["roles.manage"], log: ["log.read"], backups: ["backup.create"], systems: null };
+const NEEDS: Record<Tab, string[] | null> = { overview: null, audit: ["audit.read"], search: ["audit.read", "analytics.read"], content: ["content.draft"], enquiries: ["enquiries.read"], translations: ["translations.edit"], design: ["design.draft"], features: ["flags.draft"], redirects: ["redirects.draft"], lab: ["lab.use"], team: ["roles.manage"], log: ["log.read"], backups: ["backup.create"], systems: null };
 const roleName = (p: string[]) => (p.includes("roles.manage") ? "Admin" : p.includes("translations.edit") ? "Marketing" : p.includes("flags.draft") ? "Developer" : p.includes("content.draft") ? "Editor" : p.includes("analytics.read") ? "Analyst" : "Auditor");
 
 export const Route = createFileRoute("/dashboard_/site")({
@@ -85,6 +86,7 @@ function Room({ perms, email }: { perms: string[]; email: string }) {
       </nav>
       {current === "overview" && <Overview perms={perms} go={setTab} />}
       {current === "audit" && <AuditTab canRun={can("audit.run")} />}
+      {current === "search" && <SearchTab />}
       {current === "content" && <ContentTab />}
       {current === "enquiries" && <EnquiriesTab />}
       {current === "translations" && <TranslationsTab />}
@@ -171,7 +173,7 @@ function AuditTab({ canRun }: { canRun: boolean }) {
     try {
       const r = await runAudit({ signal: cancel.current, onProgress: (done, total, phase) => setProgress({ done, total, phase }) });
       setRun(r);
-      const summary = { high: r.findings.filter((f) => f.severity === "high").length, medium: r.findings.filter((f) => f.severity === "medium").length, low: r.findings.filter((f) => f.severity === "low").length, info: r.findings.filter((f) => f.severity === "info").length, images: r.images.length, brokenImages: r.images.filter((i) => !i.ok).length };
+      const summary = { high: r.findings.filter((f) => f.severity === "high").length, medium: r.findings.filter((f) => f.severity === "medium").length, low: r.findings.filter((f) => f.severity === "low").length, info: r.findings.filter((f) => f.severity === "info").length, images: r.images.length, brokenImages: r.images.filter((i) => !i.ok).length, ...(r.search ? { search: r.search } : {}) };
       const { data: u } = await supabase.auth.getUser();
       const saved = await db.from("site_audit_reports").insert({ created_by: u.user?.id, routes_checked: r.pages.length, summary, findings: r.findings.slice(0, 1500) });
       if (saved.error) setErr(`Audit finished but couldn't be saved: ${saved.error.message}`); else { setMsg(`Checked ${r.pages.length} pages and ${r.images.length} images. Report saved.`); reports.reload(); }
@@ -427,7 +429,7 @@ function SystemsTab() {
         <p className="mt-3 text-sm">Analytics: {events.loading ? "checking…" : events.data === null ? <Pill>No read access</Pill> : events.data ? <>last event {when(events.data)}</> : <Pill tone="warn">No events recorded</Pill>}</p>
       </Card>
       <Card title="Translation"><p className="text-sm text-muted-foreground">English, French, Spanish and German use built-in text for key pages; every other language, and the rest of each page, is translated through the server AI route (/api/translate), so it depends on the AI provider above. Results are cached in each visitor's browser.</p></Card>
-      <Card title="Not connected yet"><p className="text-sm text-muted-foreground">Backups and redirects aren't managed from this page: database backups depend on your Lovable Cloud plan, and redirects are code changes. Design changes keep their own versions with one-click restore above.</p></Card>
+      <Card title="Backups and search data"><p className="text-sm text-muted-foreground">Configuration checkpoints are in Backups; full database backups (daily, about 14 days) and exports are in the Lovable project under Database. Search Console, Bing and the release checks are in "Search &amp; releases".</p></Card>
     </div>
   );
 }

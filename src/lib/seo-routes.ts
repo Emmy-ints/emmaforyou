@@ -1,4 +1,5 @@
 import { canonicalForExpertise } from "./expertise-canonical";
+import { isoDate } from "./seo";
 import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE } from "./services-data";
 import { PROJECTS, projectSlug } from "./portfolio-data";
 import { POSTS } from "./blog-data";
@@ -72,12 +73,16 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/terms", priority: 0.2, changefreq: "yearly" },
 ];
 
-export function sitemapPaths(): { path: string; priority: number; changefreq: string }[] {
+/**
+ * Every indexable URL. `lastmod` is set only where the page has a real publication date (blog
+ * posts); other pages have no recorded content-change date, so none is claimed.
+ */
+export function sitemapPaths(): { path: string; priority: number; changefreq: string; lastmod?: string }[] {
   const services = SERVICES.map((s) => ({ path: `/services/${s.slug}`, priority: 0.9, changefreq: "monthly" }));
   const expertise = EXPERTISE.filter((e) => canonicalForExpertise(e.slug) === `/expertise/${e.slug}`).map((e) => ({ path: `/expertise/${e.slug}`, priority: 0.7, changefreq: "monthly" }));
   const work = PROJECTS.map((p) => ({ path: `/portfolio/${projectSlug(p.name)}`, priority: 0.7, changefreq: "yearly" }));
   const niches = NICHES.map((n) => ({ path: `/niche/${n.slug}`, priority: 0.6, changefreq: "monthly" }));
-  const posts = POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.5, changefreq: "yearly" }));
+  const posts = POSTS.map((p) => ({ path: `/blog/${p.slug}`, priority: 0.5, changefreq: "yearly", lastmod: isoDate(p.date) }));
   const checklists = CHECKLISTS.map((c) => ({ path: `/checklists/${c.slug}`, priority: 0.6, changefreq: "yearly" }));
   const solutionCats = SOLUTION_CATEGORIES.map((c) => ({ path: `/solutions/${c.slug}`, priority: 0.8, changefreq: "monthly" }));
   const solutions = ALL_SOLUTIONS.map((s) => ({ path: `/solutions/${s.category}/${s.slug}`, priority: 0.6, changefreq: "monthly" }));

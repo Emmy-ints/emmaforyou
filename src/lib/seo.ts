@@ -257,14 +257,15 @@ export function articleLd(a: { headline: string; description: string; path: stri
   };
 }
 
-export function creativeWorkLd(w: { name: string; description: string; path: string; image: string; about?: string }): JsonLd {
+/** A client project. `image` only when it's the client's real screenshot, never a stock stand-in. */
+export function creativeWorkLd(w: { name: string; description: string; path: string; image?: string; about?: string }): JsonLd {
   return {
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: `${w.name} — client project`,
     description: w.description,
     url: absoluteUrl(w.path),
-    image: absoluteUrl(w.image),
+    ...(w.image ? { image: absoluteUrl(w.image) } : {}),
     creator: { "@id": ORG_ID },
     ...(w.about ? { about: w.about } : {}),
   };

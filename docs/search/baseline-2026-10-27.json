@@ -1,0 +1,756 @@
+{
+ "report_id": "666da5b7-0a38-473b-985e-71e2ea58809d",
+ "created_at": "2026-10-27 00:21:50.382818+00",
+ "routes_checked": 406,
+ "summary": {
+  "high": 0,
+  "info": 3,
+  "kind": "search-baseline",
+  "label": "Search baseline before SEO/AEO/GEO pass",
+  "low": 58,
+  "medium": 9,
+  "search": {
+   "brokenLinkRate": 0,
+   "brokenOccurrences": 0,
+   "brokenUnique": 0,
+   "checkedAt": "2026-10-27T00:19:31.618Z",
+   "duplicateDescriptions": 0,
+   "duplicateTitles": 1,
+   "hreflangErrors": 0,
+   "hreflangPages": 3,
+   "indexablePages": 400,
+   "linkOccurrences": 29849,
+   "missingCanonical": 0,
+   "missingFromSitemap": 3,
+   "orphanRate": 2.2670025188916876,
+   "orphans": 9,
+   "pagesChecked": 406,
+   "redirectingLinkOccurrences": 0,
+   "schemaErrors": 0,
+   "schemaPagesPassing": 400,
+   "schemaPagesTested": 400,
+   "schemaTypes": {
+    "Article": 58,
+    "BlogPosting": 43,
+    "BreadcrumbList": 387,
+    "ContactPage": 1,
+    "CreativeWork": 12,
+    "FAQPage": 182,
+    "ItemList": 15,
+    "Person": 400,
+    "ProfessionalService": 400,
+    "Service": 214,
+    "WebPage": 2,
+    "WebSite": 400
+   },
+   "schemaValidityRate": 100,
+   "schemaWarnings": 58,
+   "sitemapUrls": 397,
+   "sitemapValid": 397,
+   "validSitemapRate": 100
+  },
+  "sitemapHasLastmod": false
+ },
+ "findings": [
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/lab:0 links from other indexable pages in the server HTML",
+   "route": "/lab",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/newsletter:0 links from other indexable pages in the server HTML",
+   "route": "/newsletter",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/watch:0 links from other indexable pages in the server HTML",
+   "route": "/watch",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/digital-checklist:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/digital-checklist",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/instagram-captions:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/instagram-captions",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/ai-automation-starter:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/ai-automation-starter",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/ad-swipe-file:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/ad-swipe-file",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/whatsapp-playbook:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/whatsapp-playbook",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "0 links from other indexable pages in the server HTML",
+   "fix": "Link to it from a related service, category or article where it genuinely helps.",
+   "key": "orphan:/free-resources/growth-planner:0 links from other indexable pages in the server HTML",
+   "route": "/free-resources/growth-planner",
+   "severity": "medium",
+   "title": "No internal links point to this page",
+   "type": "orphan"
+  },
+  {
+   "confirmed": true,
+   "evidence": "200, indexable, self-canonical, linked from the site",
+   "fix": "Add it to seo-routes.ts if it should be found in search, or mark it noindex.",
+   "key": "sitemap-missing:/cases:200, indexable, self-canonical, linked from the site",
+   "route": "/cases",
+   "severity": "info",
+   "title": "Indexable page isn't in the sitemap",
+   "type": "sitemap-missing"
+  },
+  {
+   "confirmed": true,
+   "evidence": "200, indexable, self-canonical, linked from the site",
+   "fix": "Add it to seo-routes.ts if it should be found in search, or mark it noindex.",
+   "key": "sitemap-missing:/community/groups:200, indexable, self-canonical, linked from the site",
+   "route": "/community/groups",
+   "severity": "info",
+   "title": "Indexable page isn't in the sitemap",
+   "type": "sitemap-missing"
+  },
+  {
+   "confirmed": true,
+   "evidence": "200, indexable, self-canonical, linked from the site",
+   "fix": "Add it to seo-routes.ts if it should be found in search, or mark it noindex.",
+   "key": "sitemap-missing:/testimonials:200, indexable, self-canonical, linked from the site",
+   "route": "/testimonials",
+   "severity": "info",
+   "title": "Indexable page isn't in the sitemap",
+   "type": "sitemap-missing"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/agency-vs-freelancer-vs-diy:Article",
+   "route": "/compare/agency-vs-freelancer-vs-diy",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/shopify-vs-woocommerce:Article",
+   "route": "/compare/shopify-vs-woocommerce",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/website-builder-vs-wordpress-vs-custom:Article",
+   "route": "/compare/website-builder-vs-wordpress-vs-custom",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/whatsapp-business-app-vs-api:Article",
+   "route": "/compare/whatsapp-business-app-vs-api",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/meta-ads-vs-google-ads:Article",
+   "route": "/compare/meta-ads-vs-google-ads",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/seo-vs-paid-ads:Article",
+   "route": "/compare/seo-vs-paid-ads",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/ai-receptionist-vs-human-receptionist:Article",
+   "route": "/compare/ai-receptionist-vs-human-receptionist",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/compare/foundry-vs-hardhat:Article",
+   "route": "/compare/foundry-vs-hardhat",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/complete-digital-marketing-2025:Article",
+   "route": "/knowledge-base/complete-digital-marketing-2025",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/whatsapp-automation-setup:Article",
+   "route": "/knowledge-base/whatsapp-automation-setup",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/instagram-1000-followers:Article",
+   "route": "/knowledge-base/instagram-1000-followers",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/website-converts-visitors:Article",
+   "route": "/knowledge-base/website-converts-visitors",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/local-seo-guide:Article",
+   "route": "/knowledge-base/local-seo-guide",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/google-business-10-min:Article",
+   "route": "/knowledge-base/google-business-10-min",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/perfect-website-checklist:Article",
+   "route": "/knowledge-base/perfect-website-checklist",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/website-slow-fix:Article",
+   "route": "/knowledge-base/website-slow-fix",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/website-copy-sells:Article",
+   "route": "/knowledge-base/website-copy-sells",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/ai-automation-explained:Article",
+   "route": "/knowledge-base/ai-automation-explained",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/5-star-google-reviews:Article",
+   "route": "/knowledge-base/5-star-google-reviews",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/mobile-first-design:Article",
+   "route": "/knowledge-base/mobile-first-design",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/whatsapp-business-zero:Article",
+   "route": "/knowledge-base/whatsapp-business-zero",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/missed-call-text-back:Article",
+   "route": "/knowledge-base/missed-call-text-back",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/appointment-reminder-automation:Article",
+   "route": "/knowledge-base/appointment-reminder-automation",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/lead-capture-crm-automation:Article",
+   "route": "/knowledge-base/lead-capture-crm-automation",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/5-automation-systems:Article",
+   "route": "/knowledge-base/5-automation-systems",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/chatgpt-vs-claude:Article",
+   "route": "/knowledge-base/chatgpt-vs-claude",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/instagram-content-calendar:Article",
+   "route": "/knowledge-base/instagram-content-calendar",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/tiktok-business:Article",
+   "route": "/knowledge-base/tiktok-business",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/facebook-2025:Article",
+   "route": "/knowledge-base/facebook-2025",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/linkedin-b2b-africa:Article",
+   "route": "/knowledge-base/linkedin-b2b-africa",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/instagram-captions-stop-scroll:Article",
+   "route": "/knowledge-base/instagram-captions-stop-scroll",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/social-analytics:Article",
+   "route": "/knowledge-base/social-analytics",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/ugc-strategy:Article",
+   "route": "/knowledge-base/ugc-strategy",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/influencer-small-budget:Article",
+   "route": "/knowledge-base/influencer-small-budget",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/fb-vs-ig-ads:Article",
+   "route": "/knowledge-base/fb-vs-ig-ads",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/google-ads-local:Article",
+   "route": "/knowledge-base/google-ads-local",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/first-fb-campaign:Article",
+   "route": "/knowledge-base/first-fb-campaign",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/fb-ad-budget:Article",
+   "route": "/knowledge-base/fb-ad-budget",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/ads-not-working:Article",
+   "route": "/knowledge-base/ads-not-working",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/retargeting-ads:Article",
+   "route": "/knowledge-base/retargeting-ads",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/tiktok-ads:Article",
+   "route": "/knowledge-base/tiktok-ads",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/ad-creative-rules:Article",
+   "route": "/knowledge-base/ad-creative-rules",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/email-list-zero:Article",
+   "route": "/knowledge-base/email-list-zero",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/email-beats-social:Article",
+   "route": "/knowledge-base/email-beats-social",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/welcome-sequence:Article",
+   "route": "/knowledge-base/welcome-sequence",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/email-subject-lines:Article",
+   "route": "/knowledge-base/email-subject-lines",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/abandoned-cart-email:Article",
+   "route": "/knowledge-base/abandoned-cart-email",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/email-tools-compared:Article",
+   "route": "/knowledge-base/email-tools-compared",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/re-engagement-email:Article",
+   "route": "/knowledge-base/re-engagement-email",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/shopify-setup:Article",
+   "route": "/knowledge-base/shopify-setup",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/product-page-optimisation:Article",
+   "route": "/knowledge-base/product-page-optimisation",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/shopify-vs-woo:Article",
+   "route": "/knowledge-base/shopify-vs-woo",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/shipping-logistics:Article",
+   "route": "/knowledge-base/shipping-logistics",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/shopify-apps:Article",
+   "route": "/knowledge-base/shopify-apps",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/lagos-to-world:Article",
+   "route": "/knowledge-base/lagos-to-world",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/5-signs-ready-to-scale:Article",
+   "route": "/knowledge-base/5-signs-ready-to-scale",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/choose-right-agency:Article",
+   "route": "/knowledge-base/choose-right-agency",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  },
+  {
+   "confirmed": true,
+   "evidence": "Article",
+   "fix": "Correct the JSON-LD builder (lib/seo.ts) so it matches the visible page.",
+   "key": "schema-warning:/knowledge-base/personal-brand:Article",
+   "route": "/knowledge-base/personal-brand",
+   "severity": "low",
+   "title": "Article: Article without datePublished",
+   "type": "schema-warning"
+  }
+ ]
+}

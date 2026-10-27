@@ -31,6 +31,8 @@ const RESOURCES: L[] = [
   { to: "/tools", label: "Free tools" },
   { to: "/inspiration", label: "Inspiration library" },
   { to: "/free-resources", label: "Free resources" },
+  { to: "/watch", label: "How we work (video)" },
+  { to: "/newsletter", label: "Newsletter" },
   { to: "/faq", label: "FAQ" },
 ];
 const LOCATIONS: { label: string; to?: string; lang?: string }[] = [

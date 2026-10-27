@@ -151,3 +151,7 @@ A Lovable backup restore replaces the live database, can't be undone and loses e
 | Service links | All 29 links from /services return 200 |
 | Local suites | v4 50/50, v3 33/33, journeys 17/17, demo 10/10, explore 12/12, Lab 33/33, SEO 12/12, layout sweep 832 loads (only harness-only /blog) |
 | Leftovers | 0 settings, 0 redirects, 0 lab items, 0 repairs, 0 role-test users, default design |
+
+## Search visibility & release gate (27 Oct 2026, commit f8bb7f1)
+
+See `docs/search/README.md` (system, formulas, data sources, crawler policy, release + rollback procedure), `docs/search/intent-and-claims.md` (competing pages, drafts awaiting approval, claims, entity facts) and `docs/search/release-2026-10-27.md` (deployment evidence, baseline vs final). Search Console and Bing data are not connected (no credentials); AI visibility is manual observation only.

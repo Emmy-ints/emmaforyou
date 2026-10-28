@@ -163,9 +163,13 @@ export const handleBookArt = createServerOnlyFn(async (request: Request) => {
   }
   if (!res.ok) {
     await refundLimit(limit.logId);
-    await logArt(db, u.user.id, false, Date.now() - t0, `http ${res.status}`);
-    const msg = res.status === 400 ? "The image service declined that description. Try describing scenery, objects or colours instead." : res.status === 429 ? "The image service is busy. Try again in a minute." : "Image generation isn't available right now. Upload your own artwork or use a template layout.";
-    return Response.json({ message: msg, unavailable: res.status >= 401 && res.status !== 429 }, { status: res.status === 400 ? 400 : 503 });
+    // the provider's error text (never contains our key) tells a content refusal apart from an account/model problem
+    const e = (await res.json().catch(() => null)) as { error?: { message?: string; code?: string; type?: string } } | null;
+    const detail = `${e?.error?.code ?? e?.error?.type ?? ""} ${e?.error?.message ?? ""}`.replace(/sk-[A-Za-z0-9_-]+/g, "[key]").trim();
+    await logArt(db, u.user.id, false, Date.now() - t0, `http ${res.status} ${model}: ${detail}`.slice(0, 290));
+    const refused = res.status === 400 && /safety|moderation|content_policy|policy|rejected/i.test(detail);
+    const msg = refused ? "The image service declined that description. Try describing scenery, objects or colours instead." : res.status === 429 ? "The image service is busy. Try again in a minute." : "AI image generation isn't available on this site right now. Upload your own artwork or use a template layout.";
+    return Response.json({ message: msg, unavailable: !refused && res.status !== 429 }, { status: refused ? 400 : 503 });
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const j = (await res.json().catch(() => null)) as any;

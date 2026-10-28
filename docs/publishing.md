@@ -13,7 +13,7 @@ A new service line and a set of free book tools, added to the existing site (no 
 | Tool | Engine | AI | Account needed for |
 |---|---|---|---|
 | eBook Creator | `lib/books/manuscript.ts`, `import-docx.ts`, `layout.ts`, `export-pdf.ts` (embedded TrueType, ToUnicode, outlines, links), `export-epub.ts` (EPUB 3 + NCX), `export-docx.ts` | none | download, save |
-| Cover Designer | `lib/books/cover.ts` (10 canvas layouts, eBook 1600×2560, print wrap with spine/bleed from `specs.ts`) | concepts via `/api/book-ai` (`cover_concepts`), optional artwork via `/api/book-art` (OpenAI images, signed-in only, `OPENAI_IMAGE_MODEL`, default gpt-image-1); falls back to labelled template suggestions | download, save, AI artwork |
+| Cover Designer | `lib/books/cover.ts` (10 canvas layouts, eBook 1600×2560, print wrap with spine/bleed from `specs.ts`) | concepts via `/api/book-ai` (`cover_concepts`), optional artwork via `/api/book-art` (OpenAI images, signed-in only; `OPENAI_IMAGE_MODEL` if set, otherwise the newest gpt-image model the key can use); falls back to labelled template suggestions | download, save, AI artwork |
 | Mockups | `lib/books/mockup.ts` (11 formats) + ZIP | none | download, save |
 | Marketing assistant | `lib/books/listing.ts` lint | `/api/book-ai` (`marketing`), server strips banned claims/links | save, .txt download |
 | Manuscript analyzer | `lib/books/analyze.ts` (formulas shown) | `/api/book-ai` (`analyze`), notes kept only if the quote is found in the text | save |

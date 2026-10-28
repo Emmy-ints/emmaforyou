@@ -146,7 +146,8 @@ export const handleBookArt = createServerOnlyFn(async (request: Request) => {
   if (prompt.length < 10) return Response.json({ message: "Describe the artwork in a few words." }, { status: 400 });
   const limit = await checkLimits(request, "book_art", { perVisitor: 4, global: 60, label: "artwork images" });
   if (!limit.ok) return limit.response;
-  const model = /^[a-z0-9][a-z0-9.\-:_]{1,40}$/i.test(process.env.OPENAI_IMAGE_MODEL ?? "") ? process.env.OPENAI_IMAGE_MODEL! : "gpt-image-1";
+  const model = await imageModel(provider.apiKey);
+  if (!model) { await refundLimit(limit.logId); await logArt(db, u.user.id, false, 0, "no image model available to this API key"); return Response.json({ message: "AI image generation isn't available on this site right now. Upload your own artwork or use a template layout.", unavailable: true }, { status: 503 }); }
   const full = `Book cover background artwork for a ${genre || "book"}: ${prompt}. Portrait composition with calm space in the top third and bottom quarter for the title and author name, which will be added separately. Absolutely no text, letters, numbers, logos, watermarks, signatures or frames. No real people's likenesses and no copyrighted characters.`;
   const t0 = Date.now();
   let res: Response;
@@ -184,6 +185,22 @@ export const handleBookArt = createServerOnlyFn(async (request: Request) => {
   await logArt(db, u.user.id, true, Date.now() - t0);
   return Response.json({ image: dataUrl, model, remaining: limit.remaining, aiGenerated: true }, { headers: { "Cache-Control": "no-store" } });
 });
+
+let cachedModel: { id: string | null; at: number } | null = null;
+/** OPENAI_IMAGE_MODEL if set; otherwise the newest gpt-image model this key can use (from /v1/models, cached 1 h). */
+async function imageModel(key: string): Promise<string | null> {
+  const env = process.env.OPENAI_IMAGE_MODEL ?? "";
+  if (/^[a-z0-9][a-z0-9.\-:_]{1,40}$/i.test(env)) return env;
+  if (cachedModel && Date.now() - cachedModel.at < 3600_000) return cachedModel.id;
+  try {
+    const r = await fetch("https://api.openai.com/v1/models", { headers: { Authorization: `Bearer ${key}` } });
+    const j = (await r.json()) as { data?: { id: string; created?: number }[] };
+    const ids = (j.data ?? []).filter((m) => /^gpt-image/i.test(m.id) && !/mini/i.test(m.id)).sort((a, b) => (b.created ?? 0) - (a.created ?? 0));
+    const any = ids[0] ?? (j.data ?? []).filter((m) => /^gpt-image/i.test(m.id)).sort((a, b) => (b.created ?? 0) - (a.created ?? 0))[0];
+    cachedModel = { id: any?.id ?? null, at: Date.now() };
+  } catch { cachedModel = { id: null, at: Date.now() - 3000_000 }; }
+  return cachedModel.id;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function logArt(db: any, uid: string, ok: boolean, ms: number, error?: string) {

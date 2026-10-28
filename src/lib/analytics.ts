@@ -43,7 +43,15 @@ export type AnalyticsEvent =
   | "exit_offer_clicked"
   | "sticky_cta_click"
   | "newsletter_subscribed"
-  | "review_submitted";
+  | "review_submitted"
+  | "book_tool_started"
+  | "book_preview_generated"
+  | "book_registration_completed"
+  | "book_export_attempted"
+  | "book_export_completed"
+  | "book_export_failed"
+  | "book_project_saved"
+  | "publishing_enquiry_submitted";
 
 type Props = Record<string, string | number | boolean | null | undefined>;
 

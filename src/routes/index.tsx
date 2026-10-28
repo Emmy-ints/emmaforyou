@@ -25,6 +25,7 @@ import FutureOrb from "../components/future/FutureOrb";
 import { KineticText } from "../components/future/Kinetic";
 import SelectedWork from "../components/home/SelectedWork";
 import ToolsHub from "../components/home/ToolsHub";
+import PublishingSection from "../components/home/PublishingSection";
 import ResultsTicker from "../components/home/ResultsTicker";
 import NicheShowcase from "../components/NicheShowcase";
 import MissionSection from "../components/MissionSection";
@@ -141,6 +142,7 @@ function HomePage() {
         <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
+        <Flag id="home-publishing"><PublishingSection /></Flag>
         <Flag id="home-explorer"><ServiceExplorer /></Flag>
         <Flag id="home-finder"><SolutionFinder /></Flag>
         <NicheShowcase />

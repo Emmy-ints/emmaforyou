@@ -6,6 +6,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
 import AccountAuthForm from "@/components/auth/AccountAuthForm";
+import { PublishingCard } from "@/components/site-admin/publishing";
 import { KineticText } from "@/components/future/Kinetic";
 import { Btn, Card, check, db, downloadCsv, Empty, ErrorText, label, Loading, Pill, Stat, useLoad, when } from "@/components/agents-admin/shared";
 import { DEFAULTS, FONTS, PRESETS, PREVIEW_KEY, applyTokens, contrast, diffTokens, resolve, type Tokens } from "@/lib/design-tokens";
@@ -428,6 +429,7 @@ function SystemsTab() {
         {ping.loading ? <Loading /> : ping.error ? <ErrorText message={ping.error} onRetry={ping.reload} /> : <p className="text-sm"><Pill tone="good">Reachable</Pill> Round trip {ping.data?.ms} ms from your browser.</p>}
         <p className="mt-3 text-sm">Analytics: {events.loading ? "checking…" : events.data === null ? <Pill>No read access</Pill> : events.data ? <>last event {when(events.data)}</> : <Pill tone="warn">No events recorded</Pill>}</p>
       </Card>
+      <div className="md:col-span-2"><PublishingCard /></div>
       <Card title="Translation"><p className="text-sm text-muted-foreground">English, French, Spanish and German use built-in text for key pages; every other language, and the rest of each page, is translated through the server AI route (/api/translate), so it depends on the AI provider above. Results are cached in each visitor's browser.</p></Card>
       <Card title="Backups and search data"><p className="text-sm text-muted-foreground">Configuration checkpoints are in Backups; full database backups (daily, about 14 days) and exports are in the Lovable project under Database. Search Console, Bing and the release checks are in "Search &amp; releases".</p></Card>
     </div>

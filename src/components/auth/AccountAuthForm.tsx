@@ -30,8 +30,8 @@ export function friendlyAuthError(err: unknown): string {
   return m || "Something went wrong. Please try again.";
 }
 
-export default function AccountAuthForm({ initialMode = "signin", intent = "account", next, onSignedIn, idPrefix = "auth" }: {
-  initialMode?: AuthMode; intent?: AuthIntent; next?: string; onSignedIn?: () => void; idPrefix?: string;
+export default function AccountAuthForm({ initialMode = "signin", intent = "account", next, onSignedIn, onAccountCreated, idPrefix = "auth" }: {
+  initialMode?: AuthMode; intent?: AuthIntent; next?: string; onSignedIn?: () => void; onAccountCreated?: () => void; idPrefix?: string;
 }) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
@@ -67,6 +67,7 @@ export default function AccountAuthForm({ initialMode = "signin", intent = "acco
           setMode("signin");
           throw new Error("That email already has an EmmaForYou account. Sign in instead, or reset your password.");
         }
+        onAccountCreated?.();
         if (data.session) { onSignedIn?.(); return; }
         setInfo(`We've sent a confirmation link to ${mail}. Open it to finish creating your account; you'll be signed in and brought back here.`);
         setCanResend(true);

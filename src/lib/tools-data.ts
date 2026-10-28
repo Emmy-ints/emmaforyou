@@ -1,6 +1,8 @@
 /** Every free tool on the site, for the /tools directory. */
 export interface ToolInfo { to: string; name: string; icon: string; group: "AI tools" | "Plan & estimate" | "Learn" | "Talk to us"; does: string; get: string; time: string }
 
+import { PUBLISHING_TOOLS } from "./publishing-data";
+
 export const TOOLS_DIRECTORY: ToolInfo[] = [
   { to: "/ecommerce/grow", name: "Online store audit", icon: "🛒", group: "AI tools", does: "Scans any store or product page for speed, SEO, trust signals, checkout and product-page quality.", get: "Scores by category and every issue with evidence, a fix and how to verify it.", time: "~1 minute" },
   { to: "/ecommerce/research", name: "Product research & validation", icon: "🔎", group: "AI tools", does: "Checks a product idea against competitors' public pages, our tracked industry news and your unit costs.", get: "A sourced report separating evidence from hypotheses, plus margin per sale.", time: "~1 minute" },
@@ -26,4 +28,9 @@ export const TOOLS_DIRECTORY: ToolInfo[] = [
   { to: "/blog", name: "Blog", icon: "📝", group: "Learn", does: "Practical articles on growth, design, automation and Web3.", get: "Ideas you can apply this week.", time: "5–10 minutes" },
   { to: "/book", name: "Book a free strategy call", icon: "📅", group: "Talk to us", does: "A 30-minute call with Emmanuel, at a time that suits you.", get: "Your top opportunities and clear next steps.", time: "30 minutes" },
   { to: "/portal", name: "Client portal", icon: "🔐", group: "Talk to us", does: "For clients: projects, approvals, invoices, files and messages.", get: "Everything about your project in one place.", time: "Clients" },
+  ...PUBLISHING_TOOLS.map((t): ToolInfo => ({
+    to: `/publishing/${t.slug}`, name: t.name, icon: t.icon,
+    group: t.slug === "royalty-calculator" || t.slug === "launch-planner" || t.slug === "readiness-checker" ? "Plan & estimate" : "AI tools",
+    does: t.does, get: t.get, time: "Free · preview first",
+  })),
 ];

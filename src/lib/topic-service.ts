@@ -20,6 +20,7 @@ const MAP: Record<string, { label: string; to: string }> = {
   "Coaching": { label: "Accountability Coaching", to: "/expertise/accountability-coaching" },
   "Marketing & Promotion": { label: "Marketing & Promotion", to: "/expertise/marketing-promotion" },
   "Choosing an Agency": { label: "Book a free strategy call", to: "/book" },
+  Publishing: { label: "eBook Publishing & Book Marketing", to: "/services/ebook-publishing" },
 };
 
 export function serviceForTopic(category: string) {

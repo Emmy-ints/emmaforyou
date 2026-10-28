@@ -41,7 +41,7 @@ export function classifyChannel(referrer: string | null | undefined, utmSource?:
 }
 
 /** Enquiries: the visitor asked for something. Contact clicks are tracked separately. */
-export const ENQUIRY_EVENTS = ["lead_submitted", "intake_submitted", "call_booked", "assistant_lead", "proposal_accepted", "audit_requested", "affiliate_signup"] as const;
+export const ENQUIRY_EVENTS = ["lead_submitted", "intake_submitted", "call_booked", "assistant_lead", "proposal_accepted", "audit_requested", "affiliate_signup", "publishing_enquiry_submitted"] as const;
 export const CONTACT_EVENTS = ["whatsapp_click", "phone_click", "email_click"] as const;
 
 export interface EventRow { event: string; path: string | null; session_id: string; referrer: string | null; utm_source: string | null; utm_medium: string | null; created_at: string; device?: string | null; language?: string | null }

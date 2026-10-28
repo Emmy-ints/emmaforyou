@@ -16,6 +16,7 @@ const SOURCES: { id: string; name: string; summary: (r: Row) => string }[] = [
   { id: "site_audits", name: "Website audit requests", summary: (r) => [r.url, r.score != null && `score ${r.score}`].filter(Boolean).join(" · ") },
   { id: "business_intakes", name: "Business intakes", summary: (r) => [r.business_name, r.business_type, r.goal ?? r.goals].filter(Boolean).join(" · ") },
   { id: "email_sequence_leads", name: "Email generator", summary: (r) => [r.business, r.sequence ?? r.kind].filter(Boolean).join(" · ") },
+  { id: "publishing_enquiries", name: "Publishing enquiries", summary: (r) => [r.book_title && `“${r.book_title}”`, r.project_type, r.manuscript_status, (r.services ?? []).join(", "), r.launch_date && `launch ${r.launch_date}`, r.budget, r.details].filter(Boolean).join(" · ") },
 ];
 const STATUSES = ["new", "contacted", "qualified", "won", "lost", "spam"];
 

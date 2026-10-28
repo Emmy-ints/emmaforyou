@@ -4,7 +4,7 @@ import SectionHead from "./future/SectionHead";
 import { catalog, withOverrides } from "@/lib/service-catalog";
 import { useSettings } from "@/lib/site-settings";
 
-export type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app" | "ux" | "web3";
+export type Kind = "ai" | "web" | "email" | "social" | "ads" | "ecom" | "app" | "ux" | "web3" | "book";
 
 const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: string; tags: string[]; to?: string }[] = [
   { kind: "ai", slug: "ai-automation", id: "service-ai", name: "AI Automation", desc: "Automate follow-ups, bookings, and lead nurturing with intelligent AI systems that work 24/7.", tags: ["WhatsApp & chat agents", "Bookings", "Follow-up"] },
@@ -16,6 +16,7 @@ const SERVICES: { kind: Kind; slug: string; id: string; name: string; desc: stri
   { kind: "app", slug: "app-development", id: "service-app", name: "App Development", desc: "Custom mobile and web applications that streamline operations and delight your customers.", tags: ["Mobile", "Web apps", "Dashboards"] },
   { kind: "ux", slug: "ui-ux-design", id: "service-uiux", name: "UI/UX Design", desc: "Interfaces people understand at first glance: research, wireframes, prototypes and design systems for websites and apps.", tags: ["Research", "Prototypes", "Design systems"], to: "/expertise/ui-ux-design" },
   { kind: "web3", slug: "web3-development", id: "service-web3", name: "Web3 & Blockchain", desc: "dApps, wallet connections, Solidity smart contracts and crypto projects with a Web2-quality experience.", tags: ["dApps", "Solidity", "Wallets"], to: "/expertise/web3-development" },
+  { kind: "book", slug: "ebook-publishing", id: "service-ebook", name: "eBook Publishing & Marketing", desc: "Manuscripts turned into professional eBooks and paperbacks: formatting, cover design, 3D mockups, listing copy, launch plans and book marketing.", tags: ["eBook creation", "Cover design", "Mockups", "Book marketing"] },
 ];
 
 /**
@@ -118,6 +119,13 @@ export function Scene({ kind }: { kind: Kind }) {
       return (
         <div className="svb">
           {[0, 1, 2, 3].map((i) => <span key={i} className="svb-block" style={{ ["--i" as string]: i }}><i /></span>)}
+        </div>
+      );
+    case "book":
+      return (
+        <div className="svk">
+          <span className="svk-book"><span className="svk-page" /><span className="svk-page" /><span className="svk-page" /><span className="svk-cover"><i /><b /></span></span>
+          {[0, 1, 2].map((i) => <span key={i} className="svk-spark" style={{ ["--i" as string]: i }} />)}
         </div>
       );
     case "app":

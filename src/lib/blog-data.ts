@@ -27,6 +27,7 @@ const MARK = { name: "Mark Schneider", role: "Automation Lead", initials: "MS" }
 import { POSTS_A } from "./posts/posts-a";
 import { POSTS_B } from "./posts/posts-b";
 import { POSTS_C } from "./posts/posts-c";
+import { POSTS_PUBLISHING } from "./posts/posts-publishing";
 
 const ORIGINAL_POSTS: BlogPost[] = [
   {
@@ -532,7 +533,7 @@ If you can't commit 6 months to a new market, don't open it.`,
 ];
 
 /** Newest first. */
-export const POSTS: BlogPost[] = [...POSTS_A, ...POSTS_B, ...POSTS_C, ...ORIGINAL_POSTS];
+export const POSTS: BlogPost[] = [...POSTS_PUBLISHING, ...POSTS_A, ...POSTS_B, ...POSTS_C, ...ORIGINAL_POSTS];
 
 export function getPost(slug: string) {
   return POSTS.find((p) => p.slug === slug);

@@ -7,7 +7,7 @@
 import { EXPERTISE, SERVICES, SERVICE_TO_EXPERTISE } from "./services-data";
 import { SOLUTION_CATEGORIES } from "./solutions/categories";
 
-export type FamilyId = "web" | "ecom" | "design" | "ai" | "apps" | "marketing" | "web3" | "strategy" | "solutions";
+export type FamilyId = "web" | "ecom" | "design" | "ai" | "apps" | "marketing" | "web3" | "strategy" | "publishing" | "solutions";
 
 export interface Family { id: FamilyId; name: string; short: string; hue: string; icon: string }
 export interface CatalogItem {
@@ -25,6 +25,7 @@ export const FAMILIES: Family[] = [
   { id: "marketing", name: "Marketing & growth", short: "SEO, ads, email, social, lead generation and analytics.", hue: "#3ddc97", icon: "📈" },
   { id: "web3", name: "Web3 & blockchain", short: "dApps, wallets, smart contracts in Solidity and crypto projects.", hue: "#b9a6ff", icon: "⛓️" },
   { id: "strategy", name: "Strategy & coaching", short: "Digital strategy, business consulting and weekly accountability.", hue: "#f5b544", icon: "🧭" },
+  { id: "publishing", name: "eBook publishing & book marketing", short: "eBook creation, formatting, covers, mockups, listing copy, launches and book marketing.", hue: "#ff9f5a", icon: "📚" },
   { id: "solutions", name: "Ready-made solutions", short: "Build-ready systems you can try first, each with a live demo.", hue: "#7ee8fb", icon: "🧩" },
 ];
 
@@ -38,6 +39,8 @@ const FAMILY_OF: Record<string, FamilyId> = {
   "marketing-promotion": "marketing", analytics: "marketing", "sales-conversion": "marketing",
   "web3-development": "web3", "smart-contract-development": "web3", "blockchain-crypto": "web3",
   "digital-strategy": "strategy", "business-consulting": "strategy", "accountability-coaching": "strategy",
+  "ebook-publishing": "publishing", "ebook-formatting-conversion": "publishing", "book-cover-design": "publishing", "book-mockups-graphics": "publishing",
+  "book-metadata-positioning": "publishing", "book-launch-strategy": "publishing", "book-marketing": "publishing",
 };
 
 let CACHE: CatalogItem[] | null = null;

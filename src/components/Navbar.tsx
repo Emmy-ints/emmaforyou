@@ -51,6 +51,7 @@ const LEARN: Item[] = [
 
 const TOOLS: Item[] = [
   { to: "/ecommerce", name: "Ecommerce Intelligence", short: "Start or grow an online store" },
+  { to: "/publishing", name: "Book Publishing Tools", short: "eBook creator, covers, mockups, launch" },
   { to: "/website-audit", name: "Website Audit", short: "Speed, SEO and lead score" },
   { to: "/ai-receptionist", name: "AI Receptionist", short: "Chat or talk to the demo" },
   { to: "/makeover", name: "AI Website Makeover", short: "See your site redesigned" },

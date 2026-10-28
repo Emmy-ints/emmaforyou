@@ -1,4 +1,6 @@
 /** Questions and answers shown on /faq (also used for its FAQPage structured data). */
+import { PUBLISHING_FAQS } from "./publishing-data";
+
 export const CATEGORIES = [
   { id: "general", label: "General", items: [
     { q: "Do you work with businesses outside Nigeria?", a: "Yes — we serve clients in Nigeria, the United States, United Kingdom, France, Germany, Spain, Colombia, Ghana and South Africa. Most work is delivered remotely via WhatsApp and Zoom." },
@@ -45,4 +47,5 @@ export const CATEGORIES = [
     { q: "What information do you need from me?", a: "Just complete the 8-step intake form — it covers everything we need to build your custom plan." },
     { q: "How do you communicate with clients?", a: "WhatsApp for daily comms, scheduled Zoom calls for strategy, email for documentation, and a project portal for deliverables." },
   ]},
+  { id: "publishing", label: "eBooks & Publishing", items: PUBLISHING_FAQS },
 ];

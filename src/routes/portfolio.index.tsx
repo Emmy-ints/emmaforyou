@@ -11,6 +11,7 @@ import { useSettings } from "@/lib/site-settings";
 import { liveProjects } from "@/lib/portfolio-live";
 import { ADS, AUTOMATIONS, FEATURED, PROJECTS, SOCIAL_BEFORE_AFTER, VIDEOS, findProject, projectSlug } from "@/lib/portfolio-data";
 import { buildWa } from "@/lib/leads";
+import PublishingConcepts from "@/components/publishing/PublishingConcepts";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/")({
@@ -219,6 +220,9 @@ function PortfolioPage() {
             </div>
           </section>
         )}
+
+        {/* Publishing concepts: live-rendered demos, labelled — not client work */}
+        <PublishingConcepts />
 
         {/* CTA */}
         <section className="hero-ink relative overflow-hidden">

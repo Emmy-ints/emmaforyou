@@ -3,13 +3,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
 import { KineticText } from "../future/Kinetic";
+import { PUBLISHING_TOOLS } from "@/lib/publishing-data";
 
 /* Each tool keeps one accent so it reads as its own instrument inside the same brand. */
 const HUES: [RegExp, string][] = [
   [/^\/ai-receptionist/, "#3ddc97"], [/^\/book/, "#4f7bff"], [/^\/checklists/, "#3dd6f5"], [/^\/compare/, "#f5b544"],
   [/^\/goal-planner/, "#ff8a4c"], [/^\/industries/, "#ff6bb5"], [/^\/makeover/, "#ff6bb5"], [/^\/newsletter/, "#f5b544"],
   [/^\/proposal/, "#8b7bff"], [/^\/smart-contract-check/, "#3dd6f5"], [/^\/solutions\/app-planner/, "#4f7bff"], [/^\/tools/, "#3ddc97"],
-  [/^\/website-audit/, "#3dd6f5"], [/^\/unsubscribe/, "#8a90ad"],
+  [/^\/website-audit/, "#3dd6f5"], [/^\/unsubscribe/, "#8a90ad"], [/^\/publishing/, "#ff9f5a"], [/^\/account\/books/, "#ff9f5a"],
 ];
 const hueFor = (p: string) => HUES.find(([r]) => r.test(p))?.[1] ?? "#8b7bff";
 
@@ -60,9 +61,9 @@ export default function ToolShell({ eyebrow, title, intro, children, answers, wi
               ))}
             </ul>
             <nav aria-label="More free tools" className="mt-10">
-              <p className="text-sm text-muted-foreground">More free tools</p>
+              <p className="text-sm text-muted-foreground">{pathname.startsWith("/publishing") ? "More free book tools" : "More free tools"}</p>
               <ul className="mt-3 flex flex-wrap gap-2">
-                {[["/website-audit", "Website audit"], ["/ai-receptionist", "AI receptionist demo"], ["/proposal", "Instant proposal"], ["/makeover", "AI website makeover"], ["/book", "Book a strategy call"]].map(([to, label]) => (
+                {(pathname.startsWith("/publishing") ? [...PUBLISHING_TOOLS.filter((t) => !pathname.endsWith(t.slug)).map((t) => [`/publishing/${t.slug}`, t.name]), ["/publishing", "Publishing services"]] : [["/website-audit", "Website audit"], ["/ai-receptionist", "AI receptionist demo"], ["/proposal", "Instant proposal"], ["/makeover", "AI website makeover"], ["/book", "Book a strategy call"]]).map(([to, label]) => (
                   <li key={to}><Link to={to} className="tsh-chip">{label}</Link></li>
                 ))}
               </ul>

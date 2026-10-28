@@ -13,6 +13,7 @@ import { KNOWLEDGE } from "./knowledge-data";
 import { CHECKLISTS } from "./checklists";
 import { COMPARISONS } from "./comparisons";
 import { LEAD_MAGNETS } from "./lead-magnets";
+import { PUBLISHING_TOOLS } from "./publishing-data";
 
 export type PageKind = "Page" | "Service" | "Expertise" | "Solution" | "Tool" | "Industry" | "Work" | "Guide" | "Account";
 export interface PageEntry { title: string; href: string; kind: PageKind; hint?: string; keywords?: string }
@@ -71,6 +72,10 @@ const STATIC: PageEntry[] = [
   { kind: "Account", title: "Sign in or create an account", href: "/login", keywords: "login register signup" },
   { kind: "Account", title: "Your account", href: "/account", keywords: "profile settings" },
   { kind: "Account", title: "Client portal", href: "/portal", keywords: "projects invoices approvals files" },
+  { kind: "Account", title: "Author workspace (my books)", href: "/account/books", keywords: "book projects ebook saved covers" },
+  { kind: "Page", title: "eBook publishing & book marketing", href: "/publishing", keywords: "ebook book publish author kdp amazon kindle cover mockup launch marketing" },
+  { kind: "Page", title: "Publishing enquiry", href: "/publishing/enquiry", keywords: "book author help quote" },
+  ...PUBLISHING_TOOLS.map((t): PageEntry => ({ kind: "Tool", title: t.name, href: `/publishing/${t.slug}`, hint: t.does, keywords: "book ebook author publishing" })),
   { kind: "Page", title: "Privacy policy", href: "/privacy" },
   { kind: "Page", title: "Terms", href: "/terms" },
   { kind: "Page", title: "Cookie policy", href: "/cookies" },

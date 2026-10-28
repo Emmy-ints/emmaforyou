@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
-import { Loader2, Lock, Users, BarChart3, ShieldCheck, LogOut, KeyRound, CheckCircle2, ArrowRight } from "lucide-react";
+import { Loader2, Lock, Users, BarChart3, ShieldCheck, LogOut, KeyRound, CheckCircle2, ArrowRight, BookOpen } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,7 @@ function AccountPage() {
                 {summary?.client_portal
                   ? <Area icon={Lock} title="Client portal" text="Projects, approvals, invoices, files and messages." to="/portal" cta="Open portal" />
                   : <li><ActivatePortal /></li>}
+                <Area icon={BookOpen} title="Author workspace" text="Your book projects: eBooks, covers, mockups, listing copy and launch plans." to="/account/books" cta="Open my books" />
                 {summary?.admin && <Area icon={BarChart3} title="Owner dashboard" text="Analytics, leads, bookings, clients, blog and community." to="/dashboard" cta="Open dashboard" />}
                 {summary?.staff && <Area icon={ShieldCheck} title="Community moderation" text="Reports queue and support inbox." to="/community/moderation" cta="Open moderation" />}
               </ul>

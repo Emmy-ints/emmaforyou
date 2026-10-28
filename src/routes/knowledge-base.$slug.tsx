@@ -119,7 +119,7 @@ function renderBody(body: string) {
     if (para.length) {
       out.push(
         <p key={`p-${out.length}`} className="leading-relaxed">
-          {para.join(" ")}
+          {renderInline(para.join(" "))}
         </p>,
       );
       para = [];
@@ -134,7 +134,7 @@ function renderBody(body: string) {
           className={`ml-5 ${list.type === "ul" ? "list-disc" : "list-decimal"} space-y-1`}
         >
           {list.items.map((it, i) => (
-            <li key={i}>{it}</li>
+            <li key={i}>{renderInline(it)}</li>
           ))}
         </Tag>,
       );
@@ -184,4 +184,19 @@ function renderBody(body: string) {
   flushPara();
   flushList();
   return out;
+}
+
+/** **bold** and [label](/internal-path) inside paragraphs and list items (external links open in a new tab). */
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\[[^\]]+\]\([^)\s]+\))/g);
+  return parts.map((p, i) => {
+    if (p.startsWith("**") && p.endsWith("**") && p.length > 4) return <strong key={i}>{p.slice(2, -2)}</strong>;
+    const link = p.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/);
+    if (link) {
+      const [, label, href] = link;
+      const cls = "font-semibold text-[color:var(--emma-violet)] underline decoration-[color:var(--emma-violet)]/30 underline-offset-4 hover:decoration-[color:var(--emma-violet)]";
+      return href.startsWith("/") ? <Link key={i} to={href} className={cls}>{label}</Link> : <a key={i} href={href} target="_blank" rel="noopener noreferrer" className={cls}>{label}</a>;
+    }
+    return p;
+  });
 }

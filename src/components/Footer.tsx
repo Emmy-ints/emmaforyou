@@ -28,6 +28,7 @@ const RESOURCES: L[] = [
   { to: "/blog", label: "Blog" },
   { to: "/knowledge-base", label: "Knowledge base" },
   { to: "/ecommerce", label: "Ecommerce Intelligence" },
+  { to: "/publishing", label: "Book publishing tools" },
   { to: "/tools", label: "Free tools" },
   { to: "/inspiration", label: "Inspiration library" },
   { to: "/free-resources", label: "Free resources" },

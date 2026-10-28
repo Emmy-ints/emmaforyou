@@ -46,7 +46,7 @@ export default function ServiceExplorer() {
       <div className="mx-auto max-w-7xl">
         <SectionHead id="sex-h" align="center" className="max-w-3xl" kicker={`Full catalogue · ${items.length} services and solution areas`}
           title="Explore every service on one map" shine={["every", "service"]}
-          sub="Websites, ecommerce, UI/UX, AI agents, automation, apps, marketing, Web3 and strategy. Turn the map, pick an area, or search for exactly what you need." />
+          sub="Websites, ecommerce, UI/UX, AI agents, automation, apps, marketing, Web3, strategy and book publishing. Turn the map, pick an area, or search for exactly what you need." />
 
         {showWorld && <p className="mt-4 text-center"><Link to="/explore" className="nav-ghost h-auto px-5 py-2 text-sm">Prefer to wander? Enter the 3D service world <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></p>}
         <div className="sex-grid mt-12">

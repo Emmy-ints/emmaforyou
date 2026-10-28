@@ -7,11 +7,12 @@ import {
   HandCoins, HelpCircle, LayoutDashboard, ListChecks, Mail, MessageCircle, Newspaper, PlayCircle, Quote, Tag, WandSparkles,
   Bot, Globe, Languages, Mic, Palette, FileSignature, ShieldCheck, Target,
   Rocket, Search, Store, Stethoscope, Users, Megaphone, MessageSquare, FolderOpen, Plug, Layers, Scale, Sparkles, MessagesSquare,
+  BookMarked, Image as ImageIcon, PenLine, Library,
 } from "lucide-react";
 import { buildWa } from "@/lib/leads";
 import SectionHead from "../future/SectionHead";
 
-type Group = "try" | "ecommerce" | "learn" | "work" | "proof";
+type Group = "try" | "ecommerce" | "books" | "learn" | "work" | "proof";
 
 interface Tool {
   group: Group;
@@ -58,6 +59,18 @@ export const TOOLS: Tool[] = [
   { group: "ecommerce", icon: FolderOpen, name: "Ecommerce workspace", does: "Keep your roadmaps, audits, research and profit reports in one private place.", get: "Saved reports you can compare over time, export or delete.", meta: "Free account", cta: "Open workspace", href: { to: "/ecommerce/workspace" } },
   { group: "ecommerce", icon: Plug, name: "Platforms & integrations", does: "See which store platforms, marketplaces and analytics tools work with these tools today.", get: "An honest status for each, what a connection would need, and how to import a CSV instead.", meta: "19 platforms", cta: "See integrations", href: { to: "/ecommerce/integrations" } },
 
+  // eBooks & publishing
+  { group: "books", icon: BookOpen, name: "eBook creator & converter", does: "Paste your manuscript or upload a Word file. Organise chapters, choose a page size and typography, and preview every page.", get: "Real PDF, EPUB and Word files — preview free, download after a free sign-in.", meta: "Free · PDF, EPUB, DOCX", cta: "Create your eBook", href: { to: "/publishing/ebook-creator" } },
+  { group: "books", icon: Palette, name: "Book cover designer", does: "Enter your title, author, genre and style to generate several cover concepts, then adjust type, colours and layout.", get: "An eBook cover at KDP's recommended size and a paperback wrap proof with spine and bleed.", meta: "Free · eBook + print", cta: "Design a book cover", href: { to: "/publishing/cover-designer" } },
+  { group: "books", icon: ImageIcon, name: "3D book mockups & promo graphics", does: "Use your own cover or one you designed here to make 3D books, tablet and phone shots, social posts, banners and quote cards.", get: "Launch graphics in the right size for each platform, downloadable as a pack.", meta: "Free · 10 formats", cta: "Generate book mockups", href: { to: "/publishing/mockups" } },
+  { group: "books", icon: PenLine, name: "Book description & marketing assistant", does: "Give a summary, genre and audience. AI drafts your description, tagline, author bio, keywords, categories, captions and emails.", get: "Editable drafts, checked against KDP's published listing rules.", meta: "AI · editable", cta: "Improve my book description", href: { to: "/publishing/book-marketing" } },
+  { group: "books", icon: Search, name: "Manuscript & chapter analyzer", does: "Paste a chapter or upload a sample and pick what to check: readability, clarity, structure or your opening hook.", get: "Measured statistics with the formulas shown, plus AI-assisted editorial notes that quote your text.", meta: "AI-assisted · free", cta: "Analyse my chapter", href: { to: "/publishing/manuscript-analyzer" } },
+  { group: "books", icon: Rocket, name: "Book launch planner", does: "Enter your launch date, audience, channels and budget.", get: "A dated checklist, content calendar, email outline and tasks you can tick off, plus a calendar file.", meta: "Free · editable", cta: "Plan my book launch", href: { to: "/publishing/launch-planner" } },
+  { group: "books", icon: Calculator, name: "Publishing cost & royalty estimator", does: "Enter price, format, platform, expected sales and costs. Compare up to three scenarios.", get: "Royalty per copy, monthly earnings and break-even, with every formula and assumption shown.", meta: "Estimates · free", cta: "Estimate my royalties", href: { to: "/publishing/royalty-calculator" } },
+  { group: "books", icon: ListChecks, name: "Publishing readiness checker", does: "Check your manuscript, cover image and listing details before you upload.", get: "Checks we ran (pass/fix) kept separate from those that need the platform or a person.", meta: "Free", cta: "Check my book", href: { to: "/publishing/readiness-checker" } },
+  { group: "books", icon: Library, name: "Author workspace", does: "Keep your book projects, exports, covers, drafts and launch plans in one private place.", get: "Saved projects you can reopen, update or delete.", meta: "Free account", cta: "Open my books", href: { to: "/account/books" } },
+  { group: "books", icon: BookMarked, name: "Publishing services", does: "Formatting, covers, mockups, listing copy, launch strategy and book marketing, done with you.", get: "A fixed quote after a free call. You keep your rights and royalties.", meta: "Done for you", cta: "Explore publishing services", href: { to: "/publishing" } },
+
   // Learn & download
   { group: "learn", icon: Download, name: "Free growth toolkits", does: "Download practical toolkits: digital checklist, Instagram captions, AI automation starter, ad swipe file, WhatsApp playbook and a 90-day planner.", get: "Six downloadable resources you can use today.", meta: "Free download", cta: "Get the toolkits", href: { to: "/free-resources" } },
   { group: "learn", icon: BookOpen, name: "Knowledge base", does: "In-depth guides on websites, SEO, AI automation, social media, ads, email and ecommerce.", get: "Step-by-step answers written for business owners, not marketers.", meta: "Free guides", cta: "Browse the guides", href: { to: "/knowledge-base" } },
@@ -85,6 +98,7 @@ export const TOOLS: Tool[] = [
 const GROUPS: { id: Group; label: string; intro: string }[] = [
   { id: "try", label: "Try it now", intro: "Interactive tools that give you a result straight away — free, no sign-up." },
   { id: "ecommerce", label: "Ecommerce", intro: "Start an online store or grow an existing one: launch plan, research, audits, sales and profit — every figure is observed, yours, or labelled a hypothesis." },
+  { id: "books", label: "eBooks & publishing", intro: "Create, design, describe and launch your book: real file exports, cover and mockup rendering, and AI drafts you edit. Preview free; sign in to download and save." },
   { id: "learn", label: "Learn & download", intro: "Guides, toolkits and videos to grow on your own." },
   { id: "work", label: "Work with us", intro: "Ways to start a project or talk to Emmanuel." },
   { id: "proof", label: "See our work", intro: "Real client projects, results and reviews." },

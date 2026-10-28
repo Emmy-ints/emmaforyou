@@ -17,6 +17,7 @@ import { KineticText } from "./future/Kinetic";
 import SectionHead from "./future/SectionHead";
 import FounderCard from "./future/FounderCard";
 import { Scene, type Kind } from "./ServicesSection";
+import { isPublishingSlug, PUBLISHING_TOOLS, PUBLISHING_SERVICES } from "@/lib/publishing-data";
 
 /* Every service and expertise page lives in one of the seven service "worlds" (colour + live scene). */
 const KIND: Record<string, Kind> = {
@@ -27,6 +28,8 @@ const KIND: Record<string, Kind> = {
   "ad-marketing": "ads", "paid-ads": "ads", "lead-generation": "ads", seo: "ads", analytics: "ads", "conversion-rate-optimisation": "ads", "marketing-promotion": "ads",
   ecommerce: "ecom", "shopify-ecommerce": "ecom",
   "app-development": "app", "web3-development": "web3", "smart-contract-development": "web3", "blockchain-crypto": "web3",
+  "ebook-publishing": "book", "ebook-formatting-conversion": "book", "book-cover-design": "book", "book-mockups-graphics": "book",
+  "book-metadata-positioning": "book", "book-launch-strategy": "book", "book-marketing": "book",
 };
 
 const reveal = {
@@ -43,6 +46,10 @@ function relatedWork(slug: string) {
 }
 
 function relatedServices(slug: string) {
+  if (isPublishingSlug(slug)) {
+    return PUBLISHING_SERVICES.filter((p) => p.slug !== slug).map((p) => ({ label: p.label, to: p.slug === "ebook-publishing" ? "/services/ebook-publishing" : `/expertise/${p.slug}`, short: p.short })).slice(0, 4)
+      .concat([{ label: "Website Design & Dev", to: "/services/website-design", short: "Author websites and landing pages" }, { label: "Email Marketing", to: "/services/email-marketing", short: "Reader lists and sequences" }]).slice(0, 8);
+  }
   const own = Object.entries(SERVICE_TO_EXPERTISE).find(([, e]) => e === slug)?.[0];
   const svc = SERVICES.filter((s) => s.slug !== own).slice(0, 4).map((s) => ({ label: s.name, to: `/services/${s.slug}`, short: s.short }));
   const more = EXPERTISE.filter((e) => e.slug !== slug && !Object.values(SERVICE_TO_EXPERTISE).includes(e.slug)).slice(0, 4).map((e) => ({ label: e.name, to: `/expertise/${e.slug}`, short: e.short }));
@@ -196,7 +203,29 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
         </Block>
       )}
 
+      {/* Publishing: free tools + labelled concepts instead of unrelated client work */}
+      {isPublishingSlug(data.slug) && (
+        <Block tone="alt" title="Try the free book tools" lead="Start yourself and bring us in when you want a professional finish. Everything previews without an account; sign in (free) to download and save.">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[...PUBLISHING_TOOLS].sort((a, b) => Number(b.service === data.slug) - Number(a.service === data.slug)).map((t) => (
+              <li key={t.slug}>
+                <Link to={`/publishing/${t.slug}`} className="svx-related lg h-full" data-tilt="3" data-track={`svc_${data.slug}_tool_${t.slug}`}>
+                  <span className="text-2xl" aria-hidden="true">{t.icon}</span>
+                  <span className="mt-2 font-display font-semibold">{t.name}</span>
+                  <span className="mt-1 text-sm text-muted-foreground">{t.does}</span>
+                  <ArrowRight className="svx-related-arrow h-4 w-4" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sm text-muted-foreground">
+            Want to see the kind of covers, interiors and launch graphics we make? <Link to="/portfolio" hash="publishing-concepts" className="font-semibold text-[color:var(--emma-violet)] hover:underline underline-offset-4">See publishing concept examples</Link> (clearly labelled demos, not client work).
+          </p>
+        </Block>
+      )}
+
       {/* Related client work */}
+      {!isPublishingSlug(data.slug) && (
       <Block tone="alt" title="Related client work" lead="Projects where we delivered this kind of work.">
         <div className="grid gap-5 md:grid-cols-3">
           {work.map((p, i) => <ProjectCard key={p.name} p={p} index={i} />)}
@@ -205,6 +234,7 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
           See all client work <ArrowRight className="h-4 w-4" />
         </Link>
       </Block>
+      )}
 
       {/* Integrations + scope */}
       <Block tone="alt" title="Tools, scope and pricing">

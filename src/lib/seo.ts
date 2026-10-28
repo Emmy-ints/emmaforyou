@@ -45,6 +45,9 @@ export const SERVICES_OFFERED = [
   "Web3 and dApp development",
   "Smart contract (Solidity) development",
   "Blockchain and crypto projects",
+  "eBook creation, formatting and conversion",
+  "Book cover design, mockups and promotional graphics",
+  "Book marketing and launch strategy",
 ];
 
 export const AREAS_SERVED = ["Nigeria", "United States", "United Kingdom", "France", "Germany", "South Africa", "Ghana"];

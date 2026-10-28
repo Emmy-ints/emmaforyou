@@ -1,3 +1,5 @@
+import { PUBLISHING_EXPERTISE } from "./publishing-data";
+
 export interface ServiceItem {
   slug: string;
   name: string;
@@ -799,6 +801,7 @@ export const EXPERTISE: ServiceItem[] = [
       { q: "Do you give investment or legal advice?", a: "No. We build and launch products. For token regulations in your country, work with a qualified lawyer." },
     ],
   },
+  ...PUBLISHING_EXPERTISE,
 ];
 
 export const SERVICES: { slug: string; name: string; icon: string; short: string }[] = [
@@ -809,6 +812,7 @@ export const SERVICES: { slug: string; name: string; icon: string; short: string
   { slug: "ad-marketing", name: "Ad Marketing", icon: "📣", short: "Profitable Meta + Google" },
   { slug: "ecommerce", name: "Ecommerce Growth", icon: "🛍️", short: "Shopify done right" },
   { slug: "app-development", name: "App Development", icon: "📲", short: "Mobile-first apps" },
+  { slug: "ebook-publishing", name: "eBook Publishing & Marketing", icon: "📚", short: "Books readers can find" },
 ];
 
 export const SERVICE_TO_EXPERTISE: Record<string, string> = {
@@ -819,6 +823,7 @@ export const SERVICE_TO_EXPERTISE: Record<string, string> = {
   "ad-marketing": "paid-ads",
   "ecommerce": "shopify-ecommerce",
   "app-development": "app-development",
+  "ebook-publishing": "ebook-publishing",
 };
 
 export function findExpertise(slug: string) {

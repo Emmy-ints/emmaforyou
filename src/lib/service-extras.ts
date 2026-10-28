@@ -4,6 +4,8 @@
  * No prices are invented here — pages link to /pricing for plan pricing.
  */
 
+import { PUBLISHING_EXTRAS, PUBLISHING_QA } from "./publishing-data";
+
 export type DemoKind = "workflow" | "site" | "dashboard";
 
 export interface WorkflowNode {
@@ -291,6 +293,8 @@ export const SERVICE_EXTRAS: Record<string, ServiceExtra> = {
   },
 };
 
+Object.assign(SERVICE_EXTRAS, PUBLISHING_EXTRAS);
+
 export function extraFor(slug: string): ServiceExtra {
   return SERVICE_EXTRAS[slug] ?? SERVICE_EXTRAS["ai-automation"];
 }
@@ -397,6 +401,8 @@ export const SERVICE_QA: Record<string, ServiceQA[]> = {
     { q: "How do I choose the right digital growth services for my business?", a: "Start with where you lose the most customers today. If people can't find you, fix visibility (website, Google profile, SEO). If they find you but don't buy, fix replies, offers and follow-up. If you're ready to grow, add ads and content. Our free growth assessment shows which applies to you." },
   ],
 };
+
+Object.assign(SERVICE_QA, PUBLISHING_QA);
 
 /** Portfolio projects relevant to a service, matched by category or stack. */
 export const SERVICE_WORK_MATCH: Record<string, { categories?: string[]; stack?: string[] }> = {

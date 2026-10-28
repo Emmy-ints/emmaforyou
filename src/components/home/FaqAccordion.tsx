@@ -10,6 +10,7 @@ const FAQS = [
   { q: "Can you handle everything for me?", a: "Yes. Our 'Done-For-You' engagement type means you focus on running your business while we handle the strategy, design, automation, posting, ads and reporting. You just review and approve." },
   { q: "What is AI automation and how does it help my business?", a: "AI automation means your business responds to leads in seconds (not hours), follows up consistently with every enquiry, books appointments without you, and never lets a customer fall through the cracks. Most clients see 30–50% more conversions just from this." },
   { q: "Do you offer payment plans?", a: "Yes. Larger projects can be split into 2–3 monthly payments, and ongoing services bill monthly. We'll structure something that fits your cashflow." },
+  { q: "Do you help with eBooks and book marketing?", a: "Yes. We format and convert manuscripts into eBooks and paperbacks, design covers and mockups, write book descriptions and keywords, and plan and run book launches and marketing. You publish under your own account and keep your rights. Our free book tools let you start yourself." },
   { q: "Is my business too small or too new for EmmaForYou?", a: "Almost never. We've helped one-person businesses go from zero to first 100 customers, and we've helped established companies scale to seven figures. The key is commitment, not size." },
 ];
 

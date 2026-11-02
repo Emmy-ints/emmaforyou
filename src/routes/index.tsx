@@ -26,6 +26,7 @@ import { KineticText } from "../components/future/Kinetic";
 import SelectedWork from "../components/home/SelectedWork";
 import ToolsHub from "../components/home/ToolsHub";
 import PublishingSection from "../components/home/PublishingSection";
+import InternsSection from "../components/home/InternsSection";
 import ResultsTicker from "../components/home/ResultsTicker";
 import NicheShowcase from "../components/NicheShowcase";
 import MissionSection from "../components/MissionSection";
@@ -154,6 +155,7 @@ function HomePage() {
         <Flag id="home-trust"><TrustBadges /></Flag>
         <AboutTeaser />
         <MissionSection />
+        <Flag id="home-interns"><InternsSection /></Flag>
         <Flag id="home-countdown"><CountdownUrgency /></Flag>
         <IntakeSection />
         <StrategyCallSection />

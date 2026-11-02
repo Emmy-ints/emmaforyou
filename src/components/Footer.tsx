@@ -19,6 +19,7 @@ const COMPANY: L[] = [
   { to: "/why-emmaforyou", label: "Why EmmaForYou" },
   { to: "/portfolio", label: "Portfolio" },
   { to: "/cases", label: "Case studies" },
+  { to: "/interns", label: "Interns & emerging talent" },
   { to: "/testimonials", label: "Testimonials" },
   { to: "/pricing", label: "Pricing" },
   { to: "/contact", label: "Contact" },

@@ -19,15 +19,16 @@ import ContentTab from "@/components/site-admin/content";
 import LabTab from "@/components/site-admin/lab-admin";
 import { BackupsTab, EnquiriesTab, FeaturesTab, RedirectsTab, TranslationsTab } from "@/components/site-admin/operations";
 import SearchTab from "@/components/site-admin/search";
+import InternsTab from "@/components/site-admin/interns";
 
 /**
  * Website control room. Every action is checked again in the database (site_can / RLS), so the
  * tabs a person sees are a convenience, not the security boundary. Secrets never reach this page:
  * the AI check reports provider and model names only.
  */
-const TABS = [["overview", "Overview"], ["audit", "Audit & repair"], ["search", "Search & releases"], ["content", "Content"], ["enquiries", "Enquiries"], ["translations", "Translations"], ["design", "Design lab"], ["features", "Features"], ["redirects", "Redirects"], ["lab", "Innovation Lab"], ["team", "Team & roles"], ["log", "Activity log"], ["backups", "Backups"], ["systems", "AI & integrations"]] as const;
+const TABS = [["overview", "Overview"], ["audit", "Audit & repair"], ["search", "Search & releases"], ["content", "Content"], ["enquiries", "Enquiries"], ["interns", "Interns"], ["translations", "Translations"], ["design", "Design lab"], ["features", "Features"], ["redirects", "Redirects"], ["lab", "Innovation Lab"], ["team", "Team & roles"], ["log", "Activity log"], ["backups", "Backups"], ["systems", "AI & integrations"]] as const;
 type Tab = (typeof TABS)[number][0];
-const NEEDS: Record<Tab, string[] | null> = { overview: null, audit: ["audit.read"], search: ["audit.read", "analytics.read"], content: ["content.draft"], enquiries: ["enquiries.read"], translations: ["translations.edit"], design: ["design.draft"], features: ["flags.draft"], redirects: ["redirects.draft"], lab: ["lab.use"], team: ["roles.manage"], log: ["log.read"], backups: ["backup.create"], systems: null };
+const NEEDS: Record<Tab, string[] | null> = { overview: null, audit: ["audit.read"], search: ["audit.read", "analytics.read"], content: ["content.draft"], enquiries: ["enquiries.read"], interns: ["interns.manage"], translations: ["translations.edit"], design: ["design.draft"], features: ["flags.draft"], redirects: ["redirects.draft"], lab: ["lab.use"], team: ["roles.manage"], log: ["log.read"], backups: ["backup.create"], systems: null };
 const roleName = (p: string[]) => (p.includes("roles.manage") ? "Admin" : p.includes("translations.edit") ? "Marketing" : p.includes("flags.draft") ? "Developer" : p.includes("content.draft") ? "Editor" : p.includes("analytics.read") ? "Analyst" : "Auditor");
 
 export const Route = createFileRoute("/dashboard_/site")({
@@ -90,6 +91,7 @@ function Room({ perms, email }: { perms: string[]; email: string }) {
       {current === "search" && <SearchTab />}
       {current === "content" && <ContentTab />}
       {current === "enquiries" && <EnquiriesTab />}
+      {current === "interns" && <InternsTab />}
       {current === "translations" && <TranslationsTab />}
       {current === "design" && <DesignTab canPublish={can("design.publish")} />}
       {current === "features" && <FeaturesTab />}

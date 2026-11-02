@@ -73,6 +73,7 @@ const STATIC: PageEntry[] = [
   { kind: "Account", title: "Your account", href: "/account", keywords: "profile settings" },
   { kind: "Account", title: "Client portal", href: "/portal", keywords: "projects invoices approvals files" },
   { kind: "Account", title: "Author workspace (my books)", href: "/account/books", keywords: "book projects ebook saved covers" },
+  { kind: "Page", title: "Interns & emerging talent", href: "/interns", keywords: "interns intern talent team emerging directory profiles specialists" },
   { kind: "Page", title: "eBook publishing & book marketing", href: "/publishing", keywords: "ebook book publish author kdp amazon kindle cover mockup launch marketing" },
   { kind: "Page", title: "Publishing enquiry", href: "/publishing/enquiry", keywords: "book author help quote" },
   ...PUBLISHING_TOOLS.map((t): PageEntry => ({ kind: "Tool", title: t.name, href: `/publishing/${t.slug}`, hint: t.does, keywords: "book ebook author publishing" })),

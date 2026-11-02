@@ -2,16 +2,24 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL, isoDate } from "@/lib/seo";
 import { sitemapPaths } from "@/lib/seo-routes";
 import { autoSummaries } from "@/lib/blog-server";
+import { internCards } from "@/lib/interns-server";
 import { liveConfig } from "@/lib/live-config";
 
 async function xml(): Promise<string> {
   const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   // Automated blog articles come from the database (published rows only).
   const auto = (await autoSummaries(1000)).map((p) => ({ path: `/blog/${p.slug}`, priority: 0.6, changefreq: "monthly", lastmod: isoDate(p.date) }));
+  // Published intern profiles (the public view already excludes drafts and archived profiles);
+  // profiles set to noindex in the Interns tab are left out, and /interns only once one is public.
+  const interns = (await internCards().catch(() => [])).filter((i) => !i.noindex);
+  const internUrls = interns.length
+    ? [{ path: "/interns", priority: 0.5, changefreq: "weekly", lastmod: interns.map((i) => i.updated_at.slice(0, 10)).sort().pop() },
+       ...interns.map((i) => ({ path: `/interns/${i.slug}`, priority: 0.4, changefreq: "monthly", lastmod: i.updated_at.slice(0, 10) }))]
+    : [];
   const known = new Set(sitemapPaths().map((u) => u.path));
   // Pages the owner set to noindex in the control room are left out of the sitemap.
   const live = await liveConfig().catch(() => ({ settings: {} as Record<string, { noindex?: boolean }> }));
-  const urls = [...sitemapPaths(), ...auto.filter((u) => !known.has(u.path))]
+  const urls = [...sitemapPaths(), ...auto.filter((u) => !known.has(u.path)), ...internUrls.filter((u) => !known.has(u.path))]
     .filter((u) => !live.settings[`seo:${u.path}`]?.noindex)
     .map((u) => `  <url>\n    <loc>${esc(SITE_URL + (u.path === "/" ? "/" : u.path))}</loc>${"lastmod" in u && u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ""}\n    <changefreq>${u.changefreq}</changefreq>\n    <priority>${u.priority.toFixed(1)}</priority>\n  </url>`)
     .join("\n");

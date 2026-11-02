@@ -23,7 +23,7 @@ Interns never log in and never receive a role, permission or account from a prof
 - Only `site_can('interns.manage')` (admins) can read or write `interns`, `intern_private`, events and history.
 - Slugs are generated from the name, made unique (`-2`, `-3`…), and old slugs 301 to the new one.
 - Designation follows status: pending/active → **INTERN**, promoted → **TEAM MEMBER**, completed → **ALUMNI**. Archived keeps the last designation.
-- Publishing needs a name, a specialty and either a short bio or a profile introduction (≥ 60 characters). A pending draft becomes active when published.
+- Publishing needs a name, a specialty, a profile introduction (≥ 60 characters) and either the admin's short bio (≥ 40 characters) or a substantial profile biography (≥ 300 characters), so thin AI-only pages can't go live. A pending draft becomes active when published.
 - A completed internship stays public only if "approved alumni profile" is ticked.
 - Archiving unpublishes and removes the homepage spot. Restoring does not republish.
 - Every create, edit, publish, unpublish, feature, promote, complete, archive, restore and delete is logged in `intern_events` with the admin's email. Designation changes are also stored in `intern_designation_history`.

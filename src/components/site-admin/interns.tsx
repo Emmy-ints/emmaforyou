@@ -33,6 +33,7 @@ const BLANK: Omit<InternRow, "id" | "slug" | "created_at" | "updated_at"> = {
   seo_title: "", seo_description: "", noindex: false, alumni_public: false, start_date: null, end_date: null,
 };
 const STATUS_TONE: Record<InternStatus, "muted" | "good" | "warn" | "bad" | "info"> = { pending: "warn", active: "good", completed: "info", archived: "muted", promoted: "info" };
+const box = "rounded-xl border border-border bg-background px-3 py-2 text-sm";
 const inp = "mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm";
 const split = (t: string) => Array.from(new Set(t.split(/[,\n;]/).map((x) => x.trim()).filter(Boolean)));
 
@@ -99,9 +100,9 @@ export default function InternsTab() {
       )}
       <Card title="Intern profiles" actions={<Btn tone="primary" onClick={() => setEditing("new")}><Plus className="h-4 w-4" aria-hidden="true" />Add intern</Btn>}>
         <div className="flex flex-wrap gap-2">
-          <input aria-label="Search profiles" className={`${inp} mt-0 max-w-xs`} placeholder="Search name, skill, slug…" value={q} onChange={(e) => setQ(e.target.value)} />
-          <select aria-label="Status" className={`${inp} mt-0 w-auto`} value={status} onChange={(e) => setStatus(e.target.value as InternStatus | "")}><option value="">All statuses</option>{(Object.keys(STATUS_LABEL) as InternStatus[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
-          <select aria-label="Visibility" className={`${inp} mt-0 w-auto`} value={vis} onChange={(e) => setVis(e.target.value as typeof vis)}><option value="">Any visibility</option><option value="published">Published</option><option value="draft">Not published</option><option value="featured">On homepage</option></select>
+          <input aria-label="Search profiles" className={`${box} w-full max-w-xs`} placeholder="Search name, skill, slug…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <select aria-label="Status" className={box} value={status} onChange={(e) => setStatus(e.target.value as InternStatus | "")}><option value="">All statuses</option>{(Object.keys(STATUS_LABEL) as InternStatus[]).map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}</select>
+          <select aria-label="Visibility" className={box} value={vis} onChange={(e) => setVis(e.target.value as typeof vis)}><option value="">Any visibility</option><option value="published">Published</option><option value="draft">Not published</option><option value="featured">On homepage</option></select>
         </div>
         {sel.size > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/40 p-2 text-sm" role="region" aria-label="Bulk actions">

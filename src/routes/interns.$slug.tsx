@@ -32,7 +32,7 @@ export const Route = createFileRoute("/interns/$slug")({
     const d = DESIGNATION[i.designation];
     const path = `/interns/${i.slug}`;
     return pageHead({
-      title: i.seo_title || withBrand(`${i.display_name} — ${d.label}, ${i.specialty}`.slice(0, 60)),
+      title: i.seo_title || withBrand(trimWords(`${i.display_name} — ${d.label}, ${i.specialty}`, 60)),
       description: i.seo_description || clip(`${i.display_name} is ${d.label === "Intern" ? "an intern" : `a ${d.label.toLowerCase()}`} at EmmaForYou specialising in ${i.specialty}. ${cardIntro(i)}`, 158),
       path,
       type: "profile",
@@ -46,6 +46,12 @@ export const Route = createFileRoute("/interns/$slug")({
     });
   },
 });
+
+/** Cut at a word boundary (never mid-word) and drop dangling joiners. */
+function trimWords(t: string, max: number) {
+  if (t.length <= max) return t;
+  return t.slice(0, max + 1).replace(/\s+\S*$/, "").replace(/[\s,—–-]+(and|or|&|for|of|the)?$/i, "").trim();
+}
 
 /** ProfilePage + Person: only facts on the page; "affiliation" (not worksFor) because interns aren't employees. */
 function personLd(i: PublicIntern, path: string) {

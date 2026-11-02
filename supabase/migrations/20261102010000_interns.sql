@@ -136,8 +136,9 @@ BEGIN
     IF length(trim(NEW.display_name)) < 2 OR length(trim(NEW.specialty)) < 3 THEN
       RAISE EXCEPTION 'Add a display name and specialty before publishing' USING ERRCODE = '22023';
     END IF;
-    IF length(trim(coalesce(NEW.profile->>'intro', ''))) < 60 AND length(trim(NEW.short_bio)) < 60 THEN
-      RAISE EXCEPTION 'Add a short bio or generate the profile before publishing' USING ERRCODE = '22023';
+    -- no thin pages: the admin's own short bio, or a substantial reviewed profile, is required
+    IF length(trim(coalesce(NEW.profile->>'intro', ''))) < 60 OR (length(trim(NEW.short_bio)) < 40 AND length(trim(coalesce(NEW.profile->>'bio', ''))) < 300) THEN
+      RAISE EXCEPTION 'Add a short bio (at least 40 characters) and generate or write the profile before publishing' USING ERRCODE = '22023';
     END IF;
     IF NEW.published_at IS NULL OR (TG_OP = 'UPDATE' AND NOT OLD.published) THEN NEW.published_at := now(); END IF;
   END IF;

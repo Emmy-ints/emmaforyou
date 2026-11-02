@@ -32,6 +32,8 @@ export function verifyAgainst(text: string, source: string): { text: string; rem
   const removed: string[] = [];
   const parts = text.split(/(?<=[.!?])\s+/).filter((x) => x.trim());
   const kept = parts.filter((sent) => {
+    // gender is never supplied, so a gendered pronoun is an assumption
+    if (/\b(he|she|him|his|her|hers|himself|herself)\b/i.test(sent) && !/\b(he|she|him|his|her|hers)\b/i.test(source.replace(/<draft>[\s\S]*<\/draft>/, ""))) { removed.push(sent); return false; }
     const nums = sent.match(/\d+/g) ?? [];
     if (nums.some((n) => !srcNums.has(n))) { removed.push(sent); return false; }
     for (const m of sent.matchAll(CLAIMS)) { if (!src.includes(m[0].toLowerCase())) { removed.push(sent); return false; } }

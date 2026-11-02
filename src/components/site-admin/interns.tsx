@@ -163,7 +163,7 @@ function HomepageOrder({ rows, onChanged }: { rows: InternRow[]; onChanged: () =
   const move = (i: number, d: number) => { const o = [...feat]; const [x] = o.splice(i, 1); o.splice(i + d, 0, x); void save(o); };
   return (
     <Card title="Homepage: Meet Our Interns">
-      <p className="mb-3 text-sm text-muted-foreground">The homepage shows published profiles you add here, in this order (up to 8). Removing one keeps the profile; only its homepage spot is cleared. Unpublished profiles stay hidden even if selected.</p>
+      <p className="mb-3 text-sm text-muted-foreground">The homepage shows published profiles you add here, in this order (up to 12). Removing one keeps the profile; only its homepage spot is cleared. Unpublished profiles stay hidden even if selected.</p>
       <ErrorText message={err} />
       {!feat.length ? <Empty>No one is on the homepage yet, so the section is hidden. Select profiles above and choose “Add to homepage”.</Empty> : (
         <ol className="space-y-2">{feat.map((r, i) => (

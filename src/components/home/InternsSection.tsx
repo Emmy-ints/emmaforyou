@@ -16,7 +16,7 @@ export default function InternsSection() {
   useEffect(() => {
     let off = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any).from("interns_public").select(CARD_FIELDS).eq("homepage_featured", true).order("homepage_order", { ascending: true }).order("published_at", { ascending: true }).limit(8)
+    (supabase as any).from("interns_public").select(CARD_FIELDS).eq("homepage_featured", true).order("homepage_order", { ascending: true }).order("published_at", { ascending: true }).limit(12)
       .then(({ data }: { data: Card[] | null }) => { if (!off) setRows(data ?? []); }, () => { if (!off) setRows([]); });
     return () => { off = true; };
   }, []);

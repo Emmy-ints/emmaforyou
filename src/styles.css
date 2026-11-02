@@ -2387,3 +2387,15 @@ a.itn-card:hover { transform: translateY(-2px); }
 .itn-svc { display: flex; align-items: center; justify-content: space-between; gap: .5rem; border-radius: 14px; padding: .7rem .9rem; border: 1px solid var(--glass-border); background: var(--glass-2); font-size: .92rem; font-weight: 500; transition: border-color .2s, color .2s; }
 .itn-svc:hover, .itn-svc:focus-visible { color: var(--emma-violet); border-color: color-mix(in srgb, var(--emma-violet) 45%, transparent); }
 @media (prefers-reduced-motion: reduce) { .itn-card, .itn-svc { transition: none; } a.itn-card:hover { transform: none; } }
+/* languages + freelance profiles */
+.itn-lang { display: inline-flex; align-items: center; gap: .3rem; border-radius: 999px; padding: .28rem .7rem; font-size: .82rem; font-weight: 500; color: color-mix(in srgb, var(--emma-violet) 80%, var(--foreground)); background: color-mix(in srgb, var(--emma-violet) 9%, transparent); border: 1px solid color-mix(in srgb, var(--emma-violet) 22%, transparent); }
+.itn-lang-sm { padding: .14rem .5rem; font-size: .72rem; }
+.itn-lang-d { margin-left: .15rem; padding-left: .4rem; border-left: 1px solid color-mix(in srgb, var(--emma-violet) 30%, transparent); font-weight: 400; color: var(--muted-foreground); }
+.itn-fl { display: flex; flex-direction: column; gap: .6rem; border-radius: 18px; padding: 1rem; border: 1px solid var(--glass-border); background: var(--glass-2); }
+.itn-fl-p { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-foreground); }
+.itn-fl-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 999px; padding: .6rem 1rem; font-size: .9rem; font-weight: 600; color: #fff; background: var(--emma-violet); transition: opacity .2s; }
+.itn-fl-btn:hover, .itn-fl-btn:focus-visible { opacity: .9; }
+.itn-fl-btn:focus-visible, .itn-fl-mini:focus-visible { outline: 2px solid var(--emma-cyan); outline-offset: 3px; }
+.itn-fl-mini { display: inline-flex; align-items: center; gap: .3rem; margin-top: .6rem; font-size: .8rem; font-weight: 600; color: var(--muted-foreground); }
+.itn-fl-mini:hover { color: var(--emma-violet); text-decoration: underline; text-underline-offset: 3px; }
+.itn-fl-hint { display: inline-flex; align-items: center; gap: .25rem; margin-top: .6rem; font-size: .72rem; font-weight: 600; color: var(--muted-foreground); }

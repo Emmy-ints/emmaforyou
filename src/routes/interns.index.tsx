@@ -90,7 +90,7 @@ function InternsPage() {
             )}
             <div className="itn-note mt-14">
               <h2 className="font-display text-xl font-semibold">Working with EmmaForYou</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">Client projects are scoped, managed and quality-checked by EmmaForYou. Interns contribute to the services they're listed for. To start a project, talk to us rather than contacting an intern directly.</p>
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">You can contact an intern directly through the freelance profile linked on their page. If you'd rather have EmmaForYou scope, manage and quality-check a project for you, talk to us.</p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link to="/contact" className="btn-gold inline-flex items-center gap-2 rounded-full px-6 py-3 text-[15px]" data-track="interns_contact">Start a project</Link>
                 <Link to="/services" className="nav-ghost h-auto px-6 py-3">Explore our services</Link>

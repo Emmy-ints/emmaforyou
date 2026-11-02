@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Globe2, MapPin } from "lucide-react";
-import { DESIGNATION, cardIntro, initials, photoAlt, type Designation, type InternCard as Card } from "@/lib/interns";
+import { ArrowRight, ExternalLink, Globe2, MapPin } from "lucide-react";
+import { DESIGNATION, cardIntro, initials, linkLabel, photoAlt, platformName, type Designation, type InternCard as Card } from "@/lib/interns";
 
 /** The designation badge. Every intern shows INTERN; only an admin promotion changes it. */
 export function DesignationBadge({ d, className = "" }: { d: Designation; className?: string }) {
@@ -39,12 +39,8 @@ export default function InternCard({ i, compact = false }: { i: Card & { languag
       {i.display_name && <Handle u={i.username} />}
       <DesignationBadge d={i.designation} className="mt-2" />
       <p className="mt-3 text-sm font-medium text-[color:var(--emma-violet)]">{i.specialty}</p>
-      {(i.location || (i.languages?.length ?? 0) > 0) && (
-        <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-          {i.location && <p className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" aria-hidden="true" />{i.location}</p>}
-          {!compact && i.languages && i.languages.length > 0 && <p className="flex items-start justify-center gap-1"><Globe2 className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span>{i.languages.join(", ")}</span></p>}
-        </div>
-      )}
+      {i.location && <p className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="h-3.5 w-3.5" aria-hidden="true" />{i.location}</p>}
+      {!compact && <LanguageTags langs={i.languages ?? []} />}
       {!compact && cardIntro(i) && <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{cardIntro(i)}</p>}
       {!compact && i.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap justify-center gap-1.5" aria-label="Skills">{i.skills.slice(0, 6).map((s) => <li key={s} className="itn-chip">{s}</li>)}</ul>
@@ -52,6 +48,29 @@ export default function InternCard({ i, compact = false }: { i: Card & { languag
       <Link to="/interns/$slug" params={{ slug: i.slug }} className="itn-view mt-5" aria-label={`View ${name}'s profile`} data-track="intern_card">
         View profile <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
+      {(i.freelance_links?.length ?? 0) > 0 && (
+        <a href={i.freelance_links![0].url} target="_blank" rel="noopener noreferrer nofollow" className="itn-fl-mini" data-track="intern_card_freelance" data-platform={i.freelance_links![0].platform} aria-label={`${linkLabel(i.freelance_links![0])} for ${name} (opens in a new tab)`}>
+          {linkLabel(i.freelance_links![0])}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+        </a>
+      )}
     </article>
   );
+}
+
+/** Language tags; on cards only the first few, with "+N" for the rest. */
+export function LanguageTags({ langs, max = 4, className = "" }: { langs: string[]; max?: number; className?: string }) {
+  if (!langs.length) return null;
+  const more = langs.length - max;
+  return (
+    <ul className={`mt-3 flex flex-wrap justify-center gap-1.5 ${className}`} aria-label="Languages">
+      {langs.slice(0, max).map((l) => <li key={l} className="itn-lang itn-lang-sm"><Globe2 className="h-3 w-3" aria-hidden="true" />{l}</li>)}
+      {more > 0 && <li className="itn-lang itn-lang-sm" title={langs.slice(max).join(", ")}>+{more} more</li>}
+    </ul>
+  );
+}
+
+/** Non-link indicator for cards that are themselves a link (homepage). */
+export function FreelanceHint({ i }: { i: Pick<Card, "freelance_links"> }) {
+  const p = i.freelance_links?.[0]?.platform;
+  return p ? <span className="itn-fl-hint"><ExternalLink className="h-3 w-3" aria-hidden="true" />On {platformName(p)}</span> : null;
 }

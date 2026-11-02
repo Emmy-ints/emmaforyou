@@ -43,3 +43,11 @@ The admin's facts (never private fields, and location only when approved) are se
 ## SEO
 
 Each published profile has its own title and description (editable; generated from the profile otherwise), a canonical URL, Open Graph image (the photo) and alt text, a breadcrumb and a `ProfilePage`/`Person` JSON-LD with `affiliation` (not `worksFor`, because interns aren't employees). "Allow search engines to index" off → `noindex` and left out of the sitemap. `/interns` is `noindex` until at least one profile is public.
+
+## Languages and freelance profiles
+
+- Languages are rows in `intern_languages` (language + optional details such as "Native"), freelance/portfolio profiles are rows in `intern_links` (platform, URL, button label, show publicly, order). Both are admin-only (RLS `interns.manage`).
+- The editor saves both in one call, `intern_save_contacts(intern, languages, links)` (security invoker, so RLS applies; all-or-nothing). Triggers copy them onto `interns.languages` / `interns.external_links` for filters, cards and the AI — don't write those two columns directly.
+- URLs are validated in the database by `intern_link_valid(platform, url)` (https only, on the platform's own site for known platforms, never an email address) and in the editor by `linkProblem()` in `src/lib/interns.ts` (same rules). Add a platform in both places (`PLATFORMS` and the SQL function / check constraint).
+- Public pages read `interns_public.language_details` and `freelance_links` (approved only). Profile pages show every language as a tag, a "Find me online" section with one button per approved profile, and "Hire or Contact This Specialist" (first approved profile); the EmmaForYou contact option stays as a secondary choice. External links open in a new tab with `rel="noopener noreferrer nofollow"`.
+- The AI writer gets the language list and the platform names (never the URLs). The server strips any URL, email or web address from AI text and adds a plain sentence for any supplied language the AI left out.

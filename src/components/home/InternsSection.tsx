@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import SectionHead from "../future/SectionHead";
 import { supabase } from "@/integrations/supabase/client";
 import { CARD_FIELDS, type InternCard as Card } from "@/lib/interns";
-import { DesignationBadge, Handle, InternPhoto } from "@/components/interns/InternCard";
+import { DesignationBadge, FreelanceHint, Handle, InternPhoto, LanguageTags } from "@/components/interns/InternCard";
 
 /**
  * Homepage "Our Emerging Talent": the interns an admin selected for the homepage, in their order.
@@ -35,6 +35,8 @@ export default function InternsSection() {
                 {i.display_name && <Handle u={i.username} />}
                 <DesignationBadge d={i.designation} className="mt-2" />
                 <span className="mt-1 block text-sm text-muted-foreground">{i.specialty}</span>
+                <LanguageTags langs={i.languages ?? []} max={3} />
+                <FreelanceHint i={i} />
               </Link>
             </li>
           ))}

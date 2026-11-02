@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ExternalLink, Globe2, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Globe2, MapPin, MessageCircle } from "lucide-react";
 import InternCard, { DesignationBadge, Handle, InternPhoto } from "@/components/interns/InternCard";
-import { DESIGNATION, type InternCard as Card, type PublicIntern } from "@/lib/interns";
+import { DESIGNATION, linkLabel, platformName, type FreelanceLink, type InternCard as Card, type PublicIntern } from "@/lib/interns";
 import { EXPERTISE } from "@/lib/services-data";
 
 /** The public profile body. Also used by the admin preview, so a draft looks exactly as it will when published. */
@@ -10,6 +10,10 @@ export default function InternProfileView({ i, related = [], preview = false }: 
   const p = i.profile;
   const services = i.services.map((s) => EXPERTISE.find((e) => e.slug === s)).filter(Boolean) as { slug: string; name: string }[];
   const expertise = p.expertise?.length ? p.expertise : i.specialties;
+  const langs = i.language_details?.length ? i.language_details : i.languages.map((language) => ({ language, details: "" }));
+  // approved freelance profiles (older rows only carried label + url)
+  const links: FreelanceLink[] = i.freelance_links?.length ? i.freelance_links : i.external_links.map((l) => ({ platform: /fiverr\.com/i.test(l.url) ? "fiverr" : "other", label: l.label, url: l.url }));
+  const name = i.display_name || `@${i.username}`;
   const bio = (p.bio || "").split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
 
   return (
@@ -54,6 +58,26 @@ export default function InternProfileView({ i, related = [], preview = false }: 
                 {p.capabilities?.length > 0 && <ul className="mt-4 list-disc space-y-1.5 pl-5 text-muted-foreground">{p.capabilities.map((c) => <li key={c}>{c}</li>)}</ul>}
               </section>
             )}
+            {langs.length > 0 && (
+              <section aria-labelledby="itn-langs">
+                <h2 id="itn-langs" className="itn-h2">Languages</h2>
+                <ul className="mt-3 flex flex-wrap gap-2" data-languages>{langs.map((l) => (
+                  <li key={l.language} className="itn-lang"><Globe2 className="h-3.5 w-3.5" aria-hidden="true" />{l.language}{l.details && <span className="itn-lang-d">{l.details}</span>}</li>
+                ))}</ul>
+              </section>
+            )}
+            {links.length > 0 && (
+              <section aria-labelledby="itn-online" id="find-me-online">
+                <h2 id="itn-online" className="itn-h2">Find me online</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{name}'s freelance profiles. Links open the external site in a new tab.</p>
+                <ul className="mt-4 grid gap-3 sm:grid-cols-2" data-freelance>{links.map((l) => (
+                  <li key={l.url} className="itn-fl">
+                    <span className="itn-fl-p">{platformName(l.platform)}</span>
+                    <a href={l.url} target="_blank" rel="noopener noreferrer nofollow" className="itn-fl-btn" data-track="intern_freelance" data-platform={l.platform}>{linkLabel(l)}<ExternalLink className="h-4 w-4" aria-hidden="true" /></a>
+                  </li>
+                ))}</ul>
+              </section>
+            )}
             {(services.length > 0 || p.contribution) && (
               <section aria-labelledby="itn-svc">
                 <h2 id="itn-svc" className="itn-h2">Services they can contribute to</h2>
@@ -88,17 +112,21 @@ export default function InternProfileView({ i, related = [], preview = false }: 
               <p className="mt-2"><DesignationBadge d={i.designation} /></p>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.role || defaultRole(i)}</p>
             </div>
-            {i.external_links.length > 0 && (
-              <div className="itn-card">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">External portfolio</p>
-                <ul className="mt-2 space-y-1.5">{i.external_links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer nofollow ugc" className="itn-link inline-flex items-center gap-1 text-sm">{l.label}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a></li>)}</ul>
+            {links.length > 0 && (
+              <div className="itn-card" data-hire>
+                <p className="font-display text-lg font-semibold">Work with {name}</p>
+                <p className="mt-1 text-sm text-muted-foreground">Contact {name} directly through {links.length === 1 ? `their ${platformName(links[0].platform)} profile` : "their freelance profiles"}.</p>
+                <div className="mt-4 flex flex-col gap-2">
+                  <a href={links[0].url} target="_blank" rel="noopener noreferrer nofollow" className="btn-gold inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm" data-track="intern_hire" data-platform={links[0].platform}><MessageCircle className="h-4 w-4" aria-hidden="true" />Hire or Contact This Specialist</a>
+                  {links.map((l) => <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer nofollow" className="nav-ghost h-auto justify-center gap-1.5 px-5 py-2.5 text-sm" data-track="intern_freelance" data-platform={l.platform}>{linkLabel(l)}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>)}
+                </div>
               </div>
             )}
             <div className="itn-card">
-              <p className="font-display text-lg font-semibold">Have a project in mind?</p>
-              <p className="mt-1 text-sm text-muted-foreground">Projects are scoped and managed by EmmaForYou.</p>
+              <p className="font-display text-lg font-semibold">{links.length ? "Or work with EmmaForYou" : "Have a project in mind?"}</p>
+              <p className="mt-1 text-sm text-muted-foreground">We can scope and manage a project for you.</p>
               <div className="mt-4 flex flex-col gap-2">
-                <Link to="/contact" className="btn-gold inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm" data-track="intern_contact">Start a project</Link>
+                <Link to="/contact" className={links.length ? "nav-ghost h-auto justify-center px-5 py-2.5 text-sm" : "btn-gold inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm"} data-track="intern_contact">Start a project with EmmaForYou</Link>
                 <Link to="/services" className="nav-ghost h-auto justify-center px-5 py-2.5 text-sm">Explore services</Link>
               </div>
             </div>

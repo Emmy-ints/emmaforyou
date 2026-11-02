@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Btn, Card, check, db, Empty, ErrorText, Loading, Pill, Stat, useLoad, when } from "@/components/agents-admin/shared";
 import { DesignationBadge, InternPhoto } from "@/components/interns/InternCard";
 import InternProfileView from "@/components/interns/InternProfileView";
-import { DESIGNATION, STATUS_LABEL, slugify, type Designation, type InternProfile, type InternStatus, type PublicIntern } from "@/lib/interns";
+import { DESIGNATION, PLATFORMS, STATUS_LABEL, linkLabel, linkProblem, slugify, type Designation, type InternProfile, type InternStatus, type PublicIntern } from "@/lib/interns";
 import { EXPERTISE } from "@/lib/services-data";
 
 /**
@@ -13,7 +13,9 @@ import { EXPERTISE } from "@/lib/services-data";
  * checks and the audit trail. Interns never get an account, role or permission from a profile.
  */
 interface Item { title: string; description?: string; url?: string; approved: boolean }
-interface Link_ { label: string; url: string; approved: boolean }
+interface Link_ { platform?: string; label: string; url: string; approved: boolean }
+interface LangRow { language: string; details: string }
+interface LinkRow { platform: string; url: string; button_label: string; approved: boolean }
 export interface InternRow {
   id: string; slug: string; source_ref: string | null; display_name: string; username: string; designation: Designation; status: InternStatus;
   published: boolean; published_at: string | null; homepage_featured: boolean; homepage_order: number;
@@ -216,6 +218,20 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
   const [preview, setPreview] = useState(false);
   const [changed, setChanged] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // languages and freelance links are their own records (intern_languages / intern_links)
+  const [langs, setLangs] = useState<LangRow[]>(() => (orig?.languages ?? []).map((language) => ({ language, details: "" })));
+  const [links, setLinks] = useState<LinkRow[]>(() => (orig?.external_links ?? []).map((l) => ({ platform: l.platform || (/fiverr\.com/i.test(l.url) ? "fiverr" : "other"), url: l.url, button_label: l.label ?? "", approved: !!l.approved })));
+  const [contactsDirty, setContactsDirty] = useState(false);
+  const editLangs = (v: LangRow[]) => { setLangs(v); setContactsDirty(true); setDirty(true); };
+  const editLinks = (v: LinkRow[]) => { setLinks(v); setContactsDirty(true); setDirty(true); };
+
+  useEffect(() => {
+    if (!rowId) return;
+    Promise.all([
+      db.from("intern_languages").select("language,details").eq("intern_id", rowId).order("position"),
+      db.from("intern_links").select("platform,url,button_label,approved").eq("intern_id", rowId).order("position"),
+    ]).then(([l, k]: { data: unknown[] | null }[]) => { if (l.data && !contactsDirty) setLangs(l.data as LangRow[]); if (k.data && !contactsDirty) setLinks(k.data as LinkRow[]); });
+  }, [rowId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!rowId) return;
@@ -227,9 +243,10 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
   const privDirty = JSON.stringify(priv) !== (privOrig || JSON.stringify({ email: "", notes: "", completion_reason: "", archive_reason: "", missing: [] }));
 
   const payload = () => {
-    const { slug, ...rest } = f;
+    // languages / external_links are kept in step by the database from their own tables
+    const { slug, languages: _l, external_links: _x, ...rest } = f;
     return { ...rest, slug: slugify(slug) || slugify(f.display_name) || "intern", display_name: f.display_name.trim(), specialty: f.specialty.trim(), short_bio: f.short_bio.trim(),
-      portfolio: f.portfolio.filter((p) => p.title.trim()), external_links: f.external_links.filter((l) => /^https:\/\//.test(l.url.trim())) };
+      portfolio: f.portfolio.filter((p) => p.title.trim()) };
   };
 
   const save = async (extra: Partial<InternRow> = {}, note = "Saved.") => {
@@ -239,6 +256,9 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
         const dupe = rows.find((r) => r.display_name.trim().toLowerCase() === f.display_name.trim().toLowerCase() && f.display_name.trim());
         if (dupe && !window.confirm(`A profile named “${dupe.display_name}” already exists. Create another one anyway?`)) { setBusy(""); return false; }
       }
+      const linkErr = links.map((l, n) => { const p = linkProblem(l.platform, l.url); return p ? `Freelance link ${n + 1}: ${p}` : null; }).find(Boolean);
+      if (linkErr) throw new Error(linkErr);
+      const cleanLangs = langs.map((l) => ({ language: l.language.trim(), details: l.details.trim() })).filter((l) => l.language.length >= 2);
       const body = { ...payload(), ...extra };
       // the database sets designation, published_at and the final unique slug
       const { id: _i, created_at: _c, updated_at: _u, ...clean } = body as typeof body & { id?: string; created_at?: string; updated_at?: string };
@@ -249,6 +269,12 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
         const pr = await db.from("intern_private").upsert({ intern_id: r.id, ...priv, missing: missingFor(r) });
         if (pr.error) throw new Error(pr.error.message);
         setPrivOrig(JSON.stringify({ ...priv, missing: missingFor(r) }));
+      }
+      if (!rowId || contactsDirty) {
+        const c = await db.rpc("intern_save_contacts", { _intern: r.id, _languages: cleanLangs, _links: links.map((l) => ({ ...l, url: l.url.trim(), button_label: l.button_label.trim() })) });
+        if (c.error) throw new Error(c.error.message);
+        r.languages = cleanLangs.map((l) => l.language); r.external_links = links.map((l) => ({ platform: l.platform, label: l.button_label, url: l.url.trim(), approved: l.approved }));
+        setLangs(cleanLangs); setContactsDirty(false);
       }
       setRowId(r.id); setF({ ...r }); setDirty(false); setChanged(true);
       setMsg(r.slug !== slugify(body.slug) && body.slug ? `${note} That URL was taken, so it's /interns/${r.slug}.` : note);
@@ -267,7 +293,7 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
     try {
       const svc = f.services.map((s) => EXPERTISE.find((e) => e.slug === s)?.name).filter(Boolean);
       const res = await fetch("/api/intern-profile", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${await token()}` },
-        body: JSON.stringify({ action, name: f.display_name, specialty: f.specialty, shortBio: f.short_bio, skills: f.skills, specialties: f.specialties, languages: f.languages,
+        body: JSON.stringify({ action, name: f.display_name, specialty: f.specialty, shortBio: f.short_bio, skills: f.skills, specialties: f.specialties, languages: langs.map((l) => (l.details ? `${l.language} (${l.details})` : l.language)), profiles: links.filter((l) => l.approved).map((l) => PLATFORMS.find((p) => p.id === l.platform)?.name ?? "Profile"),
           location: f.show_location ? f.location : "", tools: f.tools, services: svc, interests: f.interests, portfolio: f.portfolio.filter((p) => p.approved).map((p) => `${p.title}${p.description ? ` — ${p.description}` : ""}`),
           designation: DESIGNATION[f.designation].label === "Former Intern" ? "Former Intern (Alumni)" : DESIGNATION[f.designation].label, current: f.profile }) });
       const j = await res.json().catch(() => ({}));
@@ -310,7 +336,10 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
 
   const miss = missingFor(f);
   const previewData: PublicIntern = useMemo(() => ({ ...f, location: f.show_location ? f.location : "", portfolio: f.portfolio.filter((p) => p.approved).map((p) => ({ title: p.title, description: p.description ?? "", url: p.url ?? "" })),
-    external_links: f.external_links.filter((l) => l.approved), profile: { intro: "", bio: "", expertise: [], capabilities: [], contribution: "", role: "", ...f.profile }, updated_at: new Date().toISOString() }), [f]);
+    languages: langs.map((l) => l.language).filter(Boolean), language_details: langs.filter((l) => l.language.trim()),
+    external_links: links.filter((l) => l.approved && !linkProblem(l.platform, l.url)).map((l) => ({ label: l.button_label, url: l.url })),
+    freelance_links: links.filter((l) => l.approved && !linkProblem(l.platform, l.url)).map((l) => ({ platform: l.platform, label: l.button_label, url: l.url.trim() })),
+    profile: { intro: "", bio: "", expertise: [], capabilities: [], contribution: "", role: "", ...f.profile }, updated_at: new Date().toISOString() }), [f, langs, links]);
   const locked = dirty || !!busy;
 
   return (
@@ -338,11 +367,10 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
                 <span className="mt-1 block text-[11px] font-normal text-muted-foreground">/interns/{slugify(f.slug) || slugify(f.display_name) || "…"}{orig && f.slug !== orig.slug ? " · the old URL will redirect here" : ""}</span></label>
               <label className="text-sm font-medium sm:col-span-2">Specialty (headline)<input className={inp} value={f.specialty} maxLength={160} onChange={(e) => set("specialty", e.target.value)} /></label>
               <label className="text-sm font-medium sm:col-span-2">Short bio (your words — the AI only expands what's here and in the fields below)<textarea className={`${inp} min-h-24`} value={f.short_bio} maxLength={2000} onChange={(e) => set("short_bio", e.target.value)} /></label>
-              <ListField label="Specialties" value={f.specialties} onChange={(v) => set("specialties", v)} />
-              <ListField label="Skills" value={f.skills} onChange={(v) => set("skills", v)} />
-              <ListField label="Tools & technologies" value={f.tools} onChange={(v) => set("tools", v)} />
-              <ListField label="Professional interests" value={f.interests} onChange={(v) => set("interests", v)} />
-              <ListField label="Languages" value={f.languages} onChange={(v) => set("languages", v)} />
+              <TagEditor label="Specialties" value={f.specialties} onChange={(v) => set("specialties", v)} placeholder="e.g. iOS development" />
+              <TagEditor label="Skills" value={f.skills} onChange={(v) => set("skills", v)} placeholder="e.g. Swift" />
+              <TagEditor label="Tools & technologies" value={f.tools} onChange={(v) => set("tools", v)} placeholder="e.g. Figma" />
+              <TagEditor label="Professional interests" value={f.interests} onChange={(v) => set("interests", v)} placeholder="e.g. Game design" />
               <label className="text-sm font-medium">Location<input className={inp} value={f.location} maxLength={120} onChange={(e) => set("location", e.target.value)} />
                 <span className="mt-1 flex items-center gap-2 text-xs font-normal"><input type="checkbox" checked={f.show_location} onChange={(e) => set("show_location", e.target.checked)} />Approved to show publicly</span></label>
             </div>
@@ -372,7 +400,48 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
             </div>
           </Card>
 
-          <Card title="Portfolio & external links">
+          <Card title="Languages">
+            <p className="text-sm text-muted-foreground">Every language here shows as a tag on the public profile. Details are optional (e.g. Native, Fluent, Conversational).</p>
+            <ul className="mt-3 space-y-2" data-lang-editor>{langs.map((l, n) => (
+              <li key={n} className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:grid-cols-[1fr_200px_auto_auto]">
+                <input aria-label={`Language ${n + 1}`} className={`${inp} mt-0`} placeholder="Language" value={l.language} maxLength={40} onChange={(e) => editLangs(langs.map((x, i) => (i === n ? { ...x, language: e.target.value } : x)))} />
+                <input aria-label={`Details for language ${n + 1}`} className={`${inp} mt-0`} placeholder="Details (optional)" value={l.details} maxLength={60} onChange={(e) => editLangs(langs.map((x, i) => (i === n ? { ...x, details: e.target.value } : x)))} />
+                <span className="hidden items-center gap-0.5 sm:flex">
+                  <button type="button" className="rounded-lg p-1.5 hover:bg-muted disabled:opacity-30" disabled={n === 0} aria-label={`Move ${l.language || "language"} up`} onClick={() => { const o = [...langs]; [o[n - 1], o[n]] = [o[n], o[n - 1]]; editLangs(o); }}><ArrowUp className="h-4 w-4" /></button>
+                </span>
+                <button type="button" aria-label={`Remove ${l.language || "language"}`} className="rounded-lg p-1.5 hover:bg-muted" onClick={() => editLangs(langs.filter((_, i) => i !== n))}><Trash2 className="h-4 w-4" /></button>
+              </li>
+            ))}</ul>
+            {langs.length === 0 && <p className="mt-2 text-xs text-muted-foreground">No languages yet.</p>}
+            <div className="mt-2"><Btn small onClick={() => editLangs([...langs, { language: "", details: "" }])}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Add language</Btn></div>
+          </Card>
+
+          <Card title="Freelance profiles & contact links">
+            <p className="text-sm text-muted-foreground">Visitors contact this person through these profiles. Each approved link gets its own button, and the first approved link is used for “Hire or Contact This Specialist”. Links must start with https:// and be on the chosen platform's site; they open in a new tab.</p>
+            <ul className="mt-3 space-y-3" data-link-editor>{links.map((l, n) => {
+              const problem = l.url.trim() ? linkProblem(l.platform, l.url) : null;
+              return (
+                <li key={n} className="rounded-xl border border-border p-3">
+                  <div className="grid gap-2 sm:grid-cols-[170px_1fr]">
+                    <label className="text-xs font-medium">Platform<select className={inp} value={l.platform} onChange={(e) => editLinks(links.map((x, i) => (i === n ? { ...x, platform: e.target.value } : x)))}>{PLATFORMS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+                    <label className="text-xs font-medium">Profile URL<input className={inp} value={l.url} placeholder={PLATFORMS.find((p) => p.id === l.platform)?.example} maxLength={500} aria-invalid={!!problem} onChange={(e) => editLinks(links.map((x, i) => (i === n ? { ...x, url: e.target.value } : x)))} /></label>
+                    <label className="text-xs font-medium">Button label<input className={inp} value={l.button_label} maxLength={40} placeholder={linkLabel({ platform: l.platform })} onChange={(e) => editLinks(links.map((x, i) => (i === n ? { ...x, button_label: e.target.value } : x)))} /></label>
+                    <div className="flex flex-wrap items-end gap-3 pb-1">
+                      <label className="flex items-center gap-1.5 text-xs"><input type="checkbox" checked={l.approved} onChange={(e) => editLinks(links.map((x, i) => (i === n ? { ...x, approved: e.target.checked } : x)))} />Show publicly</label>
+                      {n > 0 && <button type="button" className="text-xs underline" onClick={() => { const o = [...links]; [o[n - 1], o[n]] = [o[n], o[n - 1]]; editLinks(o); }}>Move up</button>}
+                      {l.url.trim() && !problem && <a className="text-xs underline" href={l.url.trim()} target="_blank" rel="noopener noreferrer nofollow">Test link</a>}
+                      <button type="button" className="ml-auto inline-flex items-center gap-1 text-xs text-red-600" onClick={() => editLinks(links.filter((_, i) => i !== n))}><Trash2 className="h-3.5 w-3.5" aria-hidden="true" />Delete</button>
+                    </div>
+                  </div>
+                  {problem && <p role="alert" className="mt-2 text-xs text-red-600">{problem}</p>}
+                </li>
+              );
+            })}</ul>
+            {links.length === 0 && <p className="mt-2 text-xs text-muted-foreground">No freelance profiles yet. Without one, the profile shows only the EmmaForYou contact option.</p>}
+            <div className="mt-2"><Btn small onClick={() => editLinks([...links, { platform: "fiverr", url: "", button_label: "", approved: true }])}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Add freelance profile</Btn></div>
+          </Card>
+
+          <Card title="Portfolio">
             <p className="text-sm text-muted-foreground">Only items you tick as approved appear publicly. Add only work the intern has permission to show — never client work without the client's consent.</p>
             <ul className="mt-3 space-y-2">{f.portfolio.map((p, n) => (
               <li key={n} className="grid gap-2 rounded-xl border border-border p-2 sm:grid-cols-[1fr_1fr_auto_auto]">
@@ -384,16 +453,6 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
               </li>
             ))}</ul>
             <div className="mt-2"><Btn small onClick={() => set("portfolio", [...f.portfolio, { title: "", description: "", url: "", approved: false }])}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Add portfolio item</Btn></div>
-            <h3 className="mt-5 text-sm font-semibold">External profile links (e.g. Fiverr)</h3>
-            <ul className="mt-2 space-y-2">{f.external_links.map((l, n) => (
-              <li key={n} className="grid gap-2 sm:grid-cols-[160px_1fr_auto_auto]">
-                <input aria-label="Label" className={`${inp} mt-0`} value={l.label} onChange={(e) => set("external_links", f.external_links.map((x, i) => (i === n ? { ...x, label: e.target.value } : x)))} />
-                <input aria-label="URL" className={`${inp} mt-0`} value={l.url} onChange={(e) => set("external_links", f.external_links.map((x, i) => (i === n ? { ...x, url: e.target.value } : x)))} />
-                <label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={l.approved} onChange={(e) => set("external_links", f.external_links.map((x, i) => (i === n ? { ...x, approved: e.target.checked } : x)))} />Show publicly</label>
-                <button type="button" aria-label="Remove link" className="rounded-lg p-1.5 hover:bg-muted" onClick={() => set("external_links", f.external_links.filter((_, i) => i !== n))}><Trash2 className="h-4 w-4" /></button>
-              </li>
-            ))}</ul>
-            <div className="mt-2"><Btn small onClick={() => set("external_links", [...f.external_links, { label: "Fiverr", url: "https://", approved: false }])}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Add link</Btn></div>
           </Card>
 
           <Card title="Search & sharing (SEO)">
@@ -473,13 +532,31 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
   );
 }
 
-function ListField({ label, value, onChange }: { label: string; value: string[]; onChange: (v: string[]) => void }) {
-  const [t, setT] = useState(value.join(", "));
-  useEffect(() => { setT(value.join(", ")); }, [value.join("|")]); // eslint-disable-line react-hooks/exhaustive-deps
-  return <label className="text-sm font-medium">{label} <span className="font-normal text-muted-foreground">(comma separated)</span><input className={inp} value={t} onChange={(e) => setT(e.target.value)} onBlur={() => onChange(split(t))} /></label>;
-}
 function LinesField({ label, value, onChange }: { label: string; value: string[]; onChange: (v: string[]) => void }) {
   const [t, setT] = useState(value.join("\n"));
   useEffect(() => { setT(value.join("\n")); }, [value.join("|")]); // eslint-disable-line react-hooks/exhaustive-deps
   return <label className="text-sm font-medium">{label}<textarea className={`${inp} min-h-20`} value={t} onChange={(e) => setT(e.target.value)} onBlur={() => onChange(t.split("\n").map((x) => x.trim()).filter(Boolean))} /></label>;
+}
+
+/** Chips with remove buttons; type and press Enter or comma to add; click a chip to edit it. */
+function TagEditor({ label, value, onChange, placeholder }: { label: string; value: string[]; onChange: (v: string[]) => void; placeholder?: string }) {
+  const [t, setT] = useState("");
+  const add = (raw: string) => { const xs = split(raw).filter((x) => !value.some((v) => v.toLowerCase() === x.toLowerCase())); if (xs.length) onChange([...value, ...xs]); setT(""); };
+  return (
+    <div className="text-sm font-medium" data-tags={label}>
+      {label}
+      <div className="mt-1 flex min-h-10 flex-wrap items-center gap-1.5 rounded-xl border border-border bg-background px-2 py-1.5">
+        {value.map((v) => (
+          <span key={v} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-normal">
+            <button type="button" className="hover:underline" title="Edit" onClick={() => { onChange(value.filter((x) => x !== v)); setT(v); }}>{v}</button>
+            <button type="button" aria-label={`Remove ${v}`} className="rounded-full p-0.5 hover:bg-background" onClick={() => onChange(value.filter((x) => x !== v))}><X className="h-3 w-3" /></button>
+          </span>
+        ))}
+        <input aria-label={`Add ${label.toLowerCase()}`} className="min-w-[8rem] flex-1 bg-transparent px-1 py-0.5 text-sm font-normal outline-none" value={t} placeholder={value.length ? "Add…" : placeholder}
+          onChange={(e) => { if (/[,;]$/.test(e.target.value)) add(e.target.value); else setT(e.target.value); }}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(t); } else if (e.key === "Backspace" && !t && value.length) onChange(value.slice(0, -1)); }}
+          onBlur={() => t.trim() && add(t)} />
+      </div>
+    </div>
+  );
 }

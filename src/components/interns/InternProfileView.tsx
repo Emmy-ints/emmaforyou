@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ExternalLink, Globe2, MapPin } from "lucide-react";
-import InternCard, { DesignationBadge, InternPhoto } from "@/components/interns/InternCard";
+import InternCard, { DesignationBadge, Handle, InternPhoto } from "@/components/interns/InternCard";
 import { DESIGNATION, type InternCard as Card, type PublicIntern } from "@/lib/interns";
 import { EXPERTISE } from "@/lib/services-data";
 
@@ -19,13 +19,14 @@ export default function InternProfileView({ i, related = [], preview = false }: 
           <div className="hero-ink-glow" aria-hidden="true" />
           <div className="relative mx-auto max-w-6xl px-5 pb-14 pt-32 md:px-8 lg:pt-40">
             <Link to="/interns" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/70 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />All interns</Link>
-            <div className="mt-6 flex flex-col gap-7 md:flex-row md:items-center">
+            <div className="itn-hero mt-6">
               <InternPhoto i={i} size="lg" eager />
               <div>
                 <DesignationBadge d={i.designation} className="itn-badge-lg" />
-                {preview ? <p className="hero-ink-title mt-3 !text-[clamp(2rem,1.4rem+2.6vw,3.4rem)]">{i.display_name || "Unnamed draft"}</p> : <h1 className="hero-ink-title mt-3 !text-[clamp(2rem,1.4rem+2.6vw,3.4rem)]">{i.display_name}</h1>}
+                {preview ? <p className="hero-ink-title mt-3 !text-[clamp(2rem,1.4rem+2.6vw,3.4rem)]">{i.display_name || (i.username ? `@${i.username}` : "Unnamed draft")}</p> : <h1 className="hero-ink-title mt-3 !text-[clamp(2rem,1.4rem+2.6vw,3.4rem)]">{i.display_name || `@${i.username}`}</h1>}
+                {i.display_name && <Handle u={i.username} className="mt-1 !text-white/70" />}
                 <p className="mt-2 text-lg font-medium text-[#c4baff]">{i.specialty}</p>
-                <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/75">
+                <p className="itn-hero-meta mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/75">
                   <span>{d.role}</span>
                   {i.location && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" aria-hidden="true" />{i.location}</span>}
                   {i.languages.length > 0 && <span className="inline-flex items-center gap-1"><Globe2 className="h-4 w-4" aria-hidden="true" />{i.languages.join(", ")}</span>}

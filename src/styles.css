@@ -2348,10 +2348,22 @@ select.input.h-8, select.input.h-9 { padding-right: 1.75rem; }
 a.itn-card:hover, a.itn-card:focus-visible, .itn-card:focus-within { border-color: color-mix(in srgb, var(--emma-violet) 45%, transparent); }
 a.itn-card:hover { transform: translateY(-2px); }
 .itn-home-card { height: 100%; }
-.itn-photo { flex: none; width: 72px; height: 72px; border-radius: 18px; object-fit: cover; background: var(--muted); border: 1px solid var(--glass-border); }
-.itn-photo-lg { width: 168px; height: 168px; border-radius: 28px; border-color: rgba(255,255,255,.18); box-shadow: 0 24px 60px -30px rgba(0,0,0,.7); }
-.itn-photo-ph { display: grid; place-items: center; font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; font-weight: 600; font-size: 1.4rem; color: #fff; background: linear-gradient(135deg, var(--emma-violet), #3dd6f5); }
+.itn-photo { flex: none; display: block; border-radius: 999px; object-fit: cover; background: var(--muted); border: 3px solid var(--card, #fff); box-shadow: 0 0 0 1px var(--glass-border), 0 14px 34px -18px rgba(11,13,36,.55); }
+.itn-photo-sm { width: 72px; height: 72px; }
+.itn-photo-md { width: 112px; height: 112px; }
+.itn-photo-lg { width: 168px; height: 168px; border-color: rgba(255,255,255,.22); box-shadow: 0 24px 60px -30px rgba(0,0,0,.7); }
+.itn-photo-ph { display: grid; place-items: center; font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; font-weight: 600; font-size: 1.8rem; color: #fff; background: linear-gradient(135deg, var(--emma-violet), #3dd6f5); }
+.itn-photo-sm.itn-photo-ph { font-size: 1.2rem; }
 .itn-photo-lg.itn-photo-ph { font-size: 3rem; }
+/* phone-style profile card: everything centred in one column, like a mobile profile */
+.itn-phone { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1.75rem 1.25rem 1.25rem; }
+.itn-handle { margin-top: .15rem; font-size: .85rem; font-weight: 500; color: var(--muted-foreground); }
+.itn-view { display: inline-flex; width: 100%; align-items: center; justify-content: center; gap: .4rem; margin-top: auto; border-radius: 999px; padding: .6rem 1rem; font-size: .875rem; font-weight: 600; color: var(--emma-violet); border: 1px solid color-mix(in srgb, var(--emma-violet) 35%, transparent); transition: background .2s; }
+.itn-phone > .itn-view { margin-top: 1.25rem; }
+.itn-view:hover, .itn-view:focus-visible { background: color-mix(in srgb, var(--emma-violet) 10%, transparent); }
+.itn-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.25rem; }
+.itn-hero .itn-hero-meta { justify-content: center; }
+@media (min-width: 768px) { .itn-hero { flex-direction: row; align-items: center; text-align: left; gap: 1.75rem; } .itn-hero .itn-hero-meta { justify-content: flex-start; } }
 .itn-badge { display: inline-flex; align-items: center; border-radius: 999px; padding: .2rem .6rem; font-size: .68rem; font-weight: 700; letter-spacing: .14em; line-height: 1.4; border: 1px solid; }
 .itn-badge-lg { font-size: .78rem; padding: .3rem .8rem; }
 .itn-badge-intern { color: #9a5b00; background: #fff4dc; border-color: #f2c66d; }

@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import SectionHead from "../future/SectionHead";
 import { supabase } from "@/integrations/supabase/client";
 import { CARD_FIELDS, type InternCard as Card } from "@/lib/interns";
-import { DesignationBadge, InternPhoto } from "@/components/interns/InternCard";
+import { DesignationBadge, Handle, InternPhoto } from "@/components/interns/InternCard";
 
 /**
  * Homepage "Our Emerging Talent": the interns an admin selected for the homepage, in their order.
@@ -29,10 +29,11 @@ export default function InternsSection() {
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {rows.map((i) => (
             <li key={i.slug}>
-              <Link to="/interns/$slug" params={{ slug: i.slug }} className="itn-card itn-home-card group" data-track="home_intern">
+              <Link to="/interns/$slug" params={{ slug: i.slug }} className="itn-card itn-phone itn-home-card group" data-track="home_intern">
                 <InternPhoto i={i} />
-                <DesignationBadge d={i.designation} className="mt-4" />
-                <span className="mt-2 block font-display text-lg font-semibold leading-tight group-hover:underline underline-offset-4">{i.display_name}</span>
+                <span className="mt-4 block font-display text-lg font-semibold leading-tight group-hover:underline underline-offset-4">{i.display_name || `@${i.username}`}</span>
+                {i.display_name && <Handle u={i.username} />}
+                <DesignationBadge d={i.designation} className="mt-2" />
                 <span className="mt-1 block text-sm text-muted-foreground">{i.specialty}</span>
               </Link>
             </li>

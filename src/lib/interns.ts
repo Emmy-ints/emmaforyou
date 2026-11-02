@@ -21,15 +21,15 @@ export interface InternProfile { intro: string; bio: string; expertise: string[]
 
 /** A published profile as the public may see it (from the interns_public view only). */
 export interface PublicIntern {
-  slug: string; display_name: string; designation: Designation; status: InternStatus; specialty: string; short_bio: string;
+  slug: string; display_name: string; username: string; designation: Designation; status: InternStatus; specialty: string; short_bio: string;
   location: string; skills: string[]; specialties: string[]; languages: string[]; tools: string[]; services: string[]; interests: string[];
   portfolio: PortfolioItem[]; external_links: { label: string; url: string }[]; photo_url: string; photo_alt: string;
   profile: InternProfile; seo_title: string; seo_description: string; noindex: boolean; homepage_featured: boolean; homepage_order: number;
   published_at: string | null; updated_at: string;
 }
-export type InternCard = Pick<PublicIntern, "slug" | "display_name" | "designation" | "specialty" | "short_bio" | "location" | "skills" | "specialties" | "photo_url" | "photo_alt" | "profile">;
+export type InternCard = Pick<PublicIntern, "slug" | "display_name" | "username" | "languages" | "designation" | "specialty" | "short_bio" | "location" | "skills" | "specialties" | "photo_url" | "photo_alt" | "profile">;
 
-export const CARD_FIELDS = "slug,display_name,designation,specialty,short_bio,location,skills,specialties,photo_url,photo_alt,profile";
+export const CARD_FIELDS = "slug,display_name,username,languages,designation,specialty,short_bio,location,skills,specialties,photo_url,photo_alt,profile";
 
 /** The one-line introduction shown on cards: the admin's short bio, else the profile intro. */
 export function cardIntro(i: Pick<PublicIntern, "short_bio" | "profile">): string {
@@ -37,8 +37,8 @@ export function cardIntro(i: Pick<PublicIntern, "short_bio" | "profile">): strin
   return t.length > 160 ? `${t.slice(0, 157).replace(/\s+\S*$/, "")}…` : t;
 }
 
-export function photoAlt(i: Pick<PublicIntern, "display_name" | "photo_alt" | "specialty" | "designation">): string {
-  return i.photo_alt || `${i.display_name}, ${i.specialty || DESIGNATION[i.designation].label} — ${DESIGNATION[i.designation].label} at EmmaForYou`;
+export function photoAlt(i: Pick<PublicIntern, "display_name" | "photo_alt" | "specialty" | "designation"> & { username?: string }): string {
+  return i.photo_alt || `${i.display_name || (i.username ? `@${i.username}` : "Intern")}, ${i.specialty || DESIGNATION[i.designation].label} — ${DESIGNATION[i.designation].label} at EmmaForYou`;
 }
 
 export function initials(name: string): string {

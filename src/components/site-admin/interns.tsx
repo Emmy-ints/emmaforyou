@@ -15,7 +15,7 @@ import { EXPERTISE } from "@/lib/services-data";
 interface Item { title: string; description?: string; url?: string; approved: boolean }
 interface Link_ { label: string; url: string; approved: boolean }
 export interface InternRow {
-  id: string; slug: string; source_ref: string | null; display_name: string; designation: Designation; status: InternStatus;
+  id: string; slug: string; source_ref: string | null; display_name: string; username: string; designation: Designation; status: InternStatus;
   published: boolean; published_at: string | null; homepage_featured: boolean; homepage_order: number;
   specialty: string; short_bio: string; location: string; show_location: boolean;
   skills: string[]; specialties: string[]; languages: string[]; tools: string[]; services: string[]; interests: string[];
@@ -27,7 +27,7 @@ export interface InternRow {
 interface Private { email: string; notes: string; completion_reason: string; archive_reason: string; missing: string[] }
 
 const BLANK: Omit<InternRow, "id" | "slug" | "created_at" | "updated_at"> = {
-  source_ref: null, display_name: "", designation: "intern", status: "pending", published: false, published_at: null, homepage_featured: false, homepage_order: 100,
+  source_ref: null, display_name: "", username: "", designation: "intern", status: "pending", published: false, published_at: null, homepage_featured: false, homepage_order: 100,
   specialty: "", short_bio: "", location: "", show_location: false, skills: [], specialties: [], languages: [], tools: [], services: [], interests: [],
   portfolio: [], external_links: [], photo_url: "", photo_alt: "", profile: {}, profile_source: "manual", profile_generated_at: null,
   seo_title: "", seo_description: "", noindex: false, alumni_public: false, start_date: null, end_date: null,
@@ -65,7 +65,7 @@ export default function InternsTab() {
   const reload = () => { list.reload(); ov.reload(); };
   const rows = list.data ?? [];
   const shown = rows.filter((r) => {
-    const hay = `${r.display_name} ${r.slug} ${r.specialty} ${r.skills.join(" ")} ${r.location} ${r.source_ref ?? ""}`.toLowerCase();
+    const hay = `${r.display_name} ${r.username} ${r.slug} ${r.specialty} ${r.skills.join(" ")} ${r.location} ${r.source_ref ?? ""}`.toLowerCase();
     return (!q || hay.includes(q.toLowerCase())) && (!status || r.status === status)
       && (!vis || (vis === "published" ? r.published : vis === "draft" ? !r.published : r.homepage_featured));
   });
@@ -123,10 +123,10 @@ export default function InternsTab() {
               return (
                 <li key={r.id} className="flex flex-wrap items-center gap-3 py-3" data-intern-row={r.slug}>
                   <input type="checkbox" aria-label={`Select ${r.display_name || r.slug}`} checked={sel.has(r.id)} onChange={(e) => { const n = new Set(sel); if (e.target.checked) n.add(r.id); else n.delete(r.id); setSel(n); }} />
-                  <InternPhoto i={r} />
+                  <InternPhoto i={r} size="sm" />
                   <div className="min-w-[200px] flex-1">
                     <p className="flex flex-wrap items-center gap-2 font-medium">{r.display_name || <em className="text-muted-foreground">No name yet</em>} <DesignationBadge d={r.designation} /></p>
-                    <p className="text-xs text-muted-foreground">{r.specialty || "No specialty"} · /interns/{r.slug}</p>
+                    <p className="text-xs text-muted-foreground">{r.username && <>@{r.username} · </>}{r.specialty || "No specialty"} · /interns/{r.slug}</p>
                     <p className="mt-1 flex flex-wrap gap-1.5">
                       <Pill tone={STATUS_TONE[r.status]}>{STATUS_LABEL[r.status]}</Pill>
                       <Pill tone={r.published ? "good" : "muted"}>{r.published ? "Published" : "Draft"}</Pill>
@@ -333,6 +333,7 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
           <Card title="Public details">
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="text-sm font-medium">Display name<input className={inp} value={f.display_name} maxLength={120} onChange={(e) => set("display_name", e.target.value)} /></label>
+              <label className="text-sm font-medium">Username (shown as @username)<input className={inp} value={f.username} maxLength={40} placeholder="e.g. chloemavy" onChange={(e) => set("username", e.target.value.replace(/^@/, "").replace(/[^A-Za-z0-9_.-]/g, ""))} /></label>
               <label className="text-sm font-medium">URL slug<input className={inp} value={f.slug} placeholder={slugify(f.display_name) || "made from the name"} maxLength={70} onChange={(e) => set("slug", e.target.value)} onBlur={(e) => set("slug", slugify(e.target.value))} />
                 <span className="mt-1 block text-[11px] font-normal text-muted-foreground">/interns/{slugify(f.slug) || slugify(f.display_name) || "…"}{orig && f.slug !== orig.slug ? " · the old URL will redirect here" : ""}</span></label>
               <label className="text-sm font-medium sm:col-span-2">Specialty (headline)<input className={inp} value={f.specialty} maxLength={160} onChange={(e) => set("specialty", e.target.value)} /></label>
@@ -412,7 +413,7 @@ function Editor({ id, rows, onClose }: { id: string | "new"; rows: InternRow[]; 
 
         <div className="space-y-4">
           <Card title="Photo">
-            <div className="flex items-center gap-3"><InternPhoto i={f} />
+            <div className="flex items-center gap-3"><InternPhoto i={f} size="sm" />
               <div className="flex flex-col gap-2">
                 <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" id="itn-photo" onChange={(e) => { const x = e.target.files?.[0]; if (x) void upload(x); }} />
                 <label htmlFor="itn-photo" className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted ${!rowId ? "pointer-events-none opacity-50" : ""}`}><ImagePlus className="h-3.5 w-3.5" aria-hidden="true" />{busy === "photo" ? "Uploading…" : f.photo_url ? "Change photo" : "Upload photo"}</label>

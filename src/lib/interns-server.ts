@@ -24,8 +24,8 @@ async function rest<T>(path: string): Promise<T[]> {
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /** Every public profile for the directory (cards only), active interns first. */
-export async function internCards(): Promise<(InternCard & { languages: string[]; updated_at: string; noindex: boolean })[]> {
-  return rest(`interns_public?select=${CARD_FIELDS},languages,updated_at,noindex&order=designation.asc,published_at.desc&limit=500`);
+export async function internCards(): Promise<(InternCard & { updated_at: string; noindex: boolean })[]> {
+  return rest(`interns_public?select=${CARD_FIELDS},updated_at,noindex&order=designation.asc,published_at.desc&limit=500`);
 }
 
 export const listInterns = createServerFn({ method: "GET" }).handler(async () => internCards());

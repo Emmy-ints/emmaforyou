@@ -37,7 +37,7 @@ function InternsPage() {
     return { specs: uniq(all.flatMap((i) => i.specialties.length ? i.specialties : [i.specialty])), skills: uniq(all.flatMap((i) => i.skills)), locs: uniq(all.map((i) => i.location)) };
   }, [all]);
   const shown = all.filter((i) => {
-    const hay = `${i.display_name} ${i.specialty} ${i.specialties.join(" ")} ${i.skills.join(" ")} ${i.location} ${i.languages.join(" ")} ${i.short_bio}`.toLowerCase();
+    const hay = `${i.display_name} ${i.username} ${i.specialty} ${i.specialties.join(" ")} ${i.skills.join(" ")} ${i.location} ${i.languages.join(" ")} ${i.short_bio}`.toLowerCase();
     return (!q || q.toLowerCase().split(/\s+/).every((w) => hay.includes(w)))
       && (!spec || i.specialty === spec || i.specialties.includes(spec))
       && (!skill || i.skills.includes(skill))
@@ -70,7 +70,7 @@ function InternsPage() {
                 <label className="itn-search">
                   <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <span className="sr-only">Search interns</span>
-                  <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, skill or language" className="w-full bg-transparent outline-none" />
+                  <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name, @username, skill or language" className="w-full bg-transparent outline-none" />
                 </label>
                 <label><span className="sr-only">Specialty</span><select className={sel} value={spec} onChange={(e) => setSpec(e.target.value)}><option value="">All specialties</option>{opts.specs.map((s) => <option key={s}>{s}</option>)}</select></label>
                 <label><span className="sr-only">Skill</span><select className={sel} value={skill} onChange={(e) => setSkill(e.target.value)}><option value="">All skills</option>{opts.skills.map((s) => <option key={s}>{s}</option>)}</select></label>

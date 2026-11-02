@@ -31,6 +31,9 @@ Interns never log in and never receive a role, permission or account from a prof
 
 ## What the public can see
 
+Cards and profile pages use a phone-style profile layout: round photo, display name, `@username` (as supplied, e.g. their Fiverr handle), badge, headline, location and languages. Photos can be an uploaded file or the person's own hosted photo link; links are hot-linked with `referrerPolicy="no-referrer"` and fall back to initials if they stop loading.
+
+
 Only the columns in `interns_public`. Location shows only when "approved to show publicly" is ticked. Portfolio items and external links (e.g. Fiverr) show only when individually approved. Emails, notes and lifecycle reasons are in `intern_private`, which the public key cannot read.
 
 ## AI profiles

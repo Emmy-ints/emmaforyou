@@ -16,6 +16,7 @@ import { Flag } from "../components/future/Flag";
 import ConversionLayer from "../components/tools/ConversionLayer";
 import MotionRuntime from "../components/future/MotionRuntime";
 import SearchLauncher from "../components/future/SearchLauncher";
+import FounderPresence from "../components/future/FounderPresence";
 import ScrollTop from "../components/future/ScrollTop";
 import DesignTokens from "../components/future/DesignTokens";
 import NotFoundComponent from "../components/future/NotFound";
@@ -93,6 +94,7 @@ function RootComponent() {
       <Flag id="ask-emma"><VoiceAsk /></Flag>
       <ConversionLayer />
       <SearchLauncher />
+      <FounderPresence />
       <ScrollTop />
     </I18nProvider>
   );

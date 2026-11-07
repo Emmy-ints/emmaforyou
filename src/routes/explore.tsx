@@ -61,7 +61,7 @@ function ExplorePage() {
   return (
     <main id="main-content" className={`xw ${simple ? "is-simple" : ""}`} aria-labelledby="xw-h">
       <header className="xw-bar">
-        <Link to="/" className="xw-brand">EmmaForYou<span>.</span></Link>
+        <Link to="/" className="xw-brand efy-mark efy-mark-sm" data-founder-presence="brand">EmmaForYou<span>.</span><img src="/images/emmanuel-face-96.webp" width={96} height={96} alt="" aria-hidden="true" className="efy-mark-face" decoding="async" /></Link>
         <h1 id="xw-h" className="xw-title">Service world <span className="xw-beta">Beta</span></h1>
         <div className="xw-actions">
           <button type="button" onClick={() => { setSimple((s) => !s); setFocus(null); }} aria-pressed={simple} className="xw-btn"><LayoutGrid className="h-4 w-4" aria-hidden="true" /><span>{simple ? "3D view" : "Simple view"}</span></button>

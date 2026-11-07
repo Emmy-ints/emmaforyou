@@ -8,7 +8,7 @@ import { FOUNDER } from "@/lib/seo";
  */
 export default function HeroFounder() {
   return (
-    <Link to="/about" className="hx-founder" data-track="hero_founder" aria-label={`Meet ${FOUNDER.name}, founder of EmmaForYou`}>
+    <Link to="/about" className="hx-founder" data-founder-presence="hero" data-track="hero_founder" aria-label={`Meet ${FOUNDER.name}, founder of EmmaForYou`}>
       <span className="hx-founder-ring" aria-hidden="true">
         <img src="/images/emmanuel-face-256.webp" width={256} height={256} alt="" decoding="async" />
       </span>

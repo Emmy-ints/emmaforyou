@@ -9,9 +9,10 @@ import { PROJECTS, featuredFor, projectSlug } from "@/lib/portfolio-data";
 import { CLAIMS } from "@/lib/claims";
 import { TOOLS } from "@/components/home/ToolsHub";
 import { NAV_MENUS } from "@/components/Navbar";
+import FounderMgr from "./founder";
 import { clean, CodeNote, Field, PendingBar, SearchBox, SettingActions, useCan, useSettingRows, type Row, type SettingRow } from "./settings";
 
-const SUBS = [["pages", "Pages & SEO"], ["services", "Services"], ["portfolio", "Portfolio"], ["media", "Media"], ["tools", "Tools & demos"], ["nav", "Navigation & links"], ["claims", "Claims & numbers"]] as const;
+const SUBS = [["pages", "Pages & SEO"], ["services", "Services"], ["portfolio", "Portfolio"], ["media", "Media"], ["tools", "Tools & demos"], ["nav", "Navigation & links"], ["claims", "Claims & numbers"], ["founder", "Founder portrait"]] as const;
 type Sub = (typeof SUBS)[number][0];
 
 export default function ContentTab() {
@@ -28,6 +29,7 @@ export default function ContentTab() {
       {sub === "tools" && <ToolsMgr />}
       {sub === "nav" && <NavMgr />}
       {sub === "claims" && <ClaimsMgr />}
+      {sub === "founder" && <FounderMgr />}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { FOUNDER } from "@/lib/seo";
  */
 export default function FounderCard({ line, cta = true, size = "md" }: { line: string; cta?: boolean; size?: "sm" | "md" }) {
   return (
-    <figure className={`fc fc-${size}`}>
+    <figure className={`fc fc-${size}`} data-founder-presence="card">
       <span className="fc-photo" aria-hidden="false">
         <img src="/images/emmanuel.webp" width={900} height={1350} alt={`${FOUNDER.name}, founder of EmmaForYou`} loading="lazy" decoding="async" />
       </span>

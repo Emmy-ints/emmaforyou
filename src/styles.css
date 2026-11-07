@@ -2399,3 +2399,46 @@ a.itn-card:hover { transform: translateY(-2px); }
 .itn-fl-mini { display: inline-flex; align-items: center; gap: .3rem; margin-top: .6rem; font-size: .8rem; font-weight: 600; color: var(--muted-foreground); }
 .itn-fl-mini:hover { color: var(--emma-violet); text-decoration: underline; text-underline-offset: 3px; }
 .itn-fl-hint { display: inline-flex; align-items: center; gap: .25rem; margin-top: .6rem; font-size: .72rem; font-weight: 600; color: var(--muted-foreground); }
+
+/* ── Founder in the brand (crops of the real photo /images/emmanuel.webp) ── */
+/* Logo: portrait "signature" on the corner of the E tile; the ring takes the colour of whatever the logo sits on. */
+.efy-wordmark { --efy-ring: var(--background); }
+.site-header.is-ink .efy-wordmark, .nav-on-ink .efy-wordmark, .hero-ink .efy-wordmark { --efy-ring: #12143a; }
+.band-ink .efy-wordmark { --efy-ring: #0b0d24; }
+.efy-mark { position: relative; display: inline-flex; flex: none; }
+.efy-mark-face { position: absolute; right: -12px; bottom: -9px; width: 20px; height: 20px; border-radius: 999px; object-fit: cover; object-position: 50% 30%; background: #c9cbd8;
+  box-shadow: 0 0 0 2px var(--efy-ring), 0 0 0 3.25px color-mix(in srgb, var(--emma-violet) 70%, #3dd6f5), 0 6px 14px -4px rgba(11, 13, 36, 0.55);
+  transition: transform .35s var(--ease-out, cubic-bezier(.16, 1, .3, 1)); }
+.efy-mark-sm .efy-mark-face { width: 17px; height: 17px; right: -11px; bottom: -8px; }
+.nav-brand:hover .efy-mark-face, a:hover > .efy-wordmark .efy-mark-face { transform: scale(1.12) translateY(-1px); }
+@media (prefers-reduced-motion: reduce) { .efy-mark-face { transition: none; } .nav-brand:hover .efy-mark-face { transform: none; } }
+/* Homepage hero: on desktop the portrait docks to the demo's bottom-left corner (over its empty rail) with the
+   caption below the demo; on smaller screens, where the demo has no empty rail, it sits as its own row under the demo. */
+.hx-founder { position: relative; z-index: 2; display: flex; align-items: center; gap: .8rem; width: max-content; max-width: 100%; margin-top: 1.25rem; border-radius: 999px; }
+.hx-founder-ring { position: relative; display: block; flex: none; width: 60px; height: 60px; padding: 2.5px; border-radius: 999px;
+  background: conic-gradient(from 210deg, #6d5bff, #8b7bff, #3dd6f5, #6d5bff);
+  box-shadow: 0 0 0 4px #0e1032, 0 18px 40px -14px rgba(0, 0, 0, 0.75), 0 0 34px -6px rgba(109, 91, 255, 0.55);
+  transition: transform .45s var(--ease-out, cubic-bezier(.16, 1, .3, 1)), box-shadow .45s; }
+.hx-founder-ring img { display: block; width: 100%; height: 100%; border-radius: 999px; object-fit: cover; object-position: 50% 32%; background: #c9cbd8; }
+.hx-founder-cap { display: flex; min-width: 0; flex-direction: column; gap: 1px;
+  padding: .45rem .8rem; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(14, 16, 50, 0.72);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 12px 30px -16px rgba(0, 0, 0, 0.8); }
+.hx-founder-name { font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif; font-size: .8rem; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
+.hx-founder-role { font-size: .68rem; color: #a9aed6; }
+.hx-founder:hover .hx-founder-ring, .hx-founder:focus-visible .hx-founder-ring { transform: translateY(-2px) scale(1.04); box-shadow: 0 0 0 4px #0e1032, 0 22px 44px -14px rgba(0, 0, 0, 0.8), 0 0 44px -4px rgba(109, 91, 255, 0.75); }
+.hx-founder:hover .hx-founder-role { color: #d6d9f5; }
+.hx-founder:focus-visible { outline: 2px solid var(--emma-cyan); outline-offset: 4px; }
+@media (min-width: 1024px) {
+  .hx-founder { position: absolute; left: -30px; bottom: -40px; display: block; width: auto; margin: 0; }
+  .hx-founder-ring { width: 88px; height: 88px; padding: 3px; }
+  .hx-founder-cap { position: absolute; left: calc(100% + 14px); top: calc(100% - 30px); white-space: nowrap; padding: .5rem .9rem; }
+  .hx-founder-name { font-size: .86rem; }
+  .hx-founder-role { font-size: .72rem; }
+}
+@media (prefers-reduced-motion: reduce) { .hx-founder-ring { transition: none; } .hx-founder:hover .hx-founder-ring { transform: none; } }
+/* About hero: arched editorial portrait above the "Our Story" label */
+.ab-hero-portrait { position: relative; width: 112px; height: 140px; padding: 3px; border-radius: 999px 999px 26px 26px;
+  background: linear-gradient(160deg, #8b7bff, #6d5bff 45%, #3dd6f5);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.05), 0 30px 60px -24px rgba(0, 0, 0, 0.8), 0 0 70px -10px rgba(109, 91, 255, 0.55); }
+.ab-hero-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; border-radius: 999px 999px 23px 23px; background: #c9cbd8; }
+@media (min-width: 768px) { .ab-hero-portrait { width: 136px; height: 170px; } }

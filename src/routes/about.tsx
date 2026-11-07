@@ -52,6 +52,10 @@ function AboutPage() {
         {/* Hero */}
         <section className="relative flex min-h-[60vh] items-center justify-center pt-20" style={{ background: "var(--gradient-dark)" }}>
           <div className="relative mx-auto max-w-4xl px-5 py-20 text-center">
+            {/* Founder portrait (real photo, head-and-shoulders crop) opening the story */}
+            <figure className="ab-hero-portrait mx-auto mb-7">
+              <img src="/images/emmanuel-portrait-480.webp" width={480} height={600} alt="Emmanuel Oluwaseun Akinloye, founder of EmmaForYou" decoding="async" fetchPriority="high" />
+            </figure>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 font-body text-xs font-medium text-white/70">
               Our Story
             </span>

@@ -18,6 +18,7 @@ import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
+import HeroFounder from "../components/home/HeroFounder";
 import GrowthStory from "../components/home/GrowthStory";
 import ServiceExplorer from "../components/home/ServiceExplorer";
 import SolutionFinder from "../components/future/SolutionFinder";
@@ -129,6 +130,7 @@ function HomePage() {
               transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <GrowthOS />
+              <HeroFounder />
             </motion.div>
           </div>
           <a href="#work" className="hero-x-cue" aria-label="Scroll to selected work"><span aria-hidden="true" /></a>

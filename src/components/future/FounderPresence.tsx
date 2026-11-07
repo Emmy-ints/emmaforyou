@@ -200,8 +200,10 @@ function roomForByline(el: HTMLElement) {
   for (let n: HTMLElement | null = parent; n && n.tagName !== "BODY" && n.tagName !== "HTML"; n = n.parentElement) {
     if (/hidden|clip|auto|scroll/.test(getComputedStyle(n).overflowY) && n.scrollHeight - n.clientHeight >= 30 && n.clientHeight <= innerHeight * 1.05) { clipped = true; break; }
   }
+  // The container either grows with the row, or (min-height layouts) had slack and its content still fits.
+  const fits = after - before >= 55 || parent.scrollHeight <= parent.clientHeight + 1;
   probe.remove();
-  return !clipped && after - before >= 55;
+  return !clipped && fits;
 }
 
 /** Line the byline up with the hero's text column (centred when the headline is centred). */

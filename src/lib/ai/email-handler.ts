@@ -1,6 +1,7 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { aiText, checkLimits, checkOrigin, extractJson, readJson } from "./guard";
+import { signContent } from "./content-sign";
 
 const schema = z.object({
   businessName: z.string().trim().min(2).max(80),
@@ -36,5 +37,7 @@ Respond with ONLY JSON: {"emails":[{"day":<send day number, starting at 0>,"subj
     day: Math.max(0, Math.min(60, Number(e.day) || i * 3)), subject: str(e.subject, 90), preview: str(e.preview, 120), body: str(e.body, 1500),
   })).filter((e) => e.subject && e.body);
   if (emails.length < 3) return Response.json({ aiWritten: false, notice: "AI reply unreadable" }, { headers: { "Cache-Control": "no-store" } });
-  return Response.json({ aiWritten: true, emails }, { headers: { "Cache-Control": "no-store" } });
+  // Signed so the visitor can add it to the public showcase (names are scrubbed there unless they choose to show them).
+  const content = { businessName: p.businessName, ownerName: p.ownerName, businessType: p.businessType, goal: p.goal, emails };
+  return Response.json({ aiWritten: true, emails, showcase: { content, sig: await signContent("emails", content) } }, { headers: { "Cache-Control": "no-store" } });
 });

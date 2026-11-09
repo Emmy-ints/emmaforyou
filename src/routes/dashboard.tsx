@@ -15,6 +15,7 @@ import { BlogAutomation } from "../components/dashboard/BlogAutomation";
 import { CommunityPanel } from "../components/dashboard/CommunityPanel";
 import { EcomPanel } from "../components/dashboard/EcomPanel";
 import { FollowUps } from "../components/dashboard/FollowUps";
+import { ShowcaseModeration } from "../components/dashboard/ShowcaseModeration";
 import { summaryField } from "@/lib/followups";
 
 export const Route = createFileRoute("/dashboard")({
@@ -387,7 +388,8 @@ function Dashboard({ email }: { email: string }) {
                 { label: "Made a prototype", value: stats.sessionsWith("prototype_generated") },
                 { label: "Asked for the real build", value: stats.sessionsWith("prototype_build_real_click") },
                 { label: "Clicked WhatsApp", value: stats.sessionsWith("whatsapp_click") },
-                { label: "Used an AI tool", value: stats.sessionsWithAny(["receptionist_message", "audit_run", "proposal_generated", "makeover_generated", "voice_search", "assistant_message", "contract_checked", "plan_generated"]) },
+                { label: "Used an AI tool", value: stats.sessionsWithAny(["receptionist_message", "audit_run", "proposal_generated", "makeover_generated", "voice_search", "assistant_message", "contract_checked", "plan_generated", "receptionist_mine", "audit_compare"]) },
+                { label: "Shared a result publicly", value: stats.sessionsWith("showcase_published") },
                 { label: "Submitted a form", value: stats.sessionsWithAny(["lead_submitted", "intake_submitted", "quiz_completed", "magnet_downloaded", "roi_calculated", "audit_requested"]) },
                 { label: "Booked a call or signed", value: stats.sessionsWithAny(["call_booked", "proposal_accepted"]) },
               ]}
@@ -419,6 +421,8 @@ function Dashboard({ email }: { email: string }) {
         <UpcomingCalls />
 
         <FollowUps leads={leads} loading={loading} />
+
+        <ShowcaseModeration />
 
         {/* Leads inbox */}
         <section className="dash-card mt-4">

@@ -16,6 +16,7 @@ import FaqAccordion from "../components/home/FaqAccordion";
 import FloatingWhatsApp from "../components/home/FloatingWhatsApp";
 import RoiSection from "../components/home/RoiSection";
 import PrototypeBuilder from "../components/home/PrototypeBuilder";
+import ShowcaseStrip, { ShowcaseCounters } from "../components/showcase/ShowcaseStrip";
 import TransformationSlider from "../components/home/TransformationSlider";
 import GrowthOS from "../components/home/GrowthOS";
 import HeroFounder from "../components/home/HeroFounder";
@@ -142,6 +143,7 @@ function HomePage() {
         <Flag id="home-tools"><ToolsHub /></Flag>
         <SocialProofBar />
         <Flag id="home-prototype"><PrototypeBuilder /></Flag>
+        <Flag id="home-showcase"><HomeShowcase /></Flag>
         <TransformationSlider />
         <ProblemSection />
         <ServicesSection />
@@ -167,5 +169,15 @@ function HomePage() {
       <Footer />
       <FloatingWhatsApp />
     </>
+  );
+}
+
+/** "Made on EmmaForYou": live counters from the tools + the newest showcase items (hides when there are too few). */
+function HomeShowcase() {
+  return (
+    <div className="pb-6">
+      <ShowcaseCounters className="mx-auto max-w-5xl px-5" />
+      <ShowcaseStrip min={3} />
+    </div>
   );
 }

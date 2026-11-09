@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { KineticText } from "@/components/future/Kinetic";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowLeft, Bookmark, BookmarkCheck, ExternalLink, Loader2, MessageCircle, WandSparkles } from "lucide-react";
+import { buildWa } from "@/lib/leads";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ExampleCard from "@/components/inspiration/ExampleCard";
@@ -91,6 +92,24 @@ function Page() {
                   </button>
                 </div>
                 {saves.error && <p role="alert" className="mt-2 text-sm text-red-600">{saves.error}</p>}
+                {(() => {
+                  // "I want something like this": an ORIGINAL design in the same spirit (style, layout type, mood), never a copy.
+                  const app = ex.kind === "mobile_app";
+                  const what = app ? "mobile app" : ex.kind === "ecommerce" ? "online store" : ex.kind === "landing_page" ? "landing page" : ex.kind === "email" ? "email newsletter" : "website";
+                  const mood = [...ex.styles.slice(0, 3), ex.theme === "dark" ? "dark theme" : null].filter(Boolean).join(", ");
+                  const idea = `An original ${what} for my business${ex.industries[0] ? ` (${ex.industries[0]})` : ""}${mood ? `, with a ${mood} feel` : ""}. Clear headline, strong call to action, mobile-first.`;
+                  const href = `/?proto_kind=${app ? "app" : "website"}&proto_idea=${encodeURIComponent(idea.slice(0, 480))}#prototype`;
+                  return (
+                    <div className="mt-6 rounded-2xl border border-[var(--emma-violet)]/40 bg-[var(--emma-violet)]/5 p-4" data-like-this>
+                      <p className="font-semibold">Want something like this?</p>
+                      <p className="mt-1 text-sm text-muted-foreground">We'll design an original {what} for your business with the same feel{mood ? ` (${mood})` : ""}. Not a copy: your brand, your content.</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {ex.kind !== "email" && <a href={href} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[var(--emma-violet)] px-4 text-sm font-semibold text-white"><WandSparkles className="h-4 w-4" aria-hidden="true" /> Build a free prototype in this style</a>}
+                        <a href={buildWa(`Hi Emmanuel, I like the style of "${ex.title}" in your inspiration library (${typeof window !== "undefined" ? window.location.href : ""}). Can you design something original like it for my business?`)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-border px-4 text-sm font-semibold hover:border-[var(--emma-violet)]"><MessageCircle className="h-4 w-4" aria-hidden="true" /> Ask Emmanuel</a>
+                      </div>
+                    </div>
+                  );
+                })()}
                 <dl className="mt-6 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
                   <dt className="text-muted-foreground">Found on</dt><dd>{source ? <a href={source.home_url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-[var(--emma-violet)]">{source.name}</a> : ex.source_id}{(ex.also_listed_on ?? []).length > 0 && <span className="text-muted-foreground"> · also on {[...new Set((ex.also_listed_on ?? []).map((u) => hostLabel(u)))].join(", ")}</span>}</dd>
                   {ex.industries.length > 0 && <><dt className="text-muted-foreground">Industry</dt><dd>{ex.industries.map((t) => <Link key={t} to="/inspiration" search={{ industry: t }} className="mr-2 hover:text-[var(--emma-violet)]">{t}</Link>)}</dd></>}

@@ -191,7 +191,11 @@ export default function VoiceAsk() {
                   </div>
                 )}
                 {messages.length > 2 && !busy && !asking && !answers.timing && messages[messages.length - 1].role === "assistant" && !messages[messages.length - 1].rec && (
-                  <div className="pt-1"><button onClick={() => startQualify()} className="rounded-full border border-[var(--emma-violet)]/50 bg-card px-3 py-1.5 text-xs font-semibold text-[var(--emma-violet)]">{QUICK}</button></div>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button onClick={() => startQualify()} className="rounded-full border border-[var(--emma-violet)]/50 bg-card px-3 py-1.5 text-xs font-semibold text-[var(--emma-violet)]">{QUICK}</button>
+                    {/* Human handover: the conversation so far goes with them, so they don't repeat themselves. */}
+                    <a data-ask-human href={buildWa(`Hi Emmanuel, I was chatting with Emma on your website (${pathname}). My questions:\n${messages.filter((m) => m.role === "user").slice(-3).map((m) => `• ${m.content.slice(0, 160)}`).join("\n")}`)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { from: "ask_emma_handover" })} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:border-[#25d366]">Talk to a person on WhatsApp</a>
+                  </div>
                 )}
                 {hits.length > 0 && (
                   <div className="rounded-2xl border border-dashed border-border p-3">

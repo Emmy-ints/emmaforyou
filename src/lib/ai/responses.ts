@@ -7,6 +7,7 @@ import {
   withLovableAiGatewayRunIdHeader,
 } from "./run-id.ts";
 import type { AiProvider } from "./provider";
+import { withVisitorLanguage } from "../visitor-language";
 
 /**
  * One streamed call to the OpenAI Responses API, either directly (provider "openai") or through
@@ -19,6 +20,7 @@ export function createResponsesCall(
   instructions?: string,
 ) {
   const { provider } = config;
+  instructions = withVisitorLanguage(request, instructions);
   const model = config.model || provider.model;
   const isLovable = provider.id === "lovable";
   const runIdFetch = isLovable ? createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request)) : null;

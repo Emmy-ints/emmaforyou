@@ -40,6 +40,7 @@ const STATIC: PageEntry[] = [
   { kind: "Page", title: "Free checklists", href: "/checklists" },
   { kind: "Page", title: "Comparisons", href: "/compare", keywords: "vs versus" },
   { kind: "Page", title: "Inspiration library", href: "/inspiration", keywords: "design examples websites stores emails gallery" },
+  { kind: "Page", title: "Showcase: made on EmmaForYou", href: "/showcase", keywords: "showcase gallery prototypes apps websites audits made by visitors examples" },
   { kind: "Page", title: "Free resources", href: "/free-resources", keywords: "downloads toolkits templates" },
   { kind: "Page", title: "FAQ", href: "/faq", keywords: "questions answers help" },
   { kind: "Page", title: "Watch how it works", href: "/watch", keywords: "video" },

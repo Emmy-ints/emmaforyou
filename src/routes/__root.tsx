@@ -9,6 +9,7 @@ import { ORG_DESCRIPTION, VERIFICATION_META, founderLd, organizationLd, websiteL
 
 
 import appCss from "../styles.css?url";
+import LanguageOffer from "../components/tools/LanguageOffer";
 import PageTranslator from "../components/tools/PageTranslator";
 import VoiceAsk from "../components/tools/VoiceAsk";
 import SiteRuntime from "../components/future/SiteRuntime";
@@ -91,6 +92,7 @@ function RootComponent() {
       <SiteRuntime />
       <Outlet />
       <PageTranslator />
+      <LanguageOffer />
       <Flag id="ask-emma"><VoiceAsk /></Flag>
       <ConversionLayer />
       <SearchLauncher />

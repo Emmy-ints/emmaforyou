@@ -93,16 +93,18 @@ export default function ProposalBuilder() {
           {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         </form>
       )}
-      {doc && <ProposalDocument doc={doc} req={form} onEdit={() => setDoc(null)} />}
+      {doc && <ProposalDocument doc={doc} req={form} aiWritten={aiWritten} onEdit={() => setDoc(null)} />}
     </div>
   );
 }
 
-function ProposalDocument({ doc, req, onEdit }: { doc: ProposalDoc; req: ProposalRequest; onEdit: () => void }) {
+function ProposalDocument({ doc, req, aiWritten, onEdit }: { doc: ProposalDoc; req: ProposalRequest; aiWritten: boolean; onEdit: () => void }) {
   const tier = TIERS.find((t) => t.name === doc.recommendedPlan)!;
   const custom = "custom" in tier && tier.custom;
   const date = new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
   const [signed, setSigned] = useState<{ name: string; at: string } | null>(null);
+  const [comparing, setComparing] = useState(false);
+  const validUntil = new Date(Date.now() + 30 * 864e5).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
 
   return (
     <article id="proposal-doc" className="print-area scroll-mt-28 overflow-hidden rounded-[24px] border border-border bg-card shadow-[var(--shadow-card-hover)]">
@@ -137,7 +139,10 @@ function ProposalDocument({ doc, req, onEdit }: { doc: ProposalDoc; req: Proposa
               <p className="text-sm text-muted-foreground">Recommended plan</p>
               <p className="font-display text-2xl font-semibold text-foreground">{tier.name}</p>
             </div>
-            <p className="font-display text-3xl font-semibold text-foreground">{custom ? "Custom quote" : <>${tier.monthly}<span className="text-base font-normal text-muted-foreground"> / month</span></>}</p>
+            <div className="text-right">
+              <p className="font-display text-3xl font-semibold text-foreground">{custom ? "Custom quote" : <>${tier.monthly}<span className="text-base font-normal text-muted-foreground"> / month</span></>}</p>
+              {!custom && tier.annual > 0 && tier.annual < tier.monthly && <p className="text-xs text-muted-foreground">or ${tier.annual}/month billed yearly</p>}
+            </div>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">{doc.planReason}</p>
           <ul className="mt-3 grid gap-1.5 text-sm text-foreground sm:grid-cols-2">{tier.features.map((f) => <li key={f} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />{f}</li>)}</ul>
@@ -147,7 +152,28 @@ function ProposalDocument({ doc, req, onEdit }: { doc: ProposalDoc; req: Proposa
               {doc.extras.map((x) => <p key={x.item} className="mt-1 flex justify-between gap-3 text-muted-foreground"><span>{x.item}</span><span>{x.note}</span></p>)}
             </div>
           )}
-          <p className="mt-4 text-xs text-muted-foreground">Prices as published at emmaforyou.lovable.app/pricing on {date}. Month-to-month; ad spend is paid directly to the platforms; larger projects can be split into 2–3 payments.</p>
+          <button type="button" onClick={() => setComparing((v) => !v)} aria-expanded={comparing} className="no-print mt-4 text-sm font-semibold text-[var(--emma-violet)] underline-offset-2 hover:underline">{comparing ? "Hide plan comparison" : "Compare with the other plans"}</button>
+          {comparing && (
+            <div className="no-print mt-3 overflow-x-auto" data-proposal-compare>
+              <table className="w-full min-w-[30rem] text-left text-sm">
+                <thead><tr className="text-xs text-muted-foreground"><th className="py-2 pr-3 font-medium">Plan</th><th className="py-2 pr-3 font-medium">Monthly</th><th className="py-2 pr-3 font-medium">Billed yearly</th><th className="py-2 font-medium">Best for</th></tr></thead>
+                <tbody>
+                  {TIERS.map((t) => {
+                    const c = "custom" in t && t.custom;
+                    return (
+                      <tr key={t.name} className={`border-t border-border ${t.name === tier.name ? "bg-[var(--emma-violet)]/5 font-semibold" : ""}`}>
+                        <td className="py-2 pr-3">{t.name}{t.name === tier.name ? " (recommended)" : ""}</td>
+                        <td className="py-2 pr-3 tabular-nums">{c ? "Custom" : `$${t.monthly}`}</td>
+                        <td className="py-2 pr-3 tabular-nums">{c ? "Custom" : `$${t.annual}/mo`}</td>
+                        <td className="py-2 text-muted-foreground">{t.audience}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="mt-4 text-xs text-muted-foreground">Prices in US dollars as published at emmaforyou.lovable.app/pricing on {date}. This proposal is valid until {validUntil}. Month-to-month; ad spend is paid directly to the platforms; larger projects can be split into 2–3 payments.</p>
         </section>
         <section>
           <h3 className="font-display text-lg font-semibold">How we'll measure progress</h3>

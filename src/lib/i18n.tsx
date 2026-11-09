@@ -1,4 +1,5 @@
 import { useSettings } from "./site-settings";
+import { detectUiLang, installLanguageHeader } from "./visitor-language";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "fr" | "es" | "de";
@@ -145,6 +146,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     let stored: Lang | null = null;
     try { stored = window.localStorage.getItem(STORAGE_KEY) as Lang | null; } catch { /* storage blocked */ }
     if (stored && stored in LANGUAGES) setLangState(stored);
+    // No choice yet: follow the browser's language (English when we don't have that language).
+    else setLangState(detectUiLang(navigator.languages?.length ? navigator.languages : [navigator.language]));
+    installLanguageHeader();
   }, []);
 
   useEffect(() => {

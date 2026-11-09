@@ -1,5 +1,5 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
-import { DEMO_BUSINESSES, businessPrompt, offlineReply, receptionistRequestSchema, type DemoBooking } from "../receptionist-data";
+import { DEMO_BUSINESSES, businessPrompt, customToBusiness, offlineReply, receptionistRequestSchema, type DemoBooking } from "../receptionist-data";
 import { aiText, checkLimits, checkOrigin, extractJson, readJson } from "./guard";
 
 /** AI receptionist demo: one short reply per call, optionally confirming a (demo) booking. */
@@ -16,7 +16,8 @@ export const handleReceptionist = createServerOnlyFn(async (request: Request) =>
   const limit = await checkLimits(request, "receptionist", { perVisitor: 40, global: 1500, label: "demo messages", worksWithoutAi: true });
   if (!limit.ok) return limit.response;
 
-  const business = DEMO_BUSINESSES.find((b) => b.id === input.business)!;
+  if (input.business === "custom" && !input.custom) return Response.json({ message: "Add your business name first." }, { status: 400 });
+  const business = input.business === "custom" ? customToBusiness(input.custom!) : DEMO_BUSINESSES.find((b) => b.id === input.business)!;
   const today = input.today || new Date().toDateString();
   const result = !limit.provider ? { ok: false as const } : await aiText(request, limit.provider, businessPrompt(business, today), input.messages.map((m) => ({ role: m.role, content: m.content })));
   if (!result.ok) {

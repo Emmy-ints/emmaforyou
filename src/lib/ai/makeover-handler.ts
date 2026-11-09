@@ -2,6 +2,8 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createResponsesCall } from "./responses";
 import { checkLimits, checkOrigin, pauseProvider, readJson, refundLimit } from "./guard";
+import { signContent } from "./content-sign";
+import { cleanGeneratedHtml } from "../prototype";
 import { classifyFailure, type ProviderFailure } from "./provider";
 
 const schema = z.object({
@@ -61,10 +63,11 @@ Output ONLY a complete HTML document, no markdown fences or commentary. Inline C
       const send = (v: object) => controller.enqueue(encoder.encode(`${JSON.stringify(v)}\n`));
       try {
         let hasText = false;
+        let full = "";
         for await (const part of call.result.fullStream) {
-          if (part.type === "text-delta") { hasText = true; send({ type: "text", text: part.text }); }
+          if (part.type === "text-delta") { hasText = true; full += part.text; send({ type: "text", text: part.text }); }
           if (part.type === "error") { notify(null); send({ type: "error", message: (failure as ProviderFailure | null)?.message || "The redesign couldn't be completed. Please try again." }); }
-          if (part.type === "finish") send(hasText ? { type: "done" } : { type: "error", message: "The AI returned no design. Try a clearer screenshot." });
+          if (part.type === "finish") send(hasText ? { type: "done", sig: await signContent("makeover", { html: cleanGeneratedHtml(full), style: input.style }) } : { type: "error", message: "The AI returned no design. Try a clearer screenshot." });
         }
       } catch {
         notify(null);

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Download, ImageUp, Loader2, Maximize2, MessageCircle, RotateCcw, Wand2, X } from "lucide-react";
-import { previewDocument } from "@/lib/prototype";
+import { cleanGeneratedHtml, previewDocument } from "@/lib/prototype";
+import { useI18n } from "@/lib/i18n";
+import { ShowcaseOptIn, ShowcasePublished, publishToShowcase, useShowcaseChoice } from "../showcase/ShowcaseOptIn";
 import { buildWa } from "@/lib/leads";
 import { track } from "@/lib/analytics";
 import { LeadCapture } from "./LeadCapture";
@@ -45,6 +47,9 @@ async function prepareImage(file: File): Promise<string> {
 
 export default function AiMakeover() {
   const [image, setImage] = useState<string | null>(null);
+  const { lang } = useI18n();
+  const [showChoice, setShowChoice] = useShowcaseChoice("makeover");
+  const [published, setPublished] = useState<string | null>(null);
   const [style, setStyle] = useState<(typeof STYLES)[number]["id"]>("modern");
   const [notes, setNotes] = useState("");
   const [html, setHtml] = useState("");
@@ -85,10 +90,12 @@ export default function AiMakeover() {
     setBusy(true);
     setError("");
     setHtml("");
+    setPublished(null);
     setView("after");
     const ac = new AbortController();
     abortRef.current = ac;
     let text = "";
+    let sig = "";
     try {
       const res = await fetch("/api/makeover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image, style, notes }), signal: ac.signal });
       if (!res.ok || !res.body) {
@@ -109,9 +116,16 @@ export default function AiMakeover() {
           const msg = JSON.parse(line);
           if (msg.type === "text") { text += msg.text; setHtml(text); }
           if (msg.type === "error") throw new Error(msg.message);
+          if (msg.type === "done" && typeof msg.sig === "string") sig = msg.sig;
         }
       }
-      if (text.trim()) track("makeover_generated", { style });
+      if (text.trim()) {
+        track("makeover_generated", { style });
+        if (sig && showChoice.show) {
+          const r = await publishToShowcase({ kind: "makeover", sig, content: { html: cleanGeneratedHtml(text), style }, prompt: notes.trim() || undefined, choice: showChoice }, lang);
+          if (r) setPublished(r.slug);
+        }
+      }
     } catch (e) {
       if (!(e instanceof DOMException && e.name === "AbortError")) setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -165,6 +179,7 @@ export default function AiMakeover() {
             </button>
           )}
           {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+          <ShowcaseOptIn kind="makeover" choice={showChoice} onChange={setShowChoice} />
           <p className="text-xs text-muted-foreground">Your screenshot is sent to our AI provider to create the design and isn't stored by us. 2 free makeovers per hour.</p>
         </div>
 
@@ -202,6 +217,7 @@ export default function AiMakeover() {
           <button onClick={downloadHtml} className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground hover:border-[var(--emma-violet)]"><Download className="h-4 w-4" /> Download design</button>
         </div>
       )}
+      {published && !busy && <ShowcasePublished key={published} slug={published} />}
       {html && !busy && (
         <LeadCapture compact tool="AI makeover" title="Want Emmanuel to follow up on WhatsApp?" lead="Leave your number and he'll message you about turning this concept into your real website." button="Follow up with me" summary={`Makeover style: ${style}.${notes.trim() ? ` Notes: ${notes.trim().slice(0, 400)}` : ""}`} />
       )}

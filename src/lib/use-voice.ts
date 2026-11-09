@@ -1,3 +1,4 @@
+import { speechLang } from "./visitor-language";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* Browser speech APIs (Chrome, Edge, Safari). Nothing is recorded or stored by us: the browser
@@ -31,7 +32,7 @@ export function useSpeechInput(opts: { lang?: string; onFinal: (text: string) =>
     if (!Ctor) { setError("Voice input isn't supported in this browser. Try Chrome, Edge or Safari."); return; }
     setError("");
     const rec = new Ctor();
-    rec.lang = opts.lang || (typeof navigator !== "undefined" ? navigator.language : "en-US");
+    rec.lang = opts.lang || speechLang();
     rec.interimResults = true;
     rec.maxAlternatives = 1;
     rec.continuous = false;
@@ -68,9 +69,30 @@ export function speak(text: string, lang?: string) {
   if (!clean) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(clean);
-  if (lang) u.lang = lang;
+  u.lang = lang || speechLang();
+  // Prefer an installed voice for that language (browsers otherwise read foreign text with an English voice).
+  const voice = window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith(u.lang.toLowerCase().split("-")[0]));
+  if (voice) u.voice = voice;
   u.rate = 1.03;
   window.speechSynthesis.speak(u);
+}
+
+/** Read a long text aloud (articles): queued sentence chunks, since browsers cut off very long utterances. */
+export function speakLong(text: string, onEnd?: () => void): boolean {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return false;
+  const clean = text.replace(/```[\s\S]*?```/g, " ").replace(/[*_#`>|]/g, "").replace(/\p{Extended_Pictographic}/gu, "").replace(/\s+/g, " ").trim();
+  const parts = clean.match(/[^.!?]+[.!?]*\s*/g)?.reduce<string[]>((acc, s) => { const last = acc[acc.length - 1]; if (last && last.length + s.length < 220) acc[acc.length - 1] = last + s; else acc.push(s); return acc; }, []) ?? [];
+  if (!parts.length) return false;
+  window.speechSynthesis.cancel();
+  const lang = speechLang();
+  const voice = window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith(lang.toLowerCase().split("-")[0]));
+  parts.forEach((p, i) => {
+    const u = new SpeechSynthesisUtterance(p.trim());
+    u.lang = lang; if (voice) u.voice = voice; u.rate = 1.02;
+    if (i === parts.length - 1 && onEnd) u.onend = onEnd;
+    window.speechSynthesis.speak(u);
+  });
+  return true;
 }
 
 export function stopSpeaking() {

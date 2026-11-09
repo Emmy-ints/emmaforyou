@@ -27,6 +27,7 @@ import { homeExperienceCopy } from "@/lib/home-experience-copy";
 import { prototypeCopy } from "@/lib/prototype-copy";
 import { DEFAULT_PAGES, WEBSITE_PAGES, cleanGeneratedHtml, previewDocument, suggestPlan, type PlanSuggestion, type ProtoKind, type ProtoPlan } from "@/lib/prototype";
 import { track } from "@/lib/analytics";
+import { ShowcaseOptIn, ShowcasePublished, publishToShowcase, removeFromShowcase, useShowcaseChoice } from "../showcase/ShowcaseOptIn";
 
 type Device = "desktop" | "tablet" | "mobile";
 type Mode = "new" | "refine" | "regenerate" | "repair";
@@ -74,6 +75,8 @@ export default function PrototypeBuilder() {
   const [planAi, setPlanAi] = useState(true);
   const [planning, setPlanning] = useState(false);
   const [built, setBuilt] = useState<Built | null>(null);
+  // Every build and refinement in this visit, so the visitor can go back to an earlier version.
+  const [versions, setVersions] = useState<(Built & { label: string })[]>([]);
   const [bytes, setBytes] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -90,10 +93,13 @@ export default function PrototypeBuilder() {
   const [frameKey, setFrameKey] = useState(0);
   const [fixing, setFixing] = useState(false);
   const repairBudget = useRef(0);
+  const [showChoice, setShowChoice] = useShowcaseChoice(kind);
+  const [shown, setShown] = useState<string | null>(null);
+  const publishTimer = useRef<number | null>(null);
   const abort = useRef<AbortController | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => () => abort.current?.abort(), []);
+  useEffect(() => () => { abort.current?.abort(); if (publishTimer.current) window.clearTimeout(publishTimer.current); }, []);
   // Industry pages link here with the idea filled in: /?proto_kind=app&proto_idea=…#prototype
   useEffect(() => {
     try {
@@ -192,8 +198,24 @@ export default function PrototypeBuilder() {
       }
       const cleaned = cleanGeneratedHtml(accumulated);
       if (!completed || !COMPLETE_MARKUP.test(cleaned)) throw new Error("The prototype was cut off before it finished. Please try again.");
-      setBuilt({ kind: k, html: cleaned, sig, prompt: idea, plan: usePlan ?? undefined, pages: usePages });
+      const next: Built = { kind: k, html: cleaned, sig, prompt: idea, plan: usePlan ?? undefined, pages: usePages };
+      setBuilt(next);
+      setVersions((v) => {
+        const base = mode === "new" ? [] : v;
+        if (mode === "repair" && base.length) return [...base.slice(0, -1), { ...next, label: base[base.length - 1].label }];
+        return [...base, { ...next, label: mode === "refine" && change.trim() ? change.trim().slice(0, 40) : idea.slice(0, 40) }].slice(-8);
+      });
       if (mode !== "repair") repairBudget.current = 1;
+      // Public showcase (if the visitor left it ticked). Wait a moment so a preview that reports an error is repaired first.
+      if (publishTimer.current) window.clearTimeout(publishTimer.current);
+      if (showChoice.show && sig) {
+        const previous = shown;
+        publishTimer.current = window.setTimeout(async () => {
+          publishTimer.current = null;
+          const r = await publishToShowcase({ kind: k, sig, content: { html: cleaned, plan: usePlan ?? undefined, pages: usePages, platform }, prompt: idea, business: business.trim() || undefined, choice: showChoice }, lang);
+          if (r) { if (previous) void removeFromShowcase(previous); setShown(r.slug); }
+        }, 3500);
+      }
       setSaved(null);
       setFrameKey((n) => n + 1);
       setRefining(false); setChange("");
@@ -217,6 +239,7 @@ export default function PrototypeBuilder() {
       if (!ours) return;
       if (repairBudget.current > 0) {
         repairBudget.current -= 1;
+        if (publishTimer.current) { window.clearTimeout(publishTimer.current); publishTimer.current = null; }
         track("prototype_repair", { kind: builtRef.current.kind });
         void generate("repair", msg.slice(0, 300));
       } else {
@@ -337,6 +360,7 @@ export default function PrototypeBuilder() {
               </div>
             </fieldset>
           )}
+          <ShowcaseOptIn kind={kind} choice={showChoice} onChange={setShowChoice} business={business} />
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs tabular-nums text-muted-foreground">{prompt.length}/500</span>
             <Button type="submit" disabled={!canSubmit} className="btn-gold h-11 rounded-full px-5">
@@ -374,7 +398,7 @@ export default function PrototypeBuilder() {
               ideaForm
             )}
             {built && !busy && (
-              <Button type="button" variant="ghost" size="sm" className="mt-3 rounded-full" onClick={() => { setBuilt(null); setSaved(null); setRefining(false); }}>{p.backToIdea}</Button>
+              <Button type="button" variant="ghost" size="sm" className="mt-3 rounded-full" onClick={() => { setBuilt(null); setSaved(null); setShown(null); setVersions([]); setRefining(false); }}>{p.backToIdea}</Button>
             )}
             <p className="mt-5 text-xs text-muted-foreground">
               {remaining !== null && remaining > 0 ? (remaining === 1 ? c.remainingOne : c.remaining.replace("{n}", String(remaining))) : c.freeNote}
@@ -436,6 +460,21 @@ export default function PrototypeBuilder() {
         {built && !busy && suggestion && (
           <div className="mt-8 grid gap-3">
             <p className="text-center text-sm text-muted-foreground">{c.demoNote}</p>
+            {shown && <div className="flex justify-center"><ShowcasePublished key={shown} slug={shown} /></div>}
+            {versions.length > 1 && (
+              <div className="flex flex-wrap items-center justify-center gap-1.5 text-xs" role="group" aria-label="Versions" data-proto-versions>
+                <span className="text-muted-foreground">Versions:</span>
+                {versions.map((v, i) => {
+                  const on = v.html === built.html;
+                  return (
+                    <button key={i} type="button" aria-pressed={on} title={v.label} onClick={() => { if (!on) { setBuilt(v); setFrameKey((n) => n + 1); track("prototype_version_switch", { to: i + 1 }); } }}
+                      className={`rounded-full border px-3 py-1 ${on ? "border-[var(--emma-violet)] bg-[var(--emma-violet)] text-white" : "border-border hover:border-[var(--emma-violet)]"}`}>
+                      v{i + 1}<span className="sr-only">: {v.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <MakeItReal kind={built.kind} suggestion={suggestion} c={p} slug={saved?.slug} onSave={() => { setSaveOpen(true); track("cta_click", { cta: "prototype_save_open", kind: built.kind }); }} />
             <p className="text-center text-xs text-muted-foreground">
               <button type="button" className="font-semibold text-[var(--emma-violet)] underline-offset-2 hover:underline" onClick={() => { track("prototype_build_real_click"); setIntake(true); }}>{c.hook}</button>

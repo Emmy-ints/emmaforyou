@@ -1,6 +1,7 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { fallbackPlan, planRequestSchema, type GoalPlan } from "../goal-plan";
 import { aiText, checkLimits, checkOrigin, extractJson, readJson } from "./guard";
+import { signContent } from "./content-sign";
 
 const str = (v: unknown, n: number) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, n);
 
@@ -22,7 +23,8 @@ Respond with ONLY JSON: {"headline": "<max 10 words>", "northStar": "<the 90-day
     [{ role: "user", content: `I am a: ${p.role}\nGoal: ${p.goal}\nWhy it matters: ${p.why || "not given"}\nWhere I am now: ${p.now || "not given"}\nTime available: ${p.hours}\nBiggest obstacle: ${p.obstacle}\nStart date: ${p.startDate || "this week"}` }]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const j = ai.ok ? extractJson<any>(ai.text) : null;
-  if (!j || !Array.isArray(j.weeks) || !j.weeks.length) return Response.json({ plan: fallbackPlan(p), aiWritten: false }, { headers: { "Cache-Control": "no-store" } });
+  const signed = async (plan: GoalPlan) => { const content = { role: p.role, goal: p.goal, plan }; return { content, sig: await signContent("plan", content) }; };
+  if (!j || !Array.isArray(j.weeks) || !j.weeks.length) { const fb = fallbackPlan(p); return Response.json({ plan: fb, aiWritten: false, showcase: await signed(fb) }, { headers: { "Cache-Control": "no-store" } }); }
   const plan: GoalPlan = {
     headline: str(j.headline, 100),
     northStar: str(j.northStar, 600),
@@ -32,5 +34,5 @@ Respond with ONLY JSON: {"headline": "<max 10 words>", "northStar": "<the 90-day
     risks: (Array.isArray(j.risks) ? j.risks : []).slice(0, 4).map((r: Record<string, unknown>) => ({ risk: str(r.risk, 160), plan: str(r.plan, 240) })).filter((r: { risk: string }) => r.risk),
     checkin: str(j.checkin, 400),
   };
-  return Response.json({ plan, aiWritten: true }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ plan, aiWritten: true, showcase: await signed(plan) }, { headers: { "Cache-Control": "no-store" } });
 });

@@ -2,6 +2,7 @@ import { createServerOnlyFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { fallbackPriorities, scorePillars, type AuditCheck, type AuditPriority, type AuditResult, type Vitals } from "../audit";
 import { aiText, checkLimits, checkOrigin, extractJson, readJson, refundLimit } from "./guard";
+import { signContent } from "./content-sign";
 
 const schema = z.object({ url: z.string().trim().min(4).max(300) });
 const UA = "Mozilla/5.0 (compatible; EmmaForYouAudit/1.0; +https://emmaforyou.lovable.app/website-audit)";
@@ -241,5 +242,7 @@ export const handleAudit = createServerOnlyFn(async (request: Request) => {
     url: target.toString(), finalUrl: finalUrl.toString(), fetchedAt: new Date().toISOString(), responseMs, pageKb, title,
     score, pillars, checks, vitals: psi?.vitals ?? null, screenshot: psi?.screenshot ?? null, headline, summary, priorities, aiWritten,
   };
-  return Response.json(result, { headers: { "Cache-Control": "no-store" } });
+  // Signed summary (no full URL) so the visitor can choose to show the result in the public showcase.
+  const content = { host: finalUrl.hostname.replace(/^www\./, ""), score, pillars, headline, summary, priorities: priorities.map((p) => ({ title: p.title, impact: p.impact })) };
+  return Response.json({ ...result, showcase: { content, sig: await signContent("audit", content) } }, { headers: { "Cache-Control": "no-store" } });
 });

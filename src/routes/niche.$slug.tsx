@@ -4,6 +4,7 @@ import { KineticText } from "@/components/future/Kinetic";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import NextCallTimes from "@/components/tools/NextCallTimes";
+import ShowcaseStrip from "@/components/showcase/ShowcaseStrip";
 import { ClaimGate, ClaimTag } from "@/components/future/ClaimTag";
 import { NICHES, getNiche } from "@/lib/niches";
 import { INDUSTRY_LANDING, projectsFor, prototypeLink } from "@/lib/industry-landing";
@@ -126,6 +127,9 @@ function NichePage() {
             </ul>
           </section>
         )}
+
+        {/* What visitors in this industry built with the free tools (public showcase) */}
+        <div className="mt-16"><ShowcaseStrip industry={niche.slug} min={2} /></div>
 
         {/* Owner-controlled outcome line (registered claim) */}
         <ClaimGate id="niche-results">

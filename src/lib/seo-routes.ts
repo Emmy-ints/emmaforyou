@@ -71,6 +71,7 @@ export const STATIC_PATHS: { path: string; priority: number; changefreq: string 
   { path: "/growth-quiz", priority: 0.6, changefreq: "monthly" },
   { path: "/email-generator", priority: 0.6, changefreq: "monthly" },
   { path: "/inspiration", priority: 0.7, changefreq: "daily" },
+  { path: "/showcase", priority: 0.7, changefreq: "daily" },
   { path: "/free-resources", priority: 0.6, changefreq: "monthly" },
   { path: "/intake", priority: 0.7, changefreq: "monthly" },
   { path: "/faq", priority: 0.7, changefreq: "monthly" },

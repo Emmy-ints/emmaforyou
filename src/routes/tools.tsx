@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ToolShell from "../components/tools/ToolShell";
+import ShowcaseStrip, { ShowcaseCounters } from "../components/showcase/ShowcaseStrip";
 import { TOOLS_DIRECTORY, type ToolInfo } from "@/lib/tools-data";
 import { pageHead, breadcrumbLd, itemListLd } from "@/lib/seo";
 
@@ -31,6 +32,7 @@ function Page() {
       ]}
     >
       <div className="space-y-12">
+        <ShowcaseCounters />
         {GROUPS.map((g) => (
           <section key={g} aria-labelledby={`g-${g}`}>
             <h2 id={`g-${g}`} className="font-display text-2xl font-semibold tracking-tight">{g}</h2>
@@ -49,6 +51,7 @@ function Page() {
             </ul>
           </section>
         ))}
+        <ShowcaseStrip inset title="What visitors made with these tools" />
       </div>
     </ToolShell>
   );

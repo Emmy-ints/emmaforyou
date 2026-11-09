@@ -51,7 +51,26 @@ export type AnalyticsEvent =
   | "book_export_completed"
   | "book_export_failed"
   | "book_project_saved"
-  | "publishing_enquiry_submitted";
+  | "publishing_enquiry_submitted"
+  | "assistant_qualified"
+  | "assistant_qualify_start"
+  | "audit_compare"
+  | "call_time_click"
+  | "language_offer"
+  | "plan_calendar_download"
+  | "plan_resumed"
+  | "prototype_planned"
+  | "prototype_prefilled"
+  | "prototype_repair"
+  | "prototype_saved"
+  | "prototype_version_switch"
+  | "prototype_viewed"
+  | "receptionist_mine"
+  | "showcase_like"
+  | "showcase_published"
+  | "showcase_removed"
+  | "showcase_share"
+  | "showcase_viewed";
 
 type Props = Record<string, string | number | boolean | null | undefined>;
 

@@ -83,6 +83,7 @@ export const FEATURES: { id: string; name: string; where: string; status: "live"
   { id: "publishing-tools", name: "Book tools (/publishing/*)", where: "/publishing and tool pages", status: "live", default: true },
   { id: "publishing-ai", name: "AI drafts in book tools (descriptions, analysis, cover concepts)", where: "/publishing tools", status: "live", default: true },
   { id: "home-interns", name: "Meet Our Interns (shows interns selected in the Interns tab)", where: "Homepage", status: "live", default: true },
+  { id: "home-showcase", name: "Made on EmmaForYou (recent showcase items + live tool counters)", where: "Homepage", status: "live", default: true },
   { id: "home-testimonials", name: "Testimonials preview", where: "Homepage", status: "live", default: true },
   { id: "home-trust", name: "Partners & credentials", where: "Homepage", status: "live", default: true },
   { id: "home-countdown", name: "Monthly onboarding countdown", where: "Homepage", status: "live", default: true },

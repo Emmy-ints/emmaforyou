@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, CheckCircle2, Download, Globe, Loader2, MessageCircle, Search, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowDownRight, ArrowUpRight, CheckCircle2, Download, Globe, Loader2, MessageCircle, Search, Swords, XCircle } from "lucide-react";
+import { compare, headToHead, historyFor, hostOf, loadHistory, recordAudit, type AuditSnapshot } from "@/lib/audit-history";
 import { PILLAR_LABELS, scoreBand, type AuditResult, type CheckStatus, type Pillar } from "@/lib/audit";
 import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
 import { track } from "@/lib/analytics";
+import { useI18n } from "@/lib/i18n";
+import { ShowcaseOptIn, ShowcasePublished, publishToShowcase, useShowcaseChoice } from "../showcase/ShowcaseOptIn";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as unknown as { from: (t: string) => any };
@@ -52,6 +55,10 @@ export default function WebsiteAudit() {
   const [stage, setStage] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState<AuditResult | null>(null);
+  const { lang } = useI18n();
+  const [showChoice, setShowChoice] = useShowcaseChoice("audit");
+  const [shown, setShown] = useState<string | null>(null);
+  const [prev, setPrev] = useState<AuditSnapshot | null>(null);
 
   useEffect(() => {
     if (!busy) return;
@@ -60,18 +67,24 @@ export default function WebsiteAudit() {
     return () => window.clearInterval(id);
   }, [busy]);
 
-  async function run(e: React.FormEvent) {
-    e.preventDefault();
-    if (!url.trim() || busy) return;
+  async function run(e?: React.FormEvent, again?: string) {
+    e?.preventDefault();
+    const target = (again ?? url).trim();
+    if (!target || busy) return;
     setBusy(true);
     setError("");
     setResult(null);
+    setShown(null);
     try {
-      const res = await fetch("/api/audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: url.trim() }) });
+      const res = await fetch("/api/audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: target }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "The audit couldn't run. Please try again.");
       setResult(data as AuditResult);
+      const r0 = data as AuditResult;
+      setPrev(recordAudit({ host: hostOf(r0.finalUrl), at: r0.fetchedAt || new Date().toISOString(), score: r0.score, pillars: r0.pillars }));
       track("audit_run", { score: data.score, lighthouse: Boolean(data.vitals) });
+      const sc = (data as { showcase?: { content: unknown; sig: string } }).showcase;
+      if (sc?.sig && showChoice.show) void publishToShowcase({ kind: "audit", sig: sc.sig, content: sc.content, choice: showChoice }, lang).then((r) => r && setShown(r.slug));
       window.setTimeout(() => document.getElementById("audit-report")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The audit couldn't run.");
@@ -93,6 +106,8 @@ export default function WebsiteAudit() {
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Search className="h-5 w-5" />} {busy ? "Auditing…" : "Audit my website"}
         </button>
       </form>
+      <div className="no-print mt-3"><ShowcaseOptIn kind="audit" choice={showChoice} onChange={setShowChoice} /></div>
+      {shown && <div className="no-print mt-3"><ShowcasePublished key={shown} slug={shown} /></div>}
       <p className="no-print mt-3 text-xs text-muted-foreground">Free. Checks your homepage only. Takes 20–60 seconds. We don't store the report unless you ask for an expert review.</p>
 
       {busy && (
@@ -109,16 +124,113 @@ export default function WebsiteAudit() {
       )}
       {error && <p role="alert" className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-300">{error}</p>}
 
-      {result && <Report r={result} />}
+      {result && <Report r={result} prev={prev} onRecheck={() => { setUrl(result.finalUrl); window.scrollTo({ top: 0, behavior: "smooth" }); void run(undefined, result.finalUrl); }} />}
     </div>
   );
 }
 
-function Report({ r }: { r: AuditResult }) {
+const Delta = ({ v }: { v: number }) => v === 0 ? <span className="text-muted-foreground">no change</span> : (
+  <span className={`inline-flex items-center gap-0.5 font-semibold ${v > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+    {v > 0 ? <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" /> : <ArrowDownRight className="h-3.5 w-3.5" aria-hidden="true" />}{v > 0 ? "+" : ""}{v}
+  </span>
+);
+
+/** Re-check: what changed since this browser last audited the same site, plus the score trend. */
+function Progress({ r, prev }: { r: AuditResult; prev: AuditSnapshot }) {
+  const now: AuditSnapshot = { host: hostOf(r.finalUrl), at: r.fetchedAt, score: r.score, pillars: r.pillars };
+  const d = compare(prev, now);
+  const trend = historyFor(loadHistory(), now.host).slice(-8);
+  const max = 100, w = 160, h = 40;
+  const pts = trend.map((s, i) => `${trend.length === 1 ? w / 2 : (i / (trend.length - 1)) * w},${h - (s.score / max) * h}`).join(" ");
+  return (
+    <div className="rounded-[24px] border border-border bg-card p-5 shadow-[var(--shadow-card)]" data-audit-progress>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--emma-violet)]">Since your last check{d.days ? ` ${d.days} day${d.days === 1 ? "" : "s"} ago` : " earlier today"}</p>
+          <p className="mt-1 font-display text-xl font-semibold">{prev.score} → {r.score} <span className="text-base"><Delta v={d.score} /></span></p>
+        </div>
+        {trend.length > 1 && (
+          <svg width={w} height={h + 4} viewBox={`0 -2 ${w} ${h + 4}`} role="img" aria-label={`Score trend: ${trend.map((s) => s.score).join(", ")}`}>
+            <polyline points={pts} fill="none" stroke="var(--emma-violet)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+            {trend.map((s, i) => <circle key={s.at} cx={trend.length === 1 ? w / 2 : (i / (trend.length - 1)) * w} cy={h - (s.score / max) * h} r="2.5" fill="var(--emma-violet)" />)}
+          </svg>
+        )}
+      </div>
+      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        {(Object.keys(PILLAR_LABELS) as Pillar[]).map((p) => typeof d.pillars[p] === "number" && <li key={p}><span className="text-muted-foreground">{PILLAR_LABELS[p]}</span> <Delta v={d.pillars[p]!} /></li>)}
+      </ul>
+    </div>
+  );
+}
+
+/** Audit a competitor's homepage and compare pillar by pillar. */
+function Compare({ r }: { r: AuditResult }) {
+  const [url, setUrl] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const [other, setOther] = useState<AuditResult | null>(null);
+  async function run(e?: React.FormEvent, again?: string) {
+    e?.preventDefault();
+    const target = (again ?? url).trim();
+    if (!target || busy) return;
+    setBusy(true); setErr(""); setOther(null);
+    try {
+      const res = await fetch("/api/audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: url.trim() }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || "That site couldn't be audited.");
+      if (hostOf((data as AuditResult).finalUrl) === hostOf(r.finalUrl)) throw new Error("That's the same website. Enter a competitor's address.");
+      setOther(data as AuditResult);
+      track("audit_compare", { mine: r.score, theirs: data.score });
+    } catch (e2) { setErr(e2 instanceof Error ? e2.message : "That site couldn't be audited."); } finally { setBusy(false); }
+  }
+  const mine = hostOf(r.finalUrl), theirs = other ? hostOf(other.finalUrl) : "";
+  const h2h = other ? headToHead(r.pillars, other.pillars) : null;
+  return (
+    <div className="no-print rounded-[24px] border border-border bg-card p-6 shadow-[var(--shadow-card)]" data-audit-compare>
+      <h3 className="flex items-center gap-2 font-display text-xl font-semibold"><Swords className="h-5 w-5 text-[var(--emma-violet)]" aria-hidden="true" /> Compare with a competitor</h3>
+      <p className="mt-1 text-sm text-muted-foreground">See where they're ahead and where you can win. Runs the same checks on their homepage.</p>
+      <form onSubmit={run} className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <label htmlFor="audit-compare" className="sr-only">Competitor's website</label>
+        <input id="audit-compare" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="competitor.com" inputMode="url" maxLength={300} className="input min-w-0 flex-1" />
+        <button disabled={busy || !url.trim()} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-50">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />} {busy ? "Checking…" : "Compare"}
+        </button>
+      </form>
+      {err && <p role="alert" className="mt-3 text-sm text-red-600">{err}</p>}
+      {other && h2h && (
+        <div className="mt-5" data-compare-result>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-4 gap-y-2 text-sm">
+            <span />
+            <span className="max-w-[9rem] truncate text-right text-xs font-semibold" title={mine}>{mine}</span>
+            <span className="max-w-[9rem] truncate text-right text-xs font-semibold text-muted-foreground" title={theirs}>{theirs}</span>
+            <span className="font-semibold">Overall</span>
+            <span className="text-right font-display text-lg font-semibold">{r.score}</span>
+            <span className="text-right font-display text-lg font-semibold text-muted-foreground">{other.score}</span>
+            {h2h.rows.map((row) => (
+              <div key={row.pillar} className="contents">
+                <span className="text-muted-foreground">{PILLAR_LABELS[row.pillar]}</span>
+                <span className={`text-right tabular-nums ${row.lead === "a" ? "font-semibold text-emerald-600 dark:text-emerald-400" : ""}`}>{row.a}</span>
+                <span className={`text-right tabular-nums ${row.lead === "b" ? "font-semibold text-red-600 dark:text-red-400" : "text-muted-foreground"}`}>{row.b}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 rounded-xl bg-muted px-3 py-2 text-sm">
+            {h2h.aWins > h2h.bWins ? `You're ahead on ${h2h.aWins} of ${h2h.rows.length} areas.` : h2h.bWins > h2h.aWins ? `They're ahead on ${h2h.bWins} of ${h2h.rows.length} areas.` : "You're level overall."}
+            {h2h.rows.some((x) => x.lead === "b") && ` Close the gap on ${h2h.rows.filter((x) => x.lead === "b").map((x) => PILLAR_LABELS[x.pillar].toLowerCase()).join(", ")}.`}
+          </p>
+          <a href={buildWa(`Hi Emmanuel, I compared ${mine} (${r.score}/100) with ${theirs} (${other.score}/100) on your site. Can you help me get ahead?`)} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-semibold text-white"><MessageCircle className="h-4 w-4" /> Help me get ahead</a>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Report({ r, prev, onRecheck }: { r: AuditResult; prev: AuditSnapshot | null; onRecheck: () => void }) {
   const host = new URL(r.finalUrl).host;
   const pillars = Object.keys(PILLAR_LABELS) as Pillar[];
   return (
     <section id="audit-report" className="print-area mt-10 scroll-mt-28 space-y-6" aria-labelledby="audit-heading">
+      {prev && <Progress r={r} prev={prev} />}
       <div className="rounded-[24px] border border-border bg-card p-6 shadow-[var(--shadow-card)] md:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--emma-violet)]">Website audit · {new Date(r.fetchedAt).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}</p>
         <div className="mt-4 flex flex-col gap-6 md:flex-row md:items-center">
@@ -211,7 +323,12 @@ function Report({ r }: { r: AuditResult }) {
         <p className="mt-6 text-xs text-muted-foreground">Automated checks of the homepage HTML at {r.finalUrl}, plus Google PageSpeed Insights where available. Scores are indicators to prioritise work, not guarantees of rankings or sales. Report by EmmaForYou · emmaforyou.lovable.app</p>
       </div>
 
+      <Compare r={r} />
+
       <div className="no-print flex flex-wrap gap-3">
+        <button type="button" onClick={onRecheck} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:border-[var(--emma-violet)]">
+          Re-check after changes
+        </button>
         <button onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:border-[var(--emma-violet)]">
           <Download className="h-4 w-4" /> Download PDF report
         </button>

@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { KineticText } from "@/components/future/Kinetic";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { canSpeak, speakLong, stopSpeaking } from "@/lib/use-voice";
+import { Headphones, Square, Wrench } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getKnowledgeArticle } from "@/lib/knowledge-server";
@@ -8,6 +10,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { buildWa } from "@/lib/leads";
 import { serviceForTopic } from "@/lib/topic-service";
 import { pageHead, breadcrumbLd, articleLd, describe, withBrand } from "@/lib/seo";
+
+/** The free tool that matches each topic, so readers can act on the article straight away. */
+const TOPIC_TOOL: Record<string, { to: string; name: string; does: string }> = {
+  "AI Automation": { to: "/ai-receptionist", name: "AI receptionist", does: "Type in your own business and chat with your own AI receptionist." },
+  "Website & SEO": { to: "/website-audit", name: "Website audit", does: "Score your homepage on speed, search, mobile, conversion and trust." },
+  "Email Marketing": { to: "/email-generator", name: "Email sequence generator", does: "Get a 5-email sequence for your business, plus WhatsApp versions." },
+  "Business Growth": { to: "/goal-planner", name: "90-day goal planner", does: "Turn your goal into a week-by-week plan you can add to your calendar." },
+  "Ecommerce": { to: "/ecommerce/plan", name: "Ecommerce plan", does: "Map your store's next steps from where you are today." },
+  "Paid Advertising": { to: "/roi-calculator", name: "ROI calculator", does: "See what more replies and better follow-up could be worth before you spend." },
+  "Social Media": { to: "/growth-quiz", name: "Growth quiz", does: "Find the gaps holding your marketing back in two minutes." },
+};
 
 export const Route = createFileRoute("/knowledge-base/$slug")({
   component: ArticlePage,
@@ -63,11 +76,25 @@ function ArticlePage() {
           <h1 className="mt-3 font-display text-4xl font-extrabold leading-tight md:text-5xl">{article.title}</h1>
           <p className="mt-4 text-lg text-muted-foreground">{article.excerpt}</p>
 
+          <ListenButton text={`${article.title}. ${article.body}`} />
+
           <div className="prose-emma mt-10 space-y-5 text-foreground">
             {renderBody(article.body)}
           </div>
 
-          <div className="mt-12 rounded-2xl border border-border bg-card p-6 text-center">
+          {TOPIC_TOOL[article.category] && (
+            <div className="mt-12 flex flex-col gap-4 rounded-2xl border border-[var(--emma-violet)]/40 bg-[var(--emma-violet)]/5 p-5 sm:flex-row sm:items-center" data-article-tool>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--emma-violet)] text-white"><Wrench className="h-5 w-5" aria-hidden="true" /></span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--emma-violet)]">Put this into practice · free</p>
+                <p className="mt-0.5 font-semibold">{TOPIC_TOOL[article.category].name}</p>
+                <p className="text-sm text-muted-foreground">{TOPIC_TOOL[article.category].does}</p>
+              </div>
+              <Link to={TOPIC_TOOL[article.category].to} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-foreground px-5 text-sm font-semibold text-background">Try it free</Link>
+            </div>
+          )}
+
+          <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-center">
             <p className="font-display text-base font-bold">Was this article helpful?</p>
             {voted === null ? (
               <div className="mt-3 flex justify-center gap-3">
@@ -199,4 +226,20 @@ function renderInline(text: string) {
     }
     return p;
   });
+}
+
+/** "Listen to this article" with the browser's own voice (in the visitor's language setting). */
+function ListenButton({ text }: { text: string }) {
+  const [ok, setOk] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => { setOk(canSpeak()); return () => stopSpeaking(); }, []);
+  if (!ok) return null;
+  const minutes = Math.max(1, Math.round(text.split(/\s+/).length / 160));
+  return (
+    <button type="button" aria-pressed={playing} data-listen onClick={() => { if (playing) { stopSpeaking(); setPlaying(false); } else if (speakLong(text, () => setPlaying(false))) setPlaying(true); }}
+      className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:border-[var(--emma-violet)]">
+      {playing ? <Square className="h-4 w-4" aria-hidden="true" /> : <Headphones className="h-4 w-4" aria-hidden="true" />}
+      {playing ? "Stop reading" : `Listen to this article (${minutes} min)`}
+    </button>
+  );
 }

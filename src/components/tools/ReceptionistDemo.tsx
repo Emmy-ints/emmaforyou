@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarCheck, Loader2, Mic, MicOff, RotateCcw, Send, Volume2, VolumeX } from "lucide-react";
-import { DEMO_BUSINESSES, type DemoBooking, type DemoBusiness } from "@/lib/receptionist-data";
+import { CalendarCheck, Loader2, Mic, MicOff, Pencil, RotateCcw, Send, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { DEMO_BUSINESSES, customToBusiness, parseLines, parseServices, type CustomBusiness, type DemoBooking, type DemoBusiness } from "@/lib/receptionist-data";
+import { LeadCapture } from "./LeadCapture";
 import { canSpeak, speak, stopSpeaking, useSpeechInput } from "@/lib/use-voice";
 import { track } from "@/lib/analytics";
 
@@ -12,9 +13,43 @@ function todayLabel() {
   return `${d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, ${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
+const MINE_KEY = "efy_rx_mine";
+interface MineForm { name: string; kind: string; city: string; hours: string; services: string; faqs: string }
+const EMPTY: MineForm = { name: "", kind: "", city: "", hours: "", services: "", faqs: "" };
+const toCustom = (f: MineForm): CustomBusiness => ({ name: f.name.trim(), kind: f.kind.trim(), city: f.city.trim(), hours: f.hours.trim(), services: parseServices(f.services), policies: parseLines(f.faqs) });
+
+/** "Try it with my business": the visitor types their own details and chats with their own receptionist. */
+function MineEditor({ form, onChange, onStart }: { form: MineForm; onChange: (f: MineForm) => void; onStart: () => void }) {
+  const set = (k: keyof MineForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...form, [k]: e.target.value });
+  const services = parseServices(form.services);
+  return (
+    <form className="grid gap-3 p-4 text-sm" data-rx-mine onSubmit={(e) => { e.preventDefault(); if (form.name.trim().length >= 2) onStart(); }}>
+      <p className="text-muted-foreground">Type in your own details and chat with <strong className="text-foreground">your</strong> AI receptionist. They stay in this browser and are only used for this demo.</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="grid gap-1 font-medium">Business name<input required minLength={2} maxLength={60} value={form.name} onChange={set("name")} className="input font-normal" placeholder="e.g. Ada's Kitchen" /></label>
+        <label className="grid gap-1 font-medium">What you do<input maxLength={60} value={form.kind} onChange={set("kind")} className="input font-normal" placeholder="e.g. Restaurant and catering" /></label>
+        <label className="grid gap-1 font-medium">City<input maxLength={60} value={form.city} onChange={set("city")} className="input font-normal" placeholder="e.g. Ikeja, Lagos" /></label>
+        <label className="grid gap-1 font-medium">Opening hours<input maxLength={200} value={form.hours} onChange={set("hours")} className="input font-normal" placeholder="e.g. Mon–Sat 9am–8pm, closed Sunday" /></label>
+      </div>
+      <label className="grid gap-1 font-medium">Services and prices <span className="font-normal text-muted-foreground">One per line, like "Party jollof tray - ₦45,000"</span>
+        <textarea rows={4} maxLength={1500} value={form.services} onChange={set("services")} className="input font-normal" placeholder={"Wash & style - ₦8,000\nSilk press - ₦18,000"} />
+      </label>
+      {services.length > 0 && <p className="-mt-1 text-xs text-muted-foreground" data-rx-parsed>{services.length} service{services.length === 1 ? "" : "s"} understood{services.some((x) => x.price) ? `, e.g. ${services.find((x) => x.price)!.name}: ${services.find((x) => x.price)!.price}` : ""}</p>}
+      <label className="grid gap-1 font-medium">Rules and common questions <span className="font-normal text-muted-foreground">Optional, one per line</span>
+        <textarea rows={3} maxLength={2000} value={form.faqs} onChange={set("faqs")} className="input font-normal" placeholder={"Deposit of ₦5,000 to book\nWe deliver within Lagos for ₦2,500"} />
+      </label>
+      <button disabled={form.name.trim().length < 2} className="btn-primary-gradient inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-semibold text-white disabled:opacity-50"><Sparkles className="h-4 w-4" aria-hidden="true" /> Chat with my receptionist</button>
+    </form>
+  );
+}
+
 export default function ReceptionistDemo({ compact = false }: { compact?: boolean }) {
   const [bizId, setBizId] = useState<DemoBusiness["id"]>("salon");
-  const biz = DEMO_BUSINESSES.find((b) => b.id === bizId)!;
+  const [mine, setMine] = useState<MineForm>(EMPTY);
+  const [editing, setEditing] = useState(false);
+  useEffect(() => { try { const v = JSON.parse(localStorage.getItem(MINE_KEY) || "null"); if (v && typeof v.name === "string") setMine({ ...EMPTY, ...v }); } catch { /* ignore */ } }, []);
+  const mineReady = mine.name.trim().length >= 2;
+  const biz = bizId === "custom" ? customToBusiness(toCustom(mineReady ? mine : { ...mine, name: "Your business" })) : DEMO_BUSINESSES.find((b) => b.id === bizId)!;
   const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: biz.greeting }]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -29,10 +64,11 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
 
   const voice = useSpeechInput({ onFinal: (text) => { track("voice_used", { tool: "receptionist" }); send(text, true); } });
 
-  function switchBusiness(id: DemoBusiness["id"]) {
+  function switchBusiness(id: DemoBusiness["id"], form: MineForm = mine) {
     if (busy) return;
-    const next = DEMO_BUSINESSES.find((b) => b.id === id)!;
+    const next = id === "custom" ? customToBusiness(toCustom(form.name.trim().length >= 2 ? form : { ...form, name: "Your business" })) : DEMO_BUSINESSES.find((b) => b.id === id)!;
     setBizId(id);
+    setEditing(id === "custom" && form.name.trim().length < 2);
     setMessages([{ role: "assistant", content: next.greeting }]);
     setError("");
     setLastReplyMs(null);
@@ -54,6 +90,7 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           business: bizId,
+          ...(bizId === "custom" ? { custom: toCustom(mine) } : {}),
           today: todayLabel(),
           // The greeting is local; send the real conversation (last 18 turns).
           messages: history.slice(1).slice(-18).map(({ role, content }) => ({ role, content: content.slice(0, 600) })),
@@ -86,7 +123,19 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
               <span aria-hidden="true">{b.emoji}</span>{b.name}
             </button>
           ))}
+          <button role="tab" aria-selected={bizId === "custom"} onClick={() => switchBusiness("custom")} data-rx-tab="custom"
+            className={`flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition ${bizId === "custom" ? "bg-card text-foreground shadow-sm" : "text-[var(--emma-violet)] hover:text-foreground"}`}>
+            <Sparkles className="h-4 w-4" aria-hidden="true" />{mineReady ? mine.name.slice(0, 24) : "Try my business"}
+          </button>
         </div>
+        {bizId === "custom" && editing ? (
+          <MineEditor form={mine} onChange={setMine} onStart={() => {
+            try { localStorage.setItem(MINE_KEY, JSON.stringify(mine)); } catch { /* ignore */ }
+            track("receptionist_mine", { services: parseServices(mine.services).length });
+            switchBusiness("custom", mine);
+            setEditing(false);
+          }} />
+        ) : (<>
 
         {/* Chat header */}
         <div className="flex items-center gap-3 px-4 py-3" style={{ background: `linear-gradient(90deg, ${biz.accent}22, transparent)` }}>
@@ -100,6 +149,11 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
               aria-label={voiceOn ? "Turn spoken replies off" : "Read replies aloud"}
               className={`grid h-9 w-9 place-items-center rounded-full border border-border transition ${voiceOn ? "bg-[var(--emma-violet)] text-white" : "bg-card text-muted-foreground hover:text-foreground"}`}>
               {voiceOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
+          )}
+          {bizId === "custom" && (
+            <button onClick={() => setEditing(true)} aria-label="Edit my business details" className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground">
+              <Pencil className="h-4 w-4" />
             </button>
           )}
           <button onClick={() => switchBusiness(bizId)} aria-label="Restart conversation" className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground">
@@ -168,6 +222,7 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
           </button>
         </form>
         {(error || voice.error) && <p role="alert" className="px-4 pb-3 text-xs text-red-600 dark:text-red-400">{error || voice.error}</p>}
+        </>)}
       </div>
 
       {!compact && (
@@ -188,7 +243,11 @@ export default function ReceptionistDemo({ compact = false }: { compact?: boolea
             <p className="font-semibold text-foreground">For your business</p>
             <p className="mt-2">We train the same assistant on your services, prices and tone, and connect it to WhatsApp, Instagram, your website and your calendar.</p>
             <p className="mt-3 text-xs">These sample businesses and prices are made up for the demo.</p>
+            {bizId !== "custom" && <button type="button" onClick={() => switchBusiness("custom")} className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--emma-violet)]"><Sparkles className="h-4 w-4" aria-hidden="true" /> Try it with your own business</button>}
           </div>
+          {bizId === "custom" && mineReady && messages.length >= 3 && (
+            <LeadCapture compact tool="AI receptionist (own business)" title={`Want this for ${mine.name.trim().slice(0, 40)}?`} lead="Leave your WhatsApp and we'll set up this receptionist with your real details, on WhatsApp, Instagram and your website." button="Set it up for me" summary={`Business: ${mine.name.trim()} (${mine.kind.trim() || "type not given"}${mine.city.trim() ? `, ${mine.city.trim()}` : ""}). Services entered: ${parseServices(mine.services).length}. Hours: ${mine.hours.trim() || "not given"}.`} />
+          )}
         </aside>
       )}
     </div>

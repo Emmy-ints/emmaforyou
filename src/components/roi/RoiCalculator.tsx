@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { SCENARIOS, decodeRoi, encodeRoi, scenarioAssumptions, type ScenarioId } from "@/lib/roi-share";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calculator, CheckCircle2, ChevronDown, Info, Loader2, RotateCcw, SlidersHorizontal, Wallet } from "lucide-react";
+import { Calculator, CheckCircle2, ChevronDown, Info, Link2, Loader2, Printer, RotateCcw, SlidersHorizontal, Wallet } from "lucide-react";
 import {
   ASSUMPTION_NOTES,
   CURRENCIES,
@@ -35,6 +36,25 @@ export default function RoiCalculator({ compact = false }: { compact?: boolean }
   const [setupFee, setSetupFee] = useState(CURRENCY_DEFAULTS.NGN.setupFee);
   const [months, setMonths] = useState<(typeof TIMELINES)[number]>(12);
   const [showMath, setShowMath] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // A shared link (?roi=…) opens the same calculation.
+  useEffect(() => {
+    if (compact) return;
+    try {
+      const st = decodeRoi(new URLSearchParams(window.location.search).get("roi"), INDUSTRIES);
+      if (!st) return;
+      setCurrency(st.currency); setIndustry(st.industry); setEnquiries(st.enquiries); setMissed(st.missed); setCloseRate(st.closeRate);
+      setCustomerValue(st.customerValue); setAssumptions(st.assumptions); setMonthlyFee(st.monthlyFee); setSetupFee(st.setupFee); setMonths(st.months);
+    } catch { /* bad link: keep defaults */ }
+  }, [compact]);
+  function shareLink() {
+    const url = `${window.location.origin}/roi-calculator?roi=${encodeURIComponent(encodeRoi({ currency, industry, enquiries, missed, closeRate, customerValue, assumptions, monthlyFee, setupFee, months }))}`;
+    try { void navigator.clipboard.writeText(url); } catch { /* blocked */ }
+    try { window.history.replaceState(null, "", url.replace(window.location.origin, "")); } catch { /* ignore */ }
+    setLinkCopied(true); window.setTimeout(() => setLinkCopied(false), 2000);
+  }
+  const scenario = (Object.keys(SCENARIOS) as ScenarioId[]).find((id) => JSON.stringify(scenarioAssumptions(id)) === JSON.stringify(assumptions)) ?? null;
 
   const result = useMemo(
     () => calculateRoi({ monthlyEnquiries: enquiries, missedPercent: missed, closeRatePercent: closeRate, customerValue }, assumptions, { monthlyFee, setupFee, months }),
@@ -85,6 +105,11 @@ export default function RoiCalculator({ compact = false }: { compact?: boolean }
               <button type="button" onClick={() => setAssumptions(DEFAULT_ASSUMPTIONS)} className="roi-link"><RotateCcw className="h-3.5 w-3.5" /> Reset</button>
             ) : null}
           >
+            <div className="roi-seg mb-4" role="group" aria-label="Scenario" data-roi-scenarios>
+              {(Object.keys(SCENARIOS) as ScenarioId[]).map((id) => (
+                <button key={id} type="button" aria-pressed={scenario === id} onClick={() => setAssumptions(scenarioAssumptions(id))}>{SCENARIOS[id].label}</button>
+              ))}
+            </div>
             <div className="space-y-4">
               {ASSUMPTION_FIELDS.map((f) => (
                 <div key={f.key}>
@@ -178,6 +203,12 @@ export default function RoiCalculator({ compact = false }: { compact?: boolean }
             )}
           </AnimatePresence>
 
+          {!compact && (
+            <div className="no-print mt-5 flex flex-wrap gap-2" data-roi-share>
+              <button type="button" onClick={shareLink} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/10"><Link2 className="h-3.5 w-3.5" aria-hidden="true" /> {linkCopied ? "Link copied" : "Copy link to this calculation"}</button>
+              <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/10"><Printer className="h-3.5 w-3.5" aria-hidden="true" /> Save as PDF</button>
+            </div>
+          )}
           {!compact && <RoiLeadForm result={result} industry={industry} currency={currency} months={months} monthlyFee={monthlyFee} enquiries={enquiries} closeRate={closeRate} customerValue={customerValue} />}
           {compact && (
             <a href="/roi-calculator" className="btn-gold mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm">

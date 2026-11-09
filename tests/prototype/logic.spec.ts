@@ -49,6 +49,11 @@ const webIn = prototypeRequestSchema.parse({ kind: "website", prompt: "salon sit
 t("website message has pages and brand", /Home, Booking/.test(buildUserMessage(webIn)) && /#ff3366/.test(buildUserMessage(webIn)) && /Glow/.test(buildUserMessage(webIn)));
 t("both forbid network and real transactions", [buildInstructions(appIn), buildInstructions(webIn)].every((s) => /no external requests/.test(s) && /Demo/.test(s)));
 
+t("JS rules forbid inline handlers inside strings", /Never put inline onclick/.test(buildInstructions(appIn)) && /Never put inline onclick/.test(buildInstructions(webIn)));
+const rep = prototypeRequestSchema.parse({ kind: "app", prompt: "food app", html: "<html></html>", refinement: "SyntaxError: Invalid token (line 3)", repair: true });
+t("repair message quotes the error and asks for the full corrected document", /SyntaxError: Invalid token/.test(buildUserMessage(rep)) && /complete corrected document/.test(buildUserMessage(rep)));
+t("preview reports script errors to the builder", /efyProtoError/.test(previewDocument("<p>x</p>")) && previewDocument("<p>x</p>").indexOf("efyProtoError") < previewDocument("<p>x</p>").indexOf("<body>"));
+
 // preview + logo
 const doc = previewDocument("<html><head></head><body><b data-efy-logo>A</b></body></html>", "data:image/png;base64,AAAA");
 t("CSP is first in head", /<head><meta http-equiv="Content-Security-Policy"/.test(doc));

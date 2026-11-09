@@ -36,26 +36,30 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
 
   // Visitor limit: a few generations per visitor per hour, plus an overall hourly cap to protect the AI budget.
   const visitorHash = await hashVisitor(request, visitorSalt());
+  // Automatic repairs (the preview reported a script error) have their own small allowance, so a glitch
+  // doesn't use up the visitor's prototypes.
+  const kinds = input.repair ? ["repair"] : ["new", "refine"];
+  const perVisitor = input.repair ? REPAIRS_PER_VISITOR_PER_HOUR : PER_VISITOR_PER_HOUR;
   const since = new Date(Date.now() - HOUR_MS).toISOString();
   const [{ data: mine, error: mineError }, { count: everyone, error: allError }] = await Promise.all([
     // Only prototype runs count here; other tools log their own kinds in the same table.
-    supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).in("kind", ["new", "refine"]).gte("created_at", since).order("created_at", { ascending: true }),
-    supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).in("kind", ["new", "refine"]).gte("created_at", since),
+    supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).in("kind", kinds).gte("created_at", since).order("created_at", { ascending: true }),
+    supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).in("kind", kinds).gte("created_at", since),
   ]);
   if (mineError || allError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
-  if ((mine?.length ?? 0) >= PER_VISITOR_PER_HOUR) {
+  if ((mine?.length ?? 0) >= perVisitor) {
     const oldest = new Date(mine![0].created_at).getTime();
     const minutes = Math.max(1, Math.ceil((oldest + HOUR_MS - Date.now()) / 60000));
     return Response.json(
-      { message: `You've used your ${PER_VISITOR_PER_HOUR} free prototypes for this hour. You can create more in about ${minutes} minute${minutes === 1 ? "" : "s"} — or chat with us on WhatsApp and we'll build the real thing.`, retryAfterMinutes: minutes },
+      { message: input.repair ? "We couldn't fix this prototype automatically right now. Try Regenerate, or chat with us on WhatsApp." : `You've used your ${PER_VISITOR_PER_HOUR} free prototypes for this hour. You can create more in about ${minutes} minute${minutes === 1 ? "" : "s"} — or chat with us on WhatsApp and we'll build the real thing.`, retryAfterMinutes: minutes },
       { status: 429, headers: { "Retry-After": String(minutes * 60) } },
     );
   }
   if ((everyone ?? 0) >= GLOBAL_PER_HOUR) {
     return Response.json({ message: "The prototype builder is very busy right now. Please try again in a little while." }, { status: 429, headers: { "Retry-After": "900" } });
   }
-  const { data: logged } = await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.refinement ? "refine" : "new" }).select("id").maybeSingle();
-  const remaining = PER_VISITOR_PER_HOUR - (mine?.length ?? 0) - 1;
+  const { data: logged } = await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.repair ? "repair" : input.refinement ? "refine" : "new" }).select("id").maybeSingle();
+  const remaining = input.repair ? -1 : PER_VISITOR_PER_HOUR - (mine?.length ?? 0) - 1;
 
   let notifyReady: (response: Response | null) => void = () => {};
   const ready = new Promise<Response | null>((resolve) => { notifyReady = resolve; });
@@ -110,12 +114,14 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
     return Response.json({ message: upstreamFailure || "AI generation is temporarily unavailable." }, { status: f?.status ?? 502 });
   }
   if (request.signal.aborted) return new Response(null, { status: 499 });
-  const headers = provider.id === "openai" ? new Headers({ "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) }) : getLovableAiGatewayResponseHeaders(upstream?.headers, { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", "X-Prototypes-Remaining": String(Math.max(0, remaining)) });
+  const base: Record<string, string> = { "Content-Type": "application/x-ndjson", "Cache-Control": "no-store, no-transform", ...(remaining >= 0 ? { "X-Prototypes-Remaining": String(remaining) } : {}) };
+  const headers = provider.id === "openai" ? new Headers(base) : getLovableAiGatewayResponseHeaders(upstream?.headers, base);
   return new Response(stream, { headers });
 });
 
 const HOUR_MS = 60 * 60 * 1000;
 const PER_VISITOR_PER_HOUR = 3;
+const REPAIRS_PER_VISITOR_PER_HOUR = 3;
 const GLOBAL_PER_HOUR = 60;
 const BLOCK_COOLDOWN_MS = 30 * 60 * 1000;
 

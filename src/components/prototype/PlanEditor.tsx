@@ -75,8 +75,8 @@ export default function PlanEditor({ plan, onChange, onBuild, onBack, busy, aiWr
             ))}
           </ul>
           {plan.features.length < 8 && (
-            <form className="mt-2 flex gap-2" onSubmit={(e) => { e.preventDefault(); const f = newFeature.trim(); if (!f || plan.features.includes(f)) return; set({ features: [...plan.features, f.slice(0, 80)] }); setNewFeature(""); }}>
-              <input aria-label={c.addFeature} placeholder={c.addFeature} maxLength={80} value={newFeature} onChange={(e) => setNewFeature(e.target.value)} className="efy-input min-w-0 flex-1 py-1.5" />
+            <form className="mt-2 flex gap-2" onSubmit={(e) => { e.preventDefault(); const f = newFeature.trim(); if (!f || plan.features.includes(f)) return; set({ features: [...plan.features, f.slice(0, 140)] }); setNewFeature(""); }}>
+              <input aria-label={c.addFeature} placeholder={c.addFeature} maxLength={140} value={newFeature} onChange={(e) => setNewFeature(e.target.value)} className="efy-input min-w-0 flex-1 py-1.5" />
               <Button type="submit" size="sm" variant="secondary" className="rounded-full" disabled={!newFeature.trim()}><Plus className="h-4 w-4" /></Button>
             </form>
           )}

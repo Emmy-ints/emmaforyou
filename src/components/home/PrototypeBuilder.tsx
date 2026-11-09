@@ -29,7 +29,7 @@ import { DEFAULT_PAGES, WEBSITE_PAGES, cleanGeneratedHtml, previewDocument, sugg
 import { track } from "@/lib/analytics";
 
 type Device = "desktop" | "tablet" | "mobile";
-type Mode = "new" | "refine" | "regenerate";
+type Mode = "new" | "refine" | "regenerate" | "repair";
 
 const DEVICES: { id: Device; icon: typeof Monitor }[] = [
   { id: "desktop", icon: Monitor },
@@ -88,6 +88,8 @@ export default function PrototypeBuilder() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [saved, setSaved] = useState<{ slug: string; suggestion: PlanSuggestion } | null>(null);
   const [frameKey, setFrameKey] = useState(0);
+  const [fixing, setFixing] = useState(false);
+  const repairBudget = useRef(0);
   const abort = useRef<AbortController | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -119,16 +121,17 @@ export default function PrototypeBuilder() {
     } finally { setPlanning(false); }
   }
 
-  async function generate(mode: Mode) {
+  async function generate(mode: Mode, repairError?: string) {
     const base = mode === "new" ? null : built;
     const k: ProtoKind = base ? base.kind : kind;
     const idea = (base ? base.prompt : prompt).trim();
     if (busy || paused || idea.length < 8) return;
     if (mode === "refine" && !change.trim()) return;
+    if (mode === "repair" && (!base || !repairError)) return;
     const usePlan = k === "app" ? (base?.plan ?? plan) : undefined;
     if (k === "app" && !usePlan) return;
     const usePages = k === "website" ? (base?.pages ?? pages) : undefined;
-    setBusy(true); setError(""); setBytes(0); setStage(0);
+    setBusy(true); setError(""); setBytes(0); setStage(0); setFixing(mode === "repair");
     if (window.innerWidth < 1024) previewRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     const controller = new AbortController();
     abort.current = controller;
@@ -142,6 +145,7 @@ export default function PrototypeBuilder() {
           kind: k, prompt: idea, language: lang, brand,
           ...(k === "app" ? { plan: usePlan } : { pages: usePages }),
           ...(mode === "refine" && base ? { html: base.html, refinement: change.trim() } : {}),
+          ...(mode === "repair" && base ? { html: base.html, refinement: repairError, repair: true } : {}),
         }),
       });
       if (!response.ok) {
@@ -175,6 +179,7 @@ export default function PrototypeBuilder() {
       const cleaned = cleanGeneratedHtml(accumulated);
       if (!completed || !COMPLETE_MARKUP.test(cleaned)) throw new Error("The prototype was cut off before it finished. Please try again.");
       setBuilt({ kind: k, html: cleaned, sig, prompt: idea, plan: usePlan ?? undefined, pages: usePages });
+      if (mode !== "repair") repairBudget.current = 1;
       setSaved(null);
       setFrameKey((n) => n + 1);
       setRefining(false); setChange("");
@@ -184,8 +189,29 @@ export default function PrototypeBuilder() {
         setError(e instanceof Error ? e.message : "Generation could not finish. Please try again later.");
         track("prototype_failed", { mode, kind: k });
       }
-    } finally { setBusy(false); abort.current = null; }
+    } finally { setBusy(false); setFixing(false); abort.current = null; }
   }
+
+  // The preview reports script errors (see REPORTER in lib/prototype). Repair once automatically; after that, say so.
+  const builtRef = useRef(built); builtRef.current = built;
+  const busyRef = useRef(busy); busyRef.current = busy;
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      const msg = (e.data as { efyProtoError?: unknown } | null)?.efyProtoError;
+      if (typeof msg !== "string" || !builtRef.current || busyRef.current) return;
+      const ours = [...document.querySelectorAll<HTMLIFrameElement>("#prototype iframe, [role=dialog] iframe")].some((f) => f.contentWindow === e.source);
+      if (!ours) return;
+      if (repairBudget.current > 0) {
+        repairBudget.current -= 1;
+        track("prototype_repair", { kind: builtRef.current.kind });
+        void generate("repair", msg.slice(0, 300));
+      } else {
+        setError(p.glitch);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  });
 
   const doc = useMemo(() => (built ? previewDocument(built.html, logo || null) : ""), [built, logo]);
   const stages = [c.sketch, c.code, c.interactions];
@@ -207,6 +233,7 @@ export default function PrototypeBuilder() {
           </li>
         ))}
       </ul>
+      {fixing && <p className="mt-4 text-sm font-semibold text-[var(--emma-violet)]">{p.fixing}</p>}
       <p className="mt-4 font-mono text-xs tabular-nums text-muted-foreground">{bytes ? `${bytes.toLocaleString()} characters written` : " "}</p>
       <Button variant="outline" size="sm" onClick={() => abort.current?.abort()} className="mt-5 rounded-full"><Square className="h-3.5 w-3.5" />{c.stop}</Button>
     </div>

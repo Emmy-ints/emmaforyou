@@ -15,7 +15,13 @@ Homepage section `#prototype` (`components/home/PrototypeBuilder.tsx`).
    `section.screen[data-screen]` per planned screen, a bottom tab bar, a router with back stack, a splash, every planned
    feature working in memory, "Demo" confirmations, and **no phone chrome**: the status bar, notch/punch-hole and home
    indicator are drawn by `components/prototype/PhoneFrame.tsx` (iPhone/Android switch) around the sandboxed iframe.
-5. The `done` event carries an HMAC signature of the HTML (`lib/ai/proto-sign.ts`). Only signed HTML can be saved.
+5. Generated scripts must parse (rules in `JS_RULES`: template literals + delegated listeners, never inline handlers in
+   strings). The preview document carries a tiny error reporter (`REPORTER` in `lib/prototype.ts`) that posts script
+   errors to the builder; the builder then asks for **one** automatic repair (`repair: true`, its own allowance of
+   3/hour per visitor, so a glitch doesn't use up the visitor's prototypes). If it still fails, the visitor is told to
+   regenerate. Found live on 9 Nov 2026: an AI app had escaped quotes inside an inline onclick string and stayed on
+   its splash screen.
+6. The `done` event carries an HMAC signature of the HTML (`lib/ai/proto-sign.ts`). Only signed HTML can be saved.
 
 ## Save, share, open on a phone
 - "Save & open on my phone" (`components/prototype/SavePrototype.tsx`) asks for a name, WhatsApp or email and consent,

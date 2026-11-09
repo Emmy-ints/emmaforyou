@@ -23,7 +23,7 @@ export const protoPlanSchema = z.object({
   primary: hex,
   accent: hex,
   screens: z.array(appScreenSchema).min(2).max(7),
-  features: z.array(z.string().trim().min(1).max(80)).max(10).default([]),
+  features: z.array(z.string().trim().min(1).max(140)).max(10).default([]),
   sample: z.array(z.string().trim().min(1).max(80)).max(8).default([]),
 });
 export type ProtoPlan = z.infer<typeof protoPlanSchema>;
@@ -48,6 +48,8 @@ export const prototypeRequestSchema = z.object({
   plan: protoPlanSchema.optional(),
   pages: z.array(z.enum(WEBSITE_PAGES)).min(1).max(7).optional(),
   brand: brandSchema.optional(),
+  /** Automatic fix after the preview reported a script error (refinement = the error message). */
+  repair: z.boolean().optional(),
 }).refine((value) => !value.refinement || Boolean(value.html), { message: "A refinement needs an existing prototype." })
   .refine((value) => value.kind !== "app" || Boolean(value.plan) || Boolean(value.refinement), { message: "An app needs a plan." });
 export type PrototypeRequest = z.infer<typeof prototypeRequestSchema>;
@@ -83,6 +85,8 @@ export type ShareRequest = z.infer<typeof shareRequestSchema>;
 const CSP =
   `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-src 'none'">`;
 const VIEWPORT = `<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">`;
+/** Tells the builder (parent page) when a generated script fails, so it can repair the prototype once. */
+const REPORTER = `<script>addEventListener("error",function(e){try{parent.postMessage({efyProtoError:String(e.message||"Script error").slice(0,300)+(e.lineno?" (line "+e.lineno+")":"")},"*")}catch(_){}});</script>`;
 
 /** Strip stray markdown fences the model may add around its HTML. */
 export function cleanGeneratedHtml(html: string): string {
@@ -103,13 +107,13 @@ export function applyLogo(html: string, logo?: string | null): string {
 export function previewDocument(html: string, logo?: string | null): string {
   const clean = applyLogo(cleanGeneratedHtml(html), logo);
   if (/<head[\s>]/i.test(clean)) {
-    const withCsp = clean.replace(/<head([^>]*)>/i, `<head$1>${CSP}`);
+    const withCsp = clean.replace(/<head([^>]*)>/i, `<head$1>${CSP}${REPORTER}`);
     return /name=["']viewport["']/i.test(withCsp) ? withCsp : withCsp.replace(CSP, `${CSP}${VIEWPORT}`);
   }
   if (/<html[\s>]/i.test(clean)) {
-    return clean.replace(/<html([^>]*)>/i, `<html$1><head>${CSP}${VIEWPORT}</head>`);
+    return clean.replace(/<html([^>]*)>/i, `<html$1><head>${CSP}${REPORTER}${VIEWPORT}</head>`);
   }
-  return `<!doctype html><html><head>${CSP}${VIEWPORT}</head><body>${clean}</body></html>`;
+  return `<!doctype html><html><head>${CSP}${REPORTER}${VIEWPORT}</head><body>${clean}</body></html>`;
 }
 
 /* ───────────────────────── Plans without AI ───────────────────────── */
@@ -204,7 +208,7 @@ export function normalisePlan(raw: unknown, req: Pick<PlanRequest, "idea" | "bus
     primary: req.color ?? col(r.primary, base.primary),
     accent: col(r.accent, base.accent),
     screens: screens.length >= 2 ? screens : base.screens,
-    features: list(r.features, 8, 80).length ? list(r.features, 8, 80) : base.features,
+    features: list(r.features, 8, 140).length ? list(r.features, 8, 140) : base.features,
     sample: list(r.sample, 6, 80).length ? list(r.sample, 6, 80) : base.sample,
   };
 }

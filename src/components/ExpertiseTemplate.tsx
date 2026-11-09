@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ArrowRight, Check, Clock, Layers, MessageCircle, Target, Wrench } from "lucide-react";
 import emmanuelImg from "@/assets/emmanuel-portrait.webp";
 import type { ServiceItem } from "@/lib/services-data";
+import { servicePrice } from "@/lib/service-pricing";
 import { extraFor, SERVICE_QA, SERVICE_WORK_MATCH } from "@/lib/service-extras";
 import { PROJECTS } from "@/lib/portfolio-data";
 import ProjectCard from "./portfolio/ProjectCard";
@@ -248,6 +249,13 @@ export default function ExpertiseTemplate({ data }: { data: ServiceItem }) {
           </div>
           <div className="svc-panel">
             <h3 className="font-display font-semibold">Scope and pricing</h3>
+            {(() => { const sp = servicePrice(data.slug); return (
+              <p className="mt-2" data-service-price>
+                <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">{sp.label}</span>
+                <span className="font-display text-2xl font-bold tabular-nums">{sp.amount}</span>
+                <span className="block text-xs text-muted-foreground">{sp.note} Prices in US dollars.</span>
+              </p>
+            ); })()}
             <p className="mt-2 text-sm text-muted-foreground">{x.timeline}. {x.engagement}. You get a fixed quote after a free call — no surprises.</p>
             <Link to="/pricing" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--emma-violet)] hover:underline underline-offset-4">
               See plans and pricing <ArrowRight className="h-4 w-4" />

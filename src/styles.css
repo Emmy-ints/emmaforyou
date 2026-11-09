@@ -2486,3 +2486,66 @@ a.itn-card:hover { transform: translateY(-2px); }
 .efy-fp-line-in[data-aligned] { padding: 0; }
 .efy-fp-inline { border-bottom: 0; padding: .75rem 0 .25rem; }
 .efy-fp-inline .efy-fp-line-in { margin-left: 0; width: auto; }
+
+/* ───────── Prototype phone frame (components/prototype/PhoneFrame.tsx) ───────── */
+.efy-phone-host { display: flex; justify-content: center; width: 100%; }
+.efy-phone-sizer { position: relative; flex: 0 0 auto; }
+.efy-phone { position: absolute; top: 0; left: 0; transform-origin: 0 0; border-radius: 62px; padding: 12px; background: linear-gradient(145deg, #2b2e3f, #0c0d14 45%, #24263a); box-shadow: 0 0 0 1.5px #4a4e66 inset, 0 0 0 2px #090a10, 0 40px 80px -30px rgba(11, 13, 36, .55), 0 18px 40px -20px rgba(109, 91, 255, .35); }
+.efy-phone-android { border-radius: 46px; background: linear-gradient(145deg, #23252e, #0b0b0f 50%, #1d1f27); }
+.efy-phone-btn { position: absolute; width: 4px; border-radius: 2px; background: #2d3042; left: -3px; }
+.efy-phone-btn-a { top: 120px; height: 32px; } .efy-phone-btn-b { top: 180px; height: 60px; } .efy-phone-btn-c { top: 250px; height: 60px; }
+.efy-phone-android .efy-phone-btn { left: auto; right: -3px; } .efy-phone-android .efy-phone-btn-a { display: none; }
+.efy-phone-screen { position: relative; overflow: hidden; border-radius: 50px; background: #fff; }
+.efy-phone-android .efy-phone-screen { border-radius: 36px; }
+.efy-phone-bar { position: absolute; inset: 0 0 auto; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 6px 28px 0 34px; background: #fff; color: #0b0d24; font: 600 15px/1 -apple-system, "SF Pro Text", "Inter", system-ui, sans-serif; }
+.efy-phone-android .efy-phone-bar { padding: 2px 20px 0 22px; font: 500 13px/1 "Roboto", "Inter", system-ui, sans-serif; }
+.efy-phone-island { position: absolute; left: 50%; top: 11px; width: 120px; height: 34px; transform: translateX(-50%); border-radius: 20px; background: #000; }
+.efy-phone-hole { position: absolute; left: 50%; top: 8px; width: 16px; height: 16px; transform: translateX(-50%); border-radius: 50%; background: #000; box-shadow: 0 0 0 2px #1b1b1f; }
+.efy-phone-app { position: absolute; left: 0; right: 0; background: #fff; }
+.efy-phone-app iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+.efy-phone-home { position: absolute; inset: auto 0 0; display: flex; align-items: center; justify-content: center; background: #fff; }
+.efy-phone-home span { width: 134px; height: 5px; border-radius: 3px; background: #0b0d24; }
+.efy-phone-android .efy-phone-home span { width: 108px; height: 4px; opacity: .55; }
+@media (prefers-reduced-motion: no-preference) { .efy-phone { transition: border-radius .3s var(--ease-out, ease); } }
+
+/* ───────── Prototype builder v2: kind switch, inputs, plan editor, splash, share, make-it-real ───────── */
+.efy-kind { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.efy-kind-opt { display: flex; gap: 10px; align-items: flex-start; text-align: left; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); color: var(--foreground); cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.efy-kind-opt svg { flex: 0 0 auto; margin-top: 2px; color: var(--muted-foreground); }
+.efy-kind-opt strong { display: block; font-size: .95rem; }
+.efy-kind-opt small { display: block; font-size: .78rem; line-height: 1.35; color: var(--muted-foreground); }
+.efy-kind-opt[aria-checked="true"] { border-color: var(--emma-violet, #6d5bff); box-shadow: 0 0 0 3px color-mix(in oklab, var(--emma-violet, #6d5bff) 22%, transparent); }
+.efy-kind-opt[aria-checked="true"] svg { color: var(--emma-violet, #6d5bff); }
+.efy-kind-opt:disabled { opacity: .6; cursor: default; }
+.efy-input { width: 100%; border-radius: 12px; border: 1px solid var(--input, var(--border)); background: var(--background); color: var(--foreground); padding: .55rem .8rem; font-size: .95rem; outline: none; }
+.efy-input:focus-visible { box-shadow: 0 0 0 2px var(--ring, #6d5bff); }
+.efy-swatch { width: 44px; height: 38px; padding: 3px; border-radius: 10px; border: 1px solid var(--border); background: var(--background); cursor: pointer; }
+.efy-upload { display: inline-grid; place-items: center; width: 44px; height: 38px; border-radius: 10px; border: 1px dashed var(--border); color: var(--muted-foreground); cursor: pointer; }
+.efy-upload:focus-within { box-shadow: 0 0 0 2px var(--ring, #6d5bff); }
+.efy-page-chip { border: 1px solid var(--border); border-radius: 999px; padding: .3rem .75rem; font-size: .8rem; background: var(--background); color: var(--foreground); cursor: pointer; }
+.efy-page-chip[aria-pressed="true"] { background: var(--emma-violet, #6d5bff); border-color: var(--emma-violet, #6d5bff); color: #fff; }
+.efy-page-chip:disabled { cursor: default; opacity: .75; }
+.efy-plan-screen { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--background); }
+.efy-plan-num { flex: 0 0 auto; display: grid; place-items: center; width: 26px; height: 26px; margin-top: 4px; border-radius: 8px; color: #fff; font: 700 .8rem/1 var(--font-display, inherit); }
+.efy-chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid var(--border); padding: .25rem .4rem .25rem .75rem; font-size: .8rem; }
+.efy-chip button { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 999px; color: var(--muted-foreground); }
+.efy-chip button:hover { background: var(--muted); }
+.efy-splash { height: 100%; display: flex; flex-direction: column; background: linear-gradient(160deg, var(--p), color-mix(in oklab, var(--p) 55%, var(--a))); color: #fff; font-family: -apple-system, "Inter", system-ui, sans-serif; }
+.efy-splash-mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 24px; }
+.efy-splash-mid strong { font-size: 26px; letter-spacing: -.01em; }
+.efy-splash-mid span:last-child { font-size: 15px; opacity: .85; max-width: 260px; }
+.efy-splash-mark { display: grid; place-items: center; width: 84px; height: 84px; border-radius: 24px; background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); font-size: 40px; font-weight: 800; }
+.efy-splash-tabs { display: flex; justify-content: space-around; padding: 10px 6px 12px; background: rgba(255,255,255,.96); color: #6b7080; font-size: 11px; }
+.efy-splash-tabs span { display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 70px; text-align: center; }
+.efy-splash-tabs i { width: 22px; height: 22px; border-radius: 7px; background: #d9dbe5; }
+.efy-splash-tabs span[data-on] { color: var(--p); font-weight: 600; } .efy-splash-tabs span[data-on] i { background: var(--p); }
+.efy-phone-stage { border-radius: 26px; padding: 16px; border: 1px solid var(--border); background: radial-gradient(120% 80% at 50% 0%, color-mix(in oklab, var(--emma-violet, #6d5bff) 10%, transparent), transparent 70%), var(--card); }
+.efy-phone-stage[data-busy] { box-shadow: 0 0 0 2px color-mix(in oklab, var(--emma-violet, #6d5bff) 35%, transparent); }
+.efy-qr { margin: 0; display: grid; place-items: center; }
+.efy-qr-code { width: min(220px, 70vw); aspect-ratio: 1; padding: 10px; border-radius: 18px; background: #fff; box-shadow: 0 0 0 1px var(--border); }
+.efy-qr-code svg { display: block; width: 100%; height: 100%; }
+.efy-real { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; padding: 22px; border-radius: 24px; border: 1px solid color-mix(in oklab, var(--emma-violet, #6d5bff) 35%, var(--border)); background: linear-gradient(135deg, color-mix(in oklab, var(--emma-violet, #6d5bff) 8%, var(--card)), var(--card)); }
+.efy-real > :first-child { flex: 1 1 320px; }
+.efy-shared-mobile { height: 100dvh; display: flex; flex-direction: column; background: #fff; }
+.efy-shared-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: max(8px, env(safe-area-inset-top)) 14px 8px; background: #0b0d24; color: #fff; font-size: 12.5px; }
+.efy-shared-frame { flex: 1; width: 100%; border: 0; background: #fff; }

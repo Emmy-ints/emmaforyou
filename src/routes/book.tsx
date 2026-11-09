@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import ToolShell from "../components/tools/ToolShell";
 import FounderCard from "../components/future/FounderCard";
 import SolutionFinder from "../components/future/SolutionFinder";
@@ -13,6 +13,9 @@ const ANSWERS = [
 
 export const Route = createFileRoute("/book")({
   component: Page,
+  // ?prototype=<slug> when the visitor comes from a saved prototype ("Make it real").
+  validateSearch: (search: Record<string, unknown>): { prototype?: string } =>
+    typeof search.prototype === "string" && /^[A-Za-z0-9]{10,16}$/.test(search.prototype) ? { prototype: search.prototype } : {},
   head: () =>
     pageHead({
       title: "Book a Free Strategy Call with EmmaForYou",
@@ -23,6 +26,7 @@ export const Route = createFileRoute("/book")({
 });
 
 function Page() {
+  const { prototype } = Route.useSearch();
   return (
     <ToolShell
       eyebrow="Free · 30 minutes"
@@ -31,6 +35,11 @@ function Page() {
       answers={ANSWERS}
       width="max-w-5xl"
     >
+      {prototype && (
+        <p role="status" className="mb-5 rounded-2xl border border-[var(--emma-violet)]/30 bg-[var(--emma-violet)]/5 px-5 py-3 text-sm">
+          Booking about a prototype? Paste its link in the booking notes so we can open it together on the call: <Link to="/p/$slug" params={{ slug: prototype }} className="break-all font-semibold text-[var(--emma-violet)]">/p/{prototype}</Link>
+        </p>
+      )}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <CalendlyBooking />
         <aside className="lg-strong rounded-[26px] p-5">

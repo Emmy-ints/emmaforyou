@@ -11,7 +11,7 @@ export default function ScrollTop() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [p, setP] = useState(0);
   const [show, setShow] = useState(false);
-  const hidden = /^\/(community|dashboard|portal)/.test(pathname);
+  const hidden = /^\/(community|dashboard|portal|p\/)/.test(pathname);
   useEffect(() => {
     if (hidden) return;
     let raf = 0;

@@ -33,8 +33,8 @@ export const PAGE_TYPES: { id: string; name: string; match: (p: string) => boole
   { id: "other", name: "Other and future pages", match: () => true, role: "Founder & CEO, EmmaForYou", placement: "auto", href: "/about" },
 ];
 
-/** Signed-in, private and admin areas: the logo badge is enough there. */
-export const PRIVATE_FOUNDER = /^\/(dashboard|account|portal|login)(\/|$|_)|^\/community\/(inbox|messages|notifications|settings|saved|moderation)(\/|$)/;
+/** Signed-in, private and admin areas, and saved prototypes (/p/<slug>: the visitor's own work): the logo badge is enough there. */
+export const PRIVATE_FOUNDER = /^\/(dashboard|account|portal|login|p)(\/|$|_)|^\/community\/(inbox|messages|notifications|settings|saved|moderation)(\/|$)/;
 
 export function pageType(path: string) {
   return PAGE_TYPES.find((t) => t.match(path)) ?? PAGE_TYPES[PAGE_TYPES.length - 1];

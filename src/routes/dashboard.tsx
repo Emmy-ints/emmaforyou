@@ -43,7 +43,7 @@ interface SiteEvent {
 
 interface Lead {
   id: string;
-  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form";
+  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "Prototype saved";
   name: string;
   business: string;
   email: string;
@@ -168,11 +168,12 @@ async function loadEvents(sinceIso: string): Promise<SiteEvent[]> {
 async function loadLeads(sinceIso: string): Promise<Lead[]> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const tdb = supabase as unknown as { from: (t: string) => any };
-  const [audits, proposals, calls, toolReqs] = await Promise.all([
+  const [audits, proposals, calls, toolReqs, protos] = await Promise.all([
     tdb.from("site_audits").select("id,created_at,name,whatsapp,email,url,score").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
     tdb.from("proposal_acceptances").select("id,signed_at,full_name,business_name,whatsapp,email,plan").gte("signed_at", sinceIso).order("signed_at", { ascending: false }).limit(500),
     tdb.from("strategy_bookings").select("id,created_at,name,business,whatsapp,email,slot_start,topic").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
     tdb.from("tool_requests").select("id,created_at,tool,name,whatsapp,email,summary").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
+    tdb.from("prototype_shares").select("id,created_at,slug,kind,title,prompt,name,business,whatsapp,email,suggested_plan,views").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
   ]);
   const [leads, intakes, quiz, magnets, roi] = await Promise.all([
     supabase.from("leads").select("id,created_at,source,name,email,whatsapp,business_name,business_type,location,score,goal").gte("created_at", sinceIso).order("created_at", { ascending: false }).limit(500),
@@ -234,6 +235,9 @@ async function loadLeads(sinceIso: string): Promise<Lead[]> {
   }
   for (const r of (toolReqs.data ?? []) as Record<string, unknown>[]) {
     out.push({ id: `t-${r.id}`, kind: s(r.tool) as Lead["kind"], name: s(r.name), business: "", email: s(r.email), whatsapp: s(r.whatsapp), detail: s(r.summary).slice(0, 300), created_at: s(r.created_at) });
+  }
+  for (const r of (protos.data ?? []) as Record<string, unknown>[]) {
+    out.push({ id: `pr-${r.id}`, kind: "Prototype saved", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`${s(r.kind)}: ${s(r.title)}`, `asked for "${s(r.prompt).slice(0, 160)}"`, s(r.suggested_plan) ? `fits ${s(r.suggested_plan)}` : "", `${s(r.views)} views`, `${typeof window !== "undefined" ? window.location.origin : ""}/p/${s(r.slug)}`].filter(Boolean).join(" · "), created_at: s(r.created_at) });
   }
   return out.sort((a, b) => b.created_at.localeCompare(a.created_at));
 }

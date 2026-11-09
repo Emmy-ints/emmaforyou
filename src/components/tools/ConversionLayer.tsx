@@ -31,7 +31,7 @@ export default function ConversionLayer() {
     return () => { window.clearTimeout(arm); document.removeEventListener("mouseout", onLeave); };
   }, [pathname, quiet]);
 
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal") || pathname.startsWith("/community")) return null;
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/portal") || pathname.startsWith("/community") || pathname.startsWith("/p/")) return null;
   const click = (what: string) => track("sticky_cta_click", { what, page: pathname });
 
   return (

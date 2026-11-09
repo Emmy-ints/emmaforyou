@@ -78,7 +78,7 @@ export function recommend(a: Answers): Recommendation {
   if (!tier) {
     message = `Thanks! For ${who} that isn't sure where to start, the best first step is a free 30-minute call: Emmanuel looks at how customers find you today and suggests the two or three changes that matter most.`;
   } else if (fitsBudget === false) {
-    message = `For ${goal.label.toLowerCase()}, our ${tier.name} plan (${price}) is the one that includes it. That's above the budget you picked, so start with the free ${goal.toolLabel.toLowerCase()} and a quick call: Emmanuel will tell you honestly what's worth doing first.`;
+    message = `For ${goal.label.toLowerCase()}, our ${tier.name} plan (${price}) is the one that includes it. That's above the budget you picked, so start with ${/^free\b/i.test(goal.toolLabel) ? "the " + goal.toolLabel.toLowerCase() : `the free ${goal.toolLabel.toLowerCase()}`} and a quick call: Emmanuel will tell you honestly what's worth doing first.`;
   } else {
     message = `For ${who} that wants ${goal.label.toLowerCase()}, our ${tier.name} plan (${price}) is the closest fit. It includes ${tier.features.filter((f) => !/\+$/.test(f)).slice(0, 3).map((f) => f.charAt(0).toLowerCase() + f.slice(1)).join(", ")}. A free call confirms it's right before you commit.`;
   }

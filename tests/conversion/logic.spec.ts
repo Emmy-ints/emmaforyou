@@ -44,6 +44,7 @@ const validPath = (p: string) => p === "/#prototype" || p === "/services" || p =
 t("every recommended link is a real page", recs.every(({ r }) => r.links.every((l) => validPath(l.path))), recs.flatMap(({ r }) => r.links).find((l) => !validPath(l.path)));
 const web = recommend({ business: "salon", goal: "website", budget: "lt100", timing: "now" });
 t("over-budget plan is said honestly and not hot", web.fitsBudget === false && /above the budget/.test(web.message) && web.temperature !== "hot");
+t("no doubled words in any message", recs.every(({ r }) => !/\b(\w+) \1\b/i.test(r.message)), recs.map(({ r }) => r.message).find((m) => /\b(\w+) \1\b/i.test(m)));
 const hot = recommend({ business: "restaurant", goal: "automate", budget: "100-300", timing: "now" });
 t("in-budget + this month = hot, Starter for automation", hot.temperature === "hot" && hot.plan === "Starter" && hot.links[0].path === "/niche/restaurant");
 const cool = recommend({ business: "other", goal: "unsure", budget: "unsure", timing: "exploring" });

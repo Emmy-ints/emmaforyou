@@ -94,6 +94,20 @@ export default function PrototypeBuilder() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => () => abort.current?.abort(), []);
+  // Industry pages link here with the idea filled in: /?proto_kind=app&proto_idea=…#prototype
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search);
+      const idea = q.get("proto_idea");
+      const k = q.get("proto_kind");
+      if (k === "app" || k === "website") setKind(k);
+      if (idea) {
+        setPrompt(idea.slice(0, 500));
+        track("prototype_prefilled", { kind: k ?? "website" });
+        window.setTimeout(() => document.getElementById("prototype")?.scrollIntoView({ behavior: "smooth", block: "start" }), 400);
+      }
+    } catch { /* ignore malformed links */ }
+  }, []);
   useEffect(() => {
     if (!busy) return;
     const timer = setInterval(() => setStage((s) => Math.min(s + 1, 2)), 6000);

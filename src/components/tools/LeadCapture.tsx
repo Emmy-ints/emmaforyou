@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { track } from "@/lib/analytics";
+import { buildWa } from "@/lib/leads";
+import NextCallTimes from "./NextCallTimes";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as unknown as { from: (t: string) => any };
 
-export type ToolName = "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "App planner" | "Solution enquiry" | "Lab enquiry";
+export type ToolName = "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "App planner" | "Solution enquiry" | "Lab enquiry" | "AI makeover";
 
 /** Small "talk to a human" form used at the end of a tool. Saves to tool_requests (owner emailed). */
 export function LeadCapture({ tool, title, lead, button, summary, compact = false }: { tool: ToolName; title: string; lead: string; button: string; summary: string; compact?: boolean }) {
@@ -28,7 +30,14 @@ export function LeadCapture({ tool, title, lead, button, summary, compact = fals
     setState("done");
   }
 
-  if (state === "done") return <p className="no-print rounded-[20px] border border-emerald-500/30 bg-emerald-500/10 p-5 text-sm text-foreground">Thanks {name.split(" ")[0]}! Emmanuel has your details and will get back to you shortly.</p>;
+  if (state === "done") return (
+    <div className="no-print grid gap-3 rounded-[20px] border border-emerald-500/30 bg-emerald-500/10 p-5 text-sm text-foreground">
+      <p>Thanks {name.split(" ")[0]}! Emmanuel has your details and will get back to you shortly.</p>
+      <p className="text-xs text-muted-foreground">Want to start now? Send your results on WhatsApp, or pick a call time.</p>
+      <a href={buildWa(`Hi Emmanuel, I just used your ${tool.toLowerCase()} on the website.\n${summary.slice(0, 600)}`)} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { from: `leadcapture_${tool}` })} className="inline-flex w-fit items-center gap-2 rounded-full bg-[#25d366] px-4 py-2 text-xs font-semibold text-white">Send my results on WhatsApp</a>
+      <NextCallTimes source={`leadcapture_${tool}`} compact title="Free call times" />
+    </div>
+  );
   return (
     <form onSubmit={submit} className={`no-print rounded-[24px] border border-border bg-card ${compact ? "p-4" : "p-6 shadow-[var(--shadow-card)]"}`}>
       <h3 className={`font-display font-semibold ${compact ? "text-base" : "text-xl"}`}>{title}</h3>

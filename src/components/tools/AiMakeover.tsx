@@ -4,6 +4,7 @@ import { Download, ImageUp, Loader2, Maximize2, MessageCircle, RotateCcw, Wand2,
 import { previewDocument } from "@/lib/prototype";
 import { buildWa } from "@/lib/leads";
 import { track } from "@/lib/analytics";
+import { LeadCapture } from "./LeadCapture";
 
 const STYLES = [
   { id: "modern", label: "Modern" },
@@ -200,6 +201,9 @@ export default function AiMakeover() {
           <a href={buildWa("Hi Emmanuel, I tried the AI makeover on your site and I'd like a redesign like this for my business.")} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#25d366] px-5 py-3 text-sm font-semibold text-white"><MessageCircle className="h-4 w-4" /> WhatsApp us</a>
           <button onClick={downloadHtml} className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground hover:border-[var(--emma-violet)]"><Download className="h-4 w-4" /> Download design</button>
         </div>
+      )}
+      {html && !busy && (
+        <LeadCapture compact tool="AI makeover" title="Want Emmanuel to follow up on WhatsApp?" lead="Leave your number and he'll message you about turning this concept into your real website." button="Follow up with me" summary={`Makeover style: ${style}.${notes.trim() ? ` Notes: ${notes.trim().slice(0, 400)}` : ""}`} />
       )}
 
       {full && (

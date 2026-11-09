@@ -3,6 +3,7 @@ import ToolShell from "../components/tools/ToolShell";
 import FounderCard from "../components/future/FounderCard";
 import SolutionFinder from "../components/future/SolutionFinder";
 import CalendlyBooking from "../components/tools/CalendlyBooking";
+import NextCallTimes from "../components/tools/NextCallTimes";
 import { pageHead, breadcrumbLd } from "@/lib/seo";
 
 const ANSWERS = [
@@ -40,6 +41,7 @@ function Page() {
           Booking about a prototype? Paste its link in the booking notes so we can open it together on the call: <Link to="/p/$slug" params={{ slug: prototype }} className="break-all font-semibold text-[var(--emma-violet)]">/p/{prototype}</Link>
         </p>
       )}
+      <NextCallTimes source="book" title="Next available times" />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
         <CalendlyBooking />
         <aside className="lg-strong rounded-[26px] p-5">

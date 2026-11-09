@@ -1,13 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Loader2, Mic, MicOff, Send, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import { speak, stopSpeaking, useSpeechInput, canSpeak } from "@/lib/use-voice";
 import { track } from "@/lib/analytics";
 import type { SearchHit } from "@/lib/site-search";
+import { QUESTIONS, recommend, profileText, BUSINESSES, type Answers, type Recommendation } from "@/lib/qualify";
+import { buildWa } from "@/lib/leads";
+import { supabase } from "@/integrations/supabase/client";
+import NextCallTimes from "./NextCallTimes";
 
 type SearchModule = typeof import("@/lib/site-search");
-type Msg = { role: "user" | "assistant"; content: string; links?: { label: string; path: string }[]; offline?: boolean };
+type QKey = (typeof QUESTIONS)[number]["key"];
+type Msg = { role: "user" | "assistant"; content: string; links?: { label: string; path: string }[]; offline?: boolean; ask?: QKey; rec?: Recommendation };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const leadsDb = supabase as unknown as { from: (t: string) => any };
+const QUICK = "Get a recommendation in 4 quick taps";
 
 const GREETING = "Hi, I'm Emma 👋 I can tell you what EmmaForYou can do for your business, what it costs, or point you to the right free tool. What are you working on?";
 const STARTERS = ["I need more customers", "How much is a website?", "Can you build a Web3 app?", "I need accountability coaching"];
@@ -22,6 +30,9 @@ export default function VoiceAsk() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [leadSaved, setLeadSaved] = useState(false);
+  const [answers, setAnswers] = useState<Partial<Answers>>({});
+  const [asking, setAsking] = useState<QKey | null>(null);
+  const [savedName, setSavedName] = useState("");
   const [voiceReplies, setVoiceReplies] = useState(false);
   const [speakable, setSpeakable] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -39,7 +50,16 @@ export default function VoiceAsk() {
   }, [open, mod]);
   // Other tools (e.g. the solution finder) can open Ask with a question already filled in.
   useEffect(() => {
-    const onOpen = (e: Event) => { setOpen(true); const q = (e as CustomEvent<unknown>).detail; if (typeof q === "string" && q.trim()) window.setTimeout(() => setInput(q.slice(0, 780)), 80); };
+    const onOpen = (e: Event) => {
+      setOpen(true);
+      const q = (e as CustomEvent<unknown>).detail;
+      if (typeof q === "string" && q.trim()) window.setTimeout(() => setInput(q.slice(0, 780)), 80);
+      // { qualify: true, business?: "salon" } starts the quick recommendation (e.g. from an industry page).
+      if (q && typeof q === "object" && (q as { qualify?: boolean }).qualify) {
+        const b = (q as { business?: string }).business;
+        window.setTimeout(() => startQualify(BUSINESSES.some((x) => x.id === b) ? (b as Answers["business"]) : undefined), 80);
+      }
+    };
     window.addEventListener("efy-open-ask", onOpen);
     return () => window.removeEventListener("efy-open-ask", onOpen);
   }, []);
@@ -58,7 +78,7 @@ export default function VoiceAsk() {
     try {
       const res = await fetch("/api/assistant", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page: pathname, leadSaved, messages: history.slice(1).slice(-20).map(({ role, content: c }) => ({ role, content: c.slice(0, 800) })) }),
+        body: JSON.stringify({ page: pathname, leadSaved, profile: profileText(answers) || undefined, messages: history.slice(1).filter((m) => m.content.trim()).slice(-20).map(({ role, content: c }) => ({ role, content: c.slice(0, 800) })) }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || "Emma is unavailable right now.");
@@ -70,6 +90,31 @@ export default function VoiceAsk() {
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Quick qualification: one tap per question, then a recommendation from the site's own plans and pages. */
+  function startQualify(business?: Answers["business"]) {
+    if (asking) return;
+    track("assistant_qualify_start", { page: pathname, preset: business ?? "" });
+    const start: Partial<Answers> = business ? { business } : {};
+    setAnswers(start);
+    const first = QUESTIONS.find((q) => !(q.key in start))!;
+    setAsking(first.key);
+    setMessages((m) => [...m, ...(business ? [] : [{ role: "user" as const, content: QUICK }]), { role: "assistant", content: first.ask, ask: first.key }]);
+  }
+  function answer(key: QKey, id: string, label: string) {
+    const next = { ...answers, [key]: id } as Partial<Answers>;
+    setAnswers(next);
+    const q = QUESTIONS.find((x) => !(x.key in next));
+    if (q) {
+      setAsking(q.key);
+      setMessages((m) => [...m, { role: "user", content: label }, { role: "assistant", content: q.ask, ask: q.key }]);
+      return;
+    }
+    setAsking(null);
+    const rec = recommend(next as Answers);
+    track("assistant_qualified", { page: pathname, temperature: rec.temperature, plan: rec.plan ?? "call" });
+    setMessages((m) => [...m, { role: "user", content: label }, { role: "assistant", content: rec.message, links: rec.links, rec }]);
   }
 
   const voice = useSpeechInput({ onFinal: (t) => send(t, true) });
@@ -110,9 +155,21 @@ export default function VoiceAsk() {
                     <div className="max-w-[85%] space-y-1.5">
                       <div className={`whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "rounded-br-md bg-[var(--emma-violet)] text-white" : "rounded-bl-md border border-border bg-card text-foreground"}`}>{m.content}</div>
                       {m.offline && <p className="text-[11px] text-muted-foreground">Automatic reply: the AI assistant is offline right now.</p>}
+                      {m.ask && asking === m.ask && i === messages.length - 1 && (
+                        <div className="flex flex-wrap gap-1.5" role="group" aria-label={m.content} data-qualify={m.ask}>
+                          {QUESTIONS.find((q) => q.key === m.ask)!.options.map((o) => (
+                            <button key={o.id} type="button" onClick={() => answer(m.ask!, o.id, o.label)} className="rounded-full border border-[var(--emma-violet)]/40 bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:border-[var(--emma-violet)] hover:bg-[var(--emma-violet)]/5">{o.label}</button>
+                          ))}
+                        </div>
+                      )}
+                      {m.rec && <RecNext rec={m.rec} page={pathname} leadSaved={leadSaved} savedName={savedName} onSaved={(n) => { setSavedName(n); setLeadSaved(true); }} />}
                       {m.links && m.links.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {m.links.map((l) => (
+                          {m.links.map((l) => l.path.includes("#") ? (
+                            <a key={l.path} href={l.path} onClick={() => setOpen(false)} className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-[var(--emma-violet)] hover:border-[var(--emma-violet)]">
+                              {l.label} <ArrowRight className="h-3 w-3" />
+                            </a>
+                          ) : (
                             <Link key={l.path} to={l.path} onClick={() => setOpen(false)} className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-[var(--emma-violet)] hover:border-[var(--emma-violet)]">
                               {l.label} <ArrowRight className="h-3 w-3" />
                             </Link>
@@ -129,8 +186,12 @@ export default function VoiceAsk() {
                 )}
                 {messages.length === 1 && !busy && (
                   <div className="flex flex-wrap gap-2 pt-1">
+                    <button onClick={() => startQualify()} className="rounded-full bg-[var(--emma-violet)] px-3 py-1.5 text-xs font-semibold text-white">{QUICK}</button>
                     {STARTERS.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:border-[var(--emma-violet)]">{s}</button>)}
                   </div>
+                )}
+                {messages.length > 2 && !busy && !asking && !answers.timing && messages[messages.length - 1].role === "assistant" && !messages[messages.length - 1].rec && (
+                  <div className="pt-1"><button onClick={() => startQualify()} className="rounded-full border border-[var(--emma-violet)]/50 bg-card px-3 py-1.5 text-xs font-semibold text-[var(--emma-violet)]">{QUICK}</button></div>
                 )}
                 {hits.length > 0 && (
                   <div className="rounded-2xl border border-dashed border-border p-3">
@@ -162,5 +223,48 @@ export default function VoiceAsk() {
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+
+/** After the recommendation: real call times, WhatsApp with the answers, or leave a number (saved as a qualified lead). */
+function RecNext({ rec, page, leadSaved, savedName, onSaved }: { rec: Recommendation; page: string; leadSaved: boolean; savedName: string; onSaved: (name: string) => void }) {
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [state, setState] = useState<"idle" | "saving" | "done" | "error">("idle");
+  const isEmail = contact.includes("@");
+  const ok = name.trim() && (isEmail ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact.trim()) : contact.replace(/\D/g, "").length >= 7) && consent;
+  const wa = buildWa(`Hi Emmanuel, Emma (your website assistant) suggested I talk to you.\n${rec.summary.split("\n").filter((l) => !l.startsWith("Lead:")).join("\n")}`);
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (!ok || state === "saving") return;
+    setState("saving");
+    const { error } = await leadsDb.from("tool_requests").insert({
+      tool: "Ask Emma (qualified)", name: name.trim().slice(0, 120),
+      whatsapp: isEmail ? null : contact.trim().slice(0, 40), email: isEmail ? contact.trim().slice(0, 200) : null,
+      summary: `${rec.summary}\nPage: ${page}`.slice(0, 3000),
+    });
+    if (error) { setState("error"); return; }
+    setState("done"); onSaved(name.trim().split(" ")[0]);
+    track("lead_submitted", { source: "Ask Emma (qualified)", temperature: rec.temperature });
+  }
+  return (
+    <div className="mt-2 space-y-2 rounded-2xl border border-border bg-card p-3" data-rec={rec.temperature}>
+      <NextCallTimes source="ask-emma" compact title="Pick a free call time" />
+      <a href={wa} target="_blank" rel="noopener noreferrer" onClick={() => track("whatsapp_click", { from: "ask-emma-rec" })} className="flex items-center justify-center gap-2 rounded-full bg-[#25d366] px-4 py-2 text-xs font-semibold text-white">Send this to Emmanuel on WhatsApp</a>
+      {leadSaved || state === "done" ? (
+        <p className="text-xs text-emerald-700 dark:text-emerald-400">{savedName ? `Thanks ${savedName}! Emmanuel has your answers and will get back to you.` : "Emmanuel already has your details."}</p>
+      ) : (
+        <form onSubmit={save} className="grid gap-2" aria-label="Leave your details">
+          <p className="text-xs text-muted-foreground">Or leave your details and Emmanuel will message you:</p>
+          <input aria-label="Your name" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} className="h-9 rounded-full border border-input bg-background px-3 text-xs" />
+          <input aria-label="WhatsApp number or email" placeholder="WhatsApp number (with country code) or email" value={contact} onChange={(e) => setContact(e.target.value)} maxLength={200} className="h-9 rounded-full border border-input bg-background px-3 text-xs" />
+          <label className="flex items-start gap-2 text-[11px] text-muted-foreground"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5" /> EmmaForYou may contact me about this.</label>
+          <button type="submit" disabled={!ok || state === "saving"} className="rounded-full bg-[var(--emma-violet)] px-4 py-2 text-xs font-semibold text-white disabled:opacity-40">{state === "saving" ? "Sending…" : "Send my details"}</button>
+          {state === "error" && <p role="alert" className="text-[11px] text-red-600">That didn't send. Please try WhatsApp instead.</p>}
+        </form>
+      )}
+    </div>
   );
 }

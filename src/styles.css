@@ -2549,3 +2549,25 @@ a.itn-card:hover { transform: translateY(-2px); }
 .efy-shared-mobile { height: 100dvh; display: flex; flex-direction: column; background: #fff; }
 .efy-shared-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: max(8px, env(safe-area-inset-top)) 14px 8px; background: #0b0d24; color: #fff; font-size: 12.5px; }
 .efy-shared-frame { flex: 1; width: 100%; border: 0; background: #fff; }
+
+/* ───────── Next available call times (components/tools/NextCallTimes.tsx) ───────── */
+.efy-times { display: grid; gap: 10px; }
+.efy-times-card { padding: 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); margin-bottom: 20px; }
+.efy-times-loading { min-height: 0; }
+.efy-times-title { display: flex; align-items: center; gap: 8px; font: 600 .95rem/1.2 var(--font-display, inherit); color: var(--foreground); }
+.efy-times-title svg { color: var(--emma-violet, #6d5bff); }
+.efy-times-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.efy-times-list a { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 12px; border-radius: 14px; border: 1px solid color-mix(in oklab, var(--emma-violet, #6d5bff) 35%, var(--border)); background: color-mix(in oklab, var(--emma-violet, #6d5bff) 6%, var(--card)); color: var(--foreground); text-decoration: none; transition: border-color .2s, transform .2s; }
+.efy-times-list a:hover { border-color: var(--emma-violet, #6d5bff); }
+.efy-times-list a:focus-visible { outline: 2px solid var(--emma-violet, #6d5bff); outline-offset: 2px; }
+.efy-times-day { font-size: .75rem; color: var(--muted-foreground); }
+.efy-times-time { font: 700 1.05rem/1.1 var(--font-display, inherit); font-variant-numeric: tabular-nums; }
+.efy-times-note { font-size: .75rem; color: var(--muted-foreground); }
+.efy-times-compact .efy-times-title { font-size: .82rem; }
+.efy-times-compact .efy-times-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.efy-times-compact .efy-times-list a { padding: 7px 8px; border-radius: 12px; }
+.efy-times-compact .efy-times-time { font-size: .9rem; }
+.efy-times-ink .efy-times-title, .efy-times-ink .efy-times-time { color: #fff; }
+.efy-times-ink .efy-times-day, .efy-times-ink .efy-times-note { color: rgba(255, 255, 255, .7); }
+.efy-times-ink .efy-times-list a { background: rgba(255, 255, 255, .07); border-color: rgba(255, 255, 255, .22); }
+.fu-hot { background: #fde2e1; color: #9f1d17; } .fu-warm { background: #fff1d6; color: #8a5300; } .fu-cool { background: #e6eefc; color: #1f4b99; }

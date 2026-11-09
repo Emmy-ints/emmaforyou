@@ -14,6 +14,8 @@ import { CaseStudyEditor, NewsletterPanel, ReviewsPanel } from "../components/da
 import { BlogAutomation } from "../components/dashboard/BlogAutomation";
 import { CommunityPanel } from "../components/dashboard/CommunityPanel";
 import { EcomPanel } from "../components/dashboard/EcomPanel";
+import { FollowUps } from "../components/dashboard/FollowUps";
+import { summaryField } from "@/lib/followups";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -43,13 +45,15 @@ interface SiteEvent {
 
 interface Lead {
   id: string;
-  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "Prototype saved";
+  kind: "Analyser" | "Waitlist" | "Business profile" | "Quiz" | "Resource" | "ROI calculator" | "Website audit" | "Proposal signed" | "Call booked" | "Smart contract review" | "Goal planner" | "AI assistant chat" | "Exit offer" | "Contact form" | "Prototype saved" | "Ask Emma (qualified)";
   name: string;
   business: string;
   email: string;
   whatsapp: string;
   detail: string;
   created_at: string;
+  /** Structured details for follow-up messages (see lib/followups.ts). */
+  meta?: Record<string, string | undefined>;
 }
 
 type RangeDays = 7 | 30 | 90;
@@ -194,6 +198,7 @@ async function loadLeads(sinceIso: string): Promise<Lead[]> {
       name: s(r.name), business: s(r.business_name), email: s(r.email), whatsapp: s(r.whatsapp),
       detail: [r.business_type, r.location, r.score != null ? `score ${r.score}/100` : "", r.goal].filter(Boolean).join(" · "),
       created_at: r.created_at,
+      meta: { score: r.score != null ? `${r.score}/100` : undefined, goal: s(r.goal) || undefined },
     });
   }
   for (const r of intakes.data ?? []) {
@@ -208,12 +213,14 @@ async function loadLeads(sinceIso: string): Promise<Lead[]> {
     out.push({
       id: `q-${r.id}`, kind: "Quiz", name: s(r.name), business: s(r.business_type), email: "", whatsapp: s(r.whatsapp),
       detail: [r.result_bucket, `score ${r.score}`].filter(Boolean).join(" · "), created_at: r.created_at,
+      meta: { score: r.score != null ? `${r.score}/10` : undefined },
     });
   }
   for (const r of magnets.data ?? []) {
     out.push({
       id: `m-${r.id}`, kind: "Resource", name: s(r.name), business: s(r.business_type), email: s(r.email), whatsapp: s(r.whatsapp),
       detail: s(r.resource_title), created_at: r.created_at,
+      meta: { resource: s(r.resource_title) || undefined },
     });
   }
   for (const r of roi.data ?? []) {
@@ -222,22 +229,23 @@ async function loadLeads(sinceIso: string): Promise<Lead[]> {
       id: `r-${r.id}`, kind: "ROI calculator", name: s(r.name), business: s(r.niche), email: s(r.email), whatsapp: s(r.whatsapp),
       detail: [r.budget ? `budget ${r.budget}` : "", r.additional_revenue ? `projected +${Math.round(Number(r.additional_revenue)).toLocaleString()}` : ""].filter(Boolean).join(" · "),
       created_at: r.created_at,
+      meta: { niche: s(r.niche) || undefined },
     });
   }
   for (const r of (audits.data ?? []) as Record<string, unknown>[]) {
-    out.push({ id: `a-${r.id}`, kind: "Website audit", name: s(r.name), business: s(r.url), email: s(r.email), whatsapp: s(r.whatsapp), detail: r.score != null ? `score ${r.score}/100 · wants an expert review` : "wants an expert review", created_at: s(r.created_at) });
+    out.push({ id: `a-${r.id}`, kind: "Website audit", name: s(r.name), business: s(r.url), email: s(r.email), whatsapp: s(r.whatsapp), detail: r.score != null ? `score ${r.score}/100 · wants an expert review` : "wants an expert review", created_at: s(r.created_at), meta: { url: s(r.url).replace(/^https?:\/\//, "").replace(/\/$/, "") || undefined, score: r.score != null ? s(r.score) : undefined } });
   }
   for (const r of (proposals.data ?? []) as Record<string, unknown>[]) {
-    out.push({ id: `p-${r.id}`, kind: "Proposal signed", name: s(r.full_name), business: s(r.business_name), email: s(r.email), whatsapp: s(r.whatsapp), detail: `accepted the ${s(r.plan)} plan`, created_at: s(r.signed_at) });
+    out.push({ id: `p-${r.id}`, kind: "Proposal signed", name: s(r.full_name), business: s(r.business_name), email: s(r.email), whatsapp: s(r.whatsapp), detail: `accepted the ${s(r.plan)} plan`, created_at: s(r.signed_at), meta: { plan: s(r.plan) || undefined } });
   }
   for (const r of (calls.data ?? []) as Record<string, unknown>[]) {
-    out.push({ id: `c-${r.id}`, kind: "Call booked", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`call ${new Date(s(r.slot_start)).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`, s(r.topic)].filter(Boolean).join(" · "), created_at: s(r.created_at) });
+    out.push({ id: `c-${r.id}`, kind: "Call booked", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`call ${new Date(s(r.slot_start)).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`, s(r.topic)].filter(Boolean).join(" · "), created_at: s(r.created_at), meta: { when: new Date(s(r.slot_start)).toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) } });
   }
   for (const r of (toolReqs.data ?? []) as Record<string, unknown>[]) {
-    out.push({ id: `t-${r.id}`, kind: s(r.tool) as Lead["kind"], name: s(r.name), business: "", email: s(r.email), whatsapp: s(r.whatsapp), detail: s(r.summary).slice(0, 300), created_at: s(r.created_at) });
+    out.push({ id: `t-${r.id}`, kind: s(r.tool) as Lead["kind"], name: s(r.name), business: summaryField(s(r.summary), "Business") ?? "", email: s(r.email), whatsapp: s(r.whatsapp), detail: s(r.summary).slice(0, 300), created_at: s(r.created_at), meta: { goal: summaryField(s(r.summary), "Goal"), temperature: summaryField(s(r.summary), "Lead") } });
   }
   for (const r of (protos.data ?? []) as Record<string, unknown>[]) {
-    out.push({ id: `pr-${r.id}`, kind: "Prototype saved", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`${s(r.kind)}: ${s(r.title)}`, `asked for "${s(r.prompt).slice(0, 160)}"`, s(r.suggested_plan) ? `fits ${s(r.suggested_plan)}` : "", `${s(r.views)} views`, `${typeof window !== "undefined" ? window.location.origin : ""}/p/${s(r.slug)}`].filter(Boolean).join(" · "), created_at: s(r.created_at) });
+    out.push({ id: `pr-${r.id}`, kind: "Prototype saved", name: s(r.name), business: s(r.business), email: s(r.email), whatsapp: s(r.whatsapp), detail: [`${s(r.kind)}: ${s(r.title)}`, `asked for "${s(r.prompt).slice(0, 160)}"`, s(r.suggested_plan) ? `fits ${s(r.suggested_plan)}` : "", `${s(r.views)} views`, `${typeof window !== "undefined" ? window.location.origin : ""}/p/${s(r.slug)}`].filter(Boolean).join(" · "), created_at: s(r.created_at), meta: { protoKind: s(r.kind), title: s(r.title), link: `${typeof window !== "undefined" ? window.location.origin : ""}/p/${s(r.slug)}` } });
   }
   return out.sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
@@ -409,6 +417,8 @@ function Dashboard({ email }: { email: string }) {
         </section>
 
         <UpcomingCalls />
+
+        <FollowUps leads={leads} loading={loading} />
 
         {/* Leads inbox */}
         <section className="dash-card mt-4">

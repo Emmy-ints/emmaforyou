@@ -4,6 +4,7 @@ import { ArrowUpRight, CalendarCheck, Check, Copy, Loader2, MessageCircle, QrCod
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { qrSvg } from "@/lib/qr";
+import NextCallTimes from "../tools/NextCallTimes";
 import { buildWa } from "@/lib/leads";
 import { track } from "@/lib/analytics";
 import type { PlanSuggestion, ProtoKind, ProtoPlan } from "@/lib/prototype";
@@ -135,7 +136,8 @@ export function MakeItReal({ kind, suggestion, c, onSave, slug }: { kind: ProtoK
         </ul>
         <p className="mt-3 text-xs text-muted-foreground">{c.realNote} <Link to="/pricing" className="font-semibold text-[var(--emma-violet)]">{c.seePricing}</Link></p>
       </div>
-      <div className="flex flex-col gap-2 sm:min-w-[230px]">
+      <div className="flex flex-col gap-2 sm:min-w-[230px] sm:max-w-[300px]">
+        <NextCallTimes source={`prototype_${kind}`} compact title="Talk it through this week" />
         <Button asChild className="btn-gold h-11 rounded-full"><Link to="/book" search={slug ? { prototype: slug } : {}} onClick={() => track("cta_click", { cta: "prototype_book", kind })}><CalendarCheck /> {c.bookCall}</Link></Button>
         <Button asChild variant="outline" className="h-11 rounded-full"><a href={wa} target="_blank" rel="noopener noreferrer" onClick={() => track("cta_click", { cta: "prototype_whatsapp", kind })}><MessageCircle className="text-[#25d366]" /> {c.whatsappUs}</a></Button>
         <Button type="button" variant="ghost" className="h-11 rounded-full" onClick={onSave}><QrCode /> {c.save}</Button>

@@ -3,6 +3,7 @@
 import { DEFAULT_SHOW, KIND_LABEL, detectIndustry, genericTitle, industryName, scrub, showcaseRequestSchema, stableStringify, unsuitable } from "@/lib/showcase";
 import { NICHES } from "@/lib/niches";
 import { signContent, verifyContent } from "@/lib/ai/content-sign";
+import { buildShowcaseItem } from "@/lib/showcase-build";
 
 const R: [string, boolean, unknown?][] = [];
 const t = (n: string, ok: boolean, info?: unknown) => R.push([n, ok, info]);
@@ -68,6 +69,31 @@ t("schema: rejects bad sig", !showcaseRequestSchema.safeParse({ kind: "app", sig
 t("schema: rejects unknown kind", !showcaseRequestSchema.safeParse({ kind: "video", sig: "a".repeat(64), content: {} }).success);
 const ok = showcaseRequestSchema.safeParse({ kind: "plan", sig: "a".repeat(64), content: {} });
 t("schema: defaults", ok.success && ok.data.lang === "en" && ok.data.showBusiness === false && ok.data.showSite === false);
+
+// ── building the public item for every kind (the server's real code path, minus the database)
+const base = { sig: "a".repeat(64), lang: "en", showBusiness: false, showSite: false } as const;
+const B = (x: Record<string, unknown>) => buildShowcaseItem(showcaseRequestSchema.parse({ ...base, ...x }));
+const HTML = "<!doctype html><html><body><h1>Crumb Corner</h1></body></html>";
+const em = B({ kind: "emails", business: "Crumb Corner", content: { businessName: "Crumb Corner", ownerName: "Ada", businessType: "bakery", goal: "Welcome", emails: [{ day: 0, subject: "Welcome to Crumb Corner", preview: "Hi", body: "Hi {first_name},\n\nI'm Ada from Crumb Corner. Call 0803 123 4567.\n\nWarmly,\nAda" }] } });
+t("build emails: title from business type", !("error" in em) && em.title === "Bakery email sequence: Welcome", em);
+const body = !("error" in em) ? String(((em.payload.emails as { body: string }[])[0]).body) : "";
+t("build emails: paragraphs kept, names/phone hidden", body.includes("\n\n") && body.includes("[your name] from [business]") && body.includes("[phone]") && !/Crumb|Ada\b|0803/.test(body), body);
+const em2 = B({ kind: "emails", business: "Crumb Corner", showBusiness: true, content: { businessName: "Crumb Corner", ownerName: "Ada", businessType: "bakery", goal: "Welcome", emails: [{ day: 0, subject: "Hi from Ada", preview: "", body: "Ada here" }] } });
+t("build emails: business shown when ticked, owner never", !("error" in em2) && em2.title.startsWith("Crumb Corner") && JSON.stringify(em2.payload).includes("[your name]") && !JSON.stringify(em2.payload).includes("Ada"), em2);
+const pl = B({ kind: "plan", content: { role: "Founder", goal: "10 customers", plan: { headline: "Build a Repeat-Customer\nHome Bakery", northStar: "10 regulars", milestones: [{ outcome: "o", measure: "m" }], weeks: [{ focus: "f", actions: ["a"] }], habits: ["h"] } } });
+t("build plan: '90-day plan: headline' on one line", !("error" in pl) && pl.title === "90-day plan: Build a Repeat-Customer Home Bakery", pl);
+const au = B({ kind: "audit", showSite: true, content: { host: "example.com", score: 62, pillars: { speed: 50 }, headline: "Slow", summary: "S", priorities: [{ title: "Fix", impact: "high" }] } });
+t("build audit: host only when it's theirs", !("error" in au) && au.title === "example.com: 62/100" && (au.payload as { host?: string }).host === "example.com");
+const au2 = B({ kind: "audit", content: { host: "example.com", score: 62, pillars: {}, headline: "Slow", summary: "S", priorities: [] } });
+t("build audit: no host by default", !("error" in au2) && !au2.title.includes("example") && !("host" in au2.payload));
+const ap = B({ kind: "app", prompt: "Booking app for my salon, call 08031234567", content: { html: HTML, platform: "android" } });
+t("build app: html kept, prompt scrubbed, platform", !("error" in ap) && String(ap.payload.html).includes("<h1>") && ap.payload.platform === "android" && !String(ap.summary).includes("0803") && ap.industry === "salon", ap);
+const ws = B({ kind: "website", prompt: "Menu site", content: { html: HTML, pages: ["Home", "Menu"] } });
+t("build website: pages kept", !("error" in ws) && JSON.stringify(ws.payload.pages) === '["Home","Menu"]');
+const mk = B({ kind: "makeover", prompt: "", content: { html: HTML, style: "luxury" } });
+t("build makeover", !("error" in mk) && mk.summary === "Style: luxury");
+const big = B({ kind: "website", content: { html: "<!doctype html><html><body>" + "x".repeat(180000) + "</body></html>" } });
+t("build: oversized prototype refused", "error" in big);
 
 // ── signatures (tool output only)
 await (async () => {

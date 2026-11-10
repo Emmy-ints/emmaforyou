@@ -57,7 +57,9 @@ export const handleShowcase = createServerOnlyFn(async (request: Request) => {
 
   // 2. Build a privacy-safe item per kind.
   const showName = v.showBusiness && v.business ? v.business : null;
-  const names = [v.business, ...(kind === "emails" ? [s(c.businessName, 80), s(c.ownerName, 60)] : [])].filter((x): x is string => !!x && !showName?.includes(x));
+  const names = [v.business, ...(kind === "emails" ? [s(c.businessName, 80)] : [])].filter((x): x is string => !!x && !showName?.includes(x));
+  // The owner's own name is never shown (even when the business name is).
+  const people = kind === "emails" ? [s(c.ownerName, 60)].filter((x) => x.length >= 3) : [];
   let item: Built;
   if (kind === "app" || kind === "website") {
     const html = cleanGeneratedHtml(c.html as string);
@@ -89,15 +91,15 @@ export const handleShowcase = createServerOnlyFn(async (request: Request) => {
       payload: { score: Number(c.score) || 0, pillars: c.pillars, headline: scrub(s(c.headline, 200), { names }), summary: scrub(s(c.summary, 700), { names, max: 600 }), priorities, ...(v.showSite ? { host } : {}) },
     };
   } else if (kind === "emails") {
-    const emails = Array.isArray(c.emails) ? (c.emails as Record<string, unknown>[]).slice(0, 5).map((e) => ({ day: Number(e.day) || 0, subject: scrub(s(e.subject, 90), { names, max: 90 }), preview: scrub(s(e.preview, 120), { names, max: 120 }), body: scrub(String(e.body ?? "").slice(0, 1500), { names, max: 1500 }) })) : [];
+    const emails = Array.isArray(c.emails) ? (c.emails as Record<string, unknown>[]).slice(0, 5).map((e) => ({ day: Number(e.day) || 0, subject: scrub(s(e.subject, 90), { names, people, max: 90 }), preview: scrub(s(e.preview, 120), { names, people, max: 120 }), body: scrub(String(e.body ?? "").slice(0, 1500), { names, people, max: 1500 }) })) : [];
     const industry = detectIndustry(s(c.businessType, 40), v.prompt);
-    item = { title: showName ? `${showName}: ${s(c.goal, 40)} emails` : genericTitle("emails", industry, s(c.goal, 40)), summary: `${emails.length} emails · ${s(c.goal, 40)}`, industry, business: showName, payload: { goal: s(c.goal, 40), businessType: s(c.businessType, 40), emails } };
+    item = { title: showName ? `${showName}: ${s(c.goal, 40)} emails` : (clean(c.businessType, 40) ? `${clean(c.businessType, 40).charAt(0).toUpperCase()}${clean(c.businessType, 40).slice(1)} email sequence: ${s(c.goal, 40)}`.slice(0, 90) : genericTitle("emails", industry, s(c.goal, 40))), summary: `${emails.length} emails · ${s(c.goal, 40)}`, industry, business: showName, payload: { goal: s(c.goal, 40), businessType: s(c.businessType, 40), emails } };
   } else {
     const plan = (c.plan ?? {}) as Record<string, unknown>;
     const industry = detectIndustry(s(c.role, 60), s(c.goal, 300));
     const clean = (x: unknown, n: number) => scrub(s(x, n), { names, max: n });
     item = {
-      title: genericTitle("plan", industry, clean(plan.headline, 60) || undefined),
+      title: clean(plan.headline, 60) ? `90-day plan: ${clean(plan.headline, 60)}`.slice(0, 90) : genericTitle("plan", industry),
       summary: clean(plan.northStar, 300) || clean(c.goal, 300), industry, business: showName,
       payload: {
         role: clean(c.role, 60), northStar: clean(plan.northStar, 400),
@@ -117,7 +119,7 @@ export const handleShowcase = createServerOnlyFn(async (request: Request) => {
   for (let i = 0; i < 3; i++) {
     const slug = rand(12);
     const { error } = await db.from("showcase_items").insert({
-      slug, kind, title: item.title, summary: item.summary, industry: item.industry, place: v.place ? scrub(v.place, { max: 60 }) : null,
+      slug, kind, title: item.title.replace(/\s+/g, " ").trim(), summary: item.summary ? item.summary.replace(/\s+/g, " ").trim() : null, industry: item.industry, place: v.place ? scrub(v.place, { max: 60 }) : null,
       business: item.business, payload: item.payload, lang: v.lang, remove_hash: await sha256(token), visitor_hash: visitor,
     });
     if (!error) return Response.json({ slug, token, title: item.title, path: `/showcase/${slug}` }, { headers: { "Cache-Control": "no-store" } });

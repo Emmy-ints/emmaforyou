@@ -51,13 +51,21 @@ const PHONE = /(?:\+?\d[\d\s().-]{6,}\d)/g;
 const URLISH = /\b(?:https?:\/\/|www\.)\S+|\b[a-z0-9-]+\.(?:com|ng|net|org|io|co|uk|de|fr|app|shop|store)(?:\/\S*)?\b/gi;
 
 /** Remove contact details (emails, phone numbers, links) and optionally names from free text. */
-export function scrub(text: string, opts: { names?: string[]; max?: number } = {}): string {
+export function scrub(text: string, opts: { names?: string[]; people?: string[]; max?: number } = {}): string {
   let s = String(text ?? "").replace(EMAIL, "[email]").replace(URLISH, "[link]").replace(PHONE, (m) => (m.replace(/\D/g, "").length >= 7 ? "[phone]" : m));
-  for (const n of opts.names ?? []) {
-    const name = n.trim();
-    if (name.length >= 3) s = s.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "[business]");
-  }
-  s = s.replace(/\s+/g, " ").trim();
+  const swap = (list: string[] | undefined, label: string) => {
+    for (const n of list ?? []) {
+      const name = n.trim();
+      if (name.length < 3) continue;
+      const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      // Whole words only, so "Ada" doesn't eat "Adapt".
+      s = s.replace(new RegExp(`${/^\w/.test(name) ? "\\b" : ""}${esc}${/\w$/.test(name) ? "\\b" : ""}`, "gi"), label);
+    }
+  };
+  swap(opts.names, "[business]");
+  swap(opts.people, "[your name]");
+  // Tidy spacing but keep paragraphs (emails and plans are written in paragraphs).
+  s = s.replace(/[^\S\n]+/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim();
   const max = opts.max ?? 400;
   return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
 }

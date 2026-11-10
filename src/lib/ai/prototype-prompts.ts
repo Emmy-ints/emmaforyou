@@ -27,7 +27,7 @@ Structure:
 - Navigation switches pages with JavaScript (buttons or href="#" with preventDefault) and scrolls to the top. Every call-to-action button leads to a relevant page (e.g. "Book now" opens Booking or Contact).
 - Each page has real, topic-specific content: hero, sections and a footer that repeats the navigation.
 - Interactions work in memory: e.g. shop pages with filters and a cart with totals, booking pages with date/time selection and a demo confirmation, contact forms with validation and a "Demo: message received" confirmation, FAQ accordions, gallery lightbox.
-- Design for 375px through 1440px with professional typography, intentional colours and accessible labels.`;
+- Design for 375px through 1440px with professional typography, intentional colours and accessible labels. Every section's content sits inside a centred container with side padding of at least 20px at every width (text and buttons never touch the edge of the screen).`;
 
 export function buildInstructions(input: PrototypeRequest): string {
   const lang = `All visible copy must be in ${LANG[input.language] ?? "English"}.`;

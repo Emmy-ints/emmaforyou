@@ -43,6 +43,9 @@ t("scrub ignores 1-2 letter names", scrub("A big day", { names: ["A"] }) === "A 
 t("scrub escapes regex in names", scrub("Hi (Ada+Co)", { names: ["(Ada+Co)"] }) === "Hi [business]");
 t("scrub max length with ellipsis", scrub("x".repeat(500), { max: 50 }).length === 50 && scrub("x".repeat(500), { max: 50 }).endsWith("…"));
 
+t("scrub keeps paragraphs", scrub("Hi there,\n\nPara one.   More.\n\n\n\nBest,\nAda", { max: 500 }) === "Hi there,\n\nPara one. More.\n\nBest,\nAda");
+t("scrub people get their own label, whole words only", scrub("I'm Ada from Crumb Corner. Adapt fast. Warmly, Ada", { names: ["Crumb Corner"], people: ["Ada"] }) === "I'm [your name] from [business]. Adapt fast. Warmly, [your name]");
+
 // ── blocklist
 t("unsuitable catches profanity", unsuitable("this is shit"));
 t("unsuitable catches betting", unsuitable(undefined, "Casino promo app"));

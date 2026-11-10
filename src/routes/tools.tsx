@@ -51,7 +51,7 @@ function Page() {
             </ul>
           </section>
         ))}
-        <ShowcaseStrip inset title="What visitors made with these tools" />
+        <ShowcaseStrip inset min={1} title="What visitors made with these tools" />
       </div>
     </ToolShell>
   );

@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { likeShowcase } from "@/lib/showcase-data";
 import { KIND_LABEL, industryName, myItems, type ShowcaseKind } from "@/lib/showcase";
 import { previewDocument } from "@/lib/prototype";
-import { pageHead } from "@/lib/seo";
+import { FOUNDER, pageHead } from "@/lib/seo";
 import { track } from "@/lib/analytics";
 
 interface Item extends Omit<ShowcaseListItem, "preview"> { payload: Record<string, unknown> }
@@ -119,6 +119,11 @@ function ShowcaseItemPage() {
           </div>
           <a href={buildLike(item)} onClick={() => track("cta_click", { cta: "showcase_build_like", kind: k })} className="btn-primary-gradient inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 font-semibold text-white"><WandSparkles className="h-5 w-5" aria-hidden="true" /> {k === "audit" ? "Audit my website" : k === "emails" ? "Write my email sequence" : k === "plan" ? "Make my 90-day plan" : "Build one like this, free"}</a>
           <Link to="/book" onClick={() => track("cta_click", { cta: "showcase_book", kind: k })} className="btn-gold inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 font-semibold"><CalendarCheck className="h-4 w-4" aria-hidden="true" /> Get the real one built</Link>
+          {/* Hand-placed founder note (so the site-wide byline doesn't sit under the visitor's title like an author credit). */}
+          <Link to="/about" data-founder-presence className="flex items-center gap-3 rounded-2xl bg-muted/60 p-3 text-xs text-muted-foreground hover:text-foreground">
+            <img src="/images/emmanuel.webp" alt="" width={40} height={40} loading="lazy" className="h-10 w-10 shrink-0 rounded-full object-cover object-top" />
+            <span><strong className="block text-sm text-foreground">{FOUNDER.name}</strong>Builds the real, working version for your business.</span>
+          </Link>
           <div className="grid gap-2 border-t border-border pt-4">
             <p className="text-sm font-semibold">Share</p>
             <div className="flex flex-wrap gap-2">

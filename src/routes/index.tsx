@@ -177,7 +177,7 @@ function HomeShowcase() {
   return (
     <div className="pb-6">
       <ShowcaseCounters className="mx-auto max-w-5xl px-5" />
-      <ShowcaseStrip min={3} />
+      <ShowcaseStrip min={1} />
     </div>
   );
 }

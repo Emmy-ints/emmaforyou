@@ -2616,11 +2616,11 @@ a.itn-card:hover { transform: translateY(-2px); }
 .sc-mail span, .sc-ms span { font-size: .62rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--emma-violet, #6d5bff); }
 .sc-mail b, .sc-ms b { font-size: .78rem; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .sc-strip { padding-block: 56px; }
-.sc-strip-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 280px); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 20px max(20px, calc((100vw - 72rem) / 2 + 20px)) 12px; scrollbar-width: thin; }
+.sc-strip-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 280px); gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 20px max(20px, calc((100vw - 72rem) / 2 + 20px)) 12px; scrollbar-width: thin; scroll-padding-inline: max(20px, calc((100vw - 72rem) / 2 + 20px)); }
 .sc-strip-row > li { scroll-snap-align: start; min-width: 0; }
 .sc-strip-inset { padding-block: 8px 0; }
 .sc-strip-inset > div { padding-inline: 0; }
-.sc-strip-inset .sc-strip-row { padding: 20px 0 12px; }
+.sc-strip-inset .sc-strip-row { padding: 20px 0 12px; scroll-padding-inline: 0; }
 .sc-counters { display: grid; justify-items: center; gap: 8px; }
 .sc-counters ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 .sc-counters li { display: grid; min-width: 140px; padding: 12px 18px; border-radius: 18px; border: 1px solid var(--border); background: var(--card); text-align: center; }

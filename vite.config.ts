@@ -19,7 +19,10 @@ function git(args: string) {
 function appVersion() {
   try { return String(JSON.parse(readFileSync("package.json", "utf8")).version ?? "unknown"); } catch { return "unknown"; }
 }
-const COMMIT_FULL = git("rev-parse HEAD");
+// Vercel builds from a checkout without git metadata available to the build; it gives the commit in VERCEL_GIT_COMMIT_SHA.
+const COMMIT_FULL = process.env.VERCEL_GIT_COMMIT_SHA || git("rev-parse HEAD");
+// Which host built this bundle (the same source deploys to Lovable and to Vercel).
+const BUILD_HOST = process.env.VERCEL ? "vercel" : "lovable";
 
 export default defineConfig({
   vite: {
@@ -29,6 +32,7 @@ export default defineConfig({
       __EFY_COMMIT_FULL__: JSON.stringify(COMMIT_FULL),
       __EFY_APP_VERSION__: JSON.stringify(appVersion()),
       __EFY_BUILD_ENV__: JSON.stringify(process.env.NODE_ENV || "production"),
+      __EFY_BUILD_HOST__: JSON.stringify(BUILD_HOST),
     },
   },
 });

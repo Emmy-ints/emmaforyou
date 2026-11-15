@@ -8,6 +8,7 @@ declare const __EFY_COMMIT__: string | undefined;
 declare const __EFY_COMMIT_FULL__: string | undefined;
 declare const __EFY_APP_VERSION__: string | undefined;
 declare const __EFY_BUILD_ENV__: string | undefined;
+declare const __EFY_BUILD_HOST__: string | undefined;
 
 const v = (x: string | undefined) => (typeof x === "string" && x && x !== "unknown" ? x : null);
 
@@ -19,5 +20,7 @@ export const BUILD_INFO = {
   builtAt: v(typeof __EFY_BUILT_AT__ !== "undefined" ? __EFY_BUILT_AT__ : undefined),
   appVersion: v(typeof __EFY_APP_VERSION__ !== "undefined" ? __EFY_APP_VERSION__ : undefined),
   environment: v(typeof __EFY_BUILD_ENV__ !== "undefined" ? __EFY_BUILD_ENV__ : undefined),
+  /** "lovable" or "vercel": the same source deploys to both. */
+  host: v(typeof __EFY_BUILD_HOST__ !== "undefined" ? __EFY_BUILD_HOST__ : undefined),
 };
 export const BUILD_IDENTITY: "ok" | "unavailable" = BUILD_INFO.commit && BUILD_INFO.builtAt ? "ok" : "unavailable";

@@ -1,0 +1,64 @@
+# Deploys every push to `main` to the Vercel copy of the site (project "emmaforyou", team DIsco Sundays LLC).
+# Lovable keeps building from the same commits on its own; this workflow doesn't touch Lovable.
+#
+# Why a workflow: Vercel's own GitHub integration is linked to a different GitHub account
+# (OhitsdiscosundaysLLC), so Vercel can't watch this repo directly. Vercel builds public repos
+# by URL, so this asks Vercel to build the exact commit that was pushed.
+#
+# Needs one repository secret: VERCEL_TOKEN (Vercel → Account Settings → Tokens, scoped to the
+# DIsco Sundays LLC team). Without it the job skips itself.
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TEAM_ID: team_tsXNlOi370FNHfJJ6U9VcIsm
+      VERCEL_PROJECT_ID: prj_BcbAp5sfcqGOxFFU4ZucgeWBAvu2
+    steps:
+      - name: Start the Vercel production build for this commit
+        id: start
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::VERCEL_TOKEN secret is not set, so the Vercel deploy was skipped."
+            exit 0
+          fi
+          body=$(jq -n --arg sha "$GITHUB_SHA" --arg project "$VERCEL_PROJECT_ID" '{
+            name: "emmaforyou", project: $project, target: "production",
+            gitSource: { type: "github", org: "Emmy-ints", repo: "emmaforyou", ref: "main", sha: $sha }
+          }')
+          res=$(curl -sS -X POST "https://api.vercel.com/v13/deployments?teamId=$VERCEL_TEAM_ID&forceNew=1&skipAutoDetectionConfirmation=1" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" -d "$body")
+          id=$(echo "$res" | jq -r '.id // empty')
+          if [ -z "$id" ]; then echo "::error::Vercel refused the deployment: $(echo "$res" | jq -c '.error // .')"; exit 1; fi
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+          echo "Started https://$(echo "$res" | jq -r .url)"
+
+      - name: Wait for the build to finish
+        if: steps.start.outputs.id != ''
+        run: |
+          for i in $(seq 1 90); do
+            state=$(curl -sS "https://api.vercel.com/v13/deployments/${{ steps.start.outputs.id }}?teamId=$VERCEL_TEAM_ID" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" | jq -r '.readyState')
+            echo "state: $state"
+            case "$state" in
+              READY) exit 0 ;;
+              ERROR|CANCELED) echo "::error::Vercel build $state. See the deployment's build logs in Vercel."; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::Timed out waiting for Vercel."; exit 1

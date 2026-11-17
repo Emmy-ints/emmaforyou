@@ -5,6 +5,7 @@ import { getLovableAiGatewayResponseHeaders } from "./run-id.ts";
 import { aiProvider, classifyFailure, visitorSalt, type ProviderFailure } from "./provider";
 import { signPrototype } from "./proto-sign";
 import { buildInstructions, buildUserMessage } from "./prototype-prompts";
+import { adminDb, memoryLimit, memoryRecord } from "./guard";
 
 export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   const origin = request.headers.get("origin");
@@ -26,9 +27,9 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
   const provider = aiProvider();
   if (!provider) return Response.json({ message: "The prototype builder isn't available right now. Please chat with us on WhatsApp." }, { status: 503 });
   // Only trusted same-origin generation requests can reach private circuit-breaker state.
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // adminDb() degrades to an "unavailable" stand-in when the database can't be used; limits then fall back to memory.
+  const supabaseAdmin = await adminDb();
   const { data: blocked, error: stateError } = await supabaseAdmin.from("prototype_ai_access_state").select("status,message,updated_at").eq("id", provider.pauseId).maybeSingle();
-  if (stateError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
   // A credit/access failure pauses generation for a while, then retries on its own (e.g. after credits are topped up).
   if (blocked && Date.now() - new Date(blocked.updated_at).getTime() < BLOCK_COOLDOWN_MS) {
     return Response.json({ message: "The prototype builder is taking a short break. Please try again later, or chat with us on WhatsApp." }, { status: 503 });
@@ -46,20 +47,24 @@ export const handlePrototype = createServerOnlyFn(async (request: Request) => {
     supabaseAdmin.from("prototype_generations").select("created_at").eq("visitor_hash", visitorHash).in("kind", kinds).gte("created_at", since).order("created_at", { ascending: true }),
     supabaseAdmin.from("prototype_generations").select("id", { count: "exact", head: true }).in("kind", kinds).gte("created_at", since),
   ]);
-  if (mineError || allError) return Response.json({ message: "AI generation is temporarily unavailable. Please try later." }, { status: 503 });
-  if ((mine?.length ?? 0) >= perVisitor) {
-    const oldest = new Date(mine![0].created_at).getTime();
+  const dbDown = Boolean(stateError || mineError || allError);
+  const mem = dbDown ? memoryLimit(`proto:${kinds.join("+")}`, visitorHash, perVisitor, GLOBAL_PER_HOUR) : null;
+  const usedCount = mem ? mem.used : (mine?.length ?? 0);
+  const totalCount = mem ? mem.total * 2 : (everyone ?? 0);
+  if (usedCount >= perVisitor) {
+    const oldest = mem ? (mem.oldest ?? Date.now()) : new Date(mine![0].created_at).getTime();
     const minutes = Math.max(1, Math.ceil((oldest + HOUR_MS - Date.now()) / 60000));
     return Response.json(
       { message: input.repair ? "We couldn't fix this prototype automatically right now. Try Regenerate, or chat with us on WhatsApp." : `You've used your ${PER_VISITOR_PER_HOUR} free prototypes for this hour. You can create more in about ${minutes} minute${minutes === 1 ? "" : "s"} — or chat with us on WhatsApp and we'll build the real thing.`, retryAfterMinutes: minutes },
       { status: 429, headers: { "Retry-After": String(minutes * 60) } },
     );
   }
-  if ((everyone ?? 0) >= GLOBAL_PER_HOUR) {
+  if (totalCount >= GLOBAL_PER_HOUR) {
     return Response.json({ message: "The prototype builder is very busy right now. Please try again in a little while." }, { status: 429, headers: { "Retry-After": "900" } });
   }
-  const { data: logged } = await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.repair ? "repair" : input.refinement ? "refine" : "new" }).select("id").maybeSingle();
-  const remaining = input.repair ? -1 : PER_VISITOR_PER_HOUR - (mine?.length ?? 0) - 1;
+  memoryRecord(`proto:${kinds.join("+")}`, visitorHash);
+  const { data: logged } = dbDown ? { data: null } : await supabaseAdmin.from("prototype_generations").insert({ visitor_hash: visitorHash, kind: input.repair ? "repair" : input.refinement ? "refine" : "new" }).select("id").maybeSingle();
+  const remaining = input.repair ? -1 : PER_VISITOR_PER_HOUR - usedCount - 1;
 
   let notifyReady: (response: Response | null) => void = () => {};
   const ready = new Promise<Response | null>((resolve) => { notifyReady = resolve; });

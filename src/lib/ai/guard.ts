@@ -55,22 +55,70 @@ export async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * Stand-in for the database when the server can't use it (admin key not set on this host, or the database
+ * is paused). Every query chain resolves to `{ data: null, error }` like a normal failed query, so callers
+ * degrade instead of crashing.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function offlineDb(reason: string): any {
+  const result = { data: null, error: { message: reason, code: "db_unavailable" }, count: null, status: 503 };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chain: any = new Proxy(function () { /* callable */ }, {
+    get(_t, prop) {
+      if (prop === "then") return (ok: (v: unknown) => unknown, bad?: (e: unknown) => unknown) => Promise.resolve(result).then(ok, bad);
+      if (prop === "catch" || prop === "finally") return (fn: () => unknown) => Promise.resolve(result).finally(fn);
+      return chain;
+    },
+    apply() { return chain; },
+  });
+  return chain;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function adminDb(): Promise<any> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
+  try {
+    // Touch the client so a missing SUPABASE_SERVICE_ROLE_KEY shows up here instead of inside a handler.
+    void supabaseAdmin.from;
+    return supabaseAdmin;
+  } catch {
+    return offlineDb("Database admin access is not configured on this host.");
+  }
+}
+
+// ── Fallback usage limits (in this server's memory) for when the database can't be reached. ──
+// They keep the AI tools working through a database outage while still capping use per visitor and overall.
+const memUses = new Map<string, number[]>();
+let memPauseUntil = 0;
+function memRecent(key: string, now: number): number[] {
+  const list = (memUses.get(key) ?? []).filter((t) => now - t < HOUR_MS);
+  memUses.set(key, list);
+  return list;
+}
+/** Exported for tests. */
+export function memoryLimit(kind: string, visitor: string, perVisitor: number, global: number, now = Date.now()): { used: number; total: number; oldest: number | null } {
+  const mine = memRecent(`${kind}|${visitor}`, now);
+  const all = memRecent(`${kind}|*`, now);
+  return { used: mine.length, total: all.length, oldest: mine[0] ?? null };
+}
+export function memoryRecord(kind: string, visitor: string, now = Date.now()) {
+  memRecent(`${kind}|${visitor}`, now).push(now);
+  memRecent(`${kind}|*`, now).push(now);
+  if (memUses.size > 5000) for (const k of [...memUses.keys()].slice(0, 1000)) memUses.delete(k);
 }
 
 /** Is the given provider currently paused after a credit/key failure? */
 export async function providerPaused(provider: AiProvider): Promise<{ paused: boolean; error: boolean }> {
   const db = await adminDb();
   const { data, error } = await db.from("prototype_ai_access_state").select("updated_at").eq("id", provider.pauseId).maybeSingle();
-  if (error) return { paused: false, error: true };
+  if (error) return { paused: Date.now() < memPauseUntil, error: true };
   return { paused: Boolean(data && Date.now() - new Date(data.updated_at).getTime() < PAUSE_MS), error: false };
 }
 
 /** Record a credit/key failure so every AI feature on this provider pauses for a while instead of failing repeatedly. */
 export async function pauseProvider(provider: AiProvider, status: number, message: string): Promise<void> {
+  memPauseUntil = Date.now() + PAUSE_MS;
   try {
     const db = await adminDb();
     await db.from("prototype_ai_access_state").upsert({ id: provider.pauseId, status, message: message.slice(0, 200), updated_at: new Date().toISOString() });
@@ -90,7 +138,7 @@ export async function checkLimits(
   if (!configured && !limits.worksWithoutAi) return fail("AI is not configured yet.", 503);
   const db = await adminDb();
   const state = configured ? await providerPaused(configured) : { paused: true, error: false };
-  if (state.error && !limits.worksWithoutAi) return fail("AI tools are temporarily unavailable. Please try later.", 503);
+  // A database outage no longer blocks the AI: limits fall back to this server's memory (see memoryLimit).
   const aiPaused = !configured || state.paused;
   if (aiPaused && !limits.worksWithoutAi) {
     return fail("Our AI tools are taking a short break. Please try again later, or chat with us on WhatsApp.", 503);
@@ -101,16 +149,29 @@ export async function checkLimits(
     db.from("prototype_generations").select("created_at").eq("visitor_hash", visitor).eq("kind", kind).gte("created_at", since).order("created_at", { ascending: true }),
     db.from("prototype_generations").select("id", { count: "exact", head: true }).eq("kind", kind).gte("created_at", since),
   ]);
-  if (mine.error || all.error) return fail("This tool is temporarily unavailable. Please try later.", 503);
-  const used = mine.data?.length ?? 0;
+  const dbDown = Boolean(state.error || mine.error || all.error);
+  let used: number, total: number, oldest: number | null;
+  if (dbDown) {
+    // Stricter overall cap while counting in memory (each server instance counts on its own).
+    ({ used, total, oldest } = memoryLimit(kind, visitor, limits.perVisitor, limits.global));
+    total = total * 2;
+  } else {
+    used = mine.data?.length ?? 0;
+    total = all.count ?? 0;
+    oldest = used ? new Date(mine.data[0].created_at).getTime() : null;
+  }
   if (used >= limits.perVisitor) {
-    const oldest = new Date(mine.data[0].created_at).getTime();
-    const minutes = Math.max(1, Math.ceil((oldest + HOUR_MS - Date.now()) / 60000));
+    const minutes = Math.max(1, Math.ceil(((oldest ?? Date.now()) + HOUR_MS - Date.now()) / 60000));
     return fail(`You've used your ${limits.perVisitor} free ${limits.label} for this hour. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}, or chat with us on WhatsApp.`, 429, { retryAfterMinutes: minutes });
   }
-  if ((all.count ?? 0) >= limits.global) return fail("This tool is very busy right now. Please try again in a little while.", 429);
-  const { data: logged } = await db.from("prototype_generations").insert({ visitor_hash: visitor, kind }).select("id").maybeSingle();
-  return { ok: true, provider: aiPaused ? null : configured, remaining: Math.max(0, limits.perVisitor - used - 1), aiPaused, logId: (logged?.id as string | undefined) ?? null };
+  if (total >= limits.global) return fail("This tool is very busy right now. Please try again in a little while.", 429);
+  memoryRecord(kind, visitor);
+  let logId: string | null = null;
+  if (!dbDown) {
+    const { data: logged } = await db.from("prototype_generations").insert({ visitor_hash: visitor, kind }).select("id").maybeSingle();
+    logId = (logged?.id as string | undefined) ?? null;
+  }
+  return { ok: true, provider: aiPaused ? null : configured, remaining: Math.max(0, limits.perVisitor - used - 1), aiPaused, logId };
 }
 
 /** Give a use back when the request failed for reasons outside the visitor's control (e.g. their site was unreachable, or the AI failed and nothing was produced). */

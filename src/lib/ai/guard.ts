@@ -72,7 +72,8 @@ export function offlineDb(reason: string): any {
     },
     apply() { return chain; },
   });
-  return chain;
+  // The client itself must not be awaitable (adminDb is async and would unwrap it); only query chains are.
+  return { from: () => chain, rpc: () => chain, storage: { from: () => chain }, schema: () => ({ from: () => chain, rpc: () => chain }) };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

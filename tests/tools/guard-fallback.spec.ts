@@ -14,6 +14,8 @@ await (async () => {
   t("offline: rpc resolves", !!c.error);
   let caught = false; try { await db.from("x").insert({}).select("id").maybeSingle(); } catch { caught = true; }
   t("offline: never throws", !caught);
+  const viaAsync = await (async () => offlineDb("down"))();
+  t("offline: survives being returned from an async function", typeof viaAsync.from === "function");
   const d = await db.storage.from("bucket").upload("p", new Blob(["x"]));
   t("offline: storage resolves", !!d.error);
 })();
